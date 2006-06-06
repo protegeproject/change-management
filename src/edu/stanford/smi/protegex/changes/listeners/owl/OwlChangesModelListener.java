@@ -23,6 +23,7 @@
 
 package edu.stanford.smi.protegex.changes.listeners.owl;
 
+import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protegex.changes.ChangeCreateUtil;
 import edu.stanford.smi.protegex.changes.ChangesTab;
@@ -36,8 +37,8 @@ public class OwlChangesModelListener extends ModelAdapter{
 
 	public void classCreated(RDFSClass arg0) {
 		String clsName = arg0.getBrowserText();
-		String context = "Class created: " + clsName;
-
+		String context = "Created Class: " + clsName;
+        
 		String frameId = arg0.getFrameID().toString();
 		if (!Util.frameExists(frameId)) {
 			Util.updateMap(frameId, clsName);	
@@ -52,18 +53,25 @@ public class OwlChangesModelListener extends ModelAdapter{
 		ChangesTab.createChange(changeInst);
 	}
 
+	
+	
+
 	public void classDeleted(RDFSClass arg0) {
-		String frameID = arg0.getFrameID().toString();
-		String clsName = Util.getName(frameID);
-		String context = "Class deleted: " + clsName;
-		
-		Instance changeInst = ChangeCreateUtil.createChange(
-												ChangesTab.getChangesKB(),
-												ChangeCreateUtil.CHANGETYPE_CLASS_DELETED,
-												clsName, 
-												context, 
-												ChangeCreateUtil.CHANGE_LEVEL_INFO);
-		ChangesTab.createChange(changeInst);
+//		
+//		String frameID = arg0.getFrameID().toString();
+//
+//		String clsName = Util.getName(frameID);
+//		
+//		
+//		String context = "Class deleted: " + clsName;
+//		
+//		Instance changeInst = ChangeCreateUtil.createChange(
+//												ChangesTab.getChangesKB(),
+//												ChangeCreateUtil.CHANGETYPE_CLASS_DELETED,
+//												clsName, 
+//				               				    context, 
+//												ChangeCreateUtil.CHANGE_LEVEL_INFO);
+//		ChangesTab.createChange(changeInst);
 	}
 
 	public void individualCreated(RDFResource arg0) {
@@ -74,7 +82,7 @@ public class OwlChangesModelListener extends ModelAdapter{
 
 	public void propertyCreated(RDFProperty arg0) {
 		String propName = arg0.getBrowserText();
-		String context = "Property created: " + propName;
+		String context = "Property Created: " + propName;
 
 		String frameId = arg0.getFrameID().toString();
 		if (!Util.frameExists(frameId)) {
@@ -92,7 +100,7 @@ public class OwlChangesModelListener extends ModelAdapter{
 
 	public void propertyDeleted(RDFProperty arg0) {
 		String propName = Util.getName(arg0.getFrameID().toString());
-		String context = "Property deleted: " + propName;
+		String context = "Property Deleted: " + propName;
 		
 		Instance changeInst = ChangeCreateUtil.createChange(
 												ChangesTab.getChangesKB(),

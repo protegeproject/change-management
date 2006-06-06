@@ -90,7 +90,7 @@ public class ChangesTab extends AbstractTabWidget {
 	public static final String TRANS_SIGNAL_START = "start";
 	
 	
-	private static final String ANNOTATION_PROJECT_EXISTS = "annotation_proj_exists";
+	public static final String ANNOTATION_PROJECT_EXISTS = "annotation_proj_exists";
 	private static final String CHANGES_TAB_NAME = "Changes";
 	
 	private static String userName;

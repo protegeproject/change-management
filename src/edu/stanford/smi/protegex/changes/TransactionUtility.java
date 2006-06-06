@@ -257,7 +257,7 @@ public class TransactionUtility {
 	
 	// Decompose context into its constituent parts for "Action: name (added to: actUpon)"
 	private static ArrayList decomposeContext(String context, String actUponStr) {
-		ArrayList result = new ArrayList<String>();
+		ArrayList result = new ArrayList();
 		
 		String action = context.substring(context.indexOf(":")+1, context.length()).trim();
 		String name = action.substring(0, action.lastIndexOf(actUponStr)-1);
