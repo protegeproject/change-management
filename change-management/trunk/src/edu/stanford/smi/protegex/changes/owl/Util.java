@@ -33,6 +33,7 @@ import edu.stanford.smi.protege.model.CommandManager;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.framestore.undo.MacroCommand;
 import edu.stanford.smi.protege.model.framestore.undo.UndoFrameStore;
+import edu.stanford.smi.protegex.changes.listeners.owl.ChangesOwlKBListener;
 import edu.stanford.smi.protegex.changes.listeners.ChangesTransListener;
 import edu.stanford.smi.protegex.changes.listeners.owl.OwlChangesClassListener;
 import edu.stanford.smi.protegex.changes.listeners.owl.OwlChangesModelListener;
@@ -57,6 +58,7 @@ public class Util {
 		((AbstractOWLModel) kb).addModelListener(new OwlChangesModelListener());
 		((AbstractOWLModel) kb).addPropertyListener(new OwlChangesPropertyListener());
 		kb.addTransactionListener(new ChangesTransListener());
+		kb.addKnowledgeBaseListener(new ChangesOwlKBListener()); // Handles Class Deletes
 	}
 	
 	public static void updateMap(String frameId, String name) {

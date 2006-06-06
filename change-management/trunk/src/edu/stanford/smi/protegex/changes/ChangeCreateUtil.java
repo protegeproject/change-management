@@ -170,6 +170,106 @@ public class ChangeCreateUtil {
 		
 	}
 	
+	public static Instance createTemplateSlotAddedChange(KnowledgeBase cKb, String apply, String slot) {
+		Cls tempSlotAddCls = cKb.getCls("TemplateSlot_Added");
+		
+		Instance changeInst = cKb.createInstance(null, tempSlotAddCls);
+		Slot action = cKb.getSlot("action");
+		Slot applyTo = cKb.getSlot("applyTo");
+		Slot author = cKb.getSlot("author");
+		Slot context = cKb.getSlot("context");
+		Slot created = cKb.getSlot("created");
+		Slot type = cKb.getSlot("type");
+		
+		String desc = "Added template slot: "+slot+" to: "+apply;
+		
+		changeInst.setOwnSlotValue(action, tempSlotAddCls.getName());
+		changeInst.setOwnSlotValue(applyTo, apply);
+		changeInst.setOwnSlotValue(author, "");
+		changeInst.setOwnSlotValue(context, desc);
+		changeInst.setOwnSlotValue(created, "");
+		changeInst.setOwnSlotValue(type, "info");
+		
+		return changeInst;
+		
+	}
+	
+	
+	public static Instance createRestrictionAddedChange(KnowledgeBase cKb, String apply, String slot) {
+		Cls restrAddCls = cKb.getCls("TransChange");
+		
+		Instance changeInst = cKb.createInstance(null, restrAddCls);
+		Slot action = cKb.getSlot("action");
+		Slot applyTo = cKb.getSlot("applyTo");
+		Slot author = cKb.getSlot("author");
+		Slot context = cKb.getSlot("context");
+		Slot created = cKb.getSlot("created");
+		Slot type = cKb.getSlot("type");
+		
+		String desc = "Restriction Created: "+slot;
+		
+		changeInst.setOwnSlotValue(action, "Restriction Created");
+		changeInst.setOwnSlotValue(applyTo, apply);
+		changeInst.setOwnSlotValue(author, "");
+		changeInst.setOwnSlotValue(context, desc);
+		changeInst.setOwnSlotValue(created, "");
+		changeInst.setOwnSlotValue(type, "transaction");
+		
+		return changeInst;
+		
+	}
+	
+	
+	
+	public static Instance createRestrictionRemovedChange(KnowledgeBase cKb, String apply, String slot) {
+		Cls restrRemCls = cKb.getCls("TransChange");
+		
+		Instance changeInst = cKb.createInstance(null, restrRemCls);
+		Slot action = cKb.getSlot("action");
+		Slot applyTo = cKb.getSlot("applyTo");
+		Slot author = cKb.getSlot("author");
+		Slot context = cKb.getSlot("context");
+		Slot created = cKb.getSlot("created");
+		Slot type = cKb.getSlot("type");
+		
+		String desc = "Restriction Removed: "+slot;
+		
+		changeInst.setOwnSlotValue(action, "Restriction Removed");
+		changeInst.setOwnSlotValue(applyTo, apply);
+		changeInst.setOwnSlotValue(author, "");
+		changeInst.setOwnSlotValue(context, desc);
+		changeInst.setOwnSlotValue(created, "");
+		changeInst.setOwnSlotValue(type, "transaction");
+		
+		return changeInst;
+		
+	}
+	
+	
+	public static Instance createTemplateSlotRemovedChange(KnowledgeBase cKb, String apply, String slot) {
+		Cls tempSlotRemCls = cKb.getCls("TemplateSlot_Removed");
+		
+		Instance changeInst = cKb.createInstance(null, tempSlotRemCls);
+		Slot action = cKb.getSlot("action");
+		Slot applyTo = cKb.getSlot("applyTo");
+		Slot author = cKb.getSlot("author");
+		Slot context = cKb.getSlot("context");
+		Slot created = cKb.getSlot("created");
+		Slot type = cKb.getSlot("type");
+		
+		String desc = "Removed template slot: "+slot+" from: "+apply;
+		
+		changeInst.setOwnSlotValue(action, tempSlotRemCls.getName());
+		changeInst.setOwnSlotValue(applyTo, apply);
+		changeInst.setOwnSlotValue(author, "");
+		changeInst.setOwnSlotValue(context, desc);
+		changeInst.setOwnSlotValue(created, "");
+		changeInst.setOwnSlotValue(type, "info");
+		
+		return changeInst;
+		
+	}
+	
 	public static Instance createClassDeletedChange(KnowledgeBase cKb, String apply) {
 		Cls deleteCls = cKb.getCls("Class_Deleted");
 	
