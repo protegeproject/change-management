@@ -2,19 +2,18 @@
 <project name = "change-management" default = "init" basedir = ".">
 
 	<property name = "project.name" value = "change-management"/>
-	<property name = "Name" value = "Changes"/>
 	<property name = "build.dir" value = "./build"/>
 	<property name = "build.src" value = "${build.dir}/src"/>
 	<property name = "build.dest" value = "${build.dir}/classes"/>
 	<property name = "lib.dir" value = "./lib"/>
 	<property name = "docs.dir" value = "./docs"/>
-	<property name = "build.javadoc" value = "${docs.dir}/apidocs"/>
 	<property name = "deprecation" value = "on"/>    
 	<property name = "debug" value = "off"/>
 	<property name = "includeAntRuntime" value = "no"/>
 	<property name = "optimize" value = "on"/>
 	<property name = "packages" value = "edu.*"/>
 	<property name = "dist.dir" value = "./dist"/>
+
 	<property file = "../global.properties"/>
 	
 	<target name = "init">
@@ -54,7 +53,6 @@
 	<!-- Compile the source directory. -->
 	<!-- =================================================================== -->
 	<target name = "compile" depends = "prepare-src">
-		<!-- compile source code -->
 		<javac srcdir = "${build.src}" destdir = "${build.dest}" deprecation = "${deprecation}" debug = "${debug}" optimize = "${optimize}" includeAntRuntime = "${includeAntRuntime}">
 			<classpath>
 				<pathelement path = "${protege.jar}"/>
@@ -76,12 +74,6 @@
 	</target>
 
 	<!-- =================================================================== -->
-	<!-- JAVADOC -->
-	<!-- Create the API documentation. -->
-	<!-- =================================================================== -->
-	<!-- Decided not to generate javadoc for this plug-in.  We don't distribute it and no one has asked for it yet.  This could be added back later.  -->
-
-	<!-- =================================================================== -->
 	<!-- CLEAN -->
 	<!-- Cleans all generated files and directories. -->
 	<!-- =================================================================== -->
@@ -94,7 +86,6 @@
 	
 	<!-- =================================================================== -->
 	<!-- ALL -->
-	<!-- Create the jar file, javadoc api documentaion, and the zip file. -->
 	<!-- =================================================================== -->
 	<target name = "all" depends = "jar"/>
 </project>
