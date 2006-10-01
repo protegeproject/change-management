@@ -518,6 +518,7 @@ public class ChangesTab extends AbstractTabWidget {
 		}
 	}
 	
+	// setting context and applyTo
 	private static void updateCreateName(Instance aChange, String oldName, String newName) {
 		Collection changeList = ChangeCreateUtil.getTransChanges(cKb, aChange);
 		String context = null;
@@ -578,6 +579,8 @@ public class ChangesTab extends AbstractTabWidget {
 		} 
 	}
 	
+	
+	// takes care of case when class is created & then renamed.
 	private static void checkForCreateChange(Instance aChange) {
 		String changeAction = ChangeCreateUtil.getAction(cKb, aChange);
 		if (changeAction.equals(ChangeCreateUtil.CHANGETYPE_CLASS_CREATED)
