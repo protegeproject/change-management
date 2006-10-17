@@ -15,6 +15,7 @@ import edu.stanford.smi.protegex.changes.listeners.ChangesTransListener;
 import edu.stanford.smi.protegex.changes.listeners.owl.OwlChangesClassListener;
 import edu.stanford.smi.protegex.changes.listeners.owl.OwlChangesModelListener;
 import edu.stanford.smi.protegex.changes.listeners.owl.OwlChangesPropertyListener;
+import edu.stanford.smi.protegex.changes.listeners.owl.OwlChangesFrameListener;
 import edu.stanford.smi.protegex.owl.model.impl.AbstractOWLModel;
 
 public class Util {
@@ -34,6 +35,7 @@ public class Util {
 		((AbstractOWLModel) kb).addClassListener(new OwlChangesClassListener());
 		((AbstractOWLModel) kb).addModelListener(new OwlChangesModelListener());
 		((AbstractOWLModel) kb).addPropertyListener(new OwlChangesPropertyListener());
+		((AbstractOWLModel) kb).addFrameListener(new OwlChangesFrameListener());
 		kb.addTransactionListener(new ChangesTransListener());
 		kb.addKnowledgeBaseListener(new ChangesOwlKBListener()); // Handles Class Deletes
 	}

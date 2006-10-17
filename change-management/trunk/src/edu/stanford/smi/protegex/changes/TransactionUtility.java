@@ -101,6 +101,7 @@ public class TransactionUtility {
 			// find first info action
 			boolean firstInfoInst = false;
 			boolean firstDeleted = false;
+			boolean firstAnnotate = false;
 			Instance firstInst = null;
 			
 			for (Iterator iter = transActions.iterator(); iter.hasNext();) {
@@ -114,6 +115,11 @@ public class TransactionUtility {
 					firstInst = aInst;
 					firstDeleted = true;
 				}
+				
+//				if (aInst.getDirectType().getName().equals(ChangeCreateUtil.CHANGETYPE_ANNOTATION_ADDED) && !firstAnnotate) {
+//					firstInst = aInst;
+//					firstAnnotate = true;
+//				}
 			}
 			
 			tInst = ChangeCreateUtil.createTransChange(cKb, transactionLevel(transActions), firstInst);
