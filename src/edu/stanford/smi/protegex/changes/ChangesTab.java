@@ -56,6 +56,7 @@ import edu.stanford.smi.protegex.changes.listeners.ChangesInstanceListener;
 import edu.stanford.smi.protegex.changes.listeners.ChangesKBListener;
 import edu.stanford.smi.protegex.changes.listeners.ChangesSlotListener;
 import edu.stanford.smi.protegex.changes.listeners.ChangesTransListener;
+import edu.stanford.smi.protegex.changes.listeners.ChangesFrameListener;
 import edu.stanford.smi.protegex.changes.owl.Util;
 import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
 import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
@@ -119,6 +120,7 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	private static boolean inCreateClass = false;
 	private static boolean inCreateSlot = false;
+	private static boolean inRemoveAnnotation = false;
 	
 	private static boolean isOwlProject;
 	
@@ -154,6 +156,14 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	public static void setInCreateSlot(boolean val) {
 		inCreateSlot = val;
+	}
+	
+	public static boolean getInRemoveAnnotation() {
+		return inRemoveAnnotation;
+	}
+	
+	public static void setInRemoveAnnotation(boolean val) {
+		inRemoveAnnotation = val;
 	}
 	
 	// Initialize the plugin
@@ -350,6 +360,7 @@ public class ChangesTab extends AbstractTabWidget {
 		currKB.addInstanceListener(new ChangesInstanceListener());
 		currKB.addSlotListener(new ChangesSlotListener());
 		currKB.addTransactionListener(new ChangesTransListener());
+		currKB.addFrameListener(new ChangesFrameListener());
 	}
 	
 	private boolean createChangeProject() {

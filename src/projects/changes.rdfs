@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.0' encoding='ISO-8859-1'?>
 <!DOCTYPE rdf:RDF [
 	 <!ENTITY rdf 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
 	 <!ENTITY a 'http://protege.stanford.edu/system#'>
@@ -12,6 +12,18 @@
 <rdfs:Class rdf:about="&kb;Annotation"
 	 rdfs:label="Annotation">
 	<rdfs:subClassOf rdf:resource="&a;_system_class"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Annotation_Added"
+	 rdfs:label="Annotation_Added">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Annotation_Modified"
+	 rdfs:label="Annotation_Modified">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Annotation_Removed"
+	 rdfs:label="Annotation_Removed">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Change"
 	 rdfs:label="Change">
@@ -42,6 +54,18 @@
 <rdfs:Class rdf:about="&kb;DirectType_Removed"
 	 rdfs:label="DirectType_Removed">
 	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;DisjointClass_Added"
+	 rdfs:label="DisjointClass_Added">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Documentation_Added"
+	 rdfs:label="Documentation_Added">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Documentation_Removed"
+	 rdfs:label="Documentation_Removed">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;DomainProperty_Added"
 	 rdfs:label="DomainProperty_Added">

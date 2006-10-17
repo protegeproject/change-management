@@ -25,7 +25,12 @@ public class ChangeCreateUtil {
 	public static final String CHANGETYPE_SUPERCLASS_REMOVED = "Superclass_Removed";
 	public static final String CHANGETYPE_TEMPLATESLOT_ADDED = "TemplateSlot_Added";
 	public static final String CHANGETYPE_TEMPLATESLOT_REMOVED = "TemplateSlot_Removed";
-	
+	public static final String CHANGETYPE_DOCUMENTATION_ADDED = "Documentation_Added";
+	public static final String CHANGETYPE_DOCUMENTATION_REMOVED = "Documentation_Removed";
+	public static final String CHANGETYPE_ANNOTATION_ADDED = "Annotation_Added";
+	public static final String CHANGETYPE_ANNOTATION_REMOVED = "Annotation_Removed";
+	public static final String CHANGETYPE_ANNOTATION_MODIFIED = "Annotation_Modified";
+	public static final String CHANGETYPE_DISJOINT_CLASS_ADDED = "DisjointClass_Added";
 	//Instance change
 	public static final String CHANGETYPE_DIRECTTYPE_ADDED = "DirectType_Added";
 	public static final String CHANGETYPE_DIRECTTYPE_REMOVED = "DirectType_Removed";
