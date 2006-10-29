@@ -16,7 +16,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	public void clsCreated(KnowledgeBaseEvent event) {
 		
 		Cls createdCls = event.getCls();
-		String clsName = createdCls.getName();
+		String clsName = createdCls.getBrowserText();
 		String context = "Created Class: " + clsName;
 		
 		// Create artifical transaction for create class
@@ -44,7 +44,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		String deletedClsName = "";
 		if (event.getArgument2() instanceof Cls) {
 			Cls deletedCls = (Cls) event.getArgument2();
-			deletedClsName = deletedCls.getName();
+			deletedClsName = deletedCls.getBrowserText();
 		} else {
 			deletedClsName = oldName;
 		}

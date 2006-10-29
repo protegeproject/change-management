@@ -36,6 +36,7 @@ public class ChangeCreateUtil {
 	public static final String CHANGETYPE_DIRECTTYPE_REMOVED = "DirectType_Removed";
 	public static final String CHANGETYPE_INSTANCE_ADDED = "Instance_Added";
 	public static final String CHANGETYPE_INSTANCE_REMOVED = "Instance_Removed";
+	public static final String CHANGETYPE_SLOT_VALUE = "Slot_Value";
 	
 	// KB change
 	public static final String CHANGETYPE_CLASS_CREATED = "Class_Created";
@@ -57,6 +58,10 @@ public class ChangeCreateUtil {
 	public static final String CHANGETYPE_SUBSLOT_REMOVED = "Subslot_Removed";
 	public static final String CHANGETYPE_SUPERSLOT_ADDED = "Superslot_Added";
 	public static final String CHANGETYPE_SUPERSLOT_REMOVED = "Superslot_Removed";
+	public static final String CHANGETYPE_MAXIMUM_CARDINALITY = "Maximum_Cardinality";
+	public static final String CHANGETYPE_MINIMUM_CARDINALITY = "Minimum_Cardinality";
+	public static final String CHANGETYPE_MINIMUM_VALUE = "Minimum_Value";
+	public static final String CHANGETYPE_MAXIMUM_VALUE = "Maximum_Value";
 	
 	// Trans change
 	public static final String CHANGETYPE_TRANS_CHANGE = "TransChange";

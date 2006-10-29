@@ -42,7 +42,7 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 		String deletedClsName = "";
 		if (event.getArgument2() instanceof Cls) {
 			Cls deletedCls = (Cls) event.getArgument2();
-			deletedClsName = deletedCls.getName();
+			deletedClsName = deletedCls.getBrowserText();
 		} else {
 			deletedClsName = oldName;
 		}

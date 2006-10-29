@@ -55,13 +55,16 @@ public class OwlChangesFrameListener implements FrameListener {
     	
     	Frame f = event.getFrame();
         if (f instanceof Slot) {
+           
             
         }
         
-        if (f instanceof Cls) {
+    	
+        
+        else if (f instanceof Cls) {
            
           	Cls c = (Cls)f;
-         	String cName = c.getName();
+         	String cName = c.getBrowserText();
             Slot s = event.getSlot();
             ArrayList oldValue = (ArrayList)event.getArgument2();
 		    String oldSlotValue = oldValue.toString();
@@ -69,7 +72,7 @@ public class OwlChangesFrameListener implements FrameListener {
  		
  		    StringBuffer context = new StringBuffer();
  		    String newSlotValue = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
- 		
+ 		    String newSlotValue1 = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
  		    
  		    if(s instanceof DefaultOWLDatatypeProperty){
  		        DefaultOWLDatatypeProperty sProp = (DefaultOWLDatatypeProperty)s;
@@ -164,8 +167,38 @@ public class OwlChangesFrameListener implements FrameListener {
 		    } // Handles disjoints
 		
         }
+        
+        else if (f instanceof Instance){
+    		Instance i = (Instance)f;
+         	String iName = i.getBrowserText();
+            Slot ownS = event.getSlot();
+    	    String ownSName = ownS.getName();
+    		String newSlotValue = CollectionUtilities.toString(i.getOwnSlotValues(event.getSlot()));
+    	    ArrayList oldValue = (ArrayList)event.getArgument2();
+    	    String oldSlotValue = oldValue.toString();
+    	    
+    	    StringBuffer context = new StringBuffer();
+    	    if(!ownSName.equals("rdf:type")){
+    	    context.append("Slot: ");
+    	    context.append(ownSName);
+    	    context.append(" for Instance: ");
+    	    context.append(iName);
+    	    context.append(" set to: ");
+    	    context.append(newSlotValue);
+            Instance changeInst = ChangeCreateUtil.createChange(
+    						ChangesTab.getChangesKB(),
+    						ChangeCreateUtil.CHANGETYPE_SLOT_VALUE, 
+    						iName, 
+    						context.toString(), 
+    						ChangeCreateUtil.CHANGE_LEVEL_INFO);
+
+           ChangesTab.createChange(changeInst);
+    	    } 
+    	}
 
     }
+	
+	
 
 	
 

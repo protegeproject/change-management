@@ -126,6 +126,8 @@ public class OwlChangesClassListener extends ClassAdapter{
 	}
 
 	public void superclassRemoved(RDFSClass arg0, RDFSClass arg1) {
+		String a = arg1.getName();
+		String b = arg1.getBrowserText();
 		String clsName = Util.getName(arg1.getFrameID().toString());
 		StringBuffer context = new StringBuffer();
 		context.append("Superclass Removed: ");

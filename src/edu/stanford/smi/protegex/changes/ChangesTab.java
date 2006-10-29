@@ -516,6 +516,9 @@ public class ChangesTab extends AbstractTabWidget {
 				cTableModel.update();
 			}
 		}
+		if (aChange.getDirectType().getName().equals(ChangeCreateUtil.CHANGETYPE_SUBCLASS_ADDED)) {
+			addChange = false;
+		}
 		
 		if (inTransaction) {
 			transStack.push(aChange);
@@ -540,7 +543,8 @@ public class ChangesTab extends AbstractTabWidget {
 			
 			if (changeAction.equals(ChangeCreateUtil.CHANGETYPE_CLASS_CREATED)
 						|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_SLOT_CREATED)
-						|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_PROPERTY_CREATED)) {
+						|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_PROPERTY_CREATED)
+						|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_INSTANCE_ADDED)) {
 				
 				ChangeCreateUtil.setInstApplyTo(cKb, cInst, newName);
 				ChangeCreateUtil.setInstApplyTo(cKb, aChange, newName);
@@ -596,7 +600,8 @@ public class ChangesTab extends AbstractTabWidget {
 		String changeAction = ChangeCreateUtil.getAction(cKb, aChange);
 		if (changeAction.equals(ChangeCreateUtil.CHANGETYPE_CLASS_CREATED)
 				|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_SLOT_CREATED)
-				|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_PROPERTY_CREATED)) {
+				|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_PROPERTY_CREATED)
+				|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_INSTANCE_ADDED)) {
 			Integer rowCount = new Integer(cTableModel.getRowCount());
 			createChangeName.put(ChangeCreateUtil.getApplyTo(cKb, aChange), rowCount);
 		}
