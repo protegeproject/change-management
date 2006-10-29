@@ -18,9 +18,9 @@ public class ChangesClsListener implements ClsListener{
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Added Instance: ");
-		context.append(addedInst.getName());
+		context.append(addedInst.getBrowserText());
 		context.append(" (instance of ");
-		context.append(clsOfInst.getName());
+		context.append(clsOfInst.getBrowserText());
 		context.append(")");
 		
 		Instance changeInst = ChangeCreateUtil.createChange(
@@ -49,9 +49,9 @@ public class ChangesClsListener implements ClsListener{
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Removed Instance: ");
-		context.append(removedInst.getName());
+		context.append(removedInst.getBrowserText());
 		context.append(" (instance of ");
-		context.append(clsOfInst.getName());
+		context.append(clsOfInst.getBrowserText());
 		context.append(")");
 		
 		Instance changeInst = ChangeCreateUtil.createChange(
@@ -73,9 +73,9 @@ public class ChangesClsListener implements ClsListener{
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Added subclass: ");
-		context.append(subClass.getName());
+		context.append(subClass.getBrowserText());
 		context.append(" (subclass of ");
-		context.append(superClass.getName());
+		context.append(superClass.getBrowserText());
 		context.append(")");
 		
 		Instance changeInst = ChangeCreateUtil.createChange(
@@ -110,9 +110,9 @@ public class ChangesClsListener implements ClsListener{
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Removed subclass: ");
-		context.append(subClass.getName());
+		context.append(subClass.getBrowserText());
 		context.append(" (subclass of ");
-		context.append(superClass.getName());
+		context.append(superClass.getBrowserText());
 		context.append(")");
 		
 		Instance changeInst = ChangeCreateUtil.createChange(
@@ -134,9 +134,9 @@ public class ChangesClsListener implements ClsListener{
 	
 		StringBuffer context = new StringBuffer();
 		context.append("Added superclass: ");
-		context.append(subClass.getName());
+		context.append(subClass.getBrowserText());
 		context.append(" (subclass of ");
-		context.append( superClass.getName());
+		context.append( superClass.getBrowserText());
 		context.append(")");
 		
 		Instance changeInst = ChangeCreateUtil.createChange(
@@ -158,9 +158,9 @@ public class ChangesClsListener implements ClsListener{
 	
 		StringBuffer context = new StringBuffer();
 		context.append("Removed superclass: ");
-		context.append(subClass.getName());
+		context.append(subClass.getBrowserText());
 		context.append(" (subclass of ");
-		context.append(superClass.getName());
+		context.append(superClass.getBrowserText());
 		context.append(")");
 		
 		Instance changeInst = ChangeCreateUtil.createChange(

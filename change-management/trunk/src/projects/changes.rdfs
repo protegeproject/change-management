@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='ISO-8859-1'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE rdf:RDF [
 	 <!ENTITY rdf 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
 	 <!ENTITY a 'http://protege.stanford.edu/system#'>
@@ -93,6 +93,22 @@
 	 rdfs:label="KB_Change">
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
+<rdfs:Class rdf:about="&kb;Maximum_Cardinality"
+	 rdfs:label="Maximum_Cardinality">
+	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Maximum_Value"
+	 rdfs:label="Maximum_Value">
+	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Minimum_Cardinality"
+	 rdfs:label="Minimum_Cardinality">
+	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Minimum_Value"
+	 rdfs:label="Minimum_Value">
+	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Name_Changed"
 	 rdfs:label="Name_Changed">
 	<rdfs:subClassOf rdf:resource="&kb;KB_Change"/>
@@ -121,6 +137,10 @@
 <rdfs:Class rdf:about="&kb;Slot_Deleted"
 	 rdfs:label="Slot_Deleted">
 	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Slot_Value"
+	 rdfs:label="Slot_Value">
+	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Subclass_Added"
 	 rdfs:label="Subclass_Added">

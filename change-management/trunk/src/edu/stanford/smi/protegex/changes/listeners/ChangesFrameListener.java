@@ -53,14 +53,106 @@ public class ChangesFrameListener implements FrameListener {
 	public void ownSlotValueChanged(FrameEvent event) {
     	
     	Frame f = event.getFrame();
+
         if (f instanceof Slot) {
-            
+        	Slot s = (Slot)f;
+         	String sName = s.getName();
+            Slot ownS = event.getSlot();
+ 		    String ownSName = ownS.getName();
+ 		    String newSlotValue = CollectionUtilities.toString(s.getOwnSlotValues(event.getSlot()));
+ 		    ArrayList oldValue = (ArrayList)event.getArgument2();
+		    String oldSlotValue = oldValue.toString();
+		    StringBuffer context = new StringBuffer();
+		    if(ownSName.equals(":SLOT-NUMERIC-MAXIMUM")){
+		    	   context.append("Maximum value for: ");
+	               context.append(sName);
+	               context.append(" set to: ");
+	               context.append(newSlotValue);
+	               Instance changeInst = ChangeCreateUtil.createChange(
+	       						ChangesTab.getChangesKB(),
+	       						ChangeCreateUtil.CHANGETYPE_MAXIMUM_VALUE, 
+	       						sName, 
+	       						context.toString(), 
+	       						ChangeCreateUtil.CHANGE_LEVEL_INFO);
+
+	              ChangesTab.createChange(changeInst);
+		    }
+            if(ownSName.equals(":SLOT-NUMERIC-MINIMUM")){
+         	   context.append("Minimum value for: ");
+               context.append(sName);
+               context.append(" set to: ");
+               context.append(newSlotValue);
+               Instance changeInst = ChangeCreateUtil.createChange(
+       						ChangesTab.getChangesKB(),
+       						ChangeCreateUtil.CHANGETYPE_MINIMUM_VALUE, 
+       						sName, 
+       						context.toString(), 
+       						ChangeCreateUtil.CHANGE_LEVEL_INFO);
+
+              ChangesTab.createChange(changeInst);
+		    	
+		    }
+		    
+
+        	if(ownSName.equals(":SLOT-MINIMUM-CARDINALITY")){
+        		if(!newSlotValue.equals("")){
+        			//should have atleast - value
+        	      context.append("Minimum cardinality for: ");
+               	  context.append(sName);
+               	  context.append(" set to: ");
+               	  context.append(newSlotValue);
+               	  Instance changeInst = ChangeCreateUtil.createChange(
+       						ChangesTab.getChangesKB(),
+       						ChangeCreateUtil.CHANGETYPE_MINIMUM_CARDINALITY, 
+       						sName, 
+       						context.toString(), 
+       						ChangeCreateUtil.CHANGE_LEVEL_INFO);
+
+                  ChangesTab.createChange(changeInst);
+        			
+        		}
+        		
+        	}
+            if(ownSName.equals(":SLOT-MAXIMUM-CARDINALITY")){
+            	if(newSlotValue.equals("")){
+            		//slot can take multiple values
+          	      
+               	  context.append(sName);
+               	  context.append(" can take multiple values");
+               	  
+               	  Instance changeInst = ChangeCreateUtil.createChange(
+       						ChangesTab.getChangesKB(),
+       						ChangeCreateUtil.CHANGETYPE_MAXIMUM_CARDINALITY, 
+       						sName, 
+       						context.toString(), 
+       						ChangeCreateUtil.CHANGE_LEVEL_INFO);
+
+                  ChangesTab.createChange(changeInst);
+            		
+            	}
+            	else{
+            		//maximum values set to -
+          	      context.append("Maximum cardinality for: ");
+               	  context.append(sName);
+               	  context.append(" set to: ");
+               	  context.append(newSlotValue);
+               	  Instance changeInst = ChangeCreateUtil.createChange(
+       						ChangesTab.getChangesKB(),
+       						ChangeCreateUtil.CHANGETYPE_MAXIMUM_CARDINALITY, 
+       						sName, 
+       						context.toString(), 
+       						ChangeCreateUtil.CHANGE_LEVEL_INFO);
+
+                  ChangesTab.createChange(changeInst);
+            	}
+        		
+        	}
         }
         
-        if (f instanceof Cls) {
+        else if (f instanceof Cls) {
            
           	Cls c = (Cls)f;
-         	String cName = c.getName();
+         	String cName = c.getBrowserText();
             Slot s = event.getSlot();
  		    String sName = s.getName();
  		    StringBuffer context = new StringBuffer();
@@ -116,6 +208,33 @@ public class ChangesFrameListener implements FrameListener {
 		    } // Handles documentation slot
 		
         }
+        
+        else if (f instanceof Instance){
+    		Instance i = (Instance)f;
+         	String iName = i.getBrowserText();
+            Slot ownS = event.getSlot();
+ 		    String ownSName = ownS.getName();
+ 		    String newSlotValue = CollectionUtilities.toString(i.getOwnSlotValues(event.getSlot()));
+ 		    ArrayList oldValue = (ArrayList)event.getArgument2();
+		    String oldSlotValue = oldValue.toString();
+		    
+		    StringBuffer context = new StringBuffer();
+		    context.append("Slot: ");
+		    context.append(ownSName);
+		    context.append(" for Instance: ");
+		    context.append(iName);
+		    context.append(" set to: ");
+		    context.append(newSlotValue);
+            Instance changeInst = ChangeCreateUtil.createChange(
+    						ChangesTab.getChangesKB(),
+    						ChangeCreateUtil.CHANGETYPE_SLOT_VALUE, 
+    						iName, 
+    						context.toString(), 
+    						ChangeCreateUtil.CHANGE_LEVEL_INFO);
+
+           ChangesTab.createChange(changeInst);
+		    
+    	}
 
     }
 

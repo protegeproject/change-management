@@ -21,7 +21,7 @@ public class ChangesSlotListener implements SlotListener{
 			context.append("Added template slot: ");
 			context.append(event.getSlot().getName());
 			context.append(" to: ");
-			context.append(theCls.getName());
+			context.append(theCls.getBrowserText());
 			
 			Instance changeInst = ChangeCreateUtil.createChange(
 													ChangesTab.getChangesKB(),
@@ -51,7 +51,7 @@ public class ChangesSlotListener implements SlotListener{
 			context.append("Removed template slot: ");
 			context.append(event.getSlot().getName());
 			context.append(" from: ");
-			context.append(theCls.getName());
+			context.append(theCls.getBrowserText());
 			
 			Instance changeInst = ChangeCreateUtil.createChange(
 													ChangesTab.getChangesKB(),
