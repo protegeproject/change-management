@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +31,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -38,25 +38,39 @@ import javax.swing.event.ListSelectionListener;
 
 import edu.stanford.smi.protege.event.ProjectAdapter;
 import edu.stanford.smi.protege.event.ProjectEvent;
+import edu.stanford.smi.protege.exception.ProtegeException;
+import edu.stanford.smi.protege.exception.ProtegeIOException;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
+import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.resource.Icons;
+import edu.stanford.smi.protege.server.RemoteClientProject;
+import edu.stanford.smi.protege.server.RemoteServer;
+import edu.stanford.smi.protege.server.RemoteServerProject;
+import edu.stanford.smi.protege.server.RemoteSession;
+import edu.stanford.smi.protege.server.Server;
+import edu.stanford.smi.protege.server.ServerProject;
+import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
+import edu.stanford.smi.protege.server.metaproject.MetaProjectInstance;
+import edu.stanford.smi.protege.server.metaproject.MetaProject.SlotEnum;
 import edu.stanford.smi.protege.ui.HeaderComponent;
 import edu.stanford.smi.protege.util.ApplicationProperties;
 import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.LabeledComponent;
+import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protege.util.ProtegeJob;
 import edu.stanford.smi.protege.widget.AbstractTabWidget;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
 import edu.stanford.smi.protegex.changes.action.ChangeShowAction;
 import edu.stanford.smi.protegex.changes.action.ChangesSearchClear;
 import edu.stanford.smi.protegex.changes.action.ChangesSearchExecute;
 import edu.stanford.smi.protegex.changes.listeners.ChangesClsListener;
+import edu.stanford.smi.protegex.changes.listeners.ChangesFrameListener;
 import edu.stanford.smi.protegex.changes.listeners.ChangesInstanceListener;
 import edu.stanford.smi.protegex.changes.listeners.ChangesKBListener;
 import edu.stanford.smi.protegex.changes.listeners.ChangesSlotListener;
 import edu.stanford.smi.protegex.changes.listeners.ChangesTransListener;
-import edu.stanford.smi.protegex.changes.listeners.ChangesFrameListener;
 import edu.stanford.smi.protegex.changes.owl.Util;
 import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
 import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
@@ -92,7 +106,11 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	
 	public static final String ANNOTATION_PROJECT_EXISTS = "annotation_proj_exists";
+	public static final String ANNOTATION_PROJECT_NAME_PREFIX = "annotation_";    
+    
 	private static final String CHANGES_TAB_NAME = "Changes";
+        
+        public static final String METAPROJECT_CHANGE_PROJECT_SLOT = "changesProject";
 	
 	private static String userName;
 	private static Project currProj;
@@ -212,6 +230,18 @@ public class ChangesTab extends AbstractTabWidget {
 	public static Project getChangesProj() {
 		return changes;
 	}
+        
+    public static String getAnnotationProjectName() {
+      return ANNOTATION_PROJECT_NAME_PREFIX + currProj.getName() + ".pprj";
+    }
+    
+    public static String getAnnotationSchemaName() {
+      return ANNOTATION_PROJECT_NAME_PREFIX + currProj.getName() + ".rdfs";
+    }
+    
+    public static String getAnnotationInstancesName() {
+      return ANNOTATION_PROJECT_NAME_PREFIX + currProj.getName() + ".rdf";
+    }
 	
 	private void initUI() {
 		// Create menu item
@@ -400,19 +430,28 @@ public class ChangesTab extends AbstractTabWidget {
 		// Annotation project exists	
 		} else {
 			annotateExists = true;
-			String annotationName = "annotation_" + currProj.getName() + ".pprj";
+			String annotationName = getAnnotationProjectName();
 			URI annotationURI;
-			try {
-				annotationURI = new URI(currProj.getProjectDirectoryURI()+"/" + annotationName);
-				changes = Project.loadProjectFromURI(annotationURI, errors);
-				
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
-			
-			changes.includeProject(changeOntURI,errors);
-			changes.mergeIncludedProjects();
+                        if (currProj.isMultiUserClient()) {
+                          changes = getRemoteAnnotationProject();
+                        }
+                        else {
+                          try {
+                            annotationURI = new URI(currProj.getProjectDirectoryURI()+"/" + annotationName);
+                            changes = Project.loadProjectFromURI(annotationURI, errors);
+
+                            changes.includeProject(changeOntURI,errors);
+                            changes.mergeIncludedProjects();				
+                          } catch (URISyntaxException e) {
+                            errors.add(e);
+                          }
+                        }
+
 			displayErrors(errors);
+                        if (changes == null) { 
+                          Log.getLogger().warning("Changes tab not initialized");
+                          throw new RuntimeException("Changes tab not initialized");
+                        }
 			
 			cKb = changes.getKnowledgeBase();
 		}
@@ -422,7 +461,10 @@ public class ChangesTab extends AbstractTabWidget {
 			public void projectSaved(ProjectEvent event) {
 				String changesName = "annotation_" + currProj.getName();
 				String myNameSpace = "http://protege.stanford.edu/kb#";
-				RDFBackend.setSourceFiles(changes.getSources(), changesName +".rdfs", changesName + ".rdf", myNameSpace);
+				RDFBackend.setSourceFiles(changes.getSources(), 
+                                          getAnnotationSchemaName(), 
+                                          getAnnotationInstancesName(), 
+                                          myNameSpace);
 				
 				URI projUri;
 				try {
@@ -443,7 +485,42 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		return annotateExists;
 	}
+        
+        private Project getRemoteAnnotationProject() throws ProtegeException {
+          String annotationProjectName = new RequestAnnotationProjectName(getKnowledgeBase()).execute();
+          RemoteClientProject project = (RemoteClientProject) getKnowledgeBase().getProject();
+          RemoteServer server = project.getServer();
+          RemoteSession session = project.getSession();
+          try {
+            RemoteServerProject annotationProject = server.openProject(annotationProjectName, session);
+            return RemoteClientProject.createProject(server, annotationProject, session, true);
+          } catch (RemoteException re) {
+            throw new ProtegeIOException(re);
+          }
+        }
 	
+        public static class RequestAnnotationProjectName extends ProtegeJob<String> {
+          private static final long serialVersionUID = -2383974265774152135L;
+          
+
+          public RequestAnnotationProjectName(KnowledgeBase kb) {
+            super(kb);
+          }
+
+          @Override
+          public String run() throws ProtegeException {
+            MetaProjectInstance project = getMetaProjectInstance();
+            Instance projectInOnt = project.getProtegeInstance();
+            KnowledgeBase metaOntology = projectInOnt.getKnowledgeBase();
+            Slot changeAnnotationProjectSlot = metaOntology.getSlot(METAPROJECT_CHANGE_PROJECT_SLOT);
+            Instance changeProject 
+               = (Instance) projectInOnt.getOwnSlotValue(changeAnnotationProjectSlot);
+            
+            return (String) changeProject.getOwnSlotValue(project.getMetaProject().getSlot(SlotEnum.name));
+          }
+          
+        }
+        
 	private static void loadExistingData() {
 		Collection annotateInsts = ChangeCreateUtil.getAnnotationInsts(cKb);
 		Collection changeInsts = ChangeCreateUtil.getChangeInsts(cKb);
@@ -801,4 +878,5 @@ public class ChangesTab extends AbstractTabWidget {
 			acTableModel.filterAll();
 		}
 	}
+        
 }
