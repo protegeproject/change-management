@@ -338,14 +338,14 @@ public class ChangeCreateUtil {
 		aInst.setOwnSlotValue(cKb.getSlot(SLOT_NAME_CONTEXT), newVal);
 	}
 	
-	public static Instance createAnnotation(KnowledgeBase cKb, Collection changeInsts) {
-		Cls annotate = cKb.getCls(CLS_NAME_ANNOTATE);
+	public static Instance createAnnotation(KnowledgeBase cKb, String annotType,Collection changeInsts) {
+		Cls annotate = cKb.getCls(annotType);
 		Slot annotates = cKb.getSlot(SLOT_NAME_ANNOTATES);
-		Slot title = cKb.getSlot(SLOT_NAME_TITLE);
+		//Slot title = cKb.getSlot(SLOT_NAME_TITLE);
 		
 		Instance annotateInst = cKb.createInstance(null, annotate);
 		annotateInst.setOwnSlotValues(annotates, changeInsts);
-		annotateInst.setOwnSlotValue(title, annotateInst.getName());
+		//annotateInst.setOwnSlotValue(title, annotateInst.getName());
 		
 		return annotateInst;
 	}

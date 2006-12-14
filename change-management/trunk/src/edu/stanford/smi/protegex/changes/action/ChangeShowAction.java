@@ -11,14 +11,15 @@ import javax.swing.JTable;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protegex.changes.ChangeTableModel;
+import edu.stanford.smi.protegex.changes.ui.JTreeTable;
 
 public class ChangeShowAction implements MouseListener{
 
-	JTable cTable;
+	JTreeTable cTable;
 	ChangeTableModel cTableModel;
 	Project changes;
 	
-	public ChangeShowAction(JTable cTable, ChangeTableModel cTableModel, Project changes) {
+	public ChangeShowAction(JTreeTable cTable, ChangeTableModel cTableModel, Project changes) {
 		this.cTable = cTable;
 		this.cTableModel = cTableModel;
 		this.changes = changes;

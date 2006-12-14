@@ -1,5 +1,5 @@
 package edu.stanford.smi.protegex.changes;
- 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -32,15 +32,18 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.table.TableColumn;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import edu.stanford.smi.protege.event.ProjectAdapter;
 import edu.stanford.smi.protege.event.ProjectEvent;
+import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
+import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.resource.Icons;
 import edu.stanford.smi.protege.ui.HeaderComponent;
 import edu.stanford.smi.protege.util.ApplicationProperties;
@@ -58,8 +61,7 @@ import edu.stanford.smi.protegex.changes.listeners.ChangesSlotListener;
 import edu.stanford.smi.protegex.changes.listeners.ChangesTransListener;
 import edu.stanford.smi.protegex.changes.listeners.ChangesFrameListener;
 import edu.stanford.smi.protegex.changes.owl.Util;
-import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
-import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
+import edu.stanford.smi.protegex.changes.ui.*;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
  
 /**
@@ -74,6 +76,7 @@ public class ChangesTab extends AbstractTabWidget {
 	public static final String LABELCOMP_NAME_CHANGE_HIST = "Change History";
 	public static final String LABELCOMP_NAME_ANNOTATIONS = "Annotations";
 	public static final String LABELCOMP_NAME_ASSOC_CHANGES = "Associated Changes";
+	public static final String LABELCOMP_NAME_DETAIL_CHANGES = "Detailed Changes";
 	public static final String ACTION_NAME_CREATE_ANNOTATE = "Create Annotation";
 	public static final String ACTION_NAME_REMOVE_ANNOTATE = "Remove Annotation";
 	public static final String ACTION_NAME_EDIT_ANNOTATE = "Edit Annotation";
@@ -84,6 +87,8 @@ public class ChangesTab extends AbstractTabWidget {
 	private static final String SEARCH_PANEL_TITLE = "Search";
 	private static final String SEARCH_PANEL_BUTTON_GO = "Go";
 	private static final String SEARCH_PANEL_BUTTON_CLEAR = "Clear"; 
+	
+	private static final String ANNOT_PANEL_TITLE = "Create Annotation";
 	
 	// Transaction signals
 	public static final String TRANS_SIGNAL_TRANS_BEGIN = "transaction_begin";
@@ -103,8 +108,11 @@ public class ChangesTab extends AbstractTabWidget {
 	private static JTable cTable;
 	private static JTable aTable;
 	private static JTable acTable;
+	//private static JTable dcTable;
+	private static JComboBox annTypes;
 	private static ChangeTableModel cTableModel;
 	private static ChangeTableModel acTableModel;
+	//private static ChangeTableModel dcTableModel;
 	private static AnnotationTableModel aTableModel;
 	
 	private static Instance annotateInst;
@@ -125,6 +133,12 @@ public class ChangesTab extends AbstractTabWidget {
 	private static boolean isOwlProject;
 	
 	private static ChangeMenu cMenu;
+	
+	//JTreeTable
+	
+	private static JTreeTable cTreeTable;
+	private static ChangeTreeTableModel cTreeTableModel;
+	
 	
 	public static void addNameChange(String oldName, String newName) {
 		nameChanges.put(newName, oldName);
@@ -181,8 +195,10 @@ public class ChangesTab extends AbstractTabWidget {
 		if (createChangeProject()) {
 			initTables();
 			loadExistingData();
+			//initColumnSizes(cTable);
 		} else {
 			initTables();
+			//initColumnSizes(cTable);
 		}
 		
 		TransactionUtility.initialize();
@@ -202,7 +218,9 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		// Initialize the UI
 		initUI();
-			 
+		cTreeTable.getTree().expandPath(AbstractTreeTableModel.rootPath);
+		//cTreeTable.getTree().setRootVisible(false);
+		
 	}
 
 	public static KnowledgeBase getChangesKB() {
@@ -218,16 +236,19 @@ public class ChangesTab extends AbstractTabWidget {
 		cMenu = new ChangeMenu(cKb,changes);
 		JMenuBar menuBar = getMainWindowMenuBar();
 	    menuBar.add (cMenu);
-		
-		cTable.addMouseListener(new ChangeShowAction(cTable, cTableModel, changes));
+     	//cTreeTable.addMouseListener(new ChangeShowAction(cTreeTable, cTableModel, changes));
+		//cTable.addMouseListener(new ChangeShowAction(cTable, cTableModel, changes));
 		aTable.addMouseListener(new AnnotationShowAction(aTable, aTableModel, changes));
-		JScrollPane scroll = ComponentFactory.createScrollPane(cTable);
+		JScrollPane scroll = ComponentFactory.createScrollPane(cTreeTable);
+		//JScrollPane scroll = ComponentFactory.createScrollPane(cTable);
+		//JScrollPane scroll1 = ComponentFactory.createScrollPane(dcTable);
 		JScrollPane scroll2 = ComponentFactory.createScrollPane(aTable);
 		JScrollPane scroll3 = ComponentFactory.createScrollPane(acTable);
 				
 		JPanel interPane = new JPanel();
 		interPane.setLayout(new BoxLayout(interPane, BoxLayout.PAGE_AXIS));
 		interPane.add(initSearchPanel());
+		
 		interPane.add(scroll);
 		LabeledComponent changeHistLC = new LabeledComponent(LABELCOMP_NAME_CHANGE_HIST, interPane,true);
 		
@@ -235,11 +256,27 @@ public class ChangesTab extends AbstractTabWidget {
 		changeHistLC.addHeaderSeparator();
 		AddInstanceAction addInst = new AddInstanceAction(changeHistLC, ACTION_NAME_CREATE_ANNOTATE);
 		
-		FilterTransInfoAction fNonTransInst = new FilterTransInfoAction(FILTER_NAME_DETAIL_VIEW);
-		FilterTransAction fTransInst = new FilterTransAction(FILTER_NAME_SUMMARY_VIEW);
-		changeHistLC.addHeaderButton(fTransInst);
-		changeHistLC.addHeaderButton(fNonTransInst);
+//		FilterTransInfoAction fNonTransInst = new FilterTransInfoAction(FILTER_NAME_DETAIL_VIEW);
+		//FilterTransAction fTransInst = new FilterTransAction(FILTER_NAME_SUMMARY_VIEW);
+		//changeHistLC.addHeaderButton(fTransInst);
+//		changeHistLC.addHeaderButton(fNonTransInst);
+	    changeHistLC.setHeaderComponent(initAnnotPanel(), BorderLayout.EAST);
 		changeHistLC.addHeaderButton(addInst);
+		
+		
+		//LabeledComponent detailLC = new LabeledComponent(LABELCOMP_NAME_DETAIL_CHANGES, scroll1, true);
+		//detailLC.doLayout();
+		//detailLC.addHeaderSeparator();
+		//detailLC.setMaximumSize(new Dimension(1000,800));
+		//detailLC.setPreferredSize(new Dimension(scroll3.getWidth(),90));
+		
+		/*JSplitPane splitPanel1 = ComponentFactory.createTopBottomSplitPane(false);
+		splitPanel1.setResizeWeight(0.5);
+		splitPanel1.setDividerLocation(0.75);
+		splitPanel1.setTopComponent(changeHistLC);
+		splitPanel1.setBottomComponent(detailLC);*/
+		
+		
 		
 		LabeledComponent annotLC = new LabeledComponent(LABELCOMP_NAME_ANNOTATIONS, scroll2, true);
 		annotLC.doLayout();
@@ -248,13 +285,14 @@ public class ChangesTab extends AbstractTabWidget {
 		EditInstanceAction editInst = new EditInstanceAction(ACTION_NAME_EDIT_ANNOTATE);
 		annotLC.addHeaderButton(remInst);
 		annotLC.addHeaderButton(editInst);
-		annotLC.setMaximumSize(new Dimension(1000,1000));
+		//annotLC.setMaximumSize(new Dimension(1000,800));
+		//annotLC.setPreferredSize(new Dimension(scroll3.getWidth(),250));
 		
 		LabeledComponent assocLC = new LabeledComponent(LABELCOMP_NAME_ASSOC_CHANGES, scroll3, true);
 		assocLC.doLayout();
 		assocLC.addHeaderSeparator();
-		assocLC.setMaximumSize(new Dimension(1000,1000));
-		assocLC.setMinimumSize(new Dimension(scroll3.getWidth(),100));
+		//assocLC.setMaximumSize(new Dimension(1000,800));
+		//assocLC.setPreferredSize(new Dimension(scroll3.getWidth(),150));
 		
 		JSplitPane splitPanel = ComponentFactory.createTopBottomSplitPane(false);
 		splitPanel.setResizeWeight(0.5);
@@ -262,12 +300,34 @@ public class ChangesTab extends AbstractTabWidget {
 		splitPanel.setTopComponent(annotLC);
 		splitPanel.setBottomComponent(assocLC);
 		
+		//HeaderComponent changeView = new HeaderComponent(HEADERCOMP_NAME_CHANGE_VIEWER, null, splitPanel1);
 		HeaderComponent changeView = new HeaderComponent(HEADERCOMP_NAME_CHANGE_VIEWER, null, changeHistLC);
 		HeaderComponent annotView = new HeaderComponent(HEADERCOMP_NAME_ANNOTATE_VIEWER, null, splitPanel);
 		
 		setLayout(new GridLayout(2,1));
 		add(changeView);
 		add(annotView);
+		//initColumnSizes(cTable);
+	}
+	
+	private JPanel initAnnotPanel() {
+		JPanel annotPanel = ComponentFactory.createPanel();
+		JLabel annotLabel = new JLabel(ANNOT_PANEL_TITLE);
+		String[] annotFields = {	AnnotationTableModel.TYPE_COMMENT, 
+				                    AnnotationTableModel.TYPE_EXPLANATION,
+				                    AnnotationTableModel.TYPE_EXAMPLE,
+				                    AnnotationTableModel.TYPE_QUESTION,
+				                    AnnotationTableModel.TYPE_ADVICE,
+				                    AnnotationTableModel.TYPE_SEEALSO,
+		                       };
+		
+		annTypes = new JComboBox(annotFields);
+		annTypes.setSelectedIndex(0);
+	
+		
+		annotPanel.add(annotLabel);
+		annotPanel.add(annTypes);
+		return annotPanel;
 	}
 	
 	private JPanel initSearchPanel() {
@@ -283,11 +343,13 @@ public class ChangesTab extends AbstractTabWidget {
 	
 		JTextField searchText = new JTextField(25);
 		JButton searchButton = new JButton(SEARCH_PANEL_BUTTON_GO);
-		ActionListener searchExecute = new ChangesSearchExecute(cbox, searchText, cTableModel);
+		//ActionListener searchExecute = new ChangesSearchExecute(cbox, searchText, cTableModel);
+		ActionListener searchExecute = new ChangesSearchExecute(cbox, searchText, cTreeTableModel);
 		searchButton.addActionListener(searchExecute);
 		
 		JButton clearButton = new JButton(SEARCH_PANEL_BUTTON_CLEAR);
-		ActionListener searchClear = new ChangesSearchClear(cTableModel);
+		//ActionListener searchClear = new ChangesSearchClear(cTableModel);
+		ActionListener searchClear = new ChangesSearchClear(cTreeTableModel);
 		clearButton.addActionListener(searchClear);
 		
 		searchPanel.add(searchLabel);
@@ -297,29 +359,67 @@ public class ChangesTab extends AbstractTabWidget {
 		searchPanel.add(clearButton);
 		
 		searchPanel.setLayout(new FlowLayout());
-
+		//initColumnSizes(cTable);
 		return searchPanel;
 	}
 	
+/*	private void initColumnSizes(JTable table) {
+		
+		TableColumn column = null;
+		for (int i = 0; i < 5; i++) {
+		    column = table.getColumnModel().getColumn(i);
+		    //System.out.println(table.getWidth()+"  " +column.getWidth()+ "   "+ column.getMaxWidth()+ "     " +  column.getMinWidth()+ "  "+ column.getPreferredWidth());
+		   
+		    if (i == 3) {
+		        column.setPreferredWidth(15); 
+		        column.setMaxWidth(15);
+		    }
+		    else {
+		        column.setPreferredWidth(75);
+		    }
+		}
+	}*/
+	
+	
 	private void initTables() {
 		// Create Tables
+		Instance ROOT = ChangeCreateUtil.createChange(
+	            cKb,
+	            ChangeCreateUtil.CHANGETYPE_INSTANCE_ADDED, 
+	            "ROOT", 
+	            "Changes will appear here ..", 
+	            "ROOT");
+		TreeTableNode root = new TreeTableNode(ROOT,cKb);
+		
+		
+		
+    	
+    	
+		
+		
 		cTableModel = new ChangeTableModel(cKb);
 		acTableModel = new ChangeTableModel(cKb);
+		//dcTableModel = new ChangeTableModel(cKb);
 		aTableModel = new AnnotationTableModel(cKb);
+		cTreeTableModel = new ChangeTreeTableModel(root, cKb);
 		
 		cTable = new JTable(cTableModel);
 		acTable = new JTable(acTableModel);
+		//dcTable = new JTable(dcTableModel);
 		aTable = new JTable(aTableModel);
-		
+		cTreeTable = new JTreeTable(cTreeTableModel);
+	
 		ComponentFactory.configureTable(aTable);
 		ComponentFactory.configureTable(acTable);
-		ComponentFactory.configureTable(cTable);
+		//ComponentFactory.configureTable(dcTable);
+		//ComponentFactory.configureTable(cTable);
 		
 		aTable.setShowGrid(false);
 		aTable.setIntercellSpacing(new Dimension(0, 0));
 		aTable.setColumnSelectionAllowed(false);
 		aTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		aTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 		
 		acTable.setShowGrid(false);
 		acTable.setIntercellSpacing(new Dimension(0, 0));
@@ -327,13 +427,29 @@ public class ChangesTab extends AbstractTabWidget {
 		acTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		acTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		acTable.setDefaultRenderer(Object.class, new ColoredTableCellRenderer());
+		//initColumnSizes(acTable);
 		
-		cTable.setShowGrid(false);
+		/*dcTable.setShowGrid(false);
+		dcTable.setIntercellSpacing(new Dimension(0, 0));
+		dcTable.setColumnSelectionAllowed(false);
+		dcTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		dcTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		dcTable.setDefaultRenderer(Object.class, new ColoredTableCellRenderer());
+		initColumnSizes(dcTable);*/
+		
+	/*	cTable.setShowGrid(false);
 		cTable.setIntercellSpacing(new Dimension(0, 0));
 		cTable.setColumnSelectionAllowed(false);
 		cTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		cTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		cTable.setDefaultRenderer(Object.class, new ColoredTableCellRenderer());
+		cTable.setDefaultRenderer(Object.class, new ColoredTableCellRenderer());*/
+		//initColumnSizes(cTable);
+		cTreeTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		cTreeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		//cTreeTable.getTree().expandPath(AbstractTreeTableModel.rootPath);
+		//cTreeTable.getTree().setRootVisible(false);
+		
+		
 		
 		ListSelectionModel lsm = aTable.getSelectionModel();
 		lsm.addListSelectionListener(new ListSelectionListener() {
@@ -351,6 +467,32 @@ public class ChangesTab extends AbstractTabWidget {
 				} 
 			}
 		});
+		
+		
+		/*ListSelectionModel lsm1 = cTable.getSelectionModel();
+		lsm1.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting()){
+					return;
+				}
+				
+				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+				if(!lsm.isSelectionEmpty()) {
+					int selectedRow = lsm.getMinSelectionIndex();
+					Object instName = cTableModel.getObjInRow(selectedRow);
+					Instance selectedInst = (Instance)instName;
+					Cls changeInstType = selectedInst.getDirectType();
+					if (changeInstType.getName().equals(ChangeCreateUtil.CHANGETYPE_TRANS_CHANGE)) {
+						
+						Collection relChanges = ChangeCreateUtil.getChanges(cKb, selectedInst);
+						dcTableModel.setChanges(relChanges);
+					} 
+					else
+						dcTableModel.clearData();	
+				} 
+			}
+		});
+	*/
 		
 	}
 	
@@ -461,7 +603,9 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		for (Iterator iter = changeList.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
+			
 			cTableModel.addChangeData(aInst);
+			cTreeTableModel.addChangeData(aInst);
 		}
 	}
 	
@@ -514,6 +658,7 @@ public class ChangesTab extends AbstractTabWidget {
 				
 				createChangeName.remove(oldName);
 				cTableModel.update();
+				cTreeTableModel.update();
 			}
 		}
 		if (aChange.getDirectType().getName().equals(ChangeCreateUtil.CHANGETYPE_SUBCLASS_ADDED)) {
@@ -526,6 +671,7 @@ public class ChangesTab extends AbstractTabWidget {
 			checkForCreateChange(aChange);	
 			if (addChange) {
 				cTableModel.addChangeData(aChange);
+				cTreeTableModel.addChangeData(aChange);
 				cMenu.setEnabledLastChange(true);
 				cMenu.setChange(aChange);	
 			}
@@ -544,7 +690,8 @@ public class ChangesTab extends AbstractTabWidget {
 			if (changeAction.equals(ChangeCreateUtil.CHANGETYPE_CLASS_CREATED)
 						|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_SLOT_CREATED)
 						|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_PROPERTY_CREATED)
-						|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_INSTANCE_ADDED)) {
+						) 
+				{
 				
 				ChangeCreateUtil.setInstApplyTo(cKb, cInst, newName);
 				ChangeCreateUtil.setInstApplyTo(cKb, aChange, newName);
@@ -586,6 +733,7 @@ public class ChangesTab extends AbstractTabWidget {
 				checkForCreateChange(changeInst);	
 				
 				cTableModel.addChangeData(changeInst);
+				cTreeTableModel.addChangeData(changeInst);
 				cMenu.setEnabledLastChange(true);
 				cMenu.setChange(changeInst);
 				
@@ -601,7 +749,8 @@ public class ChangesTab extends AbstractTabWidget {
 		if (changeAction.equals(ChangeCreateUtil.CHANGETYPE_CLASS_CREATED)
 				|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_SLOT_CREATED)
 				|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_PROPERTY_CREATED)
-				|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_INSTANCE_ADDED)) {
+				)
+				{
 			Integer rowCount = new Integer(cTableModel.getRowCount());
 			createChangeName.put(ChangeCreateUtil.getApplyTo(cKb, aChange), rowCount);
 		}
@@ -612,8 +761,15 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 	
 	public static void createAnnotation(Instance annotateInst) {
+		Slot body = cKb.getSlot(ChangeCreateUtil.SLOT_NAME_BODY);
+		Object bdy = annotateInst.getOwnSlotValue(body);
+		if (bdy == null) {
+			cKb.deleteInstance(annotateInst);
+		}
+		else{
 		annotateInst = ChangeCreateUtil.updateAnnotation(cKb, annotateInst);
 		aTableModel.addAnnotationData(annotateInst);
+		}
 	}
 	
 	public static String getTimeStamp() {
@@ -645,9 +801,9 @@ public class ChangesTab extends AbstractTabWidget {
 		 */
 		public void actionPerformed(ActionEvent arg0) {
 			
-			if (cTable.getSelectedRowCount() > 0) {
+			if (cTreeTable.getSelectedRowCount() > 0) {
 				
-				int[] selected = cTable.getSelectedRows();
+				int[] selected = cTreeTable.getSelectedRows();
 				Collection chngInsts = ChangeCreateUtil.getChangeInsts(cKb);
 				Object[] chngInstArray = chngInsts.toArray();
 				Collection chngInstSelected = new ArrayList();
@@ -656,8 +812,8 @@ public class ChangesTab extends AbstractTabWidget {
 					Instance changeInst = (Instance)cTableModel.getObjInRow(selected[i]);
 					chngInstSelected.add(changeInst);
 				}
-			
-				annotateInst = ChangeCreateUtil.createAnnotation(cKb, chngInstSelected);
+			    String annotType = (String)annTypes.getSelectedItem();
+				annotateInst = ChangeCreateUtil.createAnnotation(cKb, annotType, chngInstSelected);
 				JFrame edit = changes.show(annotateInst);
 				
 				edit.addWindowListener(new WindowListener() {
@@ -762,27 +918,89 @@ public class ChangesTab extends AbstractTabWidget {
 		}
 	}
 	
-	public class FilterTransAction extends AbstractAction {
+	/*public class FilterTransAction extends AbstractAction {
 		public FilterTransAction(String prompt) {
 			super(prompt, Icons.getViewClsIcon());
 		}
 
-		/* (non-Javadoc)
+		 (non-Javadoc)
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		 */
+		 
 		public void actionPerformed(ActionEvent arg0) {
-			cTableModel.filterTrans();
-			acTableModel.filterTrans();
+			//cTableModel.filterTrans();
+			//acTableModel.filterTrans();
+			//testing TreeTableModel
+			Instance ROOT = ChangeCreateUtil.createChange(
+		            cKb,
+		            ChangeCreateUtil.CHANGETYPE_INSTANCE_ADDED, 
+		            "ROOT", 
+		            "ROOT", 
+		            "ROOT");
+			TreeTableNode root = new TreeTableNode(ROOT,cKb);
+			Instance CHILD = ChangeCreateUtil.createChange(
+		            cKb,
+		            ChangeCreateUtil.CHANGETYPE_INSTANCE_ADDED, 
+		            "CHILD", 
+		            "CHILD", 
+		            "CHILD");
+			TreeTableNode child = new TreeTableNode(CHILD,cKb);
+			Instance CHILD1 = ChangeCreateUtil.createChange(
+		            cKb,
+		            ChangeCreateUtil.CHANGETYPE_INSTANCE_ADDED, 
+		            "CHILD1", 
+		            "CHILD1", 
+		            "CHILD1");
+			TreeTableNode child1 = new TreeTableNode(CHILD1,cKb); 	
+			root.addChild(child);
+			
+			ChangeTreeTableModel ttModel = new ChangeTreeTableModel(root, cKb);
+	    	
+	    	JTreeTable tt = new JTreeTable(ttModel);
+	    	//tt.setShowGrid(true);
+	    	tt.getTree().setRootVisible(false);
+	    
+	    	JFrame f = new JFrame();
+	    	f.addWindowListener(new WindowListener()  {
+	    		
+				public void windowClosing(WindowEvent e) {
+				    System.exit(0);
+				}
+				public void windowOpened(WindowEvent arg0) {
+				}
+
+				
+				public void windowClosed(WindowEvent arg0) {
+					
+				}
+
+				public void windowIconified(WindowEvent arg0) {
+				}
+
+				public void windowDeiconified(WindowEvent arg0) {
+				}
+
+				public void windowActivated(WindowEvent arg0) {
+				}
+
+				public void windowDeactivated(WindowEvent arg0) {
+				}
+		    });	    
+	    	f.getContentPane().add(new JScrollPane(tt));
+	    	f.pack();
+	    	f.setVisible(true);
+	    	//root.addChild(child1);
+	    	
+
 		}
-	}
+	}*/
 	
-	public class FilterTransInfoAction extends AbstractAction {
+	/*public class FilterTransInfoAction extends AbstractAction {
 		public FilterTransInfoAction(String prompt) {
 			super(prompt, Icons.getViewClsIcon());
 		}
-		/* (non-Javadoc)
+		 (non-Javadoc)
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		 */
+		 
 		public void actionPerformed(ActionEvent arg0) {
 			cTableModel.filterTransInfo();
 			acTableModel.filterTransInfo();
@@ -793,12 +1011,12 @@ public class ChangesTab extends AbstractTabWidget {
 		public FilterAllAction(String prompt) {
 			super(prompt, Icons.getViewClsIcon());
 		}
-		/* (non-Javadoc)
+		 (non-Javadoc)
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		 */
+		 
 		public void actionPerformed(ActionEvent arg0) {
 			cTableModel.filterAll();
 			acTableModel.filterAll();
 		}
-	}
+	}*/
 }
