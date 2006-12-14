@@ -73,7 +73,7 @@ public class ChangeMenu extends JMenu {
 		public void actionPerformed(ActionEvent arg0) {
 			Collection changeInsts = new ArrayList();
 			changeInsts.add(lastInst);
-			annotateInst = ChangeCreateUtil.createAnnotation(cKb, changeInsts);
+			annotateInst = ChangeCreateUtil.createAnnotation(cKb, "Comment", changeInsts);
 			
 			JFrame aEdit = changeProj.show(annotateInst);
 			aEdit.addWindowListener(new WindowListener() {
