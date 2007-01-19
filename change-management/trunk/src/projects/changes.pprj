@@ -1,4 +1,4 @@
-; Mon Dec 04 00:08:04 PST 2006
+; Thu Jan 18 16:06:45 PST 2007
 ; 
 ;+ (version "3.2")
 ;+ (build "Build 342")
@@ -6,11 +6,11 @@
 ([BROWSER_SLOT_NAMES] of  Property_List
 
 	(properties
-		[changes_ProjectKB_Instance_20000]
-		[changes_ProjectKB_Instance_20001]
-		[changes_ProjectKB_Instance_20002]
-		[changes_ProjectKB_Instance_30003]
-		[changes_ProjectKB_Instance_30004]))
+		[changes_ProjectKB_Instance_40006]
+		[changes_ProjectKB_Instance_40007]
+		[changes_ProjectKB_Instance_40008]
+		[changes_ProjectKB_Instance_40009]
+		[changes_ProjectKB_Instance_40010]))
 
 ([changes_ProjectKB_Instance_0] of  Widget
 
@@ -191,7 +191,7 @@
 
 ([changes_ProjectKB_Instance_10131] of  Map
 
-	(entries [changes_ProjectKB_Instance_30005]))
+	(entries [changes_ProjectKB_Instance_40011]))
 
 ([changes_ProjectKB_Instance_102] of  Property_List
 )
@@ -293,21 +293,6 @@
 		[changes_ProjectKB_Instance_30018]
 		[changes_ProjectKB_Instance_20018]))
 
-([changes_ProjectKB_Instance_20000] of  String
-
-	(name "Change")
-	(string_value "context"))
-
-([changes_ProjectKB_Instance_20001] of  String
-
-	(name ":INSTANCE-ANNOTATION")
-	(string_value "%3AANNOTATION-TEXT"))
-
-([changes_ProjectKB_Instance_20002] of  String
-
-	(name ":PAL-CONSTRAINT")
-	(string_value "%3APAL-NAME"))
-
 ([changes_ProjectKB_Instance_20003] of  Widget
 
 	(height 0)
@@ -349,23 +334,6 @@
 
 	(boolean_value FALSE)
 	(name "ButtonDisplayed-View References to Value"))
-
-([changes_ProjectKB_Instance_30003] of  String
-
-	(name "Annotation")
-	(string_value "body"))
-
-([changes_ProjectKB_Instance_30004] of  String
-
-	(name ":META-CLASS")
-	(string_value "%3ANAME"))
-
-([changes_ProjectKB_Instance_30005] of  Map_Entry
-
-	(key "annotation_proj_exists")
-	(key_class "java.lang.String")
-	(value "yes")
-	(value_class "java.lang.String"))
 
 ([changes_ProjectKB_Instance_30006] of  Property_List
 )
@@ -517,6 +485,38 @@
 
 	(boolean_value FALSE)
 	(name "ButtonDisplayed-View References to Value"))
+
+([changes_ProjectKB_Instance_40006] of  String
+
+	(name "Change")
+	(string_value "context"))
+
+([changes_ProjectKB_Instance_40007] of  String
+
+	(name ":INSTANCE-ANNOTATION")
+	(string_value "%3AANNOTATION-TEXT"))
+
+([changes_ProjectKB_Instance_40008] of  String
+
+	(name ":PAL-CONSTRAINT")
+	(string_value "%3APAL-NAME"))
+
+([changes_ProjectKB_Instance_40009] of  String
+
+	(name "Annotation")
+	(string_value "body"))
+
+([changes_ProjectKB_Instance_40010] of  String
+
+	(name ":META-CLASS")
+	(string_value "%3ANAME"))
+
+([changes_ProjectKB_Instance_40011] of  Map_Entry
+
+	(key "annotation_proj_exists")
+	(key_class "java.lang.String")
+	(value "yes")
+	(value_class "java.lang.String"))
 
 ([changes_ProjectKB_Instance_40056] of  Widget
 

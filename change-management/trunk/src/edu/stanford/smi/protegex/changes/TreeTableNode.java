@@ -11,12 +11,14 @@ import edu.stanford.smi.protegex.changes.ui.*;
 public class TreeTableNode {
     public Instance changeInst;
     public Vector children;
+
     private KnowledgeBase changeKB;
     
 
     public TreeTableNode(Instance changeInst, KnowledgeBase changeKB) {
 		this.changeInst = changeInst;
-		children = new Vector();
+		children = new Vector(10,10);
+	
 		this.changeKB = changeKB;
     }
 
@@ -32,19 +34,19 @@ public class TreeTableNode {
 
 		case 2:
 			ctxt = ChangeCreateUtil.getAuthor(changeKB, changeInst);
-			//ctxt = "dummy author";
+			
 			break;
 		case 3: 
 			ctxt = ChangeCreateUtil.getCreated(changeKB, changeInst);
-	        //ctxt = "dummy created"; 
+	         
 			break;
 		case 0: 
 			ctxt = ChangeCreateUtil.getActionDisplay(changeKB, changeInst);
-		    //ctxt = "dummy action";
+		   
 			break;
 		case 1: 
 			ctxt = ChangeCreateUtil.getContext(changeKB, changeInst);
-		    //ctxt = "dummy context";
+		
 			break;
 		}
    
@@ -58,9 +60,13 @@ public class TreeTableNode {
 		return children.size();
 	}
 	
+
+	
 	public Object[] getChildren(){
 		return children.toArray();
 	}
+	
+
 
 	public TreeTableNode getChildAt(int i) {
 		return (TreeTableNode) children.get(i);
@@ -68,8 +74,24 @@ public class TreeTableNode {
 
     public void addChild(TreeTableNode child) {
        children.add(child);
+       
+    }
+    
+    public Instance getChildInstanceAt(int i){
+    	return ((TreeTableNode) children.get(i)).changeInst;
+    }
+    
+    
+  
+    
+    
+    
+    public void removeChildren(){
+    	children.clear();
     }
 
+ 
+    
   
 }
 

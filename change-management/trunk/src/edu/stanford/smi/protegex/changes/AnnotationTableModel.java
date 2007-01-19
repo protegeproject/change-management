@@ -35,11 +35,11 @@ public class AnnotationTableModel extends AbstractTableModel{
 		
 		// Setup the table column size/names
 		colNames = new String[4];
-		colNames[0] = ANNOTATE_COLNAME_AUTHOR;
-		colNames[1] = ANNOTATE_COLNAME_CREATED;
-		colNames[2]= ANNOTATE_COLNAME_TYPE;
+		colNames[2] = ANNOTATE_COLNAME_AUTHOR;
+		colNames[3] = ANNOTATE_COLNAME_CREATED;
+		colNames[0]= ANNOTATE_COLNAME_TYPE;
 		//colNames[3] = ANNOTATE_COLNAME_TITLE;
-		colNames[3] = ANNOTATE_COLNAME_COMMENTS;
+		colNames[1] = ANNOTATE_COLNAME_COMMENTS;
 		
 		data = new ArrayList();
 	}
@@ -102,15 +102,15 @@ public class AnnotationTableModel extends AbstractTableModel{
 		
 		switch(col) {
 		
-		case 0:
-			return ChangeCreateUtil.getAuthor(changeKB, aInst);
-		case 1: 
-			return ChangeCreateUtil.getCreated(changeKB, aInst);
 		case 2:
+			return ChangeCreateUtil.getAuthor(changeKB, aInst);
+		case 3: 
+			return ChangeCreateUtil.getCreated(changeKB, aInst);
+		case 0:
 			return annotType.getName(); 
 		/*case 3:
 			return ChangeCreateUtil.getTitle(changeKB, aInst);*/
-		case 3: 
+		case 1: 
 			return ChangeCreateUtil.getBody(changeKB, aInst);
 		}
 		

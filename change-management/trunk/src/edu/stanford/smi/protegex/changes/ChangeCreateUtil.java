@@ -405,13 +405,22 @@ public class ChangeCreateUtil {
 		
 		Instance changeInst = changeKB.createInstance(null, change);
 		
+		if(apply.equals("ROOT")){
+			changeInst.setOwnSlotValue(action, "Type of change");
+			changeInst.setOwnSlotValue(applyTo, apply);
+			changeInst.setOwnSlotValue(author, "Person who made the change");
+			changeInst.setOwnSlotValue(context, "Details of the action");
+			changeInst.setOwnSlotValue(created, "Date and time the change was made");
+			changeInst.setOwnSlotValue(type, typ);	
+		}
+		else{
 		changeInst.setOwnSlotValue(action, change.getName());
 		changeInst.setOwnSlotValue(applyTo, apply);
 		changeInst.setOwnSlotValue(author, ChangesTab.getUserName());
 		changeInst.setOwnSlotValue(context, desc);
 		changeInst.setOwnSlotValue(created, ChangesTab.getTimeStamp());
 		changeInst.setOwnSlotValue(type, typ);
-		
+		}
 		return changeInst;
 	}
 	

@@ -133,6 +133,9 @@ public class ChangesTab extends AbstractTabWidget {
 	private static boolean isOwlProject;
 	
 	private static ChangeMenu cMenu;
+	private static RemoveInstanceAction remInst;
+	private static EditInstanceAction editInst;
+	private static AddInstanceAction addInst;
 	
 	//JTreeTable
 	
@@ -254,8 +257,8 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		changeHistLC.doLayout();
 		changeHistLC.addHeaderSeparator();
-		AddInstanceAction addInst = new AddInstanceAction(changeHistLC, ACTION_NAME_CREATE_ANNOTATE);
-		
+		addInst = new AddInstanceAction(changeHistLC, ACTION_NAME_CREATE_ANNOTATE);
+	    addInst.setEnabled(false);
 //		FilterTransInfoAction fNonTransInst = new FilterTransInfoAction(FILTER_NAME_DETAIL_VIEW);
 		//FilterTransAction fTransInst = new FilterTransAction(FILTER_NAME_SUMMARY_VIEW);
 		//changeHistLC.addHeaderButton(fTransInst);
@@ -281,8 +284,10 @@ public class ChangesTab extends AbstractTabWidget {
 		LabeledComponent annotLC = new LabeledComponent(LABELCOMP_NAME_ANNOTATIONS, scroll2, true);
 		annotLC.doLayout();
 		annotLC.addHeaderSeparator();
-		RemoveInstanceAction remInst = new RemoveInstanceAction(ACTION_NAME_REMOVE_ANNOTATE);
-		EditInstanceAction editInst = new EditInstanceAction(ACTION_NAME_EDIT_ANNOTATE);
+		remInst = new RemoveInstanceAction(ACTION_NAME_REMOVE_ANNOTATE);
+		editInst = new EditInstanceAction(ACTION_NAME_EDIT_ANNOTATE);
+		remInst.setEnabled(false);
+		editInst.setEnabled(false);
 		annotLC.addHeaderButton(remInst);
 		annotLC.addHeaderButton(editInst);
 		//annotLC.setMaximumSize(new Dimension(1000,800));
@@ -333,10 +338,12 @@ public class ChangesTab extends AbstractTabWidget {
 	private JPanel initSearchPanel() {
 		JPanel searchPanel = ComponentFactory.createPanel();
 		JLabel searchLabel = new JLabel(SEARCH_PANEL_TITLE);
-		String[] searchFields = {	ChangeTableModel.CHANGE_COLNAME_AUTHOR, 
-									ChangeTableModel.CHANGE_COLNAME_CREATED,
-									ChangeTableModel.CHANGE_COLNAME_ACTION, 
-									ChangeTableModel.CHANGE_COLNAME_DESCRIPTION};
+		String[] searchFields = {	ChangeTableModel.CHANGE_COLNAME_AUTHOR,
+				                    ChangeTableModel.CHANGE_COLNAME_ACTION, 
+				                    ChangeTableModel.CHANGE_COLNAME_DESCRIPTION,
+									ChangeTableModel.CHANGE_COLNAME_CREATED
+									
+									};
 		
 		JComboBox cbox = new JComboBox(searchFields);
 		cbox.setSelectedIndex(0);
@@ -387,7 +394,7 @@ public class ChangesTab extends AbstractTabWidget {
 	            cKb,
 	            ChangeCreateUtil.CHANGETYPE_INSTANCE_ADDED, 
 	            "ROOT", 
-	            "Changes will appear here ..", 
+	            "ROOT", 
 	            "ROOT");
 		TreeTableNode root = new TreeTableNode(ROOT,cKb);
 		
@@ -460,10 +467,29 @@ public class ChangesTab extends AbstractTabWidget {
 				
 				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
 				if(!lsm.isSelectionEmpty()) {
+					remInst.setEnabled(true);
+					editInst.setEnabled(true);
 					int selectedRow = lsm.getMinSelectionIndex();
 					String instName = aTableModel.getInstanceName(selectedRow);
 					Instance selectedInst = cKb.getInstance(instName);
 					acTableModel.setChanges(ChangeCreateUtil.getAnnotationChanges(cKb, selectedInst));
+				} 
+			}
+		});
+		
+		
+		
+		ListSelectionModel tlsm = cTreeTable.getSelectionModel();
+		tlsm.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting()){
+					return;
+				}
+				
+				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+				if(!lsm.isSelectionEmpty()) {
+					addInst.setEnabled(true);
+			
 				} 
 			}
 		});
@@ -809,7 +835,8 @@ public class ChangesTab extends AbstractTabWidget {
 				Collection chngInstSelected = new ArrayList();
 				
 				for (int i = 0; i < selected.length; i++) {
-					Instance changeInst = (Instance)cTableModel.getObjInRow(selected[i]);
+					Instance changeInst = (Instance)cTreeTableModel.getObjInRow(selected[i]-1);
+					//Instance changeInst = (Instance)cTableModel.getObjInRow(selected[i]-1);
 					chngInstSelected.add(changeInst);
 				}
 			    String annotType = (String)annTypes.getSelectedItem();
@@ -820,6 +847,7 @@ public class ChangesTab extends AbstractTabWidget {
 					
 					public void windowClosed(WindowEvent arg0) {
 						createAnnotation(annotateInst);	
+						//addInst.setEnabled(false);
 					}
 
 					public void windowClosing(WindowEvent arg0) {
@@ -867,12 +895,16 @@ public class ChangesTab extends AbstractTabWidget {
 			}
 			
 			aTable.clearSelection();
+			remInst.setEnabled(false);
+			editInst.setEnabled(false);
+			
+			
 		}
 	}
 	
 	public class EditInstanceAction extends AbstractAction {
 		public EditInstanceAction(String prompt) {
-			super(prompt, Icons.getCreateClsNoteIcon());
+			super(prompt, Icons.getClsNoteIcon());
 		}
 
 		/* (non-Javadoc)
@@ -897,6 +929,8 @@ public class ChangesTab extends AbstractTabWidget {
 
 					public void windowClosed(WindowEvent arg0) {
 						aTableModel.editAnnotationData(instToEdit, aTable.getSelectedRow());
+						remInst.setEnabled(false);
+						editInst.setEnabled(false);
 					}
 
 					public void windowIconified(WindowEvent arg0) {

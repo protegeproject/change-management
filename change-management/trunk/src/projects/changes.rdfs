@@ -134,6 +134,10 @@
 	 rdfs:label="Name_Changed">
 	<rdfs:subClassOf rdf:resource="&kb;KB_Change"/>
 </rdfs:Class>
+<rdfs:Class rdf:about="&kb;Ontology_Component"
+	 rdfs:label="Ontology_Component">
+	<rdfs:subClassOf rdf:resource="&a;_system_class"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Property_Change"
 	 rdfs:label="Property_Change">
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
@@ -241,8 +245,10 @@
 <rdf:Property rdf:about="&kb;annotates"
 	 rdfs:label="annotates">
 	<rdfs:domain rdf:resource="&kb;Annotation"/>
-	<rdfs:range rdf:resource="&kb;Change"/>
+	<a:allowedClasses rdf:resource="&kb;Change"/>
+	<a:allowedClasses rdf:resource="&kb;Ontology_Component"/>
 	<a:inverseProperty rdf:resource="&kb;assoc_annotations"/>
+	<rdfs:range rdf:resource="&a;_system_class"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;applyTo"
 	 a:maxCardinality="1"
@@ -254,6 +260,7 @@
 	 rdfs:label="assoc_annotations">
 	<rdfs:range rdf:resource="&kb;Annotation"/>
 	<rdfs:domain rdf:resource="&kb;Change"/>
+	<rdfs:domain rdf:resource="&kb;Ontology_Component"/>
 	<a:inverseProperty rdf:resource="&kb;annotates"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;author"

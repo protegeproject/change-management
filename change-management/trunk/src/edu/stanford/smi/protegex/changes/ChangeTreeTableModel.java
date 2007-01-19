@@ -26,13 +26,13 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	private String[] colNames;
 	private ArrayList completeData;
 	private KnowledgeBase changeKB;
-
+    private static TreeTableNode root;
 	 
 	
 	
-	public ChangeTreeTableModel(TreeTableNode root, KnowledgeBase changeKb) {
+	public ChangeTreeTableModel(TreeTableNode rootOfTree, KnowledgeBase changeKb) {
 		
-		super(root);
+		super(rootOfTree);
 		this.changeKB = changeKb;
 		init();
 	}
@@ -46,7 +46,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 		colNames[0] = CHANGE_COLNAME_ACTION;
 		colNames[1] = CHANGE_COLNAME_DESCRIPTION;
 		completeData = new ArrayList();
-	
+		root = (TreeTableNode)getRoot();
 	}
 	
 	
@@ -82,7 +82,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	}
 	
 	public void update() {
-		TreeTableNode root = (TreeTableNode)getRoot();
+		
 		int[] childIndices = new int[1];
 		if(root.getChildCount()!=0)
 	      childIndices[0]= root.getChildCount()- 1;
@@ -120,14 +120,8 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 		
 		addChangeData(changeInst, true);
 		
-		TreeTableNode root = (TreeTableNode)getRoot();
-		int[] childIndices = new int[1];
-		if(root.getChildCount()!=0)
-	      childIndices[0]= root.getChildCount()- 1;
-		Object[] children = new Object[1];
-	    if(root.getChildCount()!=0)
-	      children[0] = root.getChildAt(childIndices[0]);
-		fireTreeNodesInserted(getRoot(), rootPath.getPath() , childIndices, children);
+		
+	
 	}
 
 	
@@ -135,12 +129,24 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	
 	private void addChangeData(Instance changeInst,  boolean completeUpdate) {
 	
-		TreeTableNode root = (TreeTableNode)getRoot();
+		
 		TreeTableNode newNode = new TreeTableNode(changeInst,changeKB);
 		String actionType = ChangeCreateUtil.getType(changeKB, changeInst);
 		if (actionType != null){
-			if(!actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS_INFO)&& !actionType.equals("ROOT"))
+			if(!actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS_INFO)&& !actionType.equals("ROOT")){
 				 root.addChild(newNode);
+				 int[] childIndices = new int[1];
+					if(root.getChildCount()!=0)
+				      childIndices[0]= root.getChildCount()- 1;
+					Object[] children = new Object[1];
+				    if(root.getChildCount()!=0)
+				      children[0] = root.getChildAt(childIndices[0]);
+					fireTreeNodesInserted(getRoot(), rootPath.getPath() , childIndices, children);
+				  if (completeUpdate) {
+					 completeData.add(changeInst);
+					}
+				
+			}
 		}
 		
 			
@@ -156,18 +162,12 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 					Instance aInst = (Instance) iter.next();
 					TreeTableNode transChild = new TreeTableNode(aInst,changeKB);
 					newNode.addChild(transChild) ;        //if the change is a transaction, its children are the associated changes
-					
-					if (completeUpdate) {
-						completeData.add(aInst);
-					}
+				
 					
 				}
 			} 
 			
 			
-			if (completeUpdate) {
-				completeData.add(changeInst);
-			}
 		
 		}
 	
@@ -192,8 +192,18 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	
 	
 	private void setNewSearch(String field, String text) {
-	
 		
+		int i;
+		
+		int num = root.getChildCount();
+		if(num!=0){
+		  int[] childIndices = new int[num];
+	      Object[] children = new Object[num];
+	      for(i=0;i<num;i++)
+	        children[i] = root.getChildAt(i);
+	      root.removeChildren();
+		  fireTreeNodesRemoved(getRoot(), rootPath.getPath() , childIndices, children);
+		}
 		Slot author = changeKB.getSlot(ChangeCreateUtil.SLOT_NAME_AUTHOR);
 		Slot created = changeKB.getSlot(ChangeCreateUtil.SLOT_NAME_CREATED);
 		Slot action = changeKB.getSlot(ChangeCreateUtil.SLOT_NAME_ACTION);
@@ -215,37 +225,41 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 			Object element = (Object) iter.next();
 			if (element instanceof Instance) {
 				Instance someInst = (Instance) element;
-				addChangeData(someInst,false);
+				addChangeData(someInst, false);
+		
+				
 			}
 		}
-		TreeTableNode root = (TreeTableNode)getRoot();
-		int[] childIndices = new int[1];
-		if(root.getChildCount()!=0)
-	      childIndices[0]= root.getChildCount()- 1;
-		Object[] children = new Object[1];
-	    if(root.getChildCount()!=0)
-	      children[0] = root.getChildAt(childIndices[0]);
-		fireTreeNodesChanged(getRoot(), rootPath.getPath() , childIndices, children);
+	
+	
+	}
+	
+	
+	public Object getObjInRow(int row) {
+		Instance aInst = root.getChildInstanceAt(row);
+		return aInst;
 	}
 	
 	private void setNewFilter() {
+        int i;
 		
-		
-		//initCurrColor();
-		for (Iterator iter = completeData.iterator(); iter.hasNext();) {
-			Instance aInst = (Instance) iter.next();
-			addChangeData(aInst);
+		int num = root.getChildCount();
+		if(num!=0){
+		  int[] childIndices = new int[num];
+	      Object[] children = new Object[num];
+	      for(i=0;i<num;i++)
+	        children[i] = root.getChildAt(i);
+	      root.removeChildren();
+		  fireTreeNodesRemoved(getRoot(), rootPath.getPath() , childIndices, children);
 		}
 		
-		TreeTableNode root = (TreeTableNode)getRoot();
-		int[] childIndices = new int[1];
-		if(root.getChildCount()!=0)
-	      childIndices[0]= root.getChildCount()- 1;
-		Object[] children = new Object[1];
-	    if(root.getChildCount()!=0)
-	      children[0] = root.getChildAt(childIndices[0]);
-		fireTreeNodesChanged(getRoot(), rootPath.getPath() , childIndices, children);
-	}
 	
+		for (Iterator iter = completeData.iterator(); iter.hasNext();) {
+			Instance aInst = (Instance) iter.next();
+			addChangeData(aInst, false);
+	
+		}
+	
+	}
 
 }
