@@ -6,15 +6,15 @@ import java.awt.event.ActionListener;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
-import edu.stanford.smi.protegex.changes.ChangeTableModel;
+import edu.stanford.smi.protegex.changes.ChangeTreeTableModel;
 
 public class ChangesSearchExecute implements ActionListener{
 
 	JComboBox searchField;
 	JTextField searchText;
-	ChangeTableModel changeTableModel;
+	ChangeTreeTableModel changeTableModel;
 	
-	public ChangesSearchExecute(JComboBox field, JTextField text, ChangeTableModel ctableModel) {
+	public ChangesSearchExecute(JComboBox field, JTextField text, ChangeTreeTableModel ctableModel) {
 		searchField = field;
 		searchText = text;
 		changeTableModel = ctableModel;

@@ -6,6 +6,7 @@ import javax.swing.table.AbstractTableModel;
 
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Cls;
 
 /**
  * The tabel model for the annotation specific table
@@ -15,9 +16,16 @@ public class AnnotationTableModel extends AbstractTableModel{
 
 	public static final String ANNOTATE_COLNAME_AUTHOR ="Author";
 	public static final String ANNOTATE_COLNAME_CREATED ="Created";
-	public static final String ANNOTATE_COLNAME_TITLE ="Title";
-	public static final String ANNOTATE_COLNAME_COMMENTS ="Comments";
-	
+	//public static final String ANNOTATE_COLNAME_TITLE ="Title";
+	public static final String ANNOTATE_COLNAME_TYPE ="Type";
+	public static final String ANNOTATE_COLNAME_COMMENTS ="Description";
+    public static final String TYPE_EXPLANATION = "Explanation";
+    public static final String TYPE_QUESTION = "Question";
+    public static final String TYPE_SEEALSO = "SeeAlso";
+    public static final String TYPE_ADVICE = "Advice";
+    public static final String TYPE_EXAMPLE = "Example";
+    public static final String TYPE_COMMENT = "Comment";
+
 	private String[] colNames;
 	private ArrayList data;
 	private KnowledgeBase changeKB;
@@ -27,10 +35,11 @@ public class AnnotationTableModel extends AbstractTableModel{
 		
 		// Setup the table column size/names
 		colNames = new String[4];
-		colNames[0] = ANNOTATE_COLNAME_AUTHOR;
-		colNames[1] = ANNOTATE_COLNAME_CREATED;
-		colNames[2] = ANNOTATE_COLNAME_TITLE;
-		colNames[3] = ANNOTATE_COLNAME_COMMENTS;
+		colNames[2] = ANNOTATE_COLNAME_AUTHOR;
+		colNames[3] = ANNOTATE_COLNAME_CREATED;
+		colNames[0]= ANNOTATE_COLNAME_TYPE;
+		//colNames[3] = ANNOTATE_COLNAME_TITLE;
+		colNames[1] = ANNOTATE_COLNAME_COMMENTS;
 		
 		data = new ArrayList();
 	}
@@ -68,6 +77,7 @@ public class AnnotationTableModel extends AbstractTableModel{
 			return colNames[2];
 		case 3:
 			return colNames[3];
+		
 		}
 		
 		return "";
@@ -88,16 +98,19 @@ public class AnnotationTableModel extends AbstractTableModel{
 		// This is the instance object,
 		// get the particular piece of info out of it.
 		Instance aInst = (Instance)data.get(row);
+		Cls annotType = aInst.getDirectType();
 		
 		switch(col) {
 		
-		case 0:
-			return ChangeCreateUtil.getAuthor(changeKB, aInst);
-		case 1: 
-			return ChangeCreateUtil.getCreated(changeKB, aInst);
 		case 2:
-			return ChangeCreateUtil.getTitle(changeKB, aInst);
+			return ChangeCreateUtil.getAuthor(changeKB, aInst);
 		case 3: 
+			return ChangeCreateUtil.getCreated(changeKB, aInst);
+		case 0:
+			return annotType.getName(); 
+		/*case 3:
+			return ChangeCreateUtil.getTitle(changeKB, aInst);*/
+		case 1: 
 			return ChangeCreateUtil.getBody(changeKB, aInst);
 		}
 		
