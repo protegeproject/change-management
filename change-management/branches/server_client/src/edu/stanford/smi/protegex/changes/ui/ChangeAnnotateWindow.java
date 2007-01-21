@@ -24,6 +24,7 @@ import edu.stanford.smi.protegex.changes.AnnotationTableModel;
 import edu.stanford.smi.protegex.changes.ChangeCreateUtil;
 import edu.stanford.smi.protegex.changes.ChangeTableModel;
 import edu.stanford.smi.protegex.changes.ChangesTab;
+import edu.stanford.smi.protegex.changes.TreeTableNode;
 import edu.stanford.smi.protegex.changes.InstanceDateComparator;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
 import edu.stanford.smi.protegex.changes.action.ChangeShowAction;
@@ -43,7 +44,7 @@ public class ChangeAnnotateWindow {
 	private String clsName;
 	private ArrayList names = new ArrayList();
 	private boolean nameChangeOn;
-	
+
 	
 	public ChangeAnnotateWindow(KnowledgeBase cKb, String clsName, boolean nameChangeOn) {
 		this.cKb = cKb;
@@ -64,7 +65,7 @@ public class ChangeAnnotateWindow {
 		cmFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		JPanel cmPanel = new JPanel();
-		
+	
 		cTableModel = new ChangeTableModel(cKb);
 		aTableModel = new AnnotationTableModel(cKb);
 		
@@ -173,7 +174,7 @@ public class ChangeAnnotateWindow {
 		cTable.setDefaultRenderer(Object.class, new ColoredTableCellRenderer());
 		
 		if (nameChangeOn) {
-			cTable.addMouseListener(new ChangeShowAction(cTable, cTableModel, ChangesTab.getChangesProj()));
+			//cTable.addMouseListener(new ChangeShowAction(cTable, cTableModel, ChangesTab.getChangesProj()));
 			aTable.addMouseListener(new AnnotationShowAction(aTable, aTableModel, ChangesTab.getChangesProj()));
 		}
 		

@@ -5,11 +5,13 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.table.AbstractTableModel;
+import javax.swing.Icon;
 
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protege.resource.Icons;
 
 public class ChangeTableModel extends AbstractTableModel {
 
@@ -21,7 +23,7 @@ public class ChangeTableModel extends AbstractTableModel {
 	public static final String CHANGE_COLNAME_CREATED ="Created";
 	public static final String CHANGE_COLNAME_ACTION ="Action";
 	public static final String CHANGE_COLNAME_DESCRIPTION ="Description";
-	
+	//static protected Class[]  cTypes = {String.class, String.class, String.class, Icon.class, String.class};
 	private String[] colNames;
 	private ArrayList completeData;
 	private ArrayList workingData;
@@ -47,10 +49,12 @@ public class ChangeTableModel extends AbstractTableModel {
 	// init the column names, data structures
 	private void init() {
 		colNames = new String[4];
-		colNames[0] = CHANGE_COLNAME_AUTHOR;
-		colNames[1] = CHANGE_COLNAME_CREATED;
-		colNames[2] = CHANGE_COLNAME_ACTION;
-		colNames[3] = CHANGE_COLNAME_DESCRIPTION;
+	
+		colNames[2] = CHANGE_COLNAME_AUTHOR;
+		colNames[3] = CHANGE_COLNAME_CREATED;
+		colNames[0] = CHANGE_COLNAME_ACTION;
+		//colNames[3] = "    ";
+		colNames[1] = CHANGE_COLNAME_DESCRIPTION;
 		
 		workingData = new ArrayList();
 		completeData = new ArrayList();
@@ -84,10 +88,19 @@ public class ChangeTableModel extends AbstractTableModel {
 			return colNames[2];
 		case 3:
 			return colNames[3];
+		//case 4:
+			//return colNames[4];
+	
+		
 		}
 		
 		return "";
 	}
+	
+	/*public Class getColumnClass(int c) {
+		return cTypes[c];
+        //return getValueAt(0, c).getClass();
+    }*/
 	
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableModel#getValueAt(int, int)
@@ -102,26 +115,34 @@ public class ChangeTableModel extends AbstractTableModel {
 		Object ctxt = null;
 		
 		switch(col) {
-		case 0:
+		case 2:
 			ctxt = ChangeCreateUtil.getAuthor(changeKB, aInst);
-			break;
-		case 1: 
+		    break;
+		case 3: 
 			ctxt = ChangeCreateUtil.getCreated(changeKB, aInst);
 			break;
-		case 2: 
+		case 0: 
 			ctxt = ChangeCreateUtil.getActionDisplay(changeKB, aInst);
 			break;
-		case 3: 
+		/*case 3:  
+			//Cls changeInstType = aInst.getDirectType();
+			//if (changeInstType.getName().equals(ChangeCreateUtil.CHANGETYPE_TRANS_CHANGE))
+			  String actionType = ChangeCreateUtil.getType(changeKB, aInst);	
+			  if(actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_DISP_TRANS))
+			   ctxt = Icons.getViewClsIcon();
+			break; */ 	
+		case 1: 
 			ctxt = ChangeCreateUtil.getContext(changeKB, aInst);
 			break;
 		}
 		
-		Integer colorInt = (Integer) colorList.get(row);
-		Object[] wrapper = new Object[2];
-		wrapper[0] = colorInt;
-		wrapper[1] = ctxt;
+		//Integer colorInt = (Integer) colorList.get(row);
+		//Object[] wrapper = new Object[2];
+		//wrapper[0] = colorInt;
+		//wrapper[1] = ctxt;
 		
-		return wrapper;
+		//return wrapper;
+		return ctxt;
 	}
 	
 	public Object getObjInRow(int row) {
@@ -148,7 +169,7 @@ public class ChangeTableModel extends AbstractTableModel {
 		boolean added = false;
 		String actionType = ChangeCreateUtil.getType(changeKB, changeInst);
 			
-		if (actionType != null) {
+		if (actionType != null && !actionType.equals("ROOT")) {
 			if (filterMethod == FILTER_TRANS) {
 				if (actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_INFO) || 
 						actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS) || 
@@ -220,6 +241,9 @@ public class ChangeTableModel extends AbstractTableModel {
 		updateCurrColor();
 	}
 	
+	
+	
+	
 	/**
 	 * @param changeInsts
 	 * Set the given data structure to the given collectin of instances
@@ -229,7 +253,9 @@ public class ChangeTableModel extends AbstractTableModel {
 		colorList.clear();
 		for (Iterator iter = changeInsts.iterator(); iter.hasNext();) {
 			Instance cInst = (Instance) iter.next();
-			addChangeData(cInst, false);
+			workingData.add(cInst);
+			colorList.add(currColor);
+			updateCurrColor();
 		}
 		
 		completeData.clear();
@@ -317,7 +343,7 @@ public class ChangeTableModel extends AbstractTableModel {
 		workingData.clear();
 		colorList.clear();
 		
-		initCurrColor();
+		//initCurrColor();
 		for (Iterator iter = completeData.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
 			addChangeData(aInst, false);
@@ -326,3 +352,4 @@ public class ChangeTableModel extends AbstractTableModel {
 		fireTableDataChanged();
 	}
 }
+

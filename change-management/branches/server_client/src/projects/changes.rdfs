@@ -9,7 +9,13 @@
 	 xmlns:a="&a;"
 	 xmlns:kb="&kb;"
 	 xmlns:rdfs="&rdfs;">
+<rdfs:Class rdf:about="&kb;Advice"
+	 rdfs:comment="A class of Annotations representing advice for the reader"
+	 rdfs:label="Advice">
+	<rdfs:subClassOf rdf:resource="&kb;Annotation"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Annotation"
+	 a:role="abstract"
 	 rdfs:label="Annotation">
 	<rdfs:subClassOf rdf:resource="&a;_system_class"/>
 </rdfs:Class>
@@ -47,6 +53,11 @@
 	 rdfs:label="Class_Deleted">
 	<rdfs:subClassOf rdf:resource="&kb;KB_Change"/>
 </rdfs:Class>
+<rdfs:Class rdf:about="&kb;Comment"
+	 rdfs:comment="A class of Annotations representing general comments"
+	 rdfs:label="Comment">
+	<rdfs:subClassOf rdf:resource="&kb;Annotation"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;DirectType_Added"
 	 rdfs:label="DirectType_Added">
 	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
@@ -74,6 +85,16 @@
 <rdfs:Class rdf:about="&kb;DomainProperty_Removed"
 	 rdfs:label="DomainProperty_Removed">
 	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Example"
+	 rdfs:comment="A class of Annotations representing examples"
+	 rdfs:label="Example">
+	<rdfs:subClassOf rdf:resource="&kb;Annotation"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Explanation"
+	 rdfs:comment="A class of Annotations representing explanations of content"
+	 rdfs:label="Explanation">
+	<rdfs:subClassOf rdf:resource="&kb;Annotation"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Instance_Added"
 	 rdfs:label="Instance_Added">
@@ -113,6 +134,10 @@
 	 rdfs:label="Name_Changed">
 	<rdfs:subClassOf rdf:resource="&kb;KB_Change"/>
 </rdfs:Class>
+<rdfs:Class rdf:about="&kb;Ontology_Component"
+	 rdfs:label="Ontology_Component">
+	<rdfs:subClassOf rdf:resource="&a;_system_class"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Property_Change"
 	 rdfs:label="Property_Change">
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
@@ -124,6 +149,16 @@
 <rdfs:Class rdf:about="&kb;Property_Deleted"
 	 rdfs:label="Property_Deleted">
 	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Question"
+	 rdfs:label="Question">
+	<rdfs:comment>A class of Annotations representing questions about the content</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="&kb;Annotation"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;SeeAlso"
+	 rdfs:label="SeeAlso">
+	<rdfs:comment>A class of Annotations representing a reference to another resource</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="&kb;Annotation"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Slot_Change"
 	 a:role="abstract"
@@ -210,8 +245,10 @@
 <rdf:Property rdf:about="&kb;annotates"
 	 rdfs:label="annotates">
 	<rdfs:domain rdf:resource="&kb;Annotation"/>
-	<rdfs:range rdf:resource="&kb;Change"/>
+	<a:allowedClasses rdf:resource="&kb;Change"/>
+	<a:allowedClasses rdf:resource="&kb;Ontology_Component"/>
 	<a:inverseProperty rdf:resource="&kb;assoc_annotations"/>
+	<rdfs:range rdf:resource="&a;_system_class"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;applyTo"
 	 a:maxCardinality="1"
@@ -223,6 +260,7 @@
 	 rdfs:label="assoc_annotations">
 	<rdfs:range rdf:resource="&kb;Annotation"/>
 	<rdfs:domain rdf:resource="&kb;Change"/>
+	<rdfs:domain rdf:resource="&kb;Ontology_Component"/>
 	<a:inverseProperty rdf:resource="&kb;annotates"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;author"
@@ -287,7 +325,6 @@
 <rdf:Property rdf:about="&kb;title"
 	 a:maxCardinality="1"
 	 rdfs:label="title">
-	<rdfs:domain rdf:resource="&kb;Annotation"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;type"

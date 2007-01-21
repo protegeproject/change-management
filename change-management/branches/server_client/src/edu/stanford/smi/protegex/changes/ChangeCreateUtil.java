@@ -338,14 +338,14 @@ public class ChangeCreateUtil {
 		aInst.setOwnSlotValue(cKb.getSlot(SLOT_NAME_CONTEXT), newVal);
 	}
 	
-	public static Instance createAnnotation(KnowledgeBase cKb, Collection changeInsts) {
-		Cls annotate = cKb.getCls(CLS_NAME_ANNOTATE);
+	public static Instance createAnnotation(KnowledgeBase cKb, String annotType,Collection changeInsts) {
+		Cls annotate = cKb.getCls(annotType);
 		Slot annotates = cKb.getSlot(SLOT_NAME_ANNOTATES);
-		Slot title = cKb.getSlot(SLOT_NAME_TITLE);
+		//Slot title = cKb.getSlot(SLOT_NAME_TITLE);
 		
 		Instance annotateInst = cKb.createInstance(null, annotate);
 		annotateInst.setOwnSlotValues(annotates, changeInsts);
-		annotateInst.setOwnSlotValue(title, annotateInst.getName());
+		//annotateInst.setOwnSlotValue(title, annotateInst.getName());
 		
 		return annotateInst;
 	}
@@ -405,13 +405,22 @@ public class ChangeCreateUtil {
 		
 		Instance changeInst = changeKB.createInstance(null, change);
 		
+		if(apply.equals("ROOT")){
+			changeInst.setOwnSlotValue(action, "Type of change");
+			changeInst.setOwnSlotValue(applyTo, apply);
+			changeInst.setOwnSlotValue(author, "Person who made the change");
+			changeInst.setOwnSlotValue(context, "Details of the action");
+			changeInst.setOwnSlotValue(created, "Date and time the change was made");
+			changeInst.setOwnSlotValue(type, typ);	
+		}
+		else{
 		changeInst.setOwnSlotValue(action, change.getName());
 		changeInst.setOwnSlotValue(applyTo, apply);
 		changeInst.setOwnSlotValue(author, ChangesTab.getUserName());
 		changeInst.setOwnSlotValue(context, desc);
 		changeInst.setOwnSlotValue(created, ChangesTab.getTimeStamp());
 		changeInst.setOwnSlotValue(type, typ);
-		
+		}
 		return changeInst;
 	}
 	
