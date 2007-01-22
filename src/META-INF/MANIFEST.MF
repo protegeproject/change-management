@@ -4,3 +4,6 @@ Created-By: 1.5.0_01 (Sun Microsystems Inc.)
 Name: edu/stanford/smi/protegex/changes/ChangesTab.class
 Tab-Widget: True
 
+Name: edu/stanford/smi/protegex/changes/InstallListenersPlugin.class
+Project-Plugin: True
+
