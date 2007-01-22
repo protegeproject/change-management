@@ -66,7 +66,8 @@
       <echo message="protege installation directory where the"/>
       <echo message="appropriate plugins have been installed or copy the"/>
       <echo message="needed jars into the lib directory"/>
-      <echo message="The jar file in question is protege.jar."/>
+      <echo message="The jar files in question is protege.jar,"/>
+      <echo message="protege-owl.jar and rdf-backend.jar."/>
       <fail message="build aborted."/>
     </target>
 
