@@ -11,6 +11,11 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.framestore.undo.MacroCommand;
 import edu.stanford.smi.protege.model.framestore.undo.UndoFrameStore;
 import edu.stanford.smi.protegex.changes.listeners.owl.ChangesOwlKBListener;
+import edu.stanford.smi.protegex.changes.listeners.ChangesClsListener;
+import edu.stanford.smi.protegex.changes.listeners.ChangesFrameListener;
+import edu.stanford.smi.protegex.changes.listeners.ChangesInstanceListener;
+import edu.stanford.smi.protegex.changes.listeners.ChangesKBListener;
+import edu.stanford.smi.protegex.changes.listeners.ChangesSlotListener;
 import edu.stanford.smi.protegex.changes.listeners.ChangesTransListener;
 import edu.stanford.smi.protegex.changes.listeners.owl.OwlChangesClassListener;
 import edu.stanford.smi.protegex.changes.listeners.owl.OwlChangesModelListener;
@@ -29,15 +34,6 @@ public class Util {
 	public static boolean kbInOwl(KnowledgeBase kb) {
 		int index = (kb.getClass().getName().indexOf(OWL_KB_INDICATOR));
 		return (index > 0);
-	}
-	
-	public static void registerOwlListeners(KnowledgeBase kb) {
-		((AbstractOWLModel) kb).addClassListener(new OwlChangesClassListener());
-		((AbstractOWLModel) kb).addModelListener(new OwlChangesModelListener());
-		((AbstractOWLModel) kb).addPropertyListener(new OwlChangesPropertyListener());
-		((AbstractOWLModel) kb).addFrameListener(new OwlChangesFrameListener());
-		kb.addTransactionListener(new ChangesTransListener());
-		kb.addKnowledgeBaseListener(new ChangesOwlKBListener()); // Handles Class Deletes
 	}
 	
 	public static void updateMap(String frameId, String name) {
