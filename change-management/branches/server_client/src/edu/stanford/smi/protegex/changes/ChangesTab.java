@@ -32,7 +32,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.table.TableColumn;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -41,7 +40,6 @@ import edu.stanford.smi.protege.event.ProjectAdapter;
 import edu.stanford.smi.protege.event.ProjectEvent;
 import edu.stanford.smi.protege.exception.ProtegeException;
 import edu.stanford.smi.protege.exception.ProtegeIOException;
-import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
@@ -51,9 +49,6 @@ import edu.stanford.smi.protege.server.RemoteClientProject;
 import edu.stanford.smi.protege.server.RemoteServer;
 import edu.stanford.smi.protege.server.RemoteServerProject;
 import edu.stanford.smi.protege.server.RemoteSession;
-import edu.stanford.smi.protege.server.Server;
-import edu.stanford.smi.protege.server.ServerProject;
-import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protege.server.metaproject.MetaProjectInstance;
 import edu.stanford.smi.protege.server.metaproject.MetaProject.SlotEnum;
 import edu.stanford.smi.protege.ui.HeaderComponent;
@@ -64,17 +59,13 @@ import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.ProtegeJob;
 import edu.stanford.smi.protege.widget.AbstractTabWidget;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
-import edu.stanford.smi.protegex.changes.action.ChangeShowAction;
 import edu.stanford.smi.protegex.changes.action.ChangesSearchClear;
 import edu.stanford.smi.protegex.changes.action.ChangesSearchExecute;
-import edu.stanford.smi.protegex.changes.listeners.ChangesClsListener;
-import edu.stanford.smi.protegex.changes.listeners.ChangesFrameListener;
-import edu.stanford.smi.protegex.changes.listeners.ChangesInstanceListener;
-import edu.stanford.smi.protegex.changes.listeners.ChangesKBListener;
-import edu.stanford.smi.protegex.changes.listeners.ChangesSlotListener;
-import edu.stanford.smi.protegex.changes.listeners.ChangesTransListener;
 import edu.stanford.smi.protegex.changes.owl.Util;
-import edu.stanford.smi.protegex.changes.ui.*;
+import edu.stanford.smi.protegex.changes.ui.AbstractTreeTableModel;
+import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
+import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
+import edu.stanford.smi.protegex.changes.ui.JTreeTable;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
  
 /**
@@ -209,29 +200,13 @@ public class ChangesTab extends AbstractTabWidget {
 		transStack = new Stack();
 		
 		currProj = getProject();
-		currKB = currProj.getKnowledgeBase();
-		
-		// Annotation project exists, load associated changes/annotations
-		if (createChangeProject()) {
-			initTables();
-			loadExistingData();
-			//initColumnSizes(cTable);
-		} else {
-			initTables();
-			//initColumnSizes(cTable);
-		}
-		
-		TransactionUtility.initialize();
-		
+        
+        initializeChangesKB(currProj.getKnowledgeBase());
+	
 		//Check to see if the project is an OWL one
 		isOwlProject = Util.kbInOwl(currKB);
-		
-		// Register listeners
-		if (isOwlProject) {
-			Util.registerOwlListeners(currKB);
-		} else {
-			registerKBListeners();
-		}
+        
+		// register listnners call used to go here...
         		
        // Initialize the tab text
 		setLabel(CHANGES_TAB_NAME);
@@ -242,6 +217,19 @@ public class ChangesTab extends AbstractTabWidget {
 		//cTreeTable.getTree().setRootVisible(false);
 		
 	}
+    
+    public static void initializeChangesKB(KnowledgeBase kb) {
+        currKB =  kb;
+        // Annotation project exists, load associated changes/annotations
+        if (createChangeProject()) {
+            initTables();
+            loadExistingData();
+        } else {
+            initTables();
+        }
+        
+        TransactionUtility.initialize();
+    }
 
 	public static KnowledgeBase getChangesKB() {
 		return cKb;
@@ -417,7 +405,7 @@ public class ChangesTab extends AbstractTabWidget {
 	}*/
 	
 	
-	private void initTables() {
+	private static void  initTables() {
 		// Create Tables
 		Instance ROOT = ChangeCreateUtil.createChange(
 	            cKb,
@@ -426,12 +414,6 @@ public class ChangesTab extends AbstractTabWidget {
 	            "ROOT", 
 	            "ROOT");
 		TreeTableNode root = new TreeTableNode(ROOT,cKb);
-		
-		
-		
-    	
-    	
-		
 		
 		cTableModel = new ChangeTableModel(cKb);
 		acTableModel = new ChangeTableModel(cKb);
@@ -551,16 +533,10 @@ public class ChangesTab extends AbstractTabWidget {
 		
 	}
 	
-	private static void registerKBListeners() {
-		currKB.addKnowledgeBaseListener(new ChangesKBListener());
-		currKB.addClsListener(new ChangesClsListener());
-		currKB.addInstanceListener(new ChangesInstanceListener());
-		currKB.addSlotListener(new ChangesSlotListener());
-		currKB.addTransactionListener(new ChangesTransListener());
-		currKB.addFrameListener(new ChangesFrameListener());
-	}
+
+    
 	
-	private boolean createChangeProject() {
+	private static boolean createChangeProject() {
 		boolean annotateExists = false;
 		Collection errors = new ArrayList();
 		
@@ -653,10 +629,10 @@ public class ChangesTab extends AbstractTabWidget {
 		return annotateExists;
 	}
         
-        private Project getRemoteAnnotationProject() throws ProtegeException {
+        private static Project getRemoteAnnotationProject() throws ProtegeException {
           String annotationProjectName 
-              = (String) new RequestAnnotationProjectName(getKnowledgeBase()).execute();
-          RemoteClientProject project = (RemoteClientProject) getKnowledgeBase().getProject();
+              = (String) new RequestAnnotationProjectName(currKB).execute();
+          RemoteClientProject project = (RemoteClientProject) currKB.getProject();
           RemoteServer server = project.getServer();
           RemoteSession session = project.getSession();
           try {
