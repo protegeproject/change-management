@@ -5,14 +5,19 @@ change management tab.  You will need the following jars:
    protege-owl.jar
    rdf-backend.jar.
 
-The sources for thes jars can be obtained from the following svn repositories:
+The sources for thes jars can be obtained from the following svn
+repositories:
 
    http://smi-protege.stanford.edu/repos/protege/protege-core/trunk
    http://smi-protege.stanford.edu/repos/protege/owl/trunk
    http://smi-protege.stanford.edu/repos/protege/rdf-backend/trunk.
 
-Copy the compiled jar files into the lib directory and run "ant
-dist".  The dist directory will then contain the change-management.zip
-file which can be unzipped into the plugin directory of a protege
-distribution.  In addition the change-management.jar file can be
-found in the directory dist/edu.stanford.smi.protegex.changes.
+There are two ways of proceeding.  One method is to point the
+environment variable PROTEGE_HOME to a valid Protege installation that
+includes the owl plugin and the rdf-backend plugin.  The seond method
+is to compile the jar files and copy the compiled jar files into the
+lib directory and run "ant dist".  The dist directory will then
+contain the change-management.zip file which can be unzipped into the
+plugin directory of a protege distribution.  In addition the
+change-management.jar file can be found in the directory
+dist/edu.stanford.smi.protegex.changes.
