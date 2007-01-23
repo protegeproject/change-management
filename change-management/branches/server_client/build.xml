@@ -104,9 +104,6 @@
      <copy todir = "${dist}/${plugin_dir}"
            file = "${src}/plugin.properties"/>
 
-     <copy todir = "${dist}/${plugin_dir}"
-           file = "lib/icu4j.jar"/>
-
    </target>
 
    <target name = "dist" depends = "jar">
