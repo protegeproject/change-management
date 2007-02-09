@@ -2,6 +2,7 @@ package edu.stanford.smi.protegex.server_changes;
 
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import edu.stanford.smi.protege.model.Cls;
@@ -138,7 +139,7 @@ public class ServerChangesUtil {
 	public static Instance createClassCreatedChange(KnowledgeBase cKb, String apply) {
 		Cls createCls = cKb.getCls("Class_Created");
 		
-		Instance changeInst = cKb.createInstance(null, createCls);
+		Instance changeInst = cKb.createInstance(null, new ArrayList());
 		Slot action = cKb.getSlot("action");
 		Slot applyTo = cKb.getSlot("applyTo");
 		Slot author = cKb.getSlot("author");
@@ -154,6 +155,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
 		changeInst.setOwnSlotValue(created, "");
 		changeInst.setOwnSlotValue(type, "info");
+                cKb.setDirectType(changeInst, createCls);
 		
 		return changeInst;
 		
@@ -162,7 +164,7 @@ public class ServerChangesUtil {
 	public static Instance createTemplateSlotAddedChange(KnowledgeBase cKb, String apply, String slot) {
 		Cls tempSlotAddCls = cKb.getCls("TemplateSlot_Added");
 		
-		Instance changeInst = cKb.createInstance(null, tempSlotAddCls);
+		Instance changeInst = cKb.createInstance(null, new ArrayList());
 		Slot action = cKb.getSlot("action");
 		Slot applyTo = cKb.getSlot("applyTo");
 		Slot author = cKb.getSlot("author");
@@ -178,7 +180,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
 		changeInst.setOwnSlotValue(created, "");
 		changeInst.setOwnSlotValue(type, "info");
-		
+		cKb.setDirectType(changeInst, tempSlotAddCls);
 		return changeInst;
 		
 	}
@@ -187,7 +189,7 @@ public class ServerChangesUtil {
 	public static Instance createRestrictionAddedChange(KnowledgeBase cKb, String apply, String slot) {
 		Cls restrAddCls = cKb.getCls("TransChange");
 		
-		Instance changeInst = cKb.createInstance(null, restrAddCls);
+		Instance changeInst = cKb.createInstance(null, new ArrayList());
 		Slot action = cKb.getSlot("action");
 		Slot applyTo = cKb.getSlot("applyTo");
 		Slot author = cKb.getSlot("author");
@@ -203,7 +205,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
 		changeInst.setOwnSlotValue(created, "");
 		changeInst.setOwnSlotValue(type, "transaction");
-		
+		cKb.setDirectType(changeInst, restrAddCls);
 		return changeInst;
 		
 	}
@@ -213,7 +215,7 @@ public class ServerChangesUtil {
 	public static Instance createRestrictionRemovedChange(KnowledgeBase cKb, String apply, String slot) {
 		Cls restrRemCls = cKb.getCls("TransChange");
 		
-		Instance changeInst = cKb.createInstance(null, restrRemCls);
+		Instance changeInst = cKb.createInstance(null, new ArrayList());
 		Slot action = cKb.getSlot("action");
 		Slot applyTo = cKb.getSlot("applyTo");
 		Slot author = cKb.getSlot("author");
@@ -229,7 +231,9 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
 		changeInst.setOwnSlotValue(created, "");
 		changeInst.setOwnSlotValue(type, "transaction");
-		
+
+		cKb.setDirectType(changeInst, restrRemCls);
+
 		return changeInst;
 		
 	}
@@ -238,7 +242,7 @@ public class ServerChangesUtil {
 	public static Instance createTemplateSlotRemovedChange(KnowledgeBase cKb, String apply, String slot) {
 		Cls tempSlotRemCls = cKb.getCls("TemplateSlot_Removed");
 		
-		Instance changeInst = cKb.createInstance(null, tempSlotRemCls);
+		Instance changeInst = cKb.createInstance(null, new ArrayList());
 		Slot action = cKb.getSlot("action");
 		Slot applyTo = cKb.getSlot("applyTo");
 		Slot author = cKb.getSlot("author");
@@ -254,6 +258,8 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
 		changeInst.setOwnSlotValue(created, "");
 		changeInst.setOwnSlotValue(type, "info");
+
+                cKb.setDirectType(changeInst, tempSlotRemCls);
 		
 		return changeInst;
 		
@@ -262,7 +268,7 @@ public class ServerChangesUtil {
 	public static Instance createClassDeletedChange(KnowledgeBase cKb, String apply) {
 		Cls deleteCls = cKb.getCls("Class_Deleted");
 	
-		Instance changeInst = cKb.createInstance(null, deleteCls);
+		Instance changeInst = cKb.createInstance(null, new ArrayList());
 		Slot action = cKb.getSlot("action");
 		Slot applyTo = cKb.getSlot("applyTo");
 		Slot author = cKb.getSlot("author");
@@ -279,6 +285,8 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(created, "");
 		changeInst.setOwnSlotValue(type, "info");
 		
+                cKb.setDirectType(changeInst, deleteCls);
+
 		return changeInst;
 		
 	}
@@ -286,7 +294,7 @@ public class ServerChangesUtil {
 	public static Instance createClsRenameChange(KnowledgeBase cKb, String oldName, String newName) {
 		Cls nameChangeCls = cKb.getCls("Name_Changed");
 		
-		Instance changeInst = cKb.createInstance(null, nameChangeCls);
+		Instance changeInst = cKb.createInstance(null, new ArrayList());
 		Slot action = cKb.getSlot("action");
 		Slot applyTo = cKb.getSlot("applyTo");
 		Slot author = cKb.getSlot("author");
@@ -303,6 +311,8 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(created, "");
 		changeInst.setOwnSlotValue(type, "info");
 		
+                cKb.setDirectType(changeInst, nameChangeCls);
+
 		return changeInst;
 	}
 	
@@ -345,10 +355,11 @@ public class ServerChangesUtil {
 		Slot annotates = cKb.getSlot(SLOT_NAME_ANNOTATES);
 		//Slot title = cKb.getSlot(SLOT_NAME_TITLE);
 		
-		Instance annotateInst = cKb.createInstance(null, annotate);
+		Instance annotateInst = cKb.createInstance(null, new ArrayList());
 		annotateInst.setOwnSlotValues(annotates, changeInsts);
 		//annotateInst.setOwnSlotValue(title, annotateInst.getName());
-		
+		cKb.setDirectType(annotateInst, annotate);
+
 		return annotateInst;
 	}
 	
@@ -374,7 +385,7 @@ public class ServerChangesUtil {
 	
 	public static Instance createTransChange(KnowledgeBase cKb, Collection transChanges, Instance repInst) {
 		Cls transChange = cKb.getCls(CHANGETYPE_TRANS_CHANGE);
-		Instance tInst = cKb.createInstance(null, transChange);
+		Instance tInst = cKb.createInstance(null, new ArrayList());
 		
 		Slot applyTo = cKb.getSlot(SLOT_NAME_APPLYTO);
 		Slot author = cKb.getSlot(SLOT_NAME_AUTHOR);
@@ -391,6 +402,8 @@ public class ServerChangesUtil {
 		tInst.setOwnSlotValue(applyTo, repInst.getOwnSlotValue(applyTo));
 		tInst.setOwnSlotValue(type, CHANGE_LEVEL_DISP_TRANS);
 		tInst.setOwnSlotValues(changes, transChanges);
+
+                cKb.setDirectType(tInst, transChange);
 		
 		return tInst;
 	}
@@ -405,7 +418,7 @@ public class ServerChangesUtil {
 		Slot created = changeKB.getSlot("created");
 		Slot type = changeKB.getSlot("type");
 		
-		Instance changeInst = changeKB.createInstance(null, change);
+		Instance changeInst = changeKB.createInstance(null, new ArrayList());
 		
 		if(apply.equals("ROOT")){
 			changeInst.setOwnSlotValue(action, "Type of change");
@@ -423,6 +436,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(created, ChangesProject.getTimeStamp());
 		changeInst.setOwnSlotValue(type, typ);
 		}
+        changeKB.setDirectType(changeInst, change);
 		return changeInst;
 	}
 	
