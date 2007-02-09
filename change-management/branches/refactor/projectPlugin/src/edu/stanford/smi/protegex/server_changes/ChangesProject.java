@@ -63,7 +63,7 @@ public class ChangesProject extends AbstractProjectPlugin {
 	private static boolean isOwlProject;
 
 	public static String getUserName() {
-		return userName;
+		return currKB.getUserName();
 	}
 	
 	public static String getTimeStamp() {
