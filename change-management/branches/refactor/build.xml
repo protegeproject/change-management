@@ -118,7 +118,7 @@
    <target name = "dist" depends = "jar">
      <zip basedir = "${plugins}"
           includes = "${plugin_dist}/**"
-          destfile = "${plugins}/${pluginName}.zip"/>
+          destfile = "${build}/${pluginName}.zip"/>
    </target>
 
    <target name = "install" depends = "dist">
