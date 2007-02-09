@@ -423,7 +423,16 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 	
 
-    private void getChangeProject(){
+    private static void getChangeProject(){
+        // NEED TO ADD IMPLEMENTATION FOR SERVER MODE
+        // But this project must "essentially" be the same as the project that the project plugin is using
+        // same events, contents etc.
+        // it also runs after the changes project plugin has initialized.
+        if (changes == null) {
+            changes = ChangesProject.getChangesProj();
+            cKb = changes.getKnowledgeBase();
+        }
+        /*
     	Collection errors = new ArrayList();
 		URI changeOntURI = null;
 		try {
@@ -468,6 +477,7 @@ public class ChangesTab extends AbstractTabWidget {
 			
 			}
 		});
+        */
     	
     }
     
