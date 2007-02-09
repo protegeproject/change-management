@@ -429,6 +429,9 @@ public class ChangesTab extends AbstractTabWidget {
         // same events, contents etc.
         // it also runs after the changes project plugin has initialized.
         if (changes == null) {
+            if (ChangesProject.getChangesProj() == null) { // the tab has been configured so the
+                new ChangesProject().afterLoad(currProj);  // project plugin is not initialized                           
+            }
             changes = ChangesProject.getChangesProj();
             cKb = changes.getKnowledgeBase();
         }
