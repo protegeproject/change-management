@@ -19,6 +19,7 @@ import edu.stanford.smi.protege.model.*;
 import edu.stanford.smi.protege.plugin.*;
 import edu.stanford.smi.protege.ui.*;
 import edu.stanford.smi.protege.util.ApplicationProperties;
+import edu.stanford.smi.protege.util.Log;
 
 
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesClsListener;
@@ -31,6 +32,11 @@ import edu.stanford.smi.protegex.server_changes.util.Util;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
 public class ChangesProject extends AbstractProjectPlugin {
+    private static Project existingServerChangesProject;
+    
+    // this is bad but it removes a reverse dependency.
+    private static final String CHANGES_TAB_CLASSNAME="edu.stanford.smi.protegex.changes.ChangesTab";
+
 	
 	private static Project currProj;
 	private static Project changes;
@@ -53,13 +59,8 @@ public class ChangesProject extends AbstractProjectPlugin {
 	private static boolean inCreateSlot = false;
 
 	private static String userName;
-		
-
-
 	
 	private static boolean isOwlProject;
-	
-	
 
 	public static String getUserName() {
 		return userName;
@@ -103,12 +104,7 @@ public class ChangesProject extends AbstractProjectPlugin {
     }
 
     
-       public void initialize(Project p) {
-
-		
-	
-		
-	
+       public void initialize(Project p) {	
 		currProj = p;
 		currKB = currProj.getKnowledgeBase();
 		transStack = new Stack();
@@ -179,7 +175,7 @@ public class ChangesProject extends AbstractProjectPlugin {
 		} 
 	}
 	
-	private boolean createChangeProject() {
+	private static boolean createChangeProject() {
 		
 		// NEED TO ADD IMPLEMENTATION FOR MULTI-USER MODE
 		
@@ -278,8 +274,33 @@ public class ChangesProject extends AbstractProjectPlugin {
 	
     
     public void afterLoad(Project p) {
+        KnowledgeBase kb = p.getKnowledgeBase();
+        if (!isChangesTabProject(p) || p.isMultiUserClient()) {
+            return;
+        }
+        if (p.isMultiUserServer() && existingServerChangesProject != null &&
+                !existingServerChangesProject.equals(p)) {
+            Log.getLogger().info("Can only have one server side project with the Changes Plugin");
+            return;
+        }
+        else if (p.isMultiUserServer()) {
+            existingServerChangesProject = p;
+        }
+
       initialize(p);
     }
+    
+    private boolean isChangesTabProject(Project p) {
+        String changesTabClassName = CHANGES_TAB_CLASSNAME;
+        for (Object o : p.getTabWidgetDescriptors()) {
+            WidgetDescriptor w = (WidgetDescriptor) o;
+            if (w.isVisible() && changesTabClassName.equals(w.getWidgetClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     
 
 	public static KnowledgeBase getChangesKB() {
