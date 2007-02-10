@@ -8,8 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +15,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Stack;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -30,41 +27,43 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.table.TableColumn;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import edu.stanford.smi.protege.event.ProjectAdapter;
-import edu.stanford.smi.protege.event.ProjectEvent;
 import edu.stanford.smi.protege.model.Cls;
+import edu.stanford.smi.protege.model.DefaultKnowledgeBase;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protege.model.framestore.FrameStoreManager;
 import edu.stanford.smi.protege.resource.Icons;
+import edu.stanford.smi.protege.server.RemoteProjectManager;
+import edu.stanford.smi.protege.server.framestore.RemoteClientFrameStore;
 import edu.stanford.smi.protege.ui.HeaderComponent;
-import edu.stanford.smi.protege.util.ApplicationProperties;
 import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.LabeledComponent;
 import edu.stanford.smi.protege.widget.AbstractTabWidget;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
-import edu.stanford.smi.protegex.changes.action.ChangeShowAction;
 import edu.stanford.smi.protegex.changes.action.ChangesSearchClear;
 import edu.stanford.smi.protegex.changes.action.ChangesSearchExecute;
-import edu.stanford.smi.protegex.changes.ui.*;
 import edu.stanford.smi.protegex.changes.listeners.ChangesListener;
+import edu.stanford.smi.protegex.changes.ui.AbstractTreeTableModel;
+import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
+import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
+import edu.stanford.smi.protegex.changes.ui.JTreeTable;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-
-import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
+import edu.stanford.smi.protegex.server_changes.GetAnnotationProjectName;
  
 /**
  * Change Management Tab widget
  * 
  */
 public class ChangesTab extends AbstractTabWidget {
+    
+
 	
 	// Main UI tables
 	public static final String HEADERCOMP_NAME_CHANGE_VIEWER = "Change Viewer";
@@ -90,8 +89,7 @@ public class ChangesTab extends AbstractTabWidget {
 	
 
 	private static final String CHANGES_TAB_NAME = "Changes";
-	
-	private static String userName;
+
 	private static Project currProj;
 	private static Project changes;
 	private static KnowledgeBase cKb;
@@ -128,11 +126,7 @@ public class ChangesTab extends AbstractTabWidget {
 	private static ChangeTreeTableModel cTreeTableModel;
 	
 	private static boolean inRemoveAnnotation = false;
-	
 
-	public static String getUserName() {
-		return userName;
-	}
 	
 
 	public static boolean getInRemoveAnnotation() {
@@ -161,13 +155,6 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	// Initialize the plugin
 	public void initialize() {
-
-		
-		userName = ApplicationProperties.getUserName();
-
-		
-	
-		
 
 		currProj = getProject();
 		currKB = currProj.getKnowledgeBase();
@@ -428,60 +415,25 @@ public class ChangesTab extends AbstractTabWidget {
         // But this project must "essentially" be the same as the project that the project plugin is using
         // same events, contents etc.
         // it also runs after the changes project plugin has initialized.
-        if (changes == null) {
-            if (ChangesProject.getChangesProj() == null) { // the tab has been configured so the
+        if (currProj.isMultiUserClient()) {
+            getServerSideChangeProject();
+        }
+        else if (changes == null) {
+            if (ChangesProject.getChangesProj() == null) { // the tab has just been configured so the
                 new ChangesProject().afterLoad(currProj);  // project plugin is not initialized                           
             }
             changes = ChangesProject.getChangesProj();
             cKb = changes.getKnowledgeBase();
         }
-        /*
-    	Collection errors = new ArrayList();
-		URI changeOntURI = null;
-		try {
-			changeOntURI = ChangesProject.class.getResource("/projects/changes.pprj").toURI();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		
-		String annotationName = "annotation_" + currProj.getName() + ".pprj";
-		URI annotationURI;
-		try {
-			annotationURI = new URI(currProj.getProjectDirectoryURI()+"/" + annotationName);
-			changes = Project.loadProjectFromURI(annotationURI, errors);
-			
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		
-		changes.includeProject(changeOntURI,errors);
-		changes.mergeIncludedProjects();
-		displayErrors(errors);
-		
-		cKb = changes.getKnowledgeBase();
-		
-		currProj.addProjectListener(new ProjectAdapter() {
-			ArrayList errors = new ArrayList();
-			public void projectSaved(ProjectEvent event) {
-				String changesName = "annotation_" + currProj.getName();
-				String myNameSpace = "http://protege.stanford.edu/kb#";
-				RDFBackend.setSourceFiles(changes.getSources(), changesName +".rdfs", changesName + ".rdf", myNameSpace);
-				
-				URI projUri;
-				try {
-					projUri = new URI(currProj.getProjectDirectoryURI()+"/"+changesName +".pprj");
-					changes.setProjectURI(projUri);
-				} catch (URISyntaxException e) {
-					e.printStackTrace();
-				}
-				changes.save(errors);
-				displayErrors(errors);
-			
-			
-			}
-		});
-        */
-    	
+    }
+    
+    private static void getServerSideChangeProject() {
+        String annotationName = (String) new GetAnnotationProjectName(currKB).execute();
+        RemoteProjectManager manager = RemoteProjectManager.getInstance();
+        FrameStoreManager fsmanager = ((DefaultKnowledgeBase) currKB).getFrameStoreManager();
+        RemoteClientFrameStore rcfs = (RemoteClientFrameStore) fsmanager.getFrameStoreFromClass(RemoteClientFrameStore.class);
+        changes = manager.connectToProject(rcfs.getRemoteServer(), rcfs.getSession(), annotationName);
+        cKb = changes.getKnowledgeBase();
     }
     
 	private static void displayErrors(Collection errors) {
@@ -811,3 +763,4 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	
 }
+
