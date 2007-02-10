@@ -16,7 +16,11 @@ import edu.stanford.smi.protege.*;
 import edu.stanford.smi.protege.event.ProjectAdapter;
 import edu.stanford.smi.protege.event.ProjectEvent;
 import edu.stanford.smi.protege.model.*;
+import edu.stanford.smi.protege.model.framestore.EventDispatchFrameStore;
+import edu.stanford.smi.protege.model.framestore.FrameStoreManager;
 import edu.stanford.smi.protege.plugin.*;
+import edu.stanford.smi.protege.server.Server;
+import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protege.ui.*;
 import edu.stanford.smi.protege.util.ApplicationProperties;
 import edu.stanford.smi.protege.util.Log;
@@ -133,6 +137,12 @@ public class ChangesProject extends AbstractProjectPlugin {
 		} else {
 			registerKBListeners();
 		}
+        if (changes.isMultiUserServer()) {
+            cKb.setDispatchEventsEnabled(true);
+            FrameStoreManager fsm = ((DefaultKnowledgeBase) cKb).getFrameStoreManager();
+            EventDispatchFrameStore dispatcher = (EventDispatchFrameStore) fsm.getFrameStoreFromClass(EventDispatchFrameStore.class);
+            dispatcher.setServerMode(true);
+        }
 		
 		
 	}
@@ -178,6 +188,12 @@ public class ChangesProject extends AbstractProjectPlugin {
 	private static boolean createChangeProject() {
 		
 		// NEED TO ADD IMPLEMENTATION FOR MULTI-USER MODE
+        if (currProj.isMultiUserServer()) {
+            Server server = Server.getInstance();
+            String annotationName = (String) new GetAnnotationProjectName(currKB).execute();
+            changes = server.getProject(annotationName);
+            cKb = changes.getKnowledgeBase();
+        }
 		
 		
 		boolean annotateExists = false;
