@@ -129,7 +129,7 @@
             </not>
          </condition>
       </fail>
-      <unzip src="${plugins}/${pluginName}.zip" 
+      <unzip src="${build}/${pluginName}.zip" 
              dest = "${protege.home}/plugins"
              overwrite = "true"/>
    </target>
