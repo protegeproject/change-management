@@ -190,7 +190,7 @@ public class ChangeCreateUtil {
 		
 		annotateInst.setOwnSlotValue(created, ChangesTab.getTimeStamp());
 		annotateInst.setOwnSlotValue(modified, ChangesTab.getTimeStamp());
-		annotateInst.setOwnSlotValue(author, ChangesTab.getUserName());
+		annotateInst.setOwnSlotValue(author, cKb.getUserName());
 		
 		// If no comments are added, add empty string as comment
 		Object bdy = annotateInst.getOwnSlotValue(body);
