@@ -45,6 +45,7 @@ import edu.stanford.smi.protege.server.framestore.RemoteClientFrameStore;
 import edu.stanford.smi.protege.ui.HeaderComponent;
 import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.LabeledComponent;
+import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.widget.AbstractTabWidget;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
 import edu.stanford.smi.protegex.changes.action.ChangesSearchClear;
@@ -429,6 +430,11 @@ public class ChangesTab extends AbstractTabWidget {
     
     private static void getServerSideChangeProject() {
         String annotationName = (String) new GetAnnotationProjectName(currKB).execute();
+        if (annotationName != null) {
+            Log.getLogger().warning("annotation project not configured (use " +
+                                    GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT +
+                                    " slot)");
+        }
         RemoteProjectManager manager = RemoteProjectManager.getInstance();
         FrameStoreManager fsmanager = ((DefaultKnowledgeBase) currKB).getFrameStoreManager();
         RemoteClientFrameStore rcfs = (RemoteClientFrameStore) fsmanager.getFrameStoreFromClass(RemoteClientFrameStore.class);
