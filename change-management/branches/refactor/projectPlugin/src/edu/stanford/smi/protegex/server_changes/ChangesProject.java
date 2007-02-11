@@ -138,10 +138,7 @@ public class ChangesProject extends AbstractProjectPlugin {
 			registerKBListeners();
 		}
         if (changes.isMultiUserServer()) {
-            cKb.setDispatchEventsEnabled(true);
-            FrameStoreManager fsm = ((DefaultKnowledgeBase) cKb).getFrameStoreManager();
-            EventDispatchFrameStore dispatcher = (EventDispatchFrameStore) fsm.getFrameStoreFromClass(EventDispatchFrameStore.class);
-            dispatcher.setServerMode(true);
+            ServerFrameStore.requestEventDispatch(currKB);
         }
 		
 		
@@ -191,8 +188,14 @@ public class ChangesProject extends AbstractProjectPlugin {
         if (currProj.isMultiUserServer()) {
             Server server = Server.getInstance();
             String annotationName = (String) new GetAnnotationProjectName(currKB).execute();
+            if (annotationName == null) {
+                throw new RuntimeException("Annotation project not configured on server (use the " + 
+                                           GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT +
+                                           " slot)");
+            }
             changes = server.getProject(annotationName);
             cKb = changes.getKnowledgeBase();
+            return true;
         }
 		
 		
