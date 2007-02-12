@@ -121,6 +121,20 @@
           destfile = "${build}/${pluginName}.zip"/>
    </target>
 
+   <target name = "update" depends = "jar">
+      <fail message = "set the protege.home variable to do an install">
+         <condition>
+            <not>
+              <isset property="protege.home"/>
+            </not>
+         </condition>
+      </fail>
+      <copy file="${plugins}/${plugin_dist}/${pluginName}ProjectPlugin.jar"
+            todir="${protege.home}/plugins/${plugin_dist}"/>
+      <copy file="${plugins}/${plugin_dist}/${pluginName}Tab.jar"
+            todir="${protege.home}/plugins/${plugin_dist}"/>
+   </target>
+
    <target name = "install" depends = "dist">
       <fail message = "set the protege.home variable to do an install">
          <condition>
