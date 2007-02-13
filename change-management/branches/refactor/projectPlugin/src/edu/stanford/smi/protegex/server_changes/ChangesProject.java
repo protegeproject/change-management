@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.logging.Level;
 
 import javax.swing.*;
 
@@ -24,6 +25,7 @@ import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protege.ui.*;
 import edu.stanford.smi.protege.util.ApplicationProperties;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protege.util.MessageError;
 
 
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesClsListener;
@@ -281,13 +283,14 @@ public class ChangesProject extends AbstractProjectPlugin {
 	private static void displayErrors(Collection errors) {
 		Iterator i = errors.iterator();
 		while (i.hasNext()) {
-			Object elem = i.next();
-			System.out.println("className: " + elem.getClass().getName());
-			if (elem instanceof Exception) {
-				((Exception)elem).printStackTrace(System.out);
-			} 
-			
-		
+			Object elem = i.next();			
+			if (elem instanceof Throwable) {
+				Log.getLogger().log(Level.WARNING, "Warnings at loading changes project", (Throwable)elem);
+			} else if (elem instanceof MessageError) {
+				Log.getLogger().log(Level.WARNING, ((MessageError)elem).getMessage(), ((MessageError)elem).getException());
+			} else {
+				Log.getLogger().warning(elem.toString());
+			}
 		}
 	}
 	
