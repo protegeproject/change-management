@@ -572,10 +572,10 @@ public class ChangesTab extends AbstractTabWidget {
 	// takes care of case when class is created & then renamed.
 	private static void checkForCreateChange(Instance aChange) {
 		String changeAction = ChangeCreateUtil.getAction(cKb, aChange);
-		if (changeAction.equals(ChangeCreateUtil.CHANGETYPE_CLASS_CREATED)
+		if  ( (changeAction != null) && (changeAction.equals(ChangeCreateUtil.CHANGETYPE_CLASS_CREATED)
 				|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_SLOT_CREATED)
 				|| changeAction.equals(ChangeCreateUtil.CHANGETYPE_PROPERTY_CREATED)
-				)
+				))
 				{
 			Integer rowCount = new Integer(cTableModel.getRowCount());
 			createChangeName.put(ChangeCreateUtil.getApplyTo(cKb, aChange), rowCount);
