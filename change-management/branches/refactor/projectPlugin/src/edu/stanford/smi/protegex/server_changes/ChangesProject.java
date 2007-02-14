@@ -1,5 +1,6 @@
 package edu.stanford.smi.protegex.server_changes;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -26,6 +27,7 @@ import edu.stanford.smi.protege.ui.*;
 import edu.stanford.smi.protege.util.ApplicationProperties;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.MessageError;
+import edu.stanford.smi.protege.util.URIUtilities;
 
 
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesClsListener;
@@ -36,249 +38,218 @@ import edu.stanford.smi.protegex.server_changes.listeners.ChangesSlotListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesTransListener;
 import edu.stanford.smi.protegex.server_changes.util.Util;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
+import edu.stanford.smi.protegex.storage.rdf.RDFKnowledgeBase;
 
-public class ChangesProject extends AbstractProjectPlugin {
-    private static Project existingServerChangesProject;
-    
-    // this is bad but it removes a reverse dependency.
-    private static final String CHANGES_TAB_CLASSNAME="edu.stanford.smi.protegex.changes.ChangesTab";
+public class ChangesProject extends ProjectPluginAdapter {
+	private static Project existingServerChangesProject;
 
-	
-	private static Project currProj;
-	private static Project changes;
-	private static KnowledgeBase cKb;
-	private static KnowledgeBase currKB;
-	
-	
-	public static final String ANNOTATION_PROJECT_EXISTS = "annotation_proj_exists";
-//	 Maintaing transaction objects
-	private static Stack transStack;
-	private static int transCount = 0;
-	private static boolean inTransaction;
+	public static final String ANNOTATION_PROJECT_NAME_PREFIX = "annotation_";
+
+	public static final String PROTEGE_NAMESPACE = "http://protege.stanford.edu/kb#";
 	
 	// Transaction signals
 	public static final String TRANS_SIGNAL_TRANS_BEGIN = "transaction_begin";
 	public static final String TRANS_SIGNAL_TRANS_END = "transaction_end";
 	public static final String TRANS_SIGNAL_START = "start";
+
+	// This is bad but it removes a reverse dependency.
+	private static final String CHANGES_TAB_CLASSNAME="edu.stanford.smi.protegex.changes.ChangesTab";
+
 	
+	private static Project currentProj;
+	private static KnowledgeBase currentKB;
+	
+	private static Project changesProj;
+	private static KnowledgeBase changesKb;
+		
+	//	Maintaing transaction objects
+	private static Stack transStack;
+	private static int transCount = 0;
+	private static boolean inTransaction;
+
 	private static boolean inCreateClass = false;
 	private static boolean inCreateSlot = false;
 
-	private static String userName;
-	
 	private static boolean isOwlProject;
 
-	public static String getUserName() {
-		return currKB.getUserName();
-	}
 	
-	public static String getTimeStamp() {
-		Date currTime = new Date();
+	public void afterLoad(Project p) {
 		
-		String datePattern = "MM/dd/yyyy HH:mm:ss zzz";
-		SimpleDateFormat format = new SimpleDateFormat(datePattern);
-		String time = format.format(currTime);
-		
-		return time;
-	}
-	
-	public static boolean getIsInTransaction() {
-		return inTransaction;
-	}
-	
-	public static boolean getInCreateClass() {
-		return inCreateClass;
-	}
-	
-	public static void setInCreateClass(boolean val) {
-		inCreateClass = val;
-	}
-	
-	public static boolean getInCreateSlot() {
-		return inCreateSlot;
-	}
-	
-	public static void setInCreateSlot(boolean val) {
-		inCreateSlot = val;
-	}
-	
+		if (!isChangesTabProject(p) || p.isMultiUserClient()) {
+			return;
+		}
+		if (p.isMultiUserServer() && existingServerChangesProject != null &&
+				!existingServerChangesProject.equals(p)) {
+			Log.getLogger().info("Can only have one server side project with the Changes Plugin");
+			return;
+		}
+		else if (p.isMultiUserServer()) {
+			existingServerChangesProject = p;
+		}
 
+		initialize(p);
+	}
 	
 	
-    public void afterCreate(Project p) {
-        // do nothing
-    }
-
-    
-       public void initialize(Project p) {	
-		currProj = p;
-		currKB = currProj.getKnowledgeBase();
+	public void initialize(Project p) {	
+		currentProj = p;
+		currentKB = currentProj.getKnowledgeBase();
 		transStack = new Stack();
+		
 		createChangeProject(); 
+
+		if (changesKb == null) {
+			Log.getLogger().warning("Could not initialize the annotations ontology. ChangesTab will probably not work");
+			return;
+		}
 		
-		// AT THIS POINT, WE HAVE THE CHANGES PROJECT 'changes' and the KB 'cKb'. 
+		// AT THIS POINT, WE HAVE THE CHANGES PROJECT 'changes' and the KB 'changesKb'. 
 		// Creating the Root of the tree for the UI
-		
-		Instance ROOT = ServerChangesUtil.createChange(
-	            cKb,
-	            ServerChangesUtil.CHANGETYPE_INSTANCE_ADDED, 
-	            "ROOT", 
-	            "ROOT", 
-	            "ROOT");
-		
-		
+
+		ServerChangesUtil.createChange(	changesKb, ServerChangesUtil.CHANGETYPE_INSTANCE_ADDED,	"ROOT", "ROOT",	"ROOT");
+
 		TransactionUtility.initialize();	
-	
-		
+
 		//Check to see if the project is an OWL one
-		isOwlProject = Util.kbInOwl(currKB);
-		
+		isOwlProject = Util.kbInOwl(currentKB);
+
 		// Register listeners
 		if (isOwlProject) {
-			Util.registerOwlListeners(currKB);
+			Util.registerOwlListeners(currentKB);
 		} else {
 			registerKBListeners();
 		}
-        if (changes.isMultiUserServer()) {
-            ServerFrameStore.requestEventDispatch(currKB);
-        }
-		
-		
+
+		if (changesProj.isMultiUserServer()) {
+			ServerFrameStore.requestEventDispatch(currentKB);
+		}		
+
 	}
 
-    private static void registerKBListeners() {
-	currKB.addKnowledgeBaseListener(new ChangesKBListener());
-	currKB.addClsListener(new ChangesClsListener());
-	currKB.addInstanceListener(new ChangesInstanceListener());
-	currKB.addSlotListener(new ChangesSlotListener());
-	currKB.addTransactionListener(new ChangesTransListener());
-	currKB.addFrameListener(new ChangesFrameListener());
-    }
-    
-    public static void createChange(Instance aChange){
-    	if (inTransaction) {
+	private static void registerKBListeners() {
+		currentKB.addKnowledgeBaseListener(new ChangesKBListener());
+		currentKB.addClsListener(new ChangesClsListener());
+		currentKB.addInstanceListener(new ChangesInstanceListener());
+		currentKB.addSlotListener(new ChangesSlotListener());
+		currentKB.addTransactionListener(new ChangesTransListener());
+		currentKB.addFrameListener(new ChangesFrameListener());
+	}
+
+	public static void createChange(Instance aChange){
+		if (inTransaction) {
 			transStack.push(aChange);
-    	}
-    }
-    
+		}
+	}
+
 	public static void createTransactionChange(String typ) {
-		
+
 		if (typ.equals(TRANS_SIGNAL_TRANS_BEGIN)) {
 			inTransaction = true;
 			transCount++;
 			transStack.push(TRANS_SIGNAL_START);
-			
+
 		} else if (typ.equals(TRANS_SIGNAL_TRANS_END)) {
 			transCount--;
 			transStack = TransactionUtility.convertTransactions(transStack);
-			
+
 			// Indicates we are done (balanced start and ends)
 			if (transCount==0) {
 				inTransaction = false;
 				Instance changeInst = TransactionUtility.findAggAction(transStack, isOwlProject);
 				//checkForCreateChange(changeInst);	
-		
-				
+
 				transStack.clear();
 			} 
 		} 
 	}
-	
-	private static boolean createChangeProject() {
-		
-		// NEED TO ADD IMPLEMENTATION FOR MULTI-USER MODE
-        if (currProj.isMultiUserServer()) {
-            Server server = Server.getInstance();
-            String annotationName = (String) new GetAnnotationProjectName(currKB).execute();
-            if (annotationName == null) {
-                throw new RuntimeException("Annotation project not configured on server (use the " + 
-                                           GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT +
-                                           " slot)");
-            }
-            changes = server.getProject(annotationName);
-            cKb = changes.getKnowledgeBase();
-            return true;
-        }
-		
-		
-		boolean annotateExists = false;
-		Collection errors = new ArrayList();
-		
-		// Check if annotations project already exists for this project.
-		String annotationExists = (String)currProj.getClientInformation(ANNOTATION_PROJECT_EXISTS);
-		
-		URI changeOntURI = null;
-		try {
-			changeOntURI = ChangesProject.class.getResource("/projects/changes.pprj").toURI();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		
-		// No anntation project exists, create one
-		if (annotationExists == null) {
-			String baseName = "annotation";
-			String myNameSpace = "http://protege.stanford.edu/kb#";
-		
-			changes = Project.loadProjectFromURI(changeOntURI, errors);
-			
-			URI annotateURI = null;
-			try {
-				annotateURI = new URI(changes.getProjectURI().toString() +"/annotation.pprj");
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
-			changes.setProjectURI(annotateURI);
-			cKb = changes.getKnowledgeBase();
-			displayErrors(errors);
-			
-			RDFBackend.setSourceFiles(changes.getSources(), baseName + ".rdfs", baseName + ".rdf", myNameSpace);
-			currProj.setClientInformation(ANNOTATION_PROJECT_EXISTS, "yes");
 
-		// Annotation project exists	
-		} else {
-			annotateExists = true;
-			String annotationName = "annotation_" + currProj.getName() + ".pprj";
-			URI annotationURI;
-			try {
-				annotationURI = new URI(currProj.getProjectDirectoryURI()+"/" + annotationName);
-				changes = Project.loadProjectFromURI(annotationURI, errors);
-				
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
+	private static boolean createChangeProject() {
+
+		if (currentProj.isMultiUserServer()) {
+			Server server = Server.getInstance();
+			String annotationName = (String) new GetAnnotationProjectName(currentKB).execute();
+			if (annotationName == null) {
+				throw new RuntimeException("Annotation project not configured on server (use the " + 
+						GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT +
+				" slot)");
 			}
-			
-			changes.includeProject(changeOntURI,errors);
-			changes.mergeIncludedProjects();
-			displayErrors(errors);
-			
-			cKb = changes.getKnowledgeBase();
+			changesProj = server.getProject(annotationName);
+			changesKb = changesProj.getKnowledgeBase();
+			return true;
 		}
+
+		boolean annotationsProjectExist = false;
+
+		ArrayList errors = new ArrayList();
+
+		URI annotationProjURI = getAnnotationProjectURI();
+
+		File annotationProjFile = new File(annotationProjURI);
 		
-		currProj.addProjectListener(new ProjectAdapter() {
+		//TODO: TT Check whether this works with real URIs
+		if (annotationProjFile.exists()) {
+			//annotation ontology exists        	      	
+			changesProj = Project.loadProjectFromURI(annotationProjURI, errors);
+
+			annotationsProjectExist = true;
+
+		} else {
+			//annotations ontology does not exist and it will be created
+			URI changeOntURI = null;
+			try {
+				changeOntURI = ChangesProject.class.getResource("/projects/changes.pprj").toURI();
+			} catch (URISyntaxException e) {
+				Log.getLogger().log(Level.WARNING, "Could not find Changes Ontology", e);
+			}
+
+			RDFBackend rdfBackendFactory = new RDFBackend();
+
+			changesProj = Project.loadProjectFromURI(changeOntURI, errors);
+
+			RDFBackend.setSourceFiles(changesProj.getSources(), ANNOTATION_PROJECT_NAME_PREFIX + currentProj.getName() + ".rdfs", ANNOTATION_PROJECT_NAME_PREFIX + currentProj.getName() + ".rdf", PROTEGE_NAMESPACE);
+			changesProj.setProjectURI(annotationProjURI);
+
+			annotationsProjectExist = false;
+		}
+
+
+		if (changesProj == null) {
+			Log.getLogger().warning("Failed to find or create annotation project");
+			displayErrors(errors);
+			return annotationsProjectExist;
+		}
+
+		changesKb = changesProj.getKnowledgeBase();
+
+		currentProj.addProjectListener(new ProjectAdapter() {
 			ArrayList errors = new ArrayList();
 			public void projectSaved(ProjectEvent event) {
-				String changesName = "annotation_" + currProj.getName();
-				String myNameSpace = "http://protege.stanford.edu/kb#";
-				RDFBackend.setSourceFiles(changes.getSources(), changesName +".rdfs", changesName + ".rdf", myNameSpace);
-				
-				URI projUri;
-				try {
-					projUri = new URI(currProj.getProjectDirectoryURI()+"/"+changesName +".pprj");
-					changes.setProjectURI(projUri);
-				} catch (URISyntaxException e) {
-					e.printStackTrace();
-				}
-				changes.save(errors);
-				displayErrors(errors);
-			
-			
+
+				changesProj.save(errors);
+				displayErrors(errors);			
 			}
 		});
 
-		
-		return annotateExists;
+		return annotationsProjectExist;
 	}
-	
+
+
+
+	private static URI getAnnotationProjectURI() {
+		return URIUtilities.createURI(currentProj.getProjectDirectoryURI() + File.separator + ANNOTATION_PROJECT_NAME_PREFIX + currentProj.getName() + ".pprj");
+	}
+
+	private boolean isChangesTabProject(Project p) {
+		String changesTabClassName = CHANGES_TAB_CLASSNAME;
+		for (Object o : p.getTabWidgetDescriptors()) {
+			WidgetDescriptor w = (WidgetDescriptor) o;
+			if (w.isVisible() && changesTabClassName.equals(w.getWidgetClassName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	
 	private static void displayErrors(Collection errors) {
 		Iterator i = errors.iterator();
@@ -294,79 +265,55 @@ public class ChangesProject extends AbstractProjectPlugin {
 		}
 	}
 	
-    
-    public void afterLoad(Project p) {
-        KnowledgeBase kb = p.getKnowledgeBase();
-        if (!isChangesTabProject(p) || p.isMultiUserClient()) {
-            return;
-        }
-        if (p.isMultiUserServer() && existingServerChangesProject != null &&
-                !existingServerChangesProject.equals(p)) {
-            Log.getLogger().info("Can only have one server side project with the Changes Plugin");
-            return;
-        }
-        else if (p.isMultiUserServer()) {
-            existingServerChangesProject = p;
-        }
+	
+	public static String getUserName() {
+		return currentKB.getUserName();
+	}
 
-      initialize(p);
-    }
-    
-    private boolean isChangesTabProject(Project p) {
-        String changesTabClassName = CHANGES_TAB_CLASSNAME;
-        for (Object o : p.getTabWidgetDescriptors()) {
-            WidgetDescriptor w = (WidgetDescriptor) o;
-            if (w.isVisible() && changesTabClassName.equals(w.getWidgetClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
+	public static String getTimeStamp() {
+		Date currTime = new Date();
 
-    
+		String datePattern = "MM/dd/yyyy HH:mm:ss zzz";
+		SimpleDateFormat format = new SimpleDateFormat(datePattern);
+		String time = format.format(currTime);
+
+		return time;
+	}
+	
+	public static boolean getIsInTransaction() {
+		return inTransaction;
+	}
+
+	public static boolean getInCreateClass() {
+		return inCreateClass;
+	}
+
+	public static void setInCreateClass(boolean val) {
+		inCreateClass = val;
+	}
+
+	public static boolean getInCreateSlot() {
+		return inCreateSlot;
+	}
+
+	public static void setInCreateSlot(boolean val) {
+		inCreateSlot = val;
+	}
 
 	public static KnowledgeBase getChangesKB() {
-		return cKb;
+		return changesKb;
 	}
-	
+
 	public static Project getChangesProj() {
-		return changes;
+		return changesProj;
 	}
 
-    public void afterShow(ProjectView view, ProjectToolBar toolBar, ProjectMenuBar menuBar) {
+	public String getName() {
+		return "Changes Project Plugin";
+	}
 
-    }
-
-    public void afterSave(Project p) {
-        // do nothing
-    }
-    
-    public void beforeSave(Project p) {
-        // do nothing
-    }
-    
-    public void beforeHide(ProjectView view, ProjectToolBar toolBar, ProjectMenuBar menuBar) {
-        // do nothing
-    }
-
-    public void beforeClose(Project p) {
-        // do nothing
-    }
-
-    public String getName() {
-        return "Changes Project Plugin";
-    }
-
-    public void dispose() {
-        // do nothing
-    }
-    
-	
-	
-    
-    public static void main(String[] args) {
-        Application.main(args);
-    }
-
+	public static void main(String[] args) {
+		Application.main(args);
+	}
 
 }
