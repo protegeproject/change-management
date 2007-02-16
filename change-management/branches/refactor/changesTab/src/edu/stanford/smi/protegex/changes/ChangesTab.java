@@ -430,7 +430,7 @@ public class ChangesTab extends AbstractTabWidget {
     
     private static void getServerSideChangeProject() {
         String annotationName = (String) new GetAnnotationProjectName(currKB).execute();
-        if (annotationName != null) {
+        if (annotationName == null) {
             Log.getLogger().warning("annotation project not configured (use " +
                                     GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT +
                                     " slot)");
