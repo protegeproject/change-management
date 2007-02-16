@@ -72,7 +72,7 @@ public class ChangesProject extends ProjectPluginAdapter {
 
 	private static boolean isOwlProject;
 
-	
+	public static HashMap createChangeName = new HashMap();
 	public void afterLoad(Project p) {
 		
 		if (!isChangesTabProject(p) || p.isMultiUserClient()) {
@@ -138,6 +138,23 @@ public class ChangesProject extends ProjectPluginAdapter {
 	public static void createChange(Instance aChange){
 		if (inTransaction) {
 			transStack.push(aChange);
+		}
+		
+		checkForCreateChange(aChange);	
+		
+	}
+	
+	
+	// takes care of case when class is created & then renamed - Adding original name of class and change instance to HashMap
+	private static void checkForCreateChange(Instance aChange) {
+		String changeAction = ServerChangesUtil.getAction(changesKb, aChange);
+		if  ( (changeAction != null) && (changeAction.equals(ServerChangesUtil.CHANGETYPE_CLASS_CREATED)
+				|| changeAction.equals(ServerChangesUtil.CHANGETYPE_SLOT_CREATED)
+				|| changeAction.equals(ServerChangesUtil.CHANGETYPE_PROPERTY_CREATED)
+				))
+				{
+			
+			createChangeName.put(ServerChangesUtil.getApplyTo(changesKb, aChange), aChange);
 		}
 	}
 
