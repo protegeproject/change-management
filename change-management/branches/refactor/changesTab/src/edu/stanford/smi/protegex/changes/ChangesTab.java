@@ -113,7 +113,7 @@ public class ChangesTab extends AbstractTabWidget {
 
 	
 	private static HashMap nameChanges = new HashMap();
-	private static HashMap createChangeName = new HashMap();
+
 	private static ChangeMenu cMenu;
 	private static RemoveInstanceAction remInst;
 	private static EditInstanceAction editInst;
@@ -497,7 +497,7 @@ public class ChangesTab extends AbstractTabWidget {
 			String newName = ChangeCreateUtil.getNameChangedNewName(cKb, aChange);
 			addNameChange(oldName, newName);
 			
-			if (createChangeName.containsKey(oldName)) {
+/*			if (createChangeName.containsKey(oldName)) {
 				addChange = false;
 				Integer rowCount= (Integer) createChangeName.get(oldName);
 				Instance cChange = (Instance) cTableModel.getObjInRow(rowCount.intValue());
@@ -512,7 +512,7 @@ public class ChangesTab extends AbstractTabWidget {
 				createChangeName.remove(oldName);
 				cTableModel.update();
 				cTreeTableModel.update();
-			}
+			}*/
 		}
 		if (aChange.getDirectType().getName().equals(ChangeCreateUtil.CHANGETYPE_SUBCLASS_ADDED)) {
 			addChange = false;
@@ -522,7 +522,7 @@ public class ChangesTab extends AbstractTabWidget {
 			//transStack.push(aChange);
 			// Don't display change yet
 		} else {
-			checkForCreateChange(aChange);	
+			//checkForCreateChange(aChange);	
 			if (addChange) {
 				cTableModel.addChangeData(aChange);
 				cTreeTableModel.addChangeData(aChange);
@@ -532,8 +532,7 @@ public class ChangesTab extends AbstractTabWidget {
 		}
 	}
 	
-	// setting context and applyTo
-	private static void updateCreateName(Instance aChange, String oldName, String newName) {
+/*	private static void updateCreateName(Instance aChange, String oldName, String newName) {
 		Collection changeList = ChangeCreateUtil.getTransChanges(cKb, aChange);
 		String context = null;
 		
@@ -564,11 +563,11 @@ public class ChangesTab extends AbstractTabWidget {
 			
 			}
 		}
-	}
+	}*/
 
 
 	
-	
+/*	
 	// takes care of case when class is created & then renamed.
 	private static void checkForCreateChange(Instance aChange) {
 		String changeAction = ChangeCreateUtil.getAction(cKb, aChange);
@@ -580,7 +579,7 @@ public class ChangesTab extends AbstractTabWidget {
 			Integer rowCount = new Integer(cTableModel.getRowCount());
 			createChangeName.put(ChangeCreateUtil.getApplyTo(cKb, aChange), rowCount);
 		}
-	}
+	}*/
 	
 	private static void loadAnnotations(Collection annotateInsts) {
 		
