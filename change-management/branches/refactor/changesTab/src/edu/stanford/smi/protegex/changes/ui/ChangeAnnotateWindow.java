@@ -76,11 +76,11 @@ public class ChangeAnnotateWindow {
 
 		// Construct name changed list
 		names.clear();
-//		if (nameChangeOn) {
-//			getAllNames(ChangesTab.getNameChanges(), clsName);	
-//		} else {
+		if (nameChangeOn) {
+			getAllNames(ChangesTab.getNameChanges(), clsName);	
+		} else {
 			getAllNames(new HashMap(), clsName);	
-		//}
+		}
 		names.add(clsName);
 		
 		for (Iterator iter = changes.iterator(); iter.hasNext();) {
