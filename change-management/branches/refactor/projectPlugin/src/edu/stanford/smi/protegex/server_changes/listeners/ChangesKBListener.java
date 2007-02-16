@@ -1,10 +1,14 @@
 package edu.stanford.smi.protegex.server_changes.listeners;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import edu.stanford.smi.protege.event.KnowledgeBaseEvent;
 import edu.stanford.smi.protege.event.KnowledgeBaseListener;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.Slot;
+
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
@@ -96,12 +100,30 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		String oldName = event.getOldName();
 		String newName = event.getFrame().getName();
 		
+		
+		// Update all instances in the change ontology with the oldName to newName
+		updateChanges(oldName,newName);
+		
+		
+		//Don't create a name change if it is a rename right after a creation
+		if (ChangesProject.createChangeName.containsKey(oldName)&& needsNameChange(oldName)) {
+			
+		
+			//Instance cChange = (Instance) ChangesProject.createChangeName.get(oldName);
+			//ServerChangesUtil.setInstApplyTo(ChangesProject.getChangesKB(), cChange, newName);
+			//updateChangeInstances(cChange, oldName, newName);
+			ChangesProject.createChangeName.remove(oldName);
+		
+		}
+		else
+		{		
 		StringBuffer context = new StringBuffer();
 		context.append("Name change from '");
 		context.append(oldName);
 		context.append("' to '");
 		context.append(newName);
 		context.append("'");
+		
 		
 		Instance changeInst = ServerChangesUtil.createNameChange(
 												ChangesProject.getChangesKB(),
@@ -112,8 +134,51 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 												oldName, 
 												newName);
 	
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(changeInst);}
 	}
+	
+	   private boolean needsNameChange(String name) {
+	        boolean needsNameChange = false;
+	        
+	        if (name != null) {
+	            int index = name.lastIndexOf('_');
+	            String possibleIntegerString = name.substring(index + 1);
+	            try {
+	                Integer.parseInt(possibleIntegerString);
+	                needsNameChange = true;
+	            } catch (Exception e) {
+	            }
+	        }
+	        return needsNameChange;
+	    }
+
+	private void updateChanges(String oldName, String newName){
+		Collection changeList = ServerChangesUtil.getChangeInsts(ChangesProject.getChangesKB());
+		String context = null;
+		int len = oldName.length();
+		for (Iterator iter = changeList.iterator(); iter.hasNext();) {
+			Instance cInst = (Instance) iter.next();
+			String applyTo = ServerChangesUtil.getApplyTo(ChangesProject.getChangesKB(), cInst);
+			if (applyTo.equals(oldName)){
+				ServerChangesUtil.setInstApplyTo(ChangesProject.getChangesKB(), cInst, newName);
+		  }
+			
+			String cCtxt = ServerChangesUtil.getContext(ChangesProject.getChangesKB(), cInst);
+			int idx = cCtxt.indexOf(oldName);
+			if(idx!=-1){
+			StringBuffer txt = new StringBuffer(cCtxt);	
+			txt.replace(idx,idx+len,newName);
+			context = txt.toString();
+			
+			ServerChangesUtil.setInstContext(ChangesProject.getChangesKB(), cInst, context);
+			}
+		}
+		
+	}
+	
+	
+	
+	
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#instanceCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
