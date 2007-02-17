@@ -87,6 +87,9 @@ public class AnnotationTableModel extends AbstractTableModel{
 	 * @see javax.swing.table.TableModel#getColumnClass(int)
 	 */
 	public Class getColumnClass(int c) {
+		if (getValueAt(0, c) == null) {
+			return String.class;
+		}
 		return getValueAt(0, c).getClass();
 	}
 	
