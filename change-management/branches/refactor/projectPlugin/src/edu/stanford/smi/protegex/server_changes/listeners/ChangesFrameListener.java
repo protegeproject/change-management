@@ -61,8 +61,7 @@ public class ChangesFrameListener implements FrameListener {
             Slot ownS = event.getSlot();
  		    String ownSName = ownS.getName();
  		    String newSlotValue = CollectionUtilities.toString(s.getOwnSlotValues(event.getSlot()));
- 		    ArrayList oldValue = (ArrayList)event.getArgument2();
-		    String oldSlotValue = oldValue.toString();
+ 		
 		    StringBuffer context = new StringBuffer();
 		    if(ownSName.equals(":SLOT-NUMERIC-MAXIMUM")){
 		    	   context.append("Maximum value for: ");
