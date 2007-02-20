@@ -6,8 +6,7 @@
    <property name = "tab.src"         value = "./changesTab/src"/>  
    <property name = "pplugin.src"     value = "./projectPlugin/src"/>
    <property name = "build"           value = "./build"/>
-   <property name = "tab.classes"     value = "${build}/tab.classes"/>  
-   <property name = "pplugin.classes" value = "${build}/pplugin.classes"/>
+   <property name = "classes"         value = "${build}/classes"/>  
    <property name = "plugins"         value = "${build}/plugins"/>
    <property name = "lib"             value = "./lib"/>
    <property name = "junit"           value = "./junit"/>
@@ -80,31 +79,22 @@
 	
    <target name = "init">
      <mkdir dir = "${build}"/>
-     <mkdir dir = "${tab.classes}"/>
-     <mkdir dir = "${pplugin.classes}"/>
+     <mkdir dir = "${classes}"/>
      <mkdir dir = "${plugins}"/>
      <mkdir dir = "${plugins}/${plugin_dist}"/>
    </target>  
 
 
    <target name = "compile" depends = "init, checkProtegeLibsAndReport">    
-     <javac srcdir = "${pplugin.src}" destdir = "${pplugin.classes}" debug="on">
+     <javac srcdir = "${pplugin.src}:${tab.src}" 
+            destdir = "${classes}" debug="on">
        <classpath refid = "project.classpath"/>    
-     </javac>
-     <javac srcdir = "${tab.src}" destdir = "${tab.classes}" debug="on">
-       <classpath refid = "project.classpath"/>    
-       <classpath>
-         <pathelement location = "${pplugin.classes}"/>
-       </classpath>
      </javac>
    </target>
 
    <target name = "jar" depends = "compile">
-     <jar jarfile = "${plugins}/${plugin_dist}/${pluginName}ProjectPlugin.jar" 
-          basedir = "${pplugin.classes}" 
-          manifest = "${pplugin.src}/META-INF/MANIFEST.MF"/>  
-     <jar jarfile = "${plugins}/${plugin_dist}/${pluginName}Tab.jar" 
-          basedir = "${tab.classes}" 
+     <jar jarfile = "${plugins}/${plugin_dist}/${pluginName}.jar" 
+          basedir = "${classes}" 
           manifest = "${tab.src}/META-INF/MANIFEST.MF"/>  
      <copy file = "${lib}/icu4j.jar"
            todir = "${plugins}/${plugin_dist}"/>
@@ -129,9 +119,7 @@
             </not>
          </condition>
       </fail>
-      <copy file="${plugins}/${plugin_dist}/${pluginName}ProjectPlugin.jar"
-            todir="${protege.home}/plugins/${plugin_dist}"/>
-      <copy file="${plugins}/${plugin_dist}/${pluginName}Tab.jar"
+      <copy file="${plugins}/${plugin_dist}/${pluginName}.jar"
             todir="${protege.home}/plugins/${plugin_dist}"/>
    </target>
 
