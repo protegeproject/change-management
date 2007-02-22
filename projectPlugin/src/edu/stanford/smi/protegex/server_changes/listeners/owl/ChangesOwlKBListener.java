@@ -4,10 +4,22 @@ import edu.stanford.smi.protege.event.KnowledgeBaseEvent;
 import edu.stanford.smi.protege.event.KnowledgeBaseListener;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
-import edu.stanford.smi.protegex.server_changes.*;
+import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protegex.owl.model.OWLModel;
+import edu.stanford.smi.protegex.server_changes.ChangesDb;
+import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 
 public class ChangesOwlKBListener implements KnowledgeBaseListener {
+    private OWLModel om;
+    private KnowledgeBase changesKb;
+    
+    public ChangesOwlKBListener(OWLModel om) {
+        this.om = om;
+        changesKb = ChangesProject.getChangesKB(om);
+    }
+
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
@@ -19,7 +31,7 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 //		
 //		// Create artifical transaction for create class
 //		if (!ChangesTab.getIsInTransaction()) {
-//			ChangesTab.createTransactionChange(ChangesTab.TRANS_SIGNAL_TRANS_BEGIN);
+//			ChangesTab.createTransactionChange(om, ChangesTab.TRANS_SIGNAL_TRANS_BEGIN);
 //			ChangesTab.setInCreateClass(true);
 //		} 
 //		
@@ -32,31 +44,35 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 //		
 //		ChangesTab.createChange(changeInst);
 	}
+    
+    /* (non-Javadoc)
+     * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsDeleted(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
+     */
+    public void clsDeleted(KnowledgeBaseEvent event) {
+        
+        String oldName = event.getOldName();
+        String deletedClsName = "";
+        if (event.getArgument2() instanceof Cls) {
+            Cls deletedCls = (Cls) event.getArgument2();
+            deletedClsName = deletedCls.getBrowserText();
+        } else {
+            Cls deletedCls = event.getCls();
+            deletedClsName = oldName;
+            ChangesDb changesDb = ChangesProject.getChangesDb(om);
+            changesDb.updateMap(deletedCls.getFrameID(), deletedClsName);
+        }
+        
+        String context = "Deleted Class: " + deletedClsName;
+        Instance changeInst = ServerChangesUtil.createChange(om,
+                                                changesKb,
+                                                ServerChangesUtil.CHANGETYPE_CLASS_DELETED,
+                                                deletedClsName, 
+                                                context, 
+                                                ServerChangesUtil.CHANGE_LEVEL_INFO);
+        ChangesProject.createChange(om, changesKb, changeInst);
+    
+    }
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsDeleted(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
-	 */
-	public void clsDeleted(KnowledgeBaseEvent event) {
-		
-		String oldName = event.getOldName();
-		String deletedClsName = "";
-		if (event.getArgument2() instanceof Cls) {
-			Cls deletedCls = (Cls) event.getArgument2();
-			deletedClsName = deletedCls.getBrowserText();
-		} else {
-			deletedClsName = oldName;
-		}
-		
-		String context = "Deleted Class: " + deletedClsName;
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
-												ServerChangesUtil.CHANGETYPE_CLASS_DELETED,
-												deletedClsName, 
-												context, 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(changeInst);
-	
-	}
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#defaultClsMetaClsChanged(edu.stanford.smi.protege.event.KnowledgeBaseEvent)

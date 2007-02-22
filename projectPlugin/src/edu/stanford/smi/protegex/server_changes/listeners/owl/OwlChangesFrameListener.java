@@ -1,20 +1,28 @@
 package edu.stanford.smi.protegex.server_changes.listeners.owl;
 
+import java.util.ArrayList;
+
 import edu.stanford.smi.protege.event.FrameEvent;
 import edu.stanford.smi.protege.event.FrameListener;
+import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.Instance;
+import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
-import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.util.CollectionUtilities;
-import edu.stanford.smi.protegex.server_changes.*;
-import edu.stanford.smi.protegex.owl.model.*;
+import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.impl.DefaultOWLDatatypeProperty;
-
-import java.util.*;
+import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class OwlChangesFrameListener implements FrameListener {
-	
+    private OWLModel om;
+    private KnowledgeBase changesKb;
+    
+    public OwlChangesFrameListener(OWLModel kb) {
+        om = kb;
+        changesKb = ChangesProject.getChangesKB(kb);
+    }	
 	public void browserTextChanged(FrameEvent event) {
 		
 	}
@@ -67,7 +75,6 @@ public class OwlChangesFrameListener implements FrameListener {
          	String cName = c.getBrowserText();
             Slot s = event.getSlot();
             ArrayList oldValue = (ArrayList)event.getArgument2();
-		    String oldSlotValue = oldValue.toString();
  		    String sName = s.getName();
  		
  		    StringBuffer context = new StringBuffer();
@@ -86,23 +93,23 @@ public class OwlChangesFrameListener implements FrameListener {
  		        	  context.append(cName);
  		        	  
 // 		     		if (!ChangesTab.getIsInTransaction()) {
-// 		   			ChangesTab.createTransactionChange(ChangesTab.TRANS_SIGNAL_TRANS_BEGIN);
+// 		   			ChangesTab.createTransactionChange(om, ChangesTab.TRANS_SIGNAL_TRANS_BEGIN);
 // 		   			ChangesTab.setInRemoveAnnotation(true);
 // 		   		    } 
  		        	  
- 		        	  Instance changeInst = ServerChangesUtil.createChange(
- 								ChangesProject.getChangesKB(),
+ 		        	  Instance changeInst = ServerChangesUtil.createChange(om,
+ 								changesKb,
  								ServerChangesUtil.CHANGETYPE_ANNOTATION_REMOVED, 
  								cName, 
  								context.toString(), 
  								ServerChangesUtil.CHANGE_LEVEL_INFO);
 
- 		        		ChangesProject.createChange(changeInst);
+ 		        		ChangesProject.createChange(om,changesKb, changeInst);
  		        	}//Annotation deleted
  		        	else{
  		        		boolean isAdd = true;
- 		        		if( !oldSlotValue.equals("[]"))
- 		 		        {
+ 		        		if(!(oldValue == null) && !oldValue.isEmpty()) {
+ 		        		    String oldSlotValue = oldValue.toString();        
  		 	              String oldSlotValueMod = oldSlotValue.substring(1,oldSlotValue.length()-1);
  		 	              String slotCompare = oldSlotValueMod.concat(", ");
  		 	              //System.out.println("OLD: "+oldSlotValueMod+"Length: "+oldSlotValueMod.length());
@@ -124,17 +131,17 @@ public class OwlChangesFrameListener implements FrameListener {
  	 		        	context.append(" to class: ");
  	 		        	context.append(cName);
  	 		        	  
- 	 		        	Instance changeInst = ServerChangesUtil.createChange(
- 	 								ChangesProject.getChangesKB(),
+ 	 		        	Instance changeInst = ServerChangesUtil.createChange(om,
+ 	 								changesKb,
  	 								ServerChangesUtil.CHANGETYPE_ANNOTATION_ADDED, 
  	 								cName, 
  	 								context.toString(), 
  	 								ServerChangesUtil.CHANGE_LEVEL_INFO);
 
- 	 		      	ChangesProject.createChange(changeInst);
+ 	 		      	ChangesProject.createChange(om,changesKb, changeInst);
  	 		            
 // 	 		      	    if (ChangesTab.getIsInTransaction() && ChangesTab.getInRemoveAnnotation()) {
-// 	 					ChangesTab.createTransactionChange(ChangesTab.TRANS_SIGNAL_TRANS_END);
+// 	 					ChangesTab.createTransactionChange(om, ChangesTab.TRANS_SIGNAL_TRANS_END);
 // 	 					ChangesTab.setInRemoveAnnotation(false);
 // 	 				    }
 		        		}
@@ -152,8 +159,8 @@ public class OwlChangesFrameListener implements FrameListener {
               context.append(" to: ");
               context.append(cName);
             	
-              Instance changeInst = ServerChangesUtil.createChange(
-						ChangesProject.getChangesKB(),
+              Instance changeInst = ServerChangesUtil.createChange(om,
+						changesKb,
 						ServerChangesUtil.CHANGETYPE_DISJOINT_CLASS_ADDED, 
 						cName, 
 						context.toString(), 
@@ -161,7 +168,7 @@ public class OwlChangesFrameListener implements FrameListener {
 
             
             	
-          	ChangesProject.createChange(changeInst);
+          	ChangesProject.createChange(om,changesKb, changeInst);
 		   
 		    } // Handles disjoints
 		
@@ -184,13 +191,13 @@ public class OwlChangesFrameListener implements FrameListener {
     	    context.append(iName);
     	    context.append(" set to: ");
     	    context.append(newSlotValue);
-            Instance changeInst = ServerChangesUtil.createChange(
-    						ChangesProject.getChangesKB(),
+            Instance changeInst = ServerChangesUtil.createChange(om,
+    						changesKb,
     						ServerChangesUtil.CHANGETYPE_SLOT_VALUE, 
     						iName, 
     						context.toString(), 
     						ServerChangesUtil.CHANGE_LEVEL_INFO);
-        	ChangesProject.createChange(changeInst);
+        	ChangesProject.createChange(om,changesKb, changeInst);
          
     	    } 
     	}
