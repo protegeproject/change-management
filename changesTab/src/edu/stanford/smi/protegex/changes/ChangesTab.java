@@ -57,6 +57,7 @@ import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
 import edu.stanford.smi.protegex.changes.ui.JTreeTable;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.GetAnnotationProjectName;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
  
 /**
  * Change Management Tab widget
@@ -492,7 +493,7 @@ public class ChangesTab extends AbstractTabWidget {
 	public static void createChange(Instance aChange) {
 		boolean addChange = true;
 		
-		if (aChange.getDirectType().getName().equals(ChangeCreateUtil.CHANGETYPE_NAME_CHANGED)) {
+		if (aChange.getDirectType().getName().equals(ServerChangesUtil.CHANGETYPE_NAME_CHANGED)) {
 			String oldName = ChangeCreateUtil.getNameChangedOldName(cKb, aChange);
 			String newName = ChangeCreateUtil.getNameChangedNewName(cKb, aChange);
 			addNameChange(oldName, newName);
@@ -514,15 +515,12 @@ public class ChangesTab extends AbstractTabWidget {
 				cTreeTableModel.update();
 			}*/
 		}
-		if (aChange.getDirectType().getName().equals(ChangeCreateUtil.CHANGETYPE_SUBCLASS_ADDED)) {
+		if (aChange.getDirectType().getName().equals(ServerChangesUtil.CHANGETYPE_SUBCLASS_ADDED)) {
 			addChange = false;
 		}
-		
-		if (ChangesProject.getIsInTransaction(currKB)) {
-			//transStack.push(aChange);
-			// Don't display change yet
-		} else {
-			//checkForCreateChange(aChange);	
+		Slot inTransactionSlot = cKb.getSlot(ServerChangesUtil.SLOT_NAME_IS_IN_TRANSACTION);
+        Boolean inTransaction = (Boolean) aChange.getOwnSlotValue(inTransactionSlot);
+		if (!inTransaction) {	
 			if (addChange) {
 				cTableModel.addChangeData(aChange);
 				cTreeTableModel.addChangeData(aChange);
@@ -601,7 +599,7 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 	
 	public static void createAnnotation(Instance annotateInst) {
-		Slot body = cKb.getSlot(ChangeCreateUtil.SLOT_NAME_BODY);
+		Slot body = cKb.getSlot(ServerChangesUtil.SLOT_NAME_BODY);
 		Object bdy = annotateInst.getOwnSlotValue(body);
 		if (bdy == null) {
 			cKb.deleteInstance(annotateInst);
