@@ -363,7 +363,8 @@ public class ServerChangesUtil {
 		return annotateInst;
 	}
 	
-	public static Instance updateAnnotation(KnowledgeBase cKb, Instance annotateInst) {
+	public static Instance updateAnnotation(KnowledgeBase kb,
+                                            KnowledgeBase cKb, Instance annotateInst) {
 		
 		Slot created = cKb.getSlot(SLOT_NAME_CREATED);
 		Slot author = cKb.getSlot(SLOT_NAME_AUTHOR);
@@ -372,7 +373,7 @@ public class ServerChangesUtil {
 		
 		annotateInst.setOwnSlotValue(created, ChangesProject.getTimeStamp());
 		annotateInst.setOwnSlotValue(modified, ChangesProject.getTimeStamp());
-		annotateInst.setOwnSlotValue(author, ChangesProject.getUserName());
+		annotateInst.setOwnSlotValue(author, ChangesProject.getUserName(kb));
 		
 		// If no comments are added, add empty string as comment
 		Object bdy = annotateInst.getOwnSlotValue(body);
@@ -408,7 +409,9 @@ public class ServerChangesUtil {
 		return tInst;
 	}
 	
-	public static Instance createChange(KnowledgeBase changeKB, String changeClsName, String apply, String desc, String typ) {
+	public static Instance createChange(KnowledgeBase currentKB,
+                                        KnowledgeBase changeKB, 
+                                        String changeClsName, String apply, String desc, String typ) {
 		
 		Cls change = changeKB.getCls(changeClsName);
 		Slot action = changeKB.getSlot("action");
@@ -431,7 +434,7 @@ public class ServerChangesUtil {
 		else{
 		changeInst.setOwnSlotValue(action, change.getName());
 		changeInst.setOwnSlotValue(applyTo, apply);
-		changeInst.setOwnSlotValue(author, ChangesProject.getUserName());
+		changeInst.setOwnSlotValue(author, ChangesProject.getUserName(currentKB));
 		changeInst.setOwnSlotValue(context, desc);
 		changeInst.setOwnSlotValue(created, ChangesProject.getTimeStamp());
 		changeInst.setOwnSlotValue(type, typ);
@@ -440,10 +443,17 @@ public class ServerChangesUtil {
 		return changeInst;
 	}
 	
-	public static Instance createNameChange(KnowledgeBase changeKB, String changeClsName, String apply, String desc, String typ, String oldName, String newName) {
+	public static Instance createNameChange(KnowledgeBase currentKB, 
+                                            KnowledgeBase changeKB, 
+                                            String changeClsName, 
+                                            String apply, 
+                                            String desc, 
+                                            String typ, 
+                                            String oldName, 
+                                            String newName) {
 		Slot oldN = changeKB.getSlot("oldName");
 		Slot newN = changeKB.getSlot("newName");
-		Instance changeInst = createChange(changeKB, changeClsName, apply, desc, typ);
+		Instance changeInst = createChange(currentKB, changeKB, changeClsName, apply, desc, typ);
 		changeInst.setOwnSlotValue(oldN, oldName);
 		changeInst.setOwnSlotValue(newN, newName);
 		
