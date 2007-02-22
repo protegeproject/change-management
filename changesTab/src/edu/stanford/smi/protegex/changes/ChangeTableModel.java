@@ -169,7 +169,7 @@ public class ChangeTableModel extends AbstractTableModel {
 		boolean added = false;
 		String actionType = ChangeCreateUtil.getType(changeKB, changeInst);
 			
-		if (actionType != null && !actionType.equals("ROOT")) {
+		if (!"ROOT".equals(actionType)) {
 			if (filterMethod == FILTER_TRANS) {
 				if (actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_INFO) || 
 						actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS) || 
