@@ -51,7 +51,7 @@ public class ChangesDb {
     }
     
     private void getOrCreateChangesProject(KnowledgeBase kb) {
-        Project project = kb.getProject();
+        final Project project = kb.getProject();
 
         if (project.isMultiUserServer()) {
             Server server = Server.getInstance();
@@ -111,7 +111,10 @@ public class ChangesDb {
         project.addProjectListener(new ProjectAdapter() {
             ArrayList errors = new ArrayList();
             public void projectSaved(ProjectEvent event) {
-
+	
+            	RDFBackend.setSourceFiles(changesProject.getSources(), ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + project.getName() + ".rdfs", ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + project.getName() + ".rdf", ChangesProject.PROTEGE_NAMESPACE);
+            	changesProject.setProjectURI(getAnnotationProjectURI(project));
+	
                 changesProject.save(errors);
                 displayErrors(errors);          
             }
@@ -120,7 +123,7 @@ public class ChangesDb {
     
     private static URI getAnnotationProjectURI(Project p) {
         return URIUtilities.createURI(p.getProjectDirectoryURI() + 
-                                      File.separator + 
+                                      "/" + 
                                       ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + 
                                       p.getName() + ".pprj");
     }
