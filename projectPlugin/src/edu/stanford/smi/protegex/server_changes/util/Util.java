@@ -10,6 +10,7 @@ import edu.stanford.smi.protege.model.CommandManager;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.framestore.undo.MacroCommand;
 import edu.stanford.smi.protege.model.framestore.undo.UndoFrameStore;
+import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.impl.AbstractOWLModel;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesTransListener;
 import edu.stanford.smi.protegex.server_changes.listeners.owl.ChangesOwlKBListener;
@@ -20,7 +21,7 @@ import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesProperty
 
 public class Util {
 
-	private static HashMap frameIdMap = new HashMap();
+
 
 	private static String OWL_KB_INDICATOR = "OWL";
 	
@@ -31,25 +32,13 @@ public class Util {
 		return (index > 0);
 	}
 	
-	public static void registerOwlListeners(KnowledgeBase kb) {
-		((AbstractOWLModel) kb).addClassListener(new OwlChangesClassListener());
-		((AbstractOWLModel) kb).addModelListener(new OwlChangesModelListener());
-		((AbstractOWLModel) kb).addPropertyListener(new OwlChangesPropertyListener());
-		((AbstractOWLModel) kb).addFrameListener(new OwlChangesFrameListener());
-		kb.addTransactionListener(new ChangesTransListener());
-		kb.addKnowledgeBaseListener(new ChangesOwlKBListener()); // Handles Class Deletes
-	}
-	
-	public static void updateMap(String frameId, String name) {
-		frameIdMap.put(frameId, name);
-	}
-	
-	public static String getName (String frameId) {
-		return (String)frameIdMap.get(frameId);
-	}
-	
-	public static boolean frameExists(String frameId) {
-		return frameIdMap.containsKey(frameId);
+	public static void registerOwlListeners(OWLModel om) {
+		om.addClassListener(new OwlChangesClassListener(om));
+		om.addModelListener(new OwlChangesModelListener(om));
+		om.addPropertyListener(new OwlChangesPropertyListener(om));
+		((KnowledgeBase) om).addFrameListener(new OwlChangesFrameListener(om));
+		om.addTransactionListener(new ChangesTransListener(om));
+		((KnowledgeBase) om).addKnowledgeBaseListener(new ChangesOwlKBListener(om)); // Handles Class Deletes
 	}
 
 	// Undo framestore possible use
