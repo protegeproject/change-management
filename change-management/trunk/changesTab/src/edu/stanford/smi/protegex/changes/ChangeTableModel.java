@@ -5,13 +5,12 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.table.AbstractTableModel;
-import javax.swing.Icon;
 
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
-import edu.stanford.smi.protege.resource.Icons;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangeTableModel extends AbstractTableModel {
 
@@ -126,9 +125,9 @@ public class ChangeTableModel extends AbstractTableModel {
 			break;
 		/*case 3:  
 			//Cls changeInstType = aInst.getDirectType();
-			//if (changeInstType.getName().equals(ChangeCreateUtil.CHANGETYPE_TRANS_CHANGE))
+			//if (changeInstType.getName().equals(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE))
 			  String actionType = ChangeCreateUtil.getType(changeKB, aInst);	
-			  if(actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_DISP_TRANS))
+			  if(actionType.equals(ServerChangesUtil.CHANGE_LEVEL_DISP_TRANS))
 			   ctxt = Icons.getViewClsIcon();
 			break; */ 	
 		case 1: 
@@ -171,18 +170,18 @@ public class ChangeTableModel extends AbstractTableModel {
 			
 		if (!"ROOT".equals(actionType)) {
 			if (filterMethod == FILTER_TRANS) {
-				if (actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_INFO) || 
-						actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS) || 
-						actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_DISP_TRANS)) {
+				if (actionType.equals(ServerChangesUtil.CHANGE_LEVEL_INFO) || 
+						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS) || 
+						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_DISP_TRANS)) {
 					workingData.add(changeInst);
 					colorList.add(currColor);
 					added = true;
 				}
 				
 			} else if (filterMethod == FILTER_TRANS_INFO) {
-				if (actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_INFO) || 
-						actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS) || 
-						actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS_INFO)) {
+				if (actionType.equals(ServerChangesUtil.CHANGE_LEVEL_INFO) || 
+						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS) || 
+						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS_INFO)) {
 					workingData.add(changeInst);
 					colorList.add(currColor);
 					added = true;
@@ -196,7 +195,7 @@ public class ChangeTableModel extends AbstractTableModel {
 
 			// If we have a transaction change, add the list of changes
 			Cls changeInstType = changeInst.getDirectType();
-			if (changeInstType.getName().equals(ChangeCreateUtil.CHANGETYPE_TRANS_CHANGE)) {
+			if (changeInstType.getName().equals(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE)) {
 				isTrans = true;
 				Collection relChanges = ChangeCreateUtil.getChanges(changeKB, changeInst);
 				addChangeData(relChanges);
@@ -219,16 +218,16 @@ public class ChangeTableModel extends AbstractTableModel {
 			String actionType = ChangeCreateUtil.getType(changeKB, aInst);
 			
 			if (filterMethod == FILTER_TRANS) {
-				if (actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_INFO) || 
-						actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS)) {
+				if (actionType.equals(ServerChangesUtil.CHANGE_LEVEL_INFO) || 
+						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS)) {
 					workingData.add(aInst);
 					colorList.add(currColor);
 				}
 				
 			} else if (filterMethod == FILTER_TRANS_INFO) {
-				if (actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_INFO) || 
-						actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS) || 
-						actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS_INFO)) {
+				if (actionType.equals(ServerChangesUtil.CHANGE_LEVEL_INFO) || 
+						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS) || 
+						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS_INFO)) {
 					workingData.add(aInst);
 					colorList.add(currColor);
 				}
@@ -311,10 +310,10 @@ public class ChangeTableModel extends AbstractTableModel {
 		workingData.clear();
 		colorList.clear();
 		
-		Slot author = changeKB.getSlot(ChangeCreateUtil.SLOT_NAME_AUTHOR);
-		Slot created = changeKB.getSlot(ChangeCreateUtil.SLOT_NAME_CREATED);
-		Slot action = changeKB.getSlot(ChangeCreateUtil.SLOT_NAME_ACTION);
-		Slot desc = changeKB.getSlot(ChangeCreateUtil.SLOT_NAME_CONTEXT);
+		Slot author = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_AUTHOR);
+		Slot created = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_CREATED);
+		Slot action = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_ACTION);
+		Slot desc = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_CONTEXT);
 		
 		Slot sltToSearch = null;
 		if (field.equals(CHANGE_COLNAME_AUTHOR)) {

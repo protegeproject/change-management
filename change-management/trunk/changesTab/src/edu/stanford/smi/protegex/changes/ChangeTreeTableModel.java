@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.swing.table.AbstractTableModel;
-
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
-
-import edu.stanford.smi.protegex.changes.ui.*;
+import edu.stanford.smi.protegex.changes.ui.AbstractTreeTableModel;
+import edu.stanford.smi.protegex.changes.ui.TreeTableModel;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangeTreeTableModel extends AbstractTreeTableModel implements TreeTableModel{
 
@@ -133,7 +132,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 		TreeTableNode newNode = new TreeTableNode(changeInst,changeKB);
 		String actionType = ChangeCreateUtil.getType(changeKB, changeInst);
 		if (actionType != null){
-			if(!actionType.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS_INFO)&& !actionType.equals("ROOT")){
+			if(!actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS_INFO)&& !actionType.equals("ROOT")){
 				 root.addChild(newNode);
 				 int[] childIndices = new int[1];
 					if(root.getChildCount()!=0)
@@ -154,7 +153,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 
 			// If we have a transaction change, add the list of changes
 			Cls changeInstType = changeInst.getDirectType();
-			if (changeInstType.getName().equals(ChangeCreateUtil.CHANGETYPE_TRANS_CHANGE)) {
+			if (changeInstType.getName().equals(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE)) {
 			
 				Collection relChanges = ChangeCreateUtil.getChanges(changeKB, changeInst);
 				
@@ -204,10 +203,10 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	      root.removeChildren();
 		  fireTreeNodesRemoved(getRoot(), rootPath.getPath() , childIndices, children);
 		}
-		Slot author = changeKB.getSlot(ChangeCreateUtil.SLOT_NAME_AUTHOR);
-		Slot created = changeKB.getSlot(ChangeCreateUtil.SLOT_NAME_CREATED);
-		Slot action = changeKB.getSlot(ChangeCreateUtil.SLOT_NAME_ACTION);
-		Slot desc = changeKB.getSlot(ChangeCreateUtil.SLOT_NAME_CONTEXT);
+		Slot author = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_AUTHOR);
+		Slot created = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_CREATED);
+		Slot action = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_ACTION);
+		Slot desc = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_CONTEXT);
 		
 		Slot sltToSearch = null;
 		if (field.equals(CHANGE_COLNAME_AUTHOR)) {
