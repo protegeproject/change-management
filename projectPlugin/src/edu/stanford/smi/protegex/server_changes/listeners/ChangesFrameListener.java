@@ -1,19 +1,27 @@
 package edu.stanford.smi.protegex.server_changes.listeners;
 
+import java.util.ArrayList;
+
 import edu.stanford.smi.protege.event.FrameEvent;
 import edu.stanford.smi.protege.event.FrameListener;
+import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.Instance;
+import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
-import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.util.CollectionUtilities;
-import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-
-import java.util.*;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 
 public class ChangesFrameListener implements FrameListener {
+    private KnowledgeBase kb;
+    private KnowledgeBase changesKb;
+    
+    public ChangesFrameListener(KnowledgeBase kb) {
+        this.kb = kb;
+        changesKb = ChangesProject.getChangesKB(kb);
+    }
 	
 	public void browserTextChanged(FrameEvent event) {
 		
@@ -68,28 +76,28 @@ public class ChangesFrameListener implements FrameListener {
 	               context.append(sName);
 	               context.append(" set to: ");
 	               context.append(newSlotValue);
-	               Instance changeInst = ServerChangesUtil.createChange(
-	       						ChangesProject.getChangesKB(),
+	               Instance changeInst = ServerChangesUtil.createChange(kb,
+	       						changesKb,
 	       						ServerChangesUtil.CHANGETYPE_MAXIMUM_VALUE, 
 	       						sName, 
 	       						context.toString(), 
 	       						ServerChangesUtil.CHANGE_LEVEL_INFO);
 
-	           	ChangesProject.createChange(changeInst);
+	           	ChangesProject.createChange(kb, changesKb, changeInst);
 		    }
             if(ownSName.equals(":SLOT-NUMERIC-MINIMUM")){
          	   context.append("Minimum value for: ");
                context.append(sName);
                context.append(" set to: ");
                context.append(newSlotValue);
-               Instance changeInst =ServerChangesUtil.createChange(
-            		        ChangesProject.getChangesKB(),
+               Instance changeInst =ServerChangesUtil.createChange(kb,
+            		        changesKb,
             		        ServerChangesUtil.CHANGETYPE_MINIMUM_VALUE, 
        						sName, 
        						context.toString(), 
        						ServerChangesUtil.CHANGE_LEVEL_INFO);
 
-           	ChangesProject.createChange(changeInst);
+           	ChangesProject.createChange(kb, changesKb, changeInst);
 		    	
 		    }
 		    
@@ -101,14 +109,14 @@ public class ChangesFrameListener implements FrameListener {
                	  context.append(sName);
                	  context.append(" set to: ");
                	  context.append(newSlotValue);
-               	  Instance changeInst =ServerChangesUtil.createChange(
-       						ChangesProject.getChangesKB(),
+               	  Instance changeInst =ServerChangesUtil.createChange(kb,
+       						changesKb,
        						ServerChangesUtil.CHANGETYPE_MINIMUM_CARDINALITY, 
        						sName, 
        						context.toString(), 
        						ServerChangesUtil.CHANGE_LEVEL_INFO);
 
-              	ChangesProject.createChange(changeInst);
+              	ChangesProject.createChange(kb, changesKb, changeInst);
         			
         		}
         		
@@ -120,14 +128,14 @@ public class ChangesFrameListener implements FrameListener {
                	  context.append(sName);
                	  context.append(" can take multiple values");
                	  
-               	  Instance changeInst = ServerChangesUtil.createChange(
-       						ChangesProject.getChangesKB(),
+               	  Instance changeInst = ServerChangesUtil.createChange(kb,
+       						changesKb,
        						ServerChangesUtil.CHANGETYPE_MAXIMUM_CARDINALITY, 
        						sName, 
        						context.toString(), 
        						ServerChangesUtil.CHANGE_LEVEL_INFO);
 
-              	ChangesProject.createChange(changeInst);
+              	ChangesProject.createChange(kb, changesKb, changeInst);
             	}
             	else{
             		//maximum values set to -
@@ -135,13 +143,13 @@ public class ChangesFrameListener implements FrameListener {
                	  context.append(sName);
                	  context.append(" set to: ");
                	  context.append(newSlotValue);
-               	  Instance changeInst =ServerChangesUtil.createChange(
-       						ChangesProject.getChangesKB(),
+               	  Instance changeInst =ServerChangesUtil.createChange(kb,
+       						changesKb,
        						ServerChangesUtil.CHANGETYPE_MAXIMUM_CARDINALITY, 
        						sName, 
        						context.toString(), 
        						ServerChangesUtil.CHANGE_LEVEL_INFO);
-              	ChangesProject.createChange(changeInst);
+              	ChangesProject.createChange(kb, changesKb, changeInst);
             	}
         		
         	}
@@ -166,14 +174,14 @@ public class ChangesFrameListener implements FrameListener {
             	context.append("Removed documentation from ");
             	context.append(cName);
             	
-            	Instance changeInst = ServerChangesUtil.createChange(
-						ChangesProject.getChangesKB(),
+            	Instance changeInst = ServerChangesUtil.createChange(kb,
+						changesKb,
 						ServerChangesUtil.CHANGETYPE_DOCUMENTATION_REMOVED, 
 						cName, 
 						context.toString(), 
 						ServerChangesUtil.CHANGE_LEVEL_INFO);
 
-            	ChangesProject.createChange(changeInst);
+            	ChangesProject.createChange(kb, changesKb, changeInst);
 		   
             	
               }
@@ -184,13 +192,13 @@ public class ChangesFrameListener implements FrameListener {
             	  context.append(newSlotValue);
             	  context.append(" to: ");
             	  context.append(cName);
-            	  Instance changeInst = ServerChangesUtil.createChange(
-    						ChangesProject.getChangesKB(),
+            	  Instance changeInst = ServerChangesUtil.createChange(kb,
+    						changesKb,
     						ServerChangesUtil.CHANGETYPE_DOCUMENTATION_ADDED, 
     						cName, 
     						context.toString(), 
     						ServerChangesUtil.CHANGE_LEVEL_INFO);
-            		ChangesProject.createChange(changeInst);
+            		ChangesProject.createChange(kb, changesKb, changeInst);
             
               }
 		      /*ArrayList oldValue = (ArrayList)event.getArgument2();
@@ -222,14 +230,14 @@ public class ChangesFrameListener implements FrameListener {
 		    context.append(iName);
 		    context.append(" set to: ");
 		    context.append(newSlotValue);
-            Instance changeInst = ServerChangesUtil.createChange(
-    						ChangesProject.getChangesKB(),
+            Instance changeInst = ServerChangesUtil.createChange(kb,
+    						changesKb,
     						ServerChangesUtil.CHANGETYPE_SLOT_VALUE, 
     						iName, 
     						context.toString(), 
     						ServerChangesUtil.CHANGE_LEVEL_INFO);
 
-        	ChangesProject.createChange(changeInst);
+        	ChangesProject.createChange(kb, changesKb, changeInst);
 		    
     	}
 

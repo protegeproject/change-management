@@ -4,10 +4,18 @@ import edu.stanford.smi.protege.event.ClsEvent;
 import edu.stanford.smi.protege.event.ClsListener;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
-
-import edu.stanford.smi.protegex.server_changes.*;
+import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangesClsListener implements ClsListener{
+    private KnowledgeBase kb;
+    private KnowledgeBase changesKb;
+    
+    public ChangesClsListener(KnowledgeBase kb) {
+        this.kb = kb;
+        changesKb = ChangesProject.getChangesKB(kb);
+    }
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.ClsListener#directInstanceAdded(edu.stanford.smi.protege.event.ClsEvent)
@@ -23,19 +31,19 @@ public class ChangesClsListener implements ClsListener{
 		context.append(clsOfInst.getBrowserText());
 		context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst = ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_INSTANCE_ADDED, 
 												clsOfInst.getName(), 
 												context.toString(), 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
 		
 	
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 		// Create artificial transaction for create slot
-		if (ChangesProject.getInCreateSlot() && ChangesProject.getIsInTransaction()) {
-			ChangesProject.createTransactionChange(ChangesProject.TRANS_SIGNAL_TRANS_END);
-			ChangesProject.setInCreateSlot(false);
+		if (ChangesProject.getInCreateSlot(kb) && ChangesProject.getIsInTransaction(kb)) {
+			ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_END);
+			ChangesProject.setInCreateSlot(kb, false);
 		}
 		
 	}
@@ -54,14 +62,14 @@ public class ChangesClsListener implements ClsListener{
 		context.append(clsOfInst.getBrowserText());
 		context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst = ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_INSTANCE_REMOVED, 
 												clsOfInst.getName(), 
 												context.toString(), 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
 	
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 
 	/* (non-Javadoc)
@@ -78,18 +86,18 @@ public class ChangesClsListener implements ClsListener{
 		context.append(superClass.getBrowserText());
 		context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst = ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_SUBCLASS_ADDED, 
 												subClass.getName(), 
 												context.toString(), 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 		
 		// Create artificial transaction for create class
-		if (ChangesProject.getIsInTransaction() && ChangesProject.getInCreateClass()) {
-			ChangesProject.createTransactionChange(ChangesProject.TRANS_SIGNAL_TRANS_END);
-			ChangesProject.setInCreateClass(false);
+		if (ChangesProject.getIsInTransaction(kb) && ChangesProject.getInCreateClass(kb)) {
+			ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_END);
+			ChangesProject.setInCreateClass(kb, false);
 		}
 	}
 
@@ -114,13 +122,13 @@ public class ChangesClsListener implements ClsListener{
 		context.append(superClass.getBrowserText());
 		context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst = ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_SUBCLASS_REMOVED, 
 												subClass.getName(), 
 												context.toString(), 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 		
 	}
 
@@ -138,13 +146,13 @@ public class ChangesClsListener implements ClsListener{
 		context.append( superClass.getBrowserText());
 		context.append(")");
 		
-		Instance changeInst =ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst =ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_SUPERCLASS_ADDED,
 												subClass.getName(), 
 												context.toString(), 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 	
 	}
 
@@ -162,14 +170,14 @@ public class ChangesClsListener implements ClsListener{
 		context.append(superClass.getBrowserText());
 		context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst = ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_SUPERCLASS_REMOVED, 
 												subClass.getName(), 
 												context.toString(), 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
 		
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 
 	/* (non-Javadoc)

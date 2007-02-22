@@ -4,12 +4,20 @@ import edu.stanford.smi.protege.event.SlotEvent;
 import edu.stanford.smi.protege.event.SlotListener;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
+import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
-import edu.stanford.smi.protegex.server_changes.*;
+import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 
 public class ChangesSlotListener implements SlotListener{
-
+    private KnowledgeBase kb;
+    private KnowledgeBase changesKb;
+    
+    public ChangesSlotListener(KnowledgeBase kb) {
+        this.kb = kb;
+        changesKb = ChangesProject.getChangesKB(kb);
+    }
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.SlotListener#templateSlotClsAdded(edu.stanford.smi.protege.event.SlotEvent)
 	 */
@@ -23,18 +31,18 @@ public class ChangesSlotListener implements SlotListener{
 			context.append(" to: ");
 			context.append(theCls.getBrowserText());
 			
-			Instance changeInst = ServerChangesUtil.createChange(
-													ChangesProject.getChangesKB(),
+			Instance changeInst = ServerChangesUtil.createChange(kb,
+													changesKb,
 													ServerChangesUtil.CHANGETYPE_TEMPLATESLOT_ADDED,
 													theCls.getName(), 
 													context.toString(), 
 													ServerChangesUtil.CHANGE_LEVEL_INFO);
 		
-			ChangesProject.createChange(changeInst);
+			ChangesProject.createChange(kb, changesKb, changeInst);
 			// Create artificial transaction for create slot
-			if (ChangesProject.getInCreateSlot() && ChangesProject.getIsInTransaction()) {
-				ChangesProject.createTransactionChange(ChangesProject.TRANS_SIGNAL_TRANS_END);
-				ChangesProject.setInCreateSlot(false);
+			if (ChangesProject.getInCreateSlot(kb) && ChangesProject.getIsInTransaction(kb)) {
+				ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_END);
+				ChangesProject.setInCreateSlot(kb, false);
 			}
 		}
 	}
@@ -52,13 +60,13 @@ public class ChangesSlotListener implements SlotListener{
 			context.append(" from: ");
 			context.append(theCls.getBrowserText());
 			
-			Instance changeInst = ServerChangesUtil.createChange(
-													ChangesProject.getChangesKB(),
+			Instance changeInst = ServerChangesUtil.createChange(kb,
+													changesKb,
 													ServerChangesUtil.CHANGETYPE_TEMPLATESLOT_REMOVED,
 													theCls.getName(), 
 													context.toString(),
 													ServerChangesUtil.CHANGE_LEVEL_INFO);
-			ChangesProject.createChange(changeInst);
+			ChangesProject.createChange(kb, changesKb, changeInst);
 	
 		}
 	}
@@ -71,13 +79,13 @@ public class ChangesSlotListener implements SlotListener{
 			Slot eventSlot = (Slot) event.getArgument();
 			String context = "Direct Subslot Added: " + eventSlot.getBrowserText();
 			
-			Instance changeInst = ServerChangesUtil.createChange(
-													ChangesProject.getChangesKB(),
+			Instance changeInst = ServerChangesUtil.createChange(kb,
+													changesKb,
 													ServerChangesUtil.CHANGETYPE_SUBSLOT_ADDED,
 													eventSlot.getBrowserText(), 
 													context, 
 													ServerChangesUtil.CHANGE_LEVEL_INFO);
-			ChangesProject.createChange(changeInst);
+			ChangesProject.createChange(kb, changesKb, changeInst);
 			
 		}
 	}
@@ -90,13 +98,13 @@ public class ChangesSlotListener implements SlotListener{
 			Slot eventSlot = (Slot) event.getArgument();
 			String context = "Direct Subslot Removed: " + eventSlot.getBrowserText();
 			
-			Instance changeInst = ServerChangesUtil.createChange(
-													ChangesProject.getChangesKB(),
+			Instance changeInst = ServerChangesUtil.createChange(kb,
+													changesKb,
 													ServerChangesUtil.CHANGETYPE_SUBSLOT_REMOVED,
 													eventSlot.getBrowserText(), 
 													context, 
 													ServerChangesUtil.CHANGE_LEVEL_INFO);
-			ChangesProject.createChange(changeInst);
+			ChangesProject.createChange(kb, changesKb, changeInst);
 		
 		}
 	}
@@ -115,13 +123,13 @@ public class ChangesSlotListener implements SlotListener{
 			Slot eventSlot = (Slot) event.getArgument();
 			String context = "Direct Superslot Added: " + eventSlot.getBrowserText();
 			
-			Instance changeInst = ServerChangesUtil.createChange(
-													ChangesProject.getChangesKB(),
+			Instance changeInst = ServerChangesUtil.createChange(kb,
+													changesKb,
 													ServerChangesUtil.CHANGETYPE_SUPERSLOT_ADDED,
 													eventSlot.getBrowserText(), 
 													context, 
 													ServerChangesUtil.CHANGE_LEVEL_INFO);
-			ChangesProject.createChange(changeInst);
+			ChangesProject.createChange(kb, changesKb, changeInst);
 			
 		}
 	}
@@ -134,14 +142,14 @@ public class ChangesSlotListener implements SlotListener{
 			Slot eventSlot = (Slot) event.getArgument();
 			String context = "Direct Superslot Removed: " + eventSlot.getBrowserText();
 			
-			Instance changeInst = ServerChangesUtil.createChange(
-													ChangesProject.getChangesKB(),
+			Instance changeInst = ServerChangesUtil.createChange(kb,
+													changesKb,
 													ServerChangesUtil.CHANGETYPE_SUPERSLOT_REMOVED,
 													eventSlot.getBrowserText(), 
 													context, 
 													ServerChangesUtil.CHANGE_LEVEL_INFO);
 			
-			ChangesProject.createChange(changeInst);
+			ChangesProject.createChange(kb, changesKb, changeInst);
 		}
 	}
 }

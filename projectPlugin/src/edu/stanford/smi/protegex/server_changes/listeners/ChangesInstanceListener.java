@@ -3,11 +3,18 @@ package edu.stanford.smi.protegex.server_changes.listeners;
 import edu.stanford.smi.protege.event.InstanceEvent;
 import edu.stanford.smi.protege.event.InstanceListener;
 import edu.stanford.smi.protege.model.Instance;
-import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangesInstanceListener implements InstanceListener{
-
+    private KnowledgeBase kb;
+    private KnowledgeBase changesKb;
+    
+    public ChangesInstanceListener(KnowledgeBase kb) {
+        this.kb = kb;
+        changesKb = ChangesProject.getChangesKB(kb);
+    }
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.InstanceListener#directTypeAdded(edu.stanford.smi.protege.event.InstanceEvent)
 	 */
@@ -23,13 +30,13 @@ public class ChangesInstanceListener implements InstanceListener{
 		context.append(instName);
 		context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst = ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_DIRECTTYPE_ADDED, 
 												directType, 
 												context.toString(), 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 
 	/* (non-Javadoc)
@@ -46,12 +53,12 @@ public class ChangesInstanceListener implements InstanceListener{
 		context.append(instName);
 		context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst = ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_DIRECTTYPE_REMOVED,
 												directType, 
 												context.toString(), 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 }
