@@ -17,21 +17,22 @@ import edu.stanford.smi.protegex.server_changes.*;
 
 
 public class TransactionUtility {
-	private static KnowledgeBase cKb;
+    private KnowledgeBase currentKB;
+	private KnowledgeBase cKb;
 	
-	private static Cls transChange;
-	private static Slot changes;
-	private static Slot author;
-	private static Slot context;
-	private static Slot created;
-	private static Slot action;
-	private static Slot type;
-	private static Slot applyTo;
+	private Cls transChange;
+	private Slot changes;
+	private Slot author;
+	private Slot context;
+	private Slot created;
+	private Slot action;
+	private Slot type;
+	private Slot applyTo;
 	
-	private TransactionUtility() {}
 	
-	public static void initialize() {
-		cKb = ChangesProject.getChangesKB();
+	public TransactionUtility(KnowledgeBase currentKB, KnowledgeBase cKb) {
+        this.currentKB = currentKB;
+		this.cKb = cKb;
 		transChange = cKb.getCls("TransChange");
 		changes = cKb.getSlot("Changes");
 		author = cKb.getSlot("author");
@@ -42,7 +43,7 @@ public class TransactionUtility {
 		applyTo = cKb.getSlot("applyTo");
 	}
 	
-	public static Stack convertTransactions(Stack trans) {
+	public Stack convertTransactions(Stack trans) {
 		Stack aTrans = new Stack();
 		Object elem;
 		
@@ -56,7 +57,7 @@ public class TransactionUtility {
 	}
 	
 	// Display transation
-	public static void displayTransactions(Stack trans) {
+	public void displayTransactions(Stack trans) {
 		
 		for (Iterator iter = trans.iterator(); iter.hasNext();) {
 			Object element = (Object) iter.next();
@@ -70,7 +71,7 @@ public class TransactionUtility {
 		}
 	}
 	
-	public static Instance findAggAction(Stack transStack, boolean isOwl) {
+	public Instance findAggAction(Stack transStack, boolean isOwl) {
 		
 		ArrayList results = new ArrayList();
 		Stack actionStack = (Stack) transStack.pop();
@@ -95,7 +96,7 @@ public class TransactionUtility {
 		return transInst;
 	}
 	
-	private static Instance generateTransInstance(Collection transActions) {
+	private Instance generateTransInstance(Collection transActions) {
 		
 		Instance tInst = null;
 		
@@ -132,7 +133,7 @@ public class TransactionUtility {
 		return tInst;
 	}
 	
-	private static Instance findRestrictionInstance(ArrayList actions) {
+	private Instance findRestrictionInstance(ArrayList actions) {
 		
 		String contextVal = null;
 		String ctxt = null;
@@ -217,7 +218,7 @@ public class TransactionUtility {
 		Instance cInst = cKb.createInstance(null, transChange);
 		cInst.setOwnSlotValues(changes, transactionLevel(actions));
 		
-		cInst.setOwnSlotValue(author, ChangesProject.getUserName());
+		cInst.setOwnSlotValue(author, ChangesProject.getUserName(currentKB));
 		cInst.setOwnSlotValue(action, act);
 		cInst.setOwnSlotValue(context, contextVal);
 		cInst.setOwnSlotValue(created, ChangesProject.getTimeStamp());
@@ -228,7 +229,7 @@ public class TransactionUtility {
 	}
 	
 	// For restrictions
-	private static String contextCleaning(String context) {
+	private String contextCleaning(String context) {
 		if (context.contains("rdf:List")) {
 			context = context.replaceAll("rdf:List", "").trim();
 			context = context.substring(1, context.length()-1);
@@ -243,7 +244,7 @@ public class TransactionUtility {
 	}
 	
 	// Decompose context into its constituent parts for "Action: name (added to: actUpon)"
-	private static ArrayList decomposeContext(String context, String actUponStr) {
+	private ArrayList decomposeContext(String context, String actUponStr) {
 		ArrayList result = new ArrayList();
 		
 		String action = context.substring(context.indexOf(":")+1, context.length()).trim();
@@ -256,7 +257,7 @@ public class TransactionUtility {
 		return result;
 	}
 	
-	private static boolean isRestriction(ArrayList actions) {
+	private boolean isRestriction(ArrayList actions) {
 		
 		boolean isRest = false;
 		
@@ -273,7 +274,7 @@ public class TransactionUtility {
 		return isRest;
 	}
 	
-	private static boolean isAnon(String context) {
+	private boolean isAnon(String context) {
 		boolean isAnon = false;
 		
 		if (context.contains("?") || context.contains("empty") || context.contains("ANONYMOUS")) {
@@ -284,7 +285,7 @@ public class TransactionUtility {
 	}
 	
 	// make sure we convert the level to transaction_level
-	private static Collection transactionLevel(Collection trans) {
+	private Collection transactionLevel(Collection trans) {
 		for (Iterator iter = trans.iterator(); iter.hasNext();) {
 			Instance element = (Instance) iter.next();
 			
@@ -296,7 +297,7 @@ public class TransactionUtility {
 		return trans;
 	}
 	
-	private static ArrayList filterActions(Stack actions) {
+	private ArrayList filterActions(Stack actions) {
 		ArrayList results = new ArrayList();
 		
 		for (Iterator iter = actions.iterator(); iter.hasNext();) {
