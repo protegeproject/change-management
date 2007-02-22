@@ -25,6 +25,7 @@ public class TransactionUtility {
 	private Slot author;
 	private Slot context;
 	private Slot created;
+    private Slot inTransactionSlot;
 	private Slot action;
 	private Slot type;
 	private Slot applyTo;
@@ -33,14 +34,15 @@ public class TransactionUtility {
 	public TransactionUtility(KnowledgeBase currentKB, KnowledgeBase cKb) {
         this.currentKB = currentKB;
 		this.cKb = cKb;
-		transChange = cKb.getCls("TransChange");
-		changes = cKb.getSlot("Changes");
-		author = cKb.getSlot("author");
-		context = cKb.getSlot("context");
-		created = cKb.getSlot("created");
-		action = cKb.getSlot("action");
-		type = cKb.getSlot("type");
-		applyTo = cKb.getSlot("applyTo");
+		transChange = cKb.getCls(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE);
+		changes = cKb.getSlot(ServerChangesUtil.SLOT_NAME_CHANGES);
+		author = cKb.getSlot(ServerChangesUtil.SLOT_NAME_AUTHOR);
+		context = cKb.getSlot(ServerChangesUtil.SLOT_NAME_CONTEXT);
+		created = cKb.getSlot(ServerChangesUtil.SLOT_NAME_CREATED);
+		action = cKb.getSlot(ServerChangesUtil.SLOT_NAME_ACTION);
+		type = cKb.getSlot(ServerChangesUtil.SLOT_NAME_TYPE);
+		applyTo = cKb.getSlot(ServerChangesUtil.SLOT_NAME_APPLYTO);
+        inTransactionSlot = cKb.getSlot(ServerChangesUtil.SLOT_NAME_IS_IN_TRANSACTION);
 	}
 	
 	public Stack convertTransactions(Stack trans) {
@@ -225,6 +227,7 @@ public class TransactionUtility {
 		cInst.setOwnSlotValue(applyTo, applyToVal);
 		
 		cInst.setOwnSlotValue(type,ServerChangesUtil.CHANGE_LEVEL_TRANS);
+        cInst.setOwnSlotValue(inTransactionSlot, false);
         
         cKb.setDirectType(cInst, transChange);
 		return cInst;
