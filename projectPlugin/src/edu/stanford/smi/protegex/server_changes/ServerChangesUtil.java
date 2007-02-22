@@ -11,9 +11,9 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 
 public class ServerChangesUtil {
-
-	//Change level
-	public static final String CHANGE_LEVEL_INFO = "info";
+    
+    //Change level
+    public static final String CHANGE_LEVEL_INFO = "info";
 	public static final String CHANGE_LEVEL_DEBUG = "debug";
 	public static final String CHANGE_LEVEL_TRANS = "transaction";
 	public static final String CHANGE_LEVEL_TRANS_INFO = "transaction_info";
@@ -75,6 +75,7 @@ public class ServerChangesUtil {
 	public static final String SLOT_NAME_ASSOC_ANNOTATIONS = "assoc_annotations";
 	public static final String SLOT_NAME_AUTHOR = "author";
 	public static final String SLOT_NAME_ANNOTATES = "annotates";
+    public static final String SLOT_NAME_IS_IN_TRANSACTION = "isInTransaction";
 	public static final String SLOT_NAME_BODY = "body";
 	public static final String SLOT_NAME_CHANGES = "Changes";
 	public static final String SLOT_NAME_CREATED = "created";
@@ -88,6 +89,7 @@ public class ServerChangesUtil {
 	// Class Name
 	public static final String CLS_NAME_CHANGE = "Change";
 	public static final String CLS_NAME_ANNOTATE = "Annotation";
+
 	
 	private ServerChangesUtil() {}
 	
@@ -414,12 +416,13 @@ public class ServerChangesUtil {
                                         String changeClsName, String apply, String desc, String typ) {
 		
 		Cls change = changeKB.getCls(changeClsName);
-		Slot action = changeKB.getSlot("action");
-		Slot applyTo = changeKB.getSlot("applyTo");
-		Slot author = changeKB.getSlot("author");
-		Slot context = changeKB.getSlot("context");
-		Slot created = changeKB.getSlot("created");
-		Slot type = changeKB.getSlot("type");
+		Slot action = changeKB.getSlot(SLOT_NAME_ACTION);
+		Slot applyTo = changeKB.getSlot(SLOT_NAME_APPLYTO);
+		Slot author = changeKB.getSlot(SLOT_NAME_AUTHOR);
+		Slot context = changeKB.getSlot(SLOT_NAME_CONTEXT);
+		Slot created = changeKB.getSlot(SLOT_NAME_CREATED);
+        Slot inTransaction = changeKB.getSlot(SLOT_NAME_IS_IN_TRANSACTION);
+		Slot type = changeKB.getSlot(SLOT_NAME_TYPE);
 		
 		Instance changeInst = changeKB.createInstance(null, new ArrayList());
 		
@@ -438,7 +441,9 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
 		changeInst.setOwnSlotValue(created, ChangesProject.getTimeStamp());
 		changeInst.setOwnSlotValue(type, typ);
+		changeInst.setOwnSlotValue(inTransaction, ChangesProject.getIsInTransaction(currentKB));
 		}
+        
         changeKB.setDirectType(changeInst, change);
 		return changeInst;
 	}
