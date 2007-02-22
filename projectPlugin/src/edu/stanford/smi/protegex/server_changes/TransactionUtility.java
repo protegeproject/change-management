@@ -215,7 +215,7 @@ public class TransactionUtility {
 		}
 		contextVal = act + ": " + ctxt;
 		
-		Instance cInst = cKb.createInstance(null, transChange);
+		Instance cInst = cKb.createInstance(null, new ArrayList());
 		cInst.setOwnSlotValues(changes, transactionLevel(actions));
 		
 		cInst.setOwnSlotValue(author, ChangesProject.getUserName(currentKB));
@@ -225,6 +225,8 @@ public class TransactionUtility {
 		cInst.setOwnSlotValue(applyTo, applyToVal);
 		
 		cInst.setOwnSlotValue(type,ServerChangesUtil.CHANGE_LEVEL_TRANS);
+        
+        cKb.setDirectType(cInst, transChange);
 		return cInst;
 	}
 	
