@@ -45,6 +45,14 @@ public class ChangesProject extends ProjectPluginAdapter {
 
 		initialize(p);
 	}
+    
+    public void beforeClose(Project p) {
+        KnowledgeBase kb = p.getKnowledgeBase();
+        ChangesDb changesDb  = getChangesDb(kb);
+        if (changesDb != null) {
+            changesDb.getChangesKb().dispose();
+        }
+    }
 	
 	
 	public void initialize(Project p) {	
