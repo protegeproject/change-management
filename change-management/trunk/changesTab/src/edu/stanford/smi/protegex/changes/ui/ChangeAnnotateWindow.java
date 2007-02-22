@@ -24,10 +24,9 @@ import edu.stanford.smi.protegex.changes.AnnotationTableModel;
 import edu.stanford.smi.protegex.changes.ChangeCreateUtil;
 import edu.stanford.smi.protegex.changes.ChangeTableModel;
 import edu.stanford.smi.protegex.changes.ChangesTab;
-import edu.stanford.smi.protegex.changes.TreeTableNode;
 import edu.stanford.smi.protegex.changes.InstanceDateComparator;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
-import edu.stanford.smi.protegex.changes.action.ChangeShowAction;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangeAnnotateWindow {
 
@@ -86,7 +85,7 @@ public class ChangeAnnotateWindow {
 		for (Iterator iter = changes.iterator(); iter.hasNext();) {
 			Instance cInst = (Instance) iter.next();
 			
-			if (cInst.getDirectType().getName().equals(ChangeCreateUtil.CHANGETYPE_TRANS_CHANGE)) {
+			if (cInst.getDirectType().getName().equals(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE)) {
 				Collection transChanges = ChangeCreateUtil.getTransChanges(cKb, cInst);
 				boolean hasChangeRel = false;
 				
@@ -120,7 +119,7 @@ public class ChangeAnnotateWindow {
 			} else {
 				String info = ChangeCreateUtil.getType(cKb, cInst);
 				
-				if (!info.equals(ChangeCreateUtil.CHANGE_LEVEL_TRANS_INFO)){
+				if (!info.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS_INFO)){
 					String applyToStr = ChangeCreateUtil.getApplyTo(cKb, cInst);
 					for (Iterator iterator = names.iterator(); iterator
 							.hasNext();) {
