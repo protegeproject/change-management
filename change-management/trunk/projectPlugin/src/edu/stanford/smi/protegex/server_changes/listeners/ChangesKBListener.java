@@ -7,13 +7,20 @@ import edu.stanford.smi.protege.event.KnowledgeBaseEvent;
 import edu.stanford.smi.protege.event.KnowledgeBaseListener;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
+import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
-
+import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangesKBListener implements KnowledgeBaseListener {
-
+    private KnowledgeBase kb;
+    private KnowledgeBase changesKb;
+    
+    public ChangesKBListener(KnowledgeBase kb) {
+        this.kb = kb;
+        changesKb = ChangesProject.getChangesKB(kb);
+    }
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
@@ -24,19 +31,19 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		String context = "Created Class: " + clsName;
 		
 		// Create artifical transaction for create class
-		if (!ChangesProject.getIsInTransaction()) {
-			ChangesProject.createTransactionChange(ChangesProject.TRANS_SIGNAL_TRANS_BEGIN);
-			ChangesProject.setInCreateClass(true);
+		if (!ChangesProject.getIsInTransaction(kb)) {
+			ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_BEGIN);
+			ChangesProject.setInCreateClass(kb, true);
 		} 
 		
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst = ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_CLASS_CREATED, 
 												clsName, 
 												context, 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
 		
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 
 	/* (non-Javadoc)
@@ -54,13 +61,13 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		}
 		
 		String context = "Deleted Class: " + deletedClsName;
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst = ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_CLASS_DELETED,
 												deletedClsName, 
 												context, 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 
 	/* (non-Javadoc)
@@ -99,6 +106,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	public void frameNameChanged(KnowledgeBaseEvent event) {
 		String oldName = event.getOldName();
 		String newName = event.getFrame().getName();
+        ChangesDb changesDb = ChangesProject.getChangesDb(kb);
 		
 		
 		// Update all instances in the change ontology with the oldName to newName
@@ -106,13 +114,13 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		
 		
 		//Don't create a name change if it is a rename right after a creation
-		if (ChangesProject.createChangeName.containsKey(oldName)&& needsNameChange(oldName)) {
+		if (changesDb.createChangeNameContains(oldName)&& needsNameChange(oldName)) {
 			
 		
 			//Instance cChange = (Instance) ChangesProject.createChangeName.get(oldName);
-			//ServerChangesUtil.setInstApplyTo(ChangesProject.getChangesKB(), cChange, newName);
+			//ServerChangesUtil.setInstApplyTo(changesKb, cChange, newName);
 			//updateChangeInstances(cChange, oldName, newName);
-			ChangesProject.createChangeName.remove(oldName);
+			changesDb.removeChangeName(oldName);
 		
 		}
 		else
@@ -126,7 +134,8 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		
 		
 		Instance changeInst = ServerChangesUtil.createNameChange(
-												ChangesProject.getChangesKB(),
+                                                kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_NAME_CHANGED,
 												newName, 
 												context.toString(), 
@@ -134,7 +143,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 												oldName, 
 												newName);
 	
-		ChangesProject.createChange(changeInst);}
+		ChangesProject.createChange(kb, changesKb, changeInst);}
 	}
 	
 	   private boolean needsNameChange(String name) {
@@ -153,24 +162,24 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	    }
 
 	private void updateChanges(String oldName, String newName){
-		Collection changeList = ServerChangesUtil.getChangeInsts(ChangesProject.getChangesKB());
+		Collection changeList = ServerChangesUtil.getChangeInsts(changesKb);
 		String context = null;
 		int len = oldName.length();
 		for (Iterator iter = changeList.iterator(); iter.hasNext();) {
 			Instance cInst = (Instance) iter.next();
-			String applyTo = ServerChangesUtil.getApplyTo(ChangesProject.getChangesKB(), cInst);
+			String applyTo = ServerChangesUtil.getApplyTo(changesKb, cInst);
 			if (applyTo.equals(oldName)){
-				ServerChangesUtil.setInstApplyTo(ChangesProject.getChangesKB(), cInst, newName);
+				ServerChangesUtil.setInstApplyTo(changesKb, cInst, newName);
 		  }
 			
-			String cCtxt = ServerChangesUtil.getContext(ChangesProject.getChangesKB(), cInst);
+			String cCtxt = ServerChangesUtil.getContext(changesKb, cInst);
 			int idx = cCtxt.indexOf(oldName);
 			if(idx!=-1){
 			StringBuffer txt = new StringBuffer(cCtxt);	
 			txt.replace(idx,idx+len,newName);
 			context = txt.toString();
 			
-			ServerChangesUtil.setInstContext(ChangesProject.getChangesKB(), cInst, context);
+			ServerChangesUtil.setInstContext(changesKb, cInst, context);
 			}
 		}
 		
@@ -200,19 +209,19 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		String slotName = createdSlot.getName();
 
 		// Create artifical transaction for create slot
-		if (!ChangesProject.getIsInTransaction()) {
-			ChangesProject.createTransactionChange(ChangesProject.TRANS_SIGNAL_TRANS_BEGIN);
-			ChangesProject.setInCreateSlot(true);
+		if (!ChangesProject.getIsInTransaction(kb)) {
+			ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_BEGIN);
+			ChangesProject.setInCreateSlot(kb, true);
 		}
 		
 		String context = "Created Slot: " + slotName;
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst = ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_SLOT_CREATED,
 												slotName, 
 												context, 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 
 	/* (non-Javadoc)
@@ -229,13 +238,13 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 			deletedSlotName = oldName;
 		}
 		String context = "Deleted Slot: " + deletedSlotName;
-		Instance changeInst = ServerChangesUtil.createChange(
-												ChangesProject.getChangesKB(),
+		Instance changeInst = ServerChangesUtil.createChange(kb,
+												changesKb,
 												ServerChangesUtil.CHANGETYPE_SLOT_DELETED,
 												deletedSlotName, 
 												context, 
 												ServerChangesUtil.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(changeInst);
+		ChangesProject.createChange(kb, changesKb, changeInst);
 	
 	}
 }
