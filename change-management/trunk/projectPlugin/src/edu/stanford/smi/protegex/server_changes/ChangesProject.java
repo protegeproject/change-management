@@ -1,35 +1,21 @@
 package edu.stanford.smi.protegex.server_changes;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Stack;
-import java.util.logging.Level;
 
-import javax.swing.*;
-
-import edu.stanford.smi.protege.*;
-import edu.stanford.smi.protege.event.ProjectAdapter;
-import edu.stanford.smi.protege.event.ProjectEvent;
-import edu.stanford.smi.protege.model.*;
-import edu.stanford.smi.protege.model.framestore.EventDispatchFrameStore;
-import edu.stanford.smi.protege.model.framestore.FrameStoreManager;
-import edu.stanford.smi.protege.plugin.*;
-import edu.stanford.smi.protege.server.Server;
+import edu.stanford.smi.protege.Application;
+import edu.stanford.smi.protege.model.Instance;
+import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Project;
+import edu.stanford.smi.protege.model.WidgetDescriptor;
+import edu.stanford.smi.protege.plugin.ProjectPluginAdapter;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
-import edu.stanford.smi.protege.ui.*;
-import edu.stanford.smi.protege.util.ApplicationProperties;
 import edu.stanford.smi.protege.util.Log;
-import edu.stanford.smi.protege.util.MessageError;
-import edu.stanford.smi.protege.util.URIUtilities;
-
-
+import edu.stanford.smi.protegex.changes.ChangesTab;
+import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesClsListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesFrameListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesInstanceListener;
@@ -37,11 +23,8 @@ import edu.stanford.smi.protegex.server_changes.listeners.ChangesKBListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesSlotListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesTransListener;
 import edu.stanford.smi.protegex.server_changes.util.Util;
-import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
-import edu.stanford.smi.protegex.storage.rdf.RDFKnowledgeBase;
 
 public class ChangesProject extends ProjectPluginAdapter {
-	private static Project existingServerChangesProject;
 
 	public static final String ANNOTATION_PROJECT_NAME_PREFIX = "annotation_";
 
@@ -51,40 +34,13 @@ public class ChangesProject extends ProjectPluginAdapter {
 	public static final String TRANS_SIGNAL_TRANS_BEGIN = "transaction_begin";
 	public static final String TRANS_SIGNAL_TRANS_END = "transaction_end";
 	public static final String TRANS_SIGNAL_START = "start";
+    
+    private static Map<KnowledgeBase, ChangesDb> changesDbMap = new HashMap<KnowledgeBase, ChangesDb>();
 
-	// This is bad but it removes a reverse dependency.
-	private static final String CHANGES_TAB_CLASSNAME="edu.stanford.smi.protegex.changes.ChangesTab";
-
-	
-	private static Project currentProj;
-	private static KnowledgeBase currentKB;
-	
-	private static Project changesProj;
-	private static KnowledgeBase changesKb;
-		
-	//	Maintaing transaction objects
-	private static Stack transStack;
-	private static int transCount = 0;
-	private static boolean inTransaction;
-
-	private static boolean inCreateClass = false;
-	private static boolean inCreateSlot = false;
-
-	private static boolean isOwlProject;
-
-	public static HashMap createChangeName = new HashMap();
 	public void afterLoad(Project p) {
 		
 		if (!isChangesTabProject(p) || p.isMultiUserClient()) {
 			return;
-		}
-		if (p.isMultiUserServer() && existingServerChangesProject != null &&
-				!existingServerChangesProject.equals(p)) {
-			Log.getLogger().info("Can only have one server side project with the Changes Plugin");
-			return;
-		}
-		else if (p.isMultiUserServer()) {
-			existingServerChangesProject = p;
 		}
 
 		initialize(p);
@@ -92,12 +48,14 @@ public class ChangesProject extends ProjectPluginAdapter {
 	
 	
 	public void initialize(Project p) {	
-		currentProj = p;
-		currentKB = currentProj.getKnowledgeBase();
-		transStack = new Stack();
+		Project currentProj = p;
+		KnowledgeBase currentKB = currentProj.getKnowledgeBase();
 		
-		createChangeProject(); 
+		createChangeProject(currentKB); 
 
+        ChangesDb changesDb = changesDbMap.get(currentKB);
+        KnowledgeBase changesKb = changesDb.getChangesKb();
+        Project changesProj = changesDb.getChangesProject();
 		if (changesKb == null) {
 			Log.getLogger().warning("Could not initialize the annotations ontology. ChangesTab will probably not work");
 			return;
@@ -106,18 +64,17 @@ public class ChangesProject extends ProjectPluginAdapter {
 		// AT THIS POINT, WE HAVE THE CHANGES PROJECT 'changes' and the KB 'changesKb'. 
 		// Creating the Root of the tree for the UI
 
-		ServerChangesUtil.createChange(	changesKb, ServerChangesUtil.CHANGETYPE_INSTANCE_ADDED,	"ROOT", "ROOT",	"ROOT");
+		ServerChangesUtil.createChange(currentKB, changesKb, ServerChangesUtil.CHANGETYPE_INSTANCE_ADDED,	"ROOT", "ROOT",	"ROOT");
 
-		TransactionUtility.initialize();	
 
 		//Check to see if the project is an OWL one
-		isOwlProject = Util.kbInOwl(currentKB);
+		boolean isOwlProject = Util.kbInOwl(currentKB);
 
 		// Register listeners
 		if (isOwlProject) {
-			Util.registerOwlListeners(currentKB);
+			Util.registerOwlListeners((OWLModel) currentKB);
 		} else {
-			registerKBListeners();
+			registerKBListeners(currentKB);
 		}
 
 		if (changesProj.isMultiUserServer()) {
@@ -126,27 +83,32 @@ public class ChangesProject extends ProjectPluginAdapter {
 
 	}
 
-	private static void registerKBListeners() {
-		currentKB.addKnowledgeBaseListener(new ChangesKBListener());
-		currentKB.addClsListener(new ChangesClsListener());
-		currentKB.addInstanceListener(new ChangesInstanceListener());
-		currentKB.addSlotListener(new ChangesSlotListener());
-		currentKB.addTransactionListener(new ChangesTransListener());
-		currentKB.addFrameListener(new ChangesFrameListener());
+	private static void registerKBListeners(KnowledgeBase currentKB) {
+		currentKB.addKnowledgeBaseListener(new ChangesKBListener(currentKB));
+		currentKB.addClsListener(new ChangesClsListener(currentKB));
+		currentKB.addInstanceListener(new ChangesInstanceListener(currentKB));
+		currentKB.addSlotListener(new ChangesSlotListener(currentKB));
+		currentKB.addTransactionListener(new ChangesTransListener(currentKB));
+		currentKB.addFrameListener(new ChangesFrameListener(currentKB));
 	}
+    
 
-	public static void createChange(Instance aChange){
-		if (inTransaction) {
-			transStack.push(aChange);
+
+	public static void createChange(KnowledgeBase currentKB, 
+                                    KnowledgeBase changesKb, 
+                                    Instance aChange){
+        ChangesDb changesDb = getChangesDb(currentKB);
+		if (changesDb.isInTransaction()) {
+			changesDb.pushTransStack(aChange);
 		}
 		
-		checkForCreateChange(aChange);	
+		checkForCreateChange(changesDb, changesKb, aChange);	
 		
 	}
 	
 	
 	// takes care of case when class is created & then renamed - Adding original name of class and change instance to HashMap
-	private static void checkForCreateChange(Instance aChange) {
+	private static void checkForCreateChange(ChangesDb changesDb, KnowledgeBase changesKb, Instance aChange) {
 		String changeAction = ServerChangesUtil.getAction(changesKb, aChange);
 		if  ( (changeAction != null) && (changeAction.equals(ServerChangesUtil.CHANGETYPE_CLASS_CREATED)
 				|| changeAction.equals(ServerChangesUtil.CHANGETYPE_SLOT_CREATED)
@@ -154,110 +116,40 @@ public class ChangesProject extends ProjectPluginAdapter {
 				))
 				{
 			
-			createChangeName.put(ServerChangesUtil.getApplyTo(changesKb, aChange), aChange);
+			changesDb.addChangeName(ServerChangesUtil.getApplyTo(changesKb, aChange), aChange);
 		}
 	}
 
-	public static void createTransactionChange(String typ) {
+	public static void createTransactionChange(KnowledgeBase currentKB, String typ) {
+        ChangesDb changesDb = changesDbMap.get(currentKB);
+        TransactionUtility tu = changesDb.getTransactionUtility();
 
 		if (typ.equals(TRANS_SIGNAL_TRANS_BEGIN)) {
-			inTransaction = true;
-			transCount++;
-			transStack.push(TRANS_SIGNAL_START);
+            changesDb.setInTransaction(true);
+            changesDb.incrementTransactionCount();
+            changesDb.pushTransStack(TRANS_SIGNAL_START);
 
 		} else if (typ.equals(TRANS_SIGNAL_TRANS_END)) {
-			transCount--;
-			transStack = TransactionUtility.convertTransactions(transStack);
+            changesDb.decrementTransactionCount();
+			changesDb.setTransStack(tu.convertTransactions(changesDb.getTransStack()));
 
 			// Indicates we are done (balanced start and ends)
-			if (transCount==0) {
-				inTransaction = false;
-				Instance changeInst = TransactionUtility.findAggAction(transStack, isOwlProject);
+			if (changesDb.getTransactionCount() ==0) {
+                changesDb.setInTransaction(false);
+				Instance changeInst = tu.findAggAction(changesDb.getTransStack(), Util.kbInOwl(currentKB));
 				//checkForCreateChange(changeInst);	
-
-				transStack.clear();
+				changesDb.clearTransStack();
 			} 
 		} 
 	}
 
-	private static boolean createChangeProject() {
-
-		if (currentProj.isMultiUserServer()) {
-			Server server = Server.getInstance();
-			String annotationName = (String) new GetAnnotationProjectName(currentKB).execute();
-			if (annotationName == null) {
-				throw new RuntimeException("Annotation project not configured on server (use the " + 
-						GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT +
-				" slot)");
-			}
-			changesProj = server.getProject(annotationName);
-			changesKb = changesProj.getKnowledgeBase();
-			return true;
-		}
-
-		boolean annotationsProjectExist = false;
-
-		ArrayList errors = new ArrayList();
-
-		URI annotationProjURI = getAnnotationProjectURI();
-
-		File annotationProjFile = new File(annotationProjURI);
-		
-		//TODO: TT Check whether this works with real URIs
-		if (annotationProjFile.exists()) {
-			//annotation ontology exists        	      	
-			changesProj = Project.loadProjectFromURI(annotationProjURI, errors);
-
-			annotationsProjectExist = true;
-
-		} else {
-			//annotations ontology does not exist and it will be created
-			URI changeOntURI = null;
-			try {
-				changeOntURI = ChangesProject.class.getResource("/projects/changes.pprj").toURI();
-			} catch (URISyntaxException e) {
-				Log.getLogger().log(Level.WARNING, "Could not find Changes Ontology", e);
-			}
-
-			RDFBackend rdfBackendFactory = new RDFBackend();
-
-			changesProj = Project.loadProjectFromURI(changeOntURI, errors);
-
-			RDFBackend.setSourceFiles(changesProj.getSources(), ANNOTATION_PROJECT_NAME_PREFIX + currentProj.getName() + ".rdfs", ANNOTATION_PROJECT_NAME_PREFIX + currentProj.getName() + ".rdf", PROTEGE_NAMESPACE);
-			changesProj.setProjectURI(annotationProjURI);
-
-			annotationsProjectExist = false;
-		}
-
-
-		if (changesProj == null) {
-			Log.getLogger().warning("Failed to find or create annotation project");
-			displayErrors(errors);
-			return annotationsProjectExist;
-		}
-
-		changesKb = changesProj.getKnowledgeBase();
-
-		currentProj.addProjectListener(new ProjectAdapter() {
-			ArrayList errors = new ArrayList();
-			public void projectSaved(ProjectEvent event) {
-
-				changesProj.save(errors);
-				displayErrors(errors);			
-			}
-		});
-
-		return annotationsProjectExist;
-	}
-
-
-
-	private static URI getAnnotationProjectURI() {
-		return URIUtilities.createURI(currentProj.getProjectDirectoryURI() + File.separator + ANNOTATION_PROJECT_NAME_PREFIX + currentProj.getName() + ".pprj");
+	private static void createChangeProject(KnowledgeBase currentKB) {
+        ChangesDb changesDb = new ChangesDb(currentKB);
+        changesDbMap.put(currentKB, changesDb);
 	}
 
 	private boolean isChangesTabProject(Project p) {
-		String changesTabClassName = CHANGES_TAB_CLASSNAME;
+		String changesTabClassName = ChangesTab.class.getName();
 		for (Object o : p.getTabWidgetDescriptors()) {
 			WidgetDescriptor w = (WidgetDescriptor) o;
 			if (w.isVisible() && changesTabClassName.equals(w.getWidgetClassName())) {
@@ -266,24 +158,9 @@ public class ChangesProject extends ProjectPluginAdapter {
 		}
 		return false;
 	}
-
-	
-	private static void displayErrors(Collection errors) {
-		Iterator i = errors.iterator();
-		while (i.hasNext()) {
-			Object elem = i.next();			
-			if (elem instanceof Throwable) {
-				Log.getLogger().log(Level.WARNING, "Warnings at loading changes project", (Throwable)elem);
-			} else if (elem instanceof MessageError) {
-				Log.getLogger().log(Level.WARNING, ((MessageError)elem).getMessage(), ((MessageError)elem).getException());
-			} else {
-				Log.getLogger().warning(elem.toString());
-			}
-		}
-	}
 	
 	
-	public static String getUserName() {
+	public static String getUserName(KnowledgeBase currentKB) {
 		return currentKB.getUserName();
 	}
 
@@ -297,32 +174,46 @@ public class ChangesProject extends ProjectPluginAdapter {
 		return time;
 	}
 	
-	public static boolean getIsInTransaction() {
-		return inTransaction;
+	public static boolean getIsInTransaction(KnowledgeBase kb) {
+        ChangesDb changesDb = getChangesDb(kb);
+		return changesDb.isInTransaction();
 	}
 
-	public static boolean getInCreateClass() {
-		return inCreateClass;
+	public static boolean getInCreateClass(KnowledgeBase kb) {
+        ChangesDb changesDb = getChangesDb(kb);
+		return changesDb.isInCreateClass();
 	}
 
-	public static void setInCreateClass(boolean val) {
-		inCreateClass = val;
+	public static void setInCreateClass(KnowledgeBase kb, boolean val) {
+        ChangesDb changesDb = getChangesDb(kb);
+        changesDb.setInCreateClass(val);
 	}
 
-	public static boolean getInCreateSlot() {
-		return inCreateSlot;
+	public static boolean getInCreateSlot(KnowledgeBase kb) {
+        ChangesDb changesDb = getChangesDb(kb);
+		return changesDb.isInCreateSlot();
 	}
 
-	public static void setInCreateSlot(boolean val) {
-		inCreateSlot = val;
+	public static void setInCreateSlot(KnowledgeBase kb, boolean val) {
+        ChangesDb changesDb = getChangesDb(kb);
+        changesDb.setInCreateSlot(val);
+	}
+    
+    public static ChangesDb getChangesDb(KnowledgeBase kb) {
+        return changesDbMap.get(kb);
+    }
+
+	public static KnowledgeBase getChangesKB(KnowledgeBase kb) {
+        ChangesDb changesDb = changesDbMap.get(kb);
+		return changesDb.getChangesKb();
 	}
 
-	public static KnowledgeBase getChangesKB() {
-		return changesKb;
-	}
-
-	public static Project getChangesProj() {
-		return changesProj;
+	public static Project getChangesProj(KnowledgeBase kb) {
+        ChangesDb changesDb = changesDbMap.get(kb);
+        if (changesDb == null) {
+        		return null;
+        }	
+        return changesDb.getChangesProject();
 	}
 
 	public String getName() {
