@@ -23,7 +23,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	//static protected Class[]  cTypes = {TreeTableModel.class, String.class, String.class, String.class};
 	
 	private String[] colNames;
-	private ArrayList completeData;
+	private ArrayList<Instance> completeData;
 	private KnowledgeBase changeKB;
     private static TreeTableNode root;
 	 
