@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -113,7 +114,7 @@ public class ChangesTab extends AbstractTabWidget {
 	
 
 	
-	private static HashMap nameChanges = new HashMap();
+	private static Map<String, String> nameChanges = new HashMap<String, String>();
 
 	private static ChangeMenu cMenu;
 	private static RemoveInstanceAction remInst;
@@ -483,7 +484,7 @@ public class ChangesTab extends AbstractTabWidget {
 		nameChanges.put(newName, oldName);
 	}
 	
-	public static HashMap getNameChanges() {
+	public static Map<String, String> getNameChanges() {
 		return nameChanges;
 	}
 	
