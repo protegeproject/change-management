@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -41,7 +43,7 @@ public class ChangeAnnotateWindow {
 	
 	private KnowledgeBase cKb;
 	private String clsName;
-	private ArrayList names = new ArrayList();
+	private List<String> names = new ArrayList<String>();
 	private boolean nameChangeOn;
 
 	
@@ -69,8 +71,8 @@ public class ChangeAnnotateWindow {
 		aTableModel = new AnnotationTableModel(cKb);
 		
 		Collection changes = ChangeCreateUtil.getChangeInsts(cKb);
-		ArrayList relChanges = new ArrayList();
-		ArrayList assocAnnotations = new ArrayList();
+		List<Instance> relChanges = new ArrayList<Instance>();
+		List<Instance> assocAnnotations = new ArrayList<Instance>();
 		HashMap uniqueSet = new HashMap();
 
 		// Construct name changed list
@@ -78,7 +80,7 @@ public class ChangeAnnotateWindow {
 		if (nameChangeOn) {
 			getAllNames(ChangesTab.getNameChanges(), clsName);	
 		} else {
-			getAllNames(new HashMap(), clsName);	
+			getAllNames(new HashMap<String, String>(), clsName);	
 		}
 		names.add(clsName);
 		
@@ -203,7 +205,7 @@ public class ChangeAnnotateWindow {
 		cmFrame.requestFocus();
 	}
 	
-	private void getAllNames(HashMap nameChanges, String name) {
+	private void getAllNames(Map<String, String> nameChanges, String name) {
 		
 		if (nameChanges.containsKey(name)) {
 			names.add(nameChanges.get(name));
