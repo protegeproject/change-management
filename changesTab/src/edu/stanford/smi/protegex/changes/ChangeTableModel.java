@@ -3,6 +3,7 @@ package edu.stanford.smi.protegex.changes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -24,8 +25,8 @@ public class ChangeTableModel extends AbstractTableModel {
 	public static final String CHANGE_COLNAME_DESCRIPTION ="Description";
 	//static protected Class[]  cTypes = {String.class, String.class, String.class, Icon.class, String.class};
 	private String[] colNames;
-	private ArrayList completeData;
-	private ArrayList workingData;
+	private List<Instance> completeData;
+	private List<Instance> workingData;
 	
 	// Used for coloring the table
 	private ArrayList colorList;
@@ -55,8 +56,8 @@ public class ChangeTableModel extends AbstractTableModel {
 		//colNames[3] = "    ";
 		colNames[1] = CHANGE_COLNAME_DESCRIPTION;
 		
-		workingData = new ArrayList();
-		completeData = new ArrayList();
+		workingData = new ArrayList<Instance>();
+		completeData = new ArrayList<Instance>();
 		colorList = new ArrayList();
 	}
 	
@@ -108,7 +109,7 @@ public class ChangeTableModel extends AbstractTableModel {
 		
 		// This is the instance object,
 		// get the particular piece of info out of it.
-		Instance aInst = (Instance)workingData.get(row);
+		Instance aInst = workingData.get(row);
 
 		
 		Object ctxt = null;
@@ -145,7 +146,7 @@ public class ChangeTableModel extends AbstractTableModel {
 	}
 	
 	public Object getObjInRow(int row) {
-		Instance aInst = (Instance) workingData.get(row);
+		Instance aInst = workingData.get(row);
 		return aInst;
 	}
 	
