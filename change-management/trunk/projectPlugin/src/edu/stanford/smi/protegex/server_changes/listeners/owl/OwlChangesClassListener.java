@@ -10,6 +10,7 @@ import edu.stanford.smi.protegex.owl.model.RDFSClass;
 import edu.stanford.smi.protegex.owl.model.event.ClassAdapter;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.util.Util;
  
@@ -35,10 +36,10 @@ public class OwlChangesClassListener extends ClassAdapter{
         ChangesDb changesDb = ChangesProject.getChangesDb(om);
 		Instance changeInst = ServerChangesUtil.createChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_INSTANCE_ADDED,
+												Model.CHANGETYPE_INSTANCE_ADDED,
 												instName, 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
@@ -54,10 +55,10 @@ public class OwlChangesClassListener extends ClassAdapter{
 		
 		Instance changeInst = ServerChangesUtil.createChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_INSTANCE_REMOVED,
+												Model.CHANGETYPE_INSTANCE_REMOVED,
 												instName, 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
@@ -81,10 +82,10 @@ public class OwlChangesClassListener extends ClassAdapter{
 		
 		Instance changeInst = ServerChangesUtil.createChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUBCLASS_ADDED,
+												Model.CHANGETYPE_SUBCLASS_ADDED,
 												clsName, 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
@@ -100,10 +101,10 @@ public class OwlChangesClassListener extends ClassAdapter{
 		
 		Instance changeInst = ServerChangesUtil.createChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUBCLASS_REMOVED,
+												Model.CHANGETYPE_SUBCLASS_REMOVED,
 												clsName, 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
@@ -121,10 +122,10 @@ public class OwlChangesClassListener extends ClassAdapter{
 		
 		Instance changeInst = ServerChangesUtil.createChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUPERCLASS_ADDED,
+												Model.CHANGETYPE_SUPERCLASS_ADDED,
 												clsName, 
 												context.toString(),
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
@@ -142,10 +143,10 @@ public class OwlChangesClassListener extends ClassAdapter{
 		
 		Instance changeInst = ServerChangesUtil.createChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUPERCLASS_REMOVED,
+												Model.CHANGETYPE_SUPERCLASS_REMOVED,
 												clsName, 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 }
