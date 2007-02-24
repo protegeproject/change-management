@@ -82,7 +82,7 @@ public class ChangesProject extends ProjectPluginAdapter {
 		// AT THIS POINT, WE HAVE THE CHANGES PROJECT 'changes' and the KB 'changesKb'. 
 		// Creating the Root of the tree for the UI
 
-		ServerChangesUtil.createChange(currentKB, changesKb, ServerChangesUtil.CHANGETYPE_INSTANCE_ADDED,	"ROOT", "ROOT",	"ROOT");
+		ServerChangesUtil.createChange(currentKB, changesKb, Model.CHANGETYPE_INSTANCE_ADDED,	"ROOT", "ROOT",	"ROOT");
 
 
 		//Check to see if the project is an OWL one
@@ -127,14 +127,14 @@ public class ChangesProject extends ProjectPluginAdapter {
 	
 	// takes care of case when class is created & then renamed - Adding original name of class and change instance to HashMap
 	private static void checkForCreateChange(ChangesDb changesDb, KnowledgeBase changesKb, Instance aChange) {
-		String changeAction = ServerChangesUtil.getAction(changesKb, aChange);
-		if  ( (changeAction != null) && (changeAction.equals(ServerChangesUtil.CHANGETYPE_CLASS_CREATED)
-				|| changeAction.equals(ServerChangesUtil.CHANGETYPE_SLOT_CREATED)
-				|| changeAction.equals(ServerChangesUtil.CHANGETYPE_PROPERTY_CREATED)
+		String changeAction = Model.getAction(aChange);
+		if  ( (changeAction != null) && (changeAction.equals(Model.CHANGETYPE_CLASS_CREATED)
+				|| changeAction.equals(Model.CHANGETYPE_SLOT_CREATED)
+				|| changeAction.equals(Model.CHANGETYPE_PROPERTY_CREATED)
 				))
 				{
 			
-			changesDb.addChangeName(ServerChangesUtil.getApplyTo(changesKb, aChange), aChange);
+			changesDb.addChangeName(Model.getApplyTo(aChange), aChange);
 		}
 	}
 
@@ -162,8 +162,11 @@ public class ChangesProject extends ProjectPluginAdapter {
 	}
 
 	private static void createChangeProject(KnowledgeBase currentKB) {
-        ChangesDb changesDb = new ChangesDb(currentKB);
-        changesDbMap.put(currentKB, changesDb);
+        ChangesDb changesDb = changesDbMap.get(currentKB);
+        if (changesDb == null) {
+            changesDb = new ChangesDb(currentKB);
+            changesDbMap.put(currentKB, changesDb);
+        }
 	}
 	
 	
