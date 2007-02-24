@@ -12,7 +12,7 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protegex.changes.ui.AbstractTreeTableModel;
 import edu.stanford.smi.protegex.changes.ui.TreeTableModel;
-import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.Model;
 
 public class ChangeTreeTableModel extends AbstractTreeTableModel implements TreeTableModel{
 
@@ -119,7 +119,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	
 	private void addChangeData(Instance changeInst,  boolean completeUpdate) {
         TreeTableNode newNode = null;
-		String actionType = ChangeCreateUtil.getType(changeKB, changeInst);   
+		String actionType = Model.getType(changeInst);   
 		if (actionType != null){
 			if (!actionType.equals("ROOT")){
 			    newNode = insertIntoModel(root, changeInst);
@@ -130,9 +130,9 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 		}
 		// If we have a transaction change, add the list of changes
 		Cls changeInstType = changeInst.getDirectType();
-		if (changeInstType.getName().equals(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE)) {
+		if (changeInstType.getName().equals(Model.CHANGETYPE_TRANS_CHANGE)) {
 
-		    Collection relChanges = ChangeCreateUtil.getChanges(changeKB, changeInst);
+		    Collection relChanges = Model.getChanges(changeInst);
             for (Object o : relChanges) {
                 Instance aInst = (Instance) o;
                 insertIntoModel(newNode, aInst);
@@ -166,10 +166,10 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	private void setNewSearch(String field, String text) {
 		
 	    clearModel();
-		Slot author = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_AUTHOR);
-		Slot created = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_CREATED);
-		Slot action = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_ACTION);
-		Slot desc = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_CONTEXT);
+		Slot author = changeKB.getSlot(Model.SLOT_NAME_AUTHOR);
+		Slot created = changeKB.getSlot(Model.SLOT_NAME_CREATED);
+		Slot action = changeKB.getSlot(Model.SLOT_NAME_ACTION);
+		Slot desc = changeKB.getSlot(Model.SLOT_NAME_CONTEXT);
 		
 		Slot sltToSearch = null;
 		if (field.equals(CHANGE_COLNAME_AUTHOR)) {
