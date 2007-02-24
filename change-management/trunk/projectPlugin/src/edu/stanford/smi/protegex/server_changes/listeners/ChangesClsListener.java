@@ -6,6 +6,7 @@ import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangesClsListener implements ClsListener{
@@ -33,10 +34,10 @@ public class ChangesClsListener implements ClsListener{
 		
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_INSTANCE_ADDED, 
+												Model.CHANGETYPE_INSTANCE_ADDED, 
 												clsOfInst.getName(), 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		
 	
 		ChangesProject.createChange(kb, changesKb, changeInst);
@@ -64,10 +65,10 @@ public class ChangesClsListener implements ClsListener{
 		
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_INSTANCE_REMOVED, 
+												Model.CHANGETYPE_INSTANCE_REMOVED, 
 												clsOfInst.getName(), 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 	
 		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
@@ -88,10 +89,10 @@ public class ChangesClsListener implements ClsListener{
 		
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUBCLASS_ADDED, 
+												Model.CHANGETYPE_SUBCLASS_ADDED, 
 												subClass.getName(), 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(kb, changesKb, changeInst);
 		
 		// Create artificial transaction for create class
@@ -124,10 +125,10 @@ public class ChangesClsListener implements ClsListener{
 		
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUBCLASS_REMOVED, 
+												Model.CHANGETYPE_SUBCLASS_REMOVED, 
 												subClass.getName(), 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(kb, changesKb, changeInst);
 		
 	}
@@ -148,10 +149,10 @@ public class ChangesClsListener implements ClsListener{
 		
 		Instance changeInst =ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUPERCLASS_ADDED,
+												Model.CHANGETYPE_SUPERCLASS_ADDED,
 												subClass.getName(), 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(kb, changesKb, changeInst);
 	
 	}
@@ -172,10 +173,10 @@ public class ChangesClsListener implements ClsListener{
 		
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUPERCLASS_REMOVED, 
+												Model.CHANGETYPE_SUPERCLASS_REMOVED, 
 												subClass.getName(), 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		
 		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
