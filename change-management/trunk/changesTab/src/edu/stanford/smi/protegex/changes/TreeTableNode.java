@@ -5,6 +5,8 @@ import java.util.List;
 
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protegex.server_changes.Model;
+import edu.stanford.smi.protegex.server_changes.listeners.ChangesKBListener;
 
 
 public class TreeTableNode {
@@ -32,11 +34,11 @@ public class TreeTableNode {
     	switch (i) {
 
 		case 2:
-			ctxt = ChangeCreateUtil.getAuthor(changeKB, changeInst);
+			ctxt = Model.getAuthor(changeInst);
 			
 			break;
 		case 3: 
-			ctxt = ChangeCreateUtil.getCreated(changeKB, changeInst);
+			ctxt = Model.getCreated(changeInst);
 	         
 			break;
 		case 0: 
@@ -44,7 +46,7 @@ public class TreeTableNode {
 		   
 			break;
 		case 1: 
-			ctxt = ChangeCreateUtil.getContext(changeKB, changeInst);
+			ctxt = Model.getContext(changeInst);
 		
 			break;
 		}
