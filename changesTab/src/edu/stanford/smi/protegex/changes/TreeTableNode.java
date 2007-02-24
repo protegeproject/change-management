@@ -1,24 +1,23 @@
 package edu.stanford.smi.protegex.changes;
 
-import java.net.URL;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protegex.changes.ui.*;
 
 
 public class TreeTableNode {
-    public Instance changeInst;
-    public Vector children;
+    private Instance changeInst;
+    private List<TreeTableNode> children;
+    private TreeTableNode parent;
 
     private KnowledgeBase changeKB;
     
 
     public TreeTableNode(Instance changeInst, KnowledgeBase changeKB) {
 		this.changeInst = changeInst;
-		children = new Vector(10,10);
-	
+		children = new ArrayList<TreeTableNode>();
 		this.changeKB = changeKB;
     }
 
@@ -60,39 +59,39 @@ public class TreeTableNode {
 		return children.size();
 	}
 	
-
-	
 	public Object[] getChildren(){
 		return children.toArray();
 	}
-	
-
 
 	public TreeTableNode getChildAt(int i) {
 		return (TreeTableNode) children.get(i);
     }
+    
+    
+    public TreeTableNode getParent() {
+        return parent;
+    }
 
     public void addChild(TreeTableNode child) {
-       children.add(child);
-       
+       child.parent = this;
+       children.add(child);    
+    }
+    
+    public void removeChild(TreeTableNode child) {
+        child.parent = null;
+        children.remove(child);
     }
     
     public Instance getChildInstanceAt(int i){
     	return ((TreeTableNode) children.get(i)).changeInst;
     }
     
-    
-  
-    
-    
-    
-    public void removeChildren(){
+    public void removeChildren() {
+        for (TreeTableNode child : children) {
+            child.parent = null;
+        }
     	children.clear();
     }
-
- 
-    
-  
 }
 
 
