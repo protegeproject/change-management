@@ -5,6 +5,7 @@ import edu.stanford.smi.protege.event.InstanceListener;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangesInstanceListener implements InstanceListener{
@@ -32,10 +33,10 @@ public class ChangesInstanceListener implements InstanceListener{
 		
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_DIRECTTYPE_ADDED, 
+												Model.CHANGETYPE_DIRECTTYPE_ADDED, 
 												directType, 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 
@@ -55,10 +56,10 @@ public class ChangesInstanceListener implements InstanceListener{
 		
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_DIRECTTYPE_REMOVED,
+												Model.CHANGETYPE_DIRECTTYPE_REMOVED,
 												directType, 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 }
