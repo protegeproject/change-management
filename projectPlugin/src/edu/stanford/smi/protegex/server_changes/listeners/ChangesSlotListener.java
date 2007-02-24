@@ -7,6 +7,7 @@ import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 
@@ -33,10 +34,10 @@ public class ChangesSlotListener implements SlotListener{
 			
 			Instance changeInst = ServerChangesUtil.createChange(kb,
 													changesKb,
-													ServerChangesUtil.CHANGETYPE_TEMPLATESLOT_ADDED,
+													Model.CHANGETYPE_TEMPLATESLOT_ADDED,
 													theCls.getName(), 
 													context.toString(), 
-													ServerChangesUtil.CHANGE_LEVEL_INFO);
+													Model.CHANGE_LEVEL_INFO);
 		
 			ChangesProject.createChange(kb, changesKb, changeInst);
 			// Create artificial transaction for create slot
@@ -62,10 +63,10 @@ public class ChangesSlotListener implements SlotListener{
 			
 			Instance changeInst = ServerChangesUtil.createChange(kb,
 													changesKb,
-													ServerChangesUtil.CHANGETYPE_TEMPLATESLOT_REMOVED,
+													Model.CHANGETYPE_TEMPLATESLOT_REMOVED,
 													theCls.getName(), 
 													context.toString(),
-													ServerChangesUtil.CHANGE_LEVEL_INFO);
+													Model.CHANGE_LEVEL_INFO);
 			ChangesProject.createChange(kb, changesKb, changeInst);
 	
 		}
@@ -81,10 +82,10 @@ public class ChangesSlotListener implements SlotListener{
 			
 			Instance changeInst = ServerChangesUtil.createChange(kb,
 													changesKb,
-													ServerChangesUtil.CHANGETYPE_SUBSLOT_ADDED,
+													Model.CHANGETYPE_SUBSLOT_ADDED,
 													eventSlot.getBrowserText(), 
 													context, 
-													ServerChangesUtil.CHANGE_LEVEL_INFO);
+													Model.CHANGE_LEVEL_INFO);
 			ChangesProject.createChange(kb, changesKb, changeInst);
 			
 		}
@@ -100,10 +101,10 @@ public class ChangesSlotListener implements SlotListener{
 			
 			Instance changeInst = ServerChangesUtil.createChange(kb,
 													changesKb,
-													ServerChangesUtil.CHANGETYPE_SUBSLOT_REMOVED,
+													Model.CHANGETYPE_SUBSLOT_REMOVED,
 													eventSlot.getBrowserText(), 
 													context, 
-													ServerChangesUtil.CHANGE_LEVEL_INFO);
+													Model.CHANGE_LEVEL_INFO);
 			ChangesProject.createChange(kb, changesKb, changeInst);
 		
 		}
@@ -125,10 +126,10 @@ public class ChangesSlotListener implements SlotListener{
 			
 			Instance changeInst = ServerChangesUtil.createChange(kb,
 													changesKb,
-													ServerChangesUtil.CHANGETYPE_SUPERSLOT_ADDED,
+													Model.CHANGETYPE_SUPERSLOT_ADDED,
 													eventSlot.getBrowserText(), 
 													context, 
-													ServerChangesUtil.CHANGE_LEVEL_INFO);
+													Model.CHANGE_LEVEL_INFO);
 			ChangesProject.createChange(kb, changesKb, changeInst);
 			
 		}
@@ -144,10 +145,10 @@ public class ChangesSlotListener implements SlotListener{
 			
 			Instance changeInst = ServerChangesUtil.createChange(kb,
 													changesKb,
-													ServerChangesUtil.CHANGETYPE_SUPERSLOT_REMOVED,
+													Model.CHANGETYPE_SUPERSLOT_REMOVED,
 													eventSlot.getBrowserText(), 
 													context, 
-													ServerChangesUtil.CHANGE_LEVEL_INFO);
+													Model.CHANGE_LEVEL_INFO);
 			
 			ChangesProject.createChange(kb, changesKb, changeInst);
 		}
