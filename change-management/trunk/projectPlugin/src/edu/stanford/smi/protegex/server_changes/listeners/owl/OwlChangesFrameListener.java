@@ -13,6 +13,7 @@ import edu.stanford.smi.protege.util.CollectionUtilities;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.impl.DefaultOWLDatatypeProperty;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class OwlChangesFrameListener implements FrameListener {
@@ -99,10 +100,10 @@ public class OwlChangesFrameListener implements FrameListener {
  		        	  
  		        	  Instance changeInst = ServerChangesUtil.createChange(om,
  								changesKb,
- 								ServerChangesUtil.CHANGETYPE_ANNOTATION_REMOVED, 
+ 								Model.CHANGETYPE_ANNOTATION_REMOVED, 
  								cName, 
  								context.toString(), 
- 								ServerChangesUtil.CHANGE_LEVEL_INFO);
+ 								Model.CHANGE_LEVEL_INFO);
 
  		        		ChangesProject.createChange(om,changesKb, changeInst);
  		        	}//Annotation deleted
@@ -133,10 +134,10 @@ public class OwlChangesFrameListener implements FrameListener {
  	 		        	  
  	 		        	Instance changeInst = ServerChangesUtil.createChange(om,
  	 								changesKb,
- 	 								ServerChangesUtil.CHANGETYPE_ANNOTATION_ADDED, 
+ 	 								Model.CHANGETYPE_ANNOTATION_ADDED, 
  	 								cName, 
  	 								context.toString(), 
- 	 								ServerChangesUtil.CHANGE_LEVEL_INFO);
+ 	 								Model.CHANGE_LEVEL_INFO);
 
  	 		      	ChangesProject.createChange(om,changesKb, changeInst);
  	 		            
@@ -161,10 +162,10 @@ public class OwlChangesFrameListener implements FrameListener {
             	
               Instance changeInst = ServerChangesUtil.createChange(om,
 						changesKb,
-						ServerChangesUtil.CHANGETYPE_DISJOINT_CLASS_ADDED, 
+						Model.CHANGETYPE_DISJOINT_CLASS_ADDED, 
 						cName, 
 						context.toString(), 
-						ServerChangesUtil.CHANGE_LEVEL_INFO);
+						Model.CHANGE_LEVEL_INFO);
 
             
             	
@@ -193,10 +194,10 @@ public class OwlChangesFrameListener implements FrameListener {
     	    context.append(newSlotValue);
             Instance changeInst = ServerChangesUtil.createChange(om,
     						changesKb,
-    						ServerChangesUtil.CHANGETYPE_SLOT_VALUE, 
+    						Model.CHANGETYPE_SLOT_VALUE, 
     						iName, 
     						context.toString(), 
-    						ServerChangesUtil.CHANGE_LEVEL_INFO);
+    						Model.CHANGE_LEVEL_INFO);
         	ChangesProject.createChange(om,changesKb, changeInst);
          
     	    } 
