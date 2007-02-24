@@ -60,6 +60,8 @@ public class JTreeTable extends JTable {
 	/** A subclass of JTree. */
 	protected TreeTableCellRenderer tree;
     
+    private TreePath rootPath;
+    
 	//Abhita: adding this because we want to change the icons of the nodes
 	TreeCellRenderer treeCellRenderer = new DefaultTreeCellRenderer() {
 		public Component getTreeCellRendererComponent(
@@ -96,6 +98,8 @@ public class JTreeTable extends JTable {
 
 		// Install a tableModel representing the visible rows in the tree.
 		super.setModel(new TreeTableModelAdapter(treeTableModel, tree));
+        
+        rootPath = new TreePath(treeTableModel.getRoot());
 
 		// Force the JTable and JTree to share their row selection models.
 		ListToTreeSelectionModelWrapper selectionWrapper = new ListToTreeSelectionModelWrapper();
@@ -285,7 +289,7 @@ public class JTreeTable extends JTable {
 			//getTree().setRootVisible(false);
 			super.paint(g);
 		
-		    tree.expandPath(AbstractTreeTableModel.rootPath);
+		    tree.expandPath(rootPath);
 			//tree.setRootVisible(false);
 			
 			// Draw the Table border if we have focus.
