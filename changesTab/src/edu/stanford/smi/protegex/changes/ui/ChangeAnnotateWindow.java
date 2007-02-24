@@ -28,6 +28,7 @@ import edu.stanford.smi.protegex.changes.ChangeTableModel;
 import edu.stanford.smi.protegex.changes.ChangesTab;
 import edu.stanford.smi.protegex.changes.InstanceDateComparator;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangeAnnotateWindow {
@@ -70,7 +71,7 @@ public class ChangeAnnotateWindow {
 		cTableModel = new ChangeTableModel(cKb);
 		aTableModel = new AnnotationTableModel(cKb);
 		
-		Collection changes = ChangeCreateUtil.getChangeInsts(cKb);
+		Collection changes = Model.getChangeInsts(cKb);
 		List<Instance> relChanges = new ArrayList<Instance>();
 		List<Instance> assocAnnotations = new ArrayList<Instance>();
 		HashMap uniqueSet = new HashMap();
@@ -87,14 +88,14 @@ public class ChangeAnnotateWindow {
 		for (Iterator iter = changes.iterator(); iter.hasNext();) {
 			Instance cInst = (Instance) iter.next();
 			
-			if (cInst.getDirectType().getName().equals(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE)) {
-				Collection transChanges = ChangeCreateUtil.getTransChanges(cKb, cInst);
+			if (cInst.getDirectType().getName().equals(Model.CHANGETYPE_TRANS_CHANGE)) {
+				Collection transChanges = Model.getTransChanges(cInst);
 				boolean hasChangeRel = false;
 				
 				for (Iterator iterator = transChanges.iterator(); iterator
 						.hasNext();) {
 					Instance tcInst = (Instance) iterator.next();
-					String tApplyToStr = ChangeCreateUtil.getApplyTo(cKb, tcInst);
+					String tApplyToStr = Model.getApplyTo(tcInst);
 					
 					for (Iterator it2 = names.iterator(); it2
 							.hasNext();) {
@@ -107,7 +108,7 @@ public class ChangeAnnotateWindow {
 				
 				if (hasChangeRel) {
 					relChanges.add(cInst);
-					Collection assocList = ChangeCreateUtil.getAssocAnnotations(cKb, cInst);
+					Collection assocList = Model.getAssocAnnotations(cInst);
 					for (Iterator iterator = assocList.iterator(); iterator
 							.hasNext();) {
 						Instance elem = (Instance) iterator.next();
@@ -119,16 +120,16 @@ public class ChangeAnnotateWindow {
 				}
 			
 			} else {
-				String info = ChangeCreateUtil.getType(cKb, cInst);
+				String info = Model.getType(cInst);
 				
-				if (!info.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS_INFO)){
-					String applyToStr = ChangeCreateUtil.getApplyTo(cKb, cInst);
+				if (!info.equals(Model.CHANGE_LEVEL_TRANS_INFO)){
+					String applyToStr = Model.getApplyTo(cInst);
 					for (Iterator iterator = names.iterator(); iterator
 							.hasNext();) {
 						String nameChange = (String) iterator.next();
 						if (nameChange.equals(applyToStr)) {
 							relChanges.add(cInst);
-							Collection assocList = ChangeCreateUtil.getAssocAnnotations(cKb, cInst);
+							Collection assocList = Model.getAssocAnnotations(cInst);
 							for (Iterator it2 = assocList.iterator(); it2
 									.hasNext();) {
 								Instance elem = (Instance) it2.next();
