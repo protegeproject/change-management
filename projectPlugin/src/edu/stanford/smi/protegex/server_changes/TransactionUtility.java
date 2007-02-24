@@ -34,15 +34,15 @@ public class TransactionUtility {
 	public TransactionUtility(KnowledgeBase currentKB, KnowledgeBase cKb) {
         this.currentKB = currentKB;
 		this.cKb = cKb;
-		transChange = cKb.getCls(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE);
-		changes = cKb.getSlot(ServerChangesUtil.SLOT_NAME_CHANGES);
-		author = cKb.getSlot(ServerChangesUtil.SLOT_NAME_AUTHOR);
-		context = cKb.getSlot(ServerChangesUtil.SLOT_NAME_CONTEXT);
-		created = cKb.getSlot(ServerChangesUtil.SLOT_NAME_CREATED);
-		action = cKb.getSlot(ServerChangesUtil.SLOT_NAME_ACTION);
-		type = cKb.getSlot(ServerChangesUtil.SLOT_NAME_TYPE);
-		applyTo = cKb.getSlot(ServerChangesUtil.SLOT_NAME_APPLYTO);
-        inTransactionSlot = cKb.getSlot(ServerChangesUtil.SLOT_NAME_IS_IN_TRANSACTION);
+		transChange = cKb.getCls(Model.CHANGETYPE_TRANS_CHANGE);
+		changes = cKb.getSlot(Model.SLOT_NAME_CHANGES);
+		author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
+		context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
+		created = cKb.getSlot(Model.SLOT_NAME_CREATED);
+		action = cKb.getSlot(Model.SLOT_NAME_ACTION);
+		type = cKb.getSlot(Model.SLOT_NAME_TYPE);
+		applyTo = cKb.getSlot(Model.SLOT_NAME_APPLYTO);
+        inTransactionSlot = cKb.getSlot(Model.SLOT_NAME_IS_IN_TRANSACTION);
 	}
 	
 	public Stack convertTransactions(Stack trans) {
@@ -111,12 +111,12 @@ public class TransactionUtility {
 			
 			for (Iterator iter = transActions.iterator(); iter.hasNext();) {
 				Instance aInst = (Instance) iter.next();
-				if ( ServerChangesUtil.getType(cKb, aInst).equals(ServerChangesUtil.CHANGE_LEVEL_INFO) && !firstInfoInst) {
+				if ( Model.getType(aInst).equals(Model.CHANGE_LEVEL_INFO) && !firstInfoInst) {
 					firstInst = aInst;
 					firstInfoInst = true;
 				}
 				
-				if (aInst.getDirectType().getName().equals(ServerChangesUtil.CHANGETYPE_CLASS_DELETED) && !firstDeleted) {
+				if (aInst.getDirectType().getName().equals(Model.CHANGETYPE_CLASS_DELETED) && !firstDeleted) {
 					firstInst = aInst;
 					firstDeleted = true;
 				}
@@ -161,14 +161,14 @@ public class TransactionUtility {
 				String actionStr = (String) aInst.getOwnSlotValue(action);
 				
 				// Checking here for equivalence (necessary vs. necessary and sufficient)
-				if (actionStr.equals(ServerChangesUtil.CHANGETYPE_SUPERCLASS_ADDED) || 
-						actionStr.equals(ServerChangesUtil.CHANGETYPE_SUBCLASS_ADDED)){
+				if (actionStr.equals(Model.CHANGETYPE_SUPERCLASS_ADDED) || 
+						actionStr.equals(Model.CHANGETYPE_SUBCLASS_ADDED)){
 					containsAdds = true;
 					String possCtxt = (String) aInst.getOwnSlotValue(context);
 					if (!isAnon(possCtxt)) {
 						
 						// Find applies to field
-						if (actionStr.equals(ServerChangesUtil.CHANGETYPE_SUBCLASS_ADDED) && !foundAppliesTo) {
+						if (actionStr.equals(Model.CHANGETYPE_SUBCLASS_ADDED) && !foundAppliesTo) {
 							
 							applyToVal = (String) aInst.getOwnSlotValue(applyTo);
 							addCtxt = (String) decomposeContext(possCtxt, "(added to:").get(1);
@@ -185,12 +185,12 @@ public class TransactionUtility {
 							equalityMap.put(rev, null);
 						}
 					}
-				} else if (actionStr.equals(ServerChangesUtil.CHANGETYPE_SUPERCLASS_REMOVED) || 
-							actionStr.equals(ServerChangesUtil.CHANGETYPE_SUBCLASS_REMOVED)) {
+				} else if (actionStr.equals(Model.CHANGETYPE_SUPERCLASS_REMOVED) || 
+							actionStr.equals(Model.CHANGETYPE_SUBCLASS_REMOVED)) {
 					containsRemoves = true;
 					String possCtxt = (String) aInst.getOwnSlotValue(context);
 					if (!isAnon(possCtxt)) {
-						if (actionStr.equals(ServerChangesUtil.CHANGETYPE_SUBCLASS_REMOVED) && !foundRemAppliesTo) {
+						if (actionStr.equals(Model.CHANGETYPE_SUBCLASS_REMOVED) && !foundRemAppliesTo) {
 							remApplyToVal = (String) aInst.getOwnSlotValue(applyTo);
 							remCtxt = (String) decomposeContext(possCtxt, "(removed from:").get(1);
 							foundRemAppliesTo = true;
@@ -226,7 +226,7 @@ public class TransactionUtility {
 		cInst.setOwnSlotValue(created, ChangesProject.getTimeStamp());
 		cInst.setOwnSlotValue(applyTo, applyToVal);
 		
-		cInst.setOwnSlotValue(type,ServerChangesUtil.CHANGE_LEVEL_TRANS);
+		cInst.setOwnSlotValue(type,Model.CHANGE_LEVEL_TRANS);
         cInst.setOwnSlotValue(inTransactionSlot, false);
         
         cKb.setDirectType(cInst, transChange);
