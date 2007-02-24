@@ -7,6 +7,7 @@ import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.owl.model.RDFSClass;
 import edu.stanford.smi.protegex.owl.model.event.PropertyAdapter;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class OwlChangesPropertyListener extends PropertyAdapter{
@@ -31,10 +32,10 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
                                                                      om,
        
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUBPROPERTY_ADDED,
+												Model.CHANGETYPE_SUBPROPERTY_ADDED,
 												arg0.getBrowserText(), 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om, changesKb, changeInst);
 	}
 
@@ -49,10 +50,10 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		Instance changeInst = ServerChangesUtil.createChange(
                                                                      om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUBPROPERTY_REMOVED,
+												Model.CHANGETYPE_SUBPROPERTY_REMOVED,
 												arg0.getBrowserText(), 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
@@ -67,10 +68,10 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		Instance changeInst = ServerChangesUtil.createChange(
                                                                      om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUPERPROPERTY_ADDED,
+												Model.CHANGETYPE_SUPERPROPERTY_ADDED,
 												arg0.getBrowserText(), 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
@@ -86,10 +87,10 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
                                                                      om,
 
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SUPERPROPERTY_REMOVED,
+												Model.CHANGETYPE_SUPERPROPERTY_REMOVED,
 												arg0.getBrowserText(), 
 												context.toString(),
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
@@ -106,10 +107,10 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 				
 		Instance changeInst = ServerChangesUtil.createChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_DOMAIN_PROP_ADDED,
+												Model.CHANGETYPE_DOMAIN_PROP_ADDED,
 												clsName, 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
@@ -126,10 +127,10 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		
 		Instance changeInst = ServerChangesUtil.createChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_DOMAIN_PROP_REMOVED,
+												Model.CHANGETYPE_DOMAIN_PROP_REMOVED,
 												clsName, 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
