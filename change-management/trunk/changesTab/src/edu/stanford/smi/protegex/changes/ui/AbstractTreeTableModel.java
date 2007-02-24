@@ -28,7 +28,7 @@ import javax.swing.event.*;
 
 public abstract class AbstractTreeTableModel implements TreeTableModel {
 	protected Object root;
-	public static TreePath rootPath; 
+	protected TreePath rootPath; 
 
 	protected EventListenerList listenerList = new EventListenerList();
 
@@ -44,6 +44,10 @@ public abstract class AbstractTreeTableModel implements TreeTableModel {
 	public Object getRoot() {
 		return root;
 	}
+    
+    public TreePath getRootPath() {
+        return rootPath;
+    }
 
 	public boolean isLeaf(Object node) {
 		return getChildCount(node) == 0;
