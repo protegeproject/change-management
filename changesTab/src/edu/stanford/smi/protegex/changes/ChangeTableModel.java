@@ -11,6 +11,7 @@ import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangeTableModel extends AbstractTableModel {
@@ -116,23 +117,23 @@ public class ChangeTableModel extends AbstractTableModel {
 		
 		switch(col) {
 		case 2:
-			ctxt = ChangeCreateUtil.getAuthor(changeKB, aInst);
+			ctxt = Model.getAuthor(aInst);
 		    break;
 		case 3: 
-			ctxt = ChangeCreateUtil.getCreated(changeKB, aInst);
+			ctxt = Model.getCreated(aInst);
 			break;
 		case 0: 
 			ctxt = ChangeCreateUtil.getActionDisplay(changeKB, aInst);
 			break;
 		/*case 3:  
 			//Cls changeInstType = aInst.getDirectType();
-			//if (changeInstType.getName().equals(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE))
+			//if (changeInstType.getName().equals(Model.CHANGETYPE_TRANS_CHANGE))
 			  String actionType = ChangeCreateUtil.getType(changeKB, aInst);	
-			  if(actionType.equals(ServerChangesUtil.CHANGE_LEVEL_DISP_TRANS))
+			  if(actionType.equals(Model.CHANGE_LEVEL_DISP_TRANS))
 			   ctxt = Icons.getViewClsIcon();
 			break; */ 	
 		case 1: 
-			ctxt = ChangeCreateUtil.getContext(changeKB, aInst);
+			ctxt = Model.getContext(aInst);
 			break;
 		}
 		
@@ -167,22 +168,22 @@ public class ChangeTableModel extends AbstractTableModel {
 	private void addChangeData(Instance changeInst, boolean completeUpdate) {
 		boolean isTrans = false;
 		boolean added = false;
-		String actionType = ChangeCreateUtil.getType(changeKB, changeInst);
+		String actionType = Model.getType(changeInst);
 			
 		if (!"ROOT".equals(actionType)) {
 			if (filterMethod == FILTER_TRANS) {
-				if (actionType.equals(ServerChangesUtil.CHANGE_LEVEL_INFO) || 
-						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS) || 
-						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_DISP_TRANS)) {
+				if (actionType.equals(Model.CHANGE_LEVEL_INFO) || 
+						actionType.equals(Model.CHANGE_LEVEL_TRANS) || 
+						actionType.equals(Model.CHANGE_LEVEL_DISP_TRANS)) {
 					workingData.add(changeInst);
 					colorList.add(currColor);
 					added = true;
 				}
 				
 			} else if (filterMethod == FILTER_TRANS_INFO) {
-				if (actionType.equals(ServerChangesUtil.CHANGE_LEVEL_INFO) || 
-						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS) || 
-						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS_INFO)) {
+				if (actionType.equals(Model.CHANGE_LEVEL_INFO) || 
+						actionType.equals(Model.CHANGE_LEVEL_TRANS) || 
+						actionType.equals(Model.CHANGE_LEVEL_TRANS_INFO)) {
 					workingData.add(changeInst);
 					colorList.add(currColor);
 					added = true;
@@ -196,9 +197,9 @@ public class ChangeTableModel extends AbstractTableModel {
 
 			// If we have a transaction change, add the list of changes
 			Cls changeInstType = changeInst.getDirectType();
-			if (changeInstType.getName().equals(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE)) {
+			if (changeInstType.getName().equals(Model.CHANGETYPE_TRANS_CHANGE)) {
 				isTrans = true;
-				Collection relChanges = ChangeCreateUtil.getChanges(changeKB, changeInst);
+				Collection relChanges = Model.getChanges(changeInst);
 				addChangeData(relChanges);
 			} 
 			
@@ -216,19 +217,19 @@ public class ChangeTableModel extends AbstractTableModel {
 		
 		for (Iterator iter = changeInsts.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
-			String actionType = ChangeCreateUtil.getType(changeKB, aInst);
+			String actionType = Model.getType(aInst);
 			
 			if (filterMethod == FILTER_TRANS) {
-				if (actionType.equals(ServerChangesUtil.CHANGE_LEVEL_INFO) || 
-						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS)) {
+				if (actionType.equals(Model.CHANGE_LEVEL_INFO) || 
+						actionType.equals(Model.CHANGE_LEVEL_TRANS)) {
 					workingData.add(aInst);
 					colorList.add(currColor);
 				}
 				
 			} else if (filterMethod == FILTER_TRANS_INFO) {
-				if (actionType.equals(ServerChangesUtil.CHANGE_LEVEL_INFO) || 
-						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS) || 
-						actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS_INFO)) {
+				if (actionType.equals(Model.CHANGE_LEVEL_INFO) || 
+						actionType.equals(Model.CHANGE_LEVEL_TRANS) || 
+						actionType.equals(Model.CHANGE_LEVEL_TRANS_INFO)) {
 					workingData.add(aInst);
 					colorList.add(currColor);
 				}
@@ -311,10 +312,10 @@ public class ChangeTableModel extends AbstractTableModel {
 		workingData.clear();
 		colorList.clear();
 		
-		Slot author = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_AUTHOR);
-		Slot created = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_CREATED);
-		Slot action = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_ACTION);
-		Slot desc = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_CONTEXT);
+		Slot author = changeKB.getSlot(Model.SLOT_NAME_AUTHOR);
+		Slot created = changeKB.getSlot(Model.SLOT_NAME_CREATED);
+		Slot action = changeKB.getSlot(Model.SLOT_NAME_ACTION);
+		Slot desc = changeKB.getSlot(Model.SLOT_NAME_CONTEXT);
 		
 		Slot sltToSearch = null;
 		if (field.equals(CHANGE_COLNAME_AUTHOR)) {
