@@ -11,6 +11,7 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangesKBListener implements KnowledgeBaseListener {
@@ -38,10 +39,10 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_CLASS_CREATED, 
+												Model.CHANGETYPE_CLASS_CREATED, 
 												clsName, 
 												context, 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		
 		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
@@ -63,10 +64,10 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		String context = "Deleted Class: " + deletedClsName;
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_CLASS_DELETED,
+												Model.CHANGETYPE_CLASS_DELETED,
 												deletedClsName, 
 												context, 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 
@@ -136,10 +137,10 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		Instance changeInst = ServerChangesUtil.createNameChange(
                                                 kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_NAME_CHANGED,
+												Model.CHANGETYPE_NAME_CHANGED,
 												newName, 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO, 
+												Model.CHANGE_LEVEL_INFO, 
 												oldName, 
 												newName);
 	
@@ -162,24 +163,24 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	    }
 
 	private void updateChanges(String oldName, String newName){
-		Collection changeList = ServerChangesUtil.getChangeInsts(changesKb);
+		Collection changeList = Model.getChangeInsts(changesKb);
 		String context = null;
 		int len = oldName.length();
 		for (Iterator iter = changeList.iterator(); iter.hasNext();) {
 			Instance cInst = (Instance) iter.next();
-			String applyTo = ServerChangesUtil.getApplyTo(changesKb, cInst);
+			String applyTo = Model.getApplyTo(cInst);
 			if (applyTo.equals(oldName)){
-				ServerChangesUtil.setInstApplyTo(changesKb, cInst, newName);
+				Model.setInstApplyTo(cInst, newName);
 		  }
 			
-			String cCtxt = ServerChangesUtil.getContext(changesKb, cInst);
+			String cCtxt = Model.getContext(cInst);
 			int idx = cCtxt.indexOf(oldName);
 			if(idx!=-1){
 			StringBuffer txt = new StringBuffer(cCtxt);	
 			txt.replace(idx,idx+len,newName);
 			context = txt.toString();
 			
-			ServerChangesUtil.setInstContext(changesKb, cInst, context);
+			Model.setInstContext(cInst, context);
 			}
 		}
 		
@@ -217,10 +218,10 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		String context = "Created Slot: " + slotName;
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SLOT_CREATED,
+												Model.CHANGETYPE_SLOT_CREATED,
 												slotName, 
 												context, 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 
@@ -240,10 +241,10 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		String context = "Deleted Slot: " + deletedSlotName;
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_SLOT_DELETED,
+												Model.CHANGETYPE_SLOT_DELETED,
 												deletedSlotName, 
 												context, 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(kb, changesKb, changeInst);
 	
 	}
