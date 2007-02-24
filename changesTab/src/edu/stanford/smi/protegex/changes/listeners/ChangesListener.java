@@ -2,25 +2,27 @@ package edu.stanford.smi.protegex.changes.listeners;
 
 
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import edu.stanford.smi.protege.event.ClsEvent;
 import edu.stanford.smi.protege.event.ClsListener;
-import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
+import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.changes.ChangesTab;
+import edu.stanford.smi.protegex.server_changes.Model;
 
 
 public class ChangesListener implements ClsListener{
+    private final static Logger log = Log.getLogger(ChangesListener.class);
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.ClsListener#directInstanceAdded(edu.stanford.smi.protege.event.ClsEvent)
 	 */
 	public void directInstanceAdded(ClsEvent event) {
 		Instance addedInst = event.getInstance();
+        Model.logChange("ChangeTab listener received change", log, Level.FINE, addedInst);
 		ChangesTab.createChange(addedInst);
-		
-	
-	
-		
 	}
 
 	/* (non-Javadoc)
