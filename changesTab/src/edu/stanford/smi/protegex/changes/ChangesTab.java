@@ -58,6 +58,7 @@ import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
 import edu.stanford.smi.protegex.changes.ui.JTreeTable;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.GetAnnotationProjectName;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
  
 /**
@@ -325,7 +326,7 @@ public class ChangesTab extends AbstractTabWidget {
 		Instance ROOT = null;
 		for (Iterator iter = changeInst.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
-			String apply = ChangeCreateUtil.getApplyTo(cKb, aInst);
+			String apply = Model.getApplyTo(aInst);
 			if(apply.equals("ROOT")){
 				 ROOT = aInst;
 		         break;
@@ -386,7 +387,7 @@ public class ChangesTab extends AbstractTabWidget {
 					int selectedRow = lsm.getMinSelectionIndex();
 					String instName = aTableModel.getInstanceName(selectedRow);
 					Instance selectedInst = cKb.getInstance(instName);
-					acTableModel.setChanges(ChangeCreateUtil.getAnnotationChanges(cKb, selectedInst));
+					acTableModel.setChanges(Model.getAnnotationChanges(selectedInst));
 				} 
 			}
 		});
@@ -459,8 +460,8 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	
 	private static void loadExistingData() {
-		Collection annotateInsts = ChangeCreateUtil.getAnnotationInsts(cKb);
-		Collection changeInsts = ChangeCreateUtil.getChangeInsts(cKb);
+		Collection annotateInsts = Model.getAnnotationInsts(cKb);
+		Collection changeInsts = Model.getChangeInsts(cKb);
 		
 		loadChanges(changeInsts);
 		loadAnnotations(annotateInsts);
@@ -494,9 +495,9 @@ public class ChangesTab extends AbstractTabWidget {
 	public static void createChange(Instance aChange) {
 		boolean addChange = true;
 		
-		if (aChange.getDirectType().getName().equals(ServerChangesUtil.CHANGETYPE_NAME_CHANGED)) {
-			String oldName = ChangeCreateUtil.getNameChangedOldName(cKb, aChange);
-			String newName = ChangeCreateUtil.getNameChangedNewName(cKb, aChange);
+		if (aChange.getDirectType().getName().equals(Model.CHANGETYPE_NAME_CHANGED)) {
+			String oldName = Model.getNameChangedOldName(aChange);
+			String newName = Model.getNameChangedNewName(aChange);
 			addNameChange(oldName, newName);
 			
 /*			if (createChangeName.containsKey(oldName)) {
@@ -516,11 +517,11 @@ public class ChangesTab extends AbstractTabWidget {
 				cTreeTableModel.update();
 			}*/
 		}
-		if (aChange.getDirectType().getName().equals(ServerChangesUtil.CHANGETYPE_SUBCLASS_ADDED)) {
+		if (aChange.getDirectType().getName().equals(Model.CHANGETYPE_SUBCLASS_ADDED)) {
 			addChange = false;
 		}
         /*
-		Slot inTransactionSlot = cKb.getSlot(ServerChangesUtil.SLOT_NAME_IS_IN_TRANSACTION);
+		Slot inTransactionSlot = cKb.getSlot(Model.SLOT_NAME_IS_IN_TRANSACTION);
         Boolean inTransaction = (Boolean) aChange.getOwnSlotValue(inTransactionSlot);
 		if (!inTransaction) {
         */	
@@ -601,7 +602,7 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 	
 	public static void createAnnotation(Instance annotateInst) {
-		Slot body = cKb.getSlot(ServerChangesUtil.SLOT_NAME_BODY);
+		Slot body = cKb.getSlot(Model.SLOT_NAME_BODY);
 		Object bdy = annotateInst.getOwnSlotValue(body);
 		if (bdy == null) {
 			cKb.deleteInstance(annotateInst);
@@ -644,7 +645,7 @@ public class ChangesTab extends AbstractTabWidget {
 			if (cTreeTable.getSelectedRowCount() > 0) {
 				
 				int[] selected = cTreeTable.getSelectedRows();
-				Collection chngInsts = ChangeCreateUtil.getChangeInsts(cKb);
+				Collection chngInsts = Model.getChangeInsts(cKb);
 				Object[] chngInstArray = chngInsts.toArray();
 				Collection chngInstSelected = new ArrayList();
 				
