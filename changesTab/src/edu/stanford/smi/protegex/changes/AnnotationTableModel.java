@@ -7,6 +7,7 @@ import javax.swing.table.AbstractTableModel;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Cls;
+import edu.stanford.smi.protegex.server_changes.Model;
 
 /**
  * The tabel model for the annotation specific table
@@ -106,15 +107,15 @@ public class AnnotationTableModel extends AbstractTableModel{
 		switch(col) {
 		
 		case 2:
-			return ChangeCreateUtil.getAuthor(changeKB, aInst);
+			return Model.getAuthor(aInst);
 		case 3: 
-			return ChangeCreateUtil.getCreated(changeKB, aInst);
+			return Model.getCreated(aInst);
 		case 0:
 			return annotType.getName(); 
 		/*case 3:
 			return ChangeCreateUtil.getTitle(changeKB, aInst);*/
 		case 1: 
-			return ChangeCreateUtil.getBody(changeKB, aInst);
+			return Model.getBody(aInst);
 		}
 		
 		return "";
