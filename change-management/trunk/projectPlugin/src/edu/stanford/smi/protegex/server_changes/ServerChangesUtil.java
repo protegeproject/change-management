@@ -397,6 +397,7 @@ public class ServerChangesUtil {
 		Slot created = cKb.getSlot(SLOT_NAME_CREATED);
 		Slot type = cKb.getSlot(SLOT_NAME_TYPE);
 		Slot changes = cKb.getSlot(SLOT_NAME_CHANGES);
+        Slot inTransactionSlot = cKb.getSlot(SLOT_NAME_IS_IN_TRANSACTION);
 		
 		tInst.setOwnSlotValue(author, repInst.getOwnSlotValue(author));
 		tInst.setOwnSlotValue(action, repInst.getOwnSlotValue(action));
@@ -405,8 +406,9 @@ public class ServerChangesUtil {
 		tInst.setOwnSlotValue(applyTo, repInst.getOwnSlotValue(applyTo));
 		tInst.setOwnSlotValue(type, CHANGE_LEVEL_DISP_TRANS);
 		tInst.setOwnSlotValues(changes, transChanges);
+        tInst.setOwnSlotValue(inTransactionSlot, Boolean.FALSE);
 
-                cKb.setDirectType(tInst, transChange);
+		cKb.setDirectType(tInst, transChange);
 		
 		return tInst;
 	}
