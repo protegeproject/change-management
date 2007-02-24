@@ -38,11 +38,9 @@ public class ChangesProject extends ProjectPluginAdapter {
     private static Map<KnowledgeBase, ChangesDb> changesDbMap = new HashMap<KnowledgeBase, ChangesDb>();
 
 	public void afterLoad(Project p) {
-		
 		if (!isChangesTabProject(p) || p.isMultiUserClient()) {
 			return;
 		}
-
 		initialize(p);
 	}
     
@@ -52,6 +50,18 @@ public class ChangesProject extends ProjectPluginAdapter {
         if (changesDb != null) {
             changesDb.getChangesKb().dispose();
         }
+    }
+    
+    
+    private boolean isChangesTabProject(Project p) {
+        String changesTabClassName = ChangesTab.class.getName();
+        for (Object o : p.getTabWidgetDescriptors()) {
+            WidgetDescriptor w = (WidgetDescriptor) o;
+            if (w.isVisible() && changesTabClassName.equals(w.getWidgetClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 	
 	
@@ -154,17 +164,6 @@ public class ChangesProject extends ProjectPluginAdapter {
 	private static void createChangeProject(KnowledgeBase currentKB) {
         ChangesDb changesDb = new ChangesDb(currentKB);
         changesDbMap.put(currentKB, changesDb);
-	}
-
-	private boolean isChangesTabProject(Project p) {
-		String changesTabClassName = ChangesTab.class.getName();
-		for (Object o : p.getTabWidgetDescriptors()) {
-			WidgetDescriptor w = (WidgetDescriptor) o;
-			if (w.isVisible() && changesTabClassName.equals(w.getWidgetClassName())) {
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	
