@@ -190,7 +190,7 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		// Initialize the UI
 		initUI();
-		cTreeTable.getTree().expandPath(AbstractTreeTableModel.rootPath);
+		cTreeTable.getTree().expandPath(cTreeTableModel.getRootPath());
 		//cTreeTable.getTree().setRootVisible(false);
 		
 	}
@@ -519,16 +519,17 @@ public class ChangesTab extends AbstractTabWidget {
 		if (aChange.getDirectType().getName().equals(ServerChangesUtil.CHANGETYPE_SUBCLASS_ADDED)) {
 			addChange = false;
 		}
+        /*
 		Slot inTransactionSlot = cKb.getSlot(ServerChangesUtil.SLOT_NAME_IS_IN_TRANSACTION);
         Boolean inTransaction = (Boolean) aChange.getOwnSlotValue(inTransactionSlot);
-		if (!inTransaction) {	
+		if (!inTransaction) {
+        */	
 			if (addChange) {
 				cTableModel.addChangeData(aChange);
 				cTreeTableModel.addChangeData(aChange);
 				cMenu.setEnabledLastChange(true);
 				cMenu.setChange(aChange);	
 			}
-		}
 	}
 	
 /*	private static void updateCreateName(Instance aChange, String oldName, String newName) {
