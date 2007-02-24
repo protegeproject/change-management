@@ -11,6 +11,7 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.CollectionUtilities;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 
@@ -78,10 +79,10 @@ public class ChangesFrameListener implements FrameListener {
 	               context.append(newSlotValue);
 	               Instance changeInst = ServerChangesUtil.createChange(kb,
 	       						changesKb,
-	       						ServerChangesUtil.CHANGETYPE_MAXIMUM_VALUE, 
+	       						Model.CHANGETYPE_MAXIMUM_VALUE, 
 	       						sName, 
 	       						context.toString(), 
-	       						ServerChangesUtil.CHANGE_LEVEL_INFO);
+	       						Model.CHANGE_LEVEL_INFO);
 
 	           	ChangesProject.createChange(kb, changesKb, changeInst);
 		    }
@@ -92,10 +93,10 @@ public class ChangesFrameListener implements FrameListener {
                context.append(newSlotValue);
                Instance changeInst =ServerChangesUtil.createChange(kb,
             		        changesKb,
-            		        ServerChangesUtil.CHANGETYPE_MINIMUM_VALUE, 
+            		        Model.CHANGETYPE_MINIMUM_VALUE, 
        						sName, 
        						context.toString(), 
-       						ServerChangesUtil.CHANGE_LEVEL_INFO);
+       						Model.CHANGE_LEVEL_INFO);
 
            	ChangesProject.createChange(kb, changesKb, changeInst);
 		    	
@@ -111,10 +112,10 @@ public class ChangesFrameListener implements FrameListener {
                	  context.append(newSlotValue);
                	  Instance changeInst =ServerChangesUtil.createChange(kb,
        						changesKb,
-       						ServerChangesUtil.CHANGETYPE_MINIMUM_CARDINALITY, 
+       						Model.CHANGETYPE_MINIMUM_CARDINALITY, 
        						sName, 
        						context.toString(), 
-       						ServerChangesUtil.CHANGE_LEVEL_INFO);
+       						Model.CHANGE_LEVEL_INFO);
 
               	ChangesProject.createChange(kb, changesKb, changeInst);
         			
@@ -130,10 +131,10 @@ public class ChangesFrameListener implements FrameListener {
                	  
                	  Instance changeInst = ServerChangesUtil.createChange(kb,
        						changesKb,
-       						ServerChangesUtil.CHANGETYPE_MAXIMUM_CARDINALITY, 
+       						Model.CHANGETYPE_MAXIMUM_CARDINALITY, 
        						sName, 
        						context.toString(), 
-       						ServerChangesUtil.CHANGE_LEVEL_INFO);
+       						Model.CHANGE_LEVEL_INFO);
 
               	ChangesProject.createChange(kb, changesKb, changeInst);
             	}
@@ -145,10 +146,10 @@ public class ChangesFrameListener implements FrameListener {
                	  context.append(newSlotValue);
                	  Instance changeInst =ServerChangesUtil.createChange(kb,
        						changesKb,
-       						ServerChangesUtil.CHANGETYPE_MAXIMUM_CARDINALITY, 
+       						Model.CHANGETYPE_MAXIMUM_CARDINALITY, 
        						sName, 
        						context.toString(), 
-       						ServerChangesUtil.CHANGE_LEVEL_INFO);
+       						Model.CHANGE_LEVEL_INFO);
               	ChangesProject.createChange(kb, changesKb, changeInst);
             	}
         		
@@ -176,10 +177,10 @@ public class ChangesFrameListener implements FrameListener {
             	
             	Instance changeInst = ServerChangesUtil.createChange(kb,
 						changesKb,
-						ServerChangesUtil.CHANGETYPE_DOCUMENTATION_REMOVED, 
+						Model.CHANGETYPE_DOCUMENTATION_REMOVED, 
 						cName, 
 						context.toString(), 
-						ServerChangesUtil.CHANGE_LEVEL_INFO);
+						Model.CHANGE_LEVEL_INFO);
 
             	ChangesProject.createChange(kb, changesKb, changeInst);
 		   
@@ -194,10 +195,10 @@ public class ChangesFrameListener implements FrameListener {
             	  context.append(cName);
             	  Instance changeInst = ServerChangesUtil.createChange(kb,
     						changesKb,
-    						ServerChangesUtil.CHANGETYPE_DOCUMENTATION_ADDED, 
+    						Model.CHANGETYPE_DOCUMENTATION_ADDED, 
     						cName, 
     						context.toString(), 
-    						ServerChangesUtil.CHANGE_LEVEL_INFO);
+    						Model.CHANGE_LEVEL_INFO);
             		ChangesProject.createChange(kb, changesKb, changeInst);
             
               }
@@ -232,10 +233,10 @@ public class ChangesFrameListener implements FrameListener {
 		    context.append(newSlotValue);
             Instance changeInst = ServerChangesUtil.createChange(kb,
     						changesKb,
-    						ServerChangesUtil.CHANGETYPE_SLOT_VALUE, 
+    						Model.CHANGETYPE_SLOT_VALUE, 
     						iName, 
     						context.toString(), 
-    						ServerChangesUtil.CHANGE_LEVEL_INFO);
+    						Model.CHANGE_LEVEL_INFO);
 
         	ChangesProject.createChange(kb, changesKb, changeInst);
 		    
