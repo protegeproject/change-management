@@ -10,6 +10,7 @@ import edu.stanford.smi.protegex.owl.model.RDFSClass;
 import edu.stanford.smi.protegex.owl.model.event.ModelAdapter;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.util.Util;
 
@@ -31,10 +32,10 @@ public class OwlChangesModelListener extends ModelAdapter{
 				
 		Instance changeInst = ServerChangesUtil.createChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_CLASS_CREATED,
+												Model.CHANGETYPE_CLASS_CREATED,
 												clsName, 
 												context, 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
@@ -73,10 +74,10 @@ public class OwlChangesModelListener extends ModelAdapter{
 
 		Instance changeInst = ServerChangesUtil.createChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_PROPERTY_CREATED,
+												Model.CHANGETYPE_PROPERTY_CREATED,
 												propName, 
 												context, 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
@@ -87,10 +88,10 @@ public class OwlChangesModelListener extends ModelAdapter{
 		
 		Instance changeInst = ServerChangesUtil.createChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_PROPERTY_DELETED,
+												Model.CHANGETYPE_PROPERTY_DELETED,
 												propName, 
 												context, 
-												ServerChangesUtil.CHANGE_LEVEL_INFO);
+												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	
 	}
@@ -110,10 +111,10 @@ public class OwlChangesModelListener extends ModelAdapter{
 		
 		Instance changeInst = ServerChangesUtil.createNameChange(om,
 												changesKb,
-												ServerChangesUtil.CHANGETYPE_NAME_CHANGED,
+												Model.CHANGETYPE_NAME_CHANGED,
 												newName, 
 												context.toString(), 
-												ServerChangesUtil.CHANGE_LEVEL_INFO, 
+												Model.CHANGE_LEVEL_INFO, 
 												oldName, 
 												newName);
 		ChangesProject.createChange(om, changesKb, changeInst);
