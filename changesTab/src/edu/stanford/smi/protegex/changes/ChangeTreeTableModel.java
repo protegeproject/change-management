@@ -2,7 +2,9 @@ package edu.stanford.smi.protegex.changes;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
@@ -25,12 +27,12 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	private String[] colNames;
 	private ArrayList<Instance> completeData;
 	private KnowledgeBase changeKB;
-    private static TreeTableNode root;
-	 
+    
+    private TreeTableNode root;
+    private Map<Instance, TreeTableNode> treeMap = new HashMap<Instance, TreeTableNode>();
 	
 	
 	public ChangeTreeTableModel(TreeTableNode rootOfTree, KnowledgeBase changeKb) {
-		
 		super(rootOfTree);
 		this.changeKB = changeKb;
 		init();
@@ -80,17 +82,6 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 		return "";
 	}
 	
-	public void update() {
-		
-		int[] childIndices = new int[1];
-		if(root.getChildCount()!=0)
-	      childIndices[0]= root.getChildCount()- 1;
-		Object[] children = new Object[1];
-	    if(root.getChildCount()!=0)
-	      children[0] = root.getChildAt(childIndices[0]);
-		fireTreeNodesChanged(getRoot(), rootPath.getPath() , childIndices, children);
-	}
-	
 	
 	        
 	        public int getChildCount(Object node) {
@@ -127,44 +118,26 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 
 	
 	private void addChangeData(Instance changeInst,  boolean completeUpdate) {
-	
-		
-		TreeTableNode newNode = new TreeTableNode(changeInst,changeKB);
-		String actionType = ChangeCreateUtil.getType(changeKB, changeInst);
+        TreeTableNode newNode = null;
+		String actionType = ChangeCreateUtil.getType(changeKB, changeInst);   
 		if (actionType != null){
-			if(!actionType.equals(ServerChangesUtil.CHANGE_LEVEL_TRANS_INFO)&& !actionType.equals("ROOT")){
-				 root.addChild(newNode);
-				 int[] childIndices = new int[1];
-					if(root.getChildCount()!=0)
-				      childIndices[0]= root.getChildCount()- 1;
-					Object[] children = new Object[1];
-				    if(root.getChildCount()!=0)
-				      children[0] = root.getChildAt(childIndices[0]);
-					fireTreeNodesInserted(getRoot(), rootPath.getPath() , childIndices, children);
-				  if (completeUpdate) {
-					 completeData.add(changeInst);
-					}
-				
+			if (!actionType.equals("ROOT")){
+			    newNode = insertIntoModel(root, changeInst);
+			    if (completeUpdate) {
+			        completeData.add(changeInst);
+			    }
 			}
 		}
-		
-			
-		
+		// If we have a transaction change, add the list of changes
+		Cls changeInstType = changeInst.getDirectType();
+		if (changeInstType.getName().equals(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE)) {
 
-			// If we have a transaction change, add the list of changes
-			Cls changeInstType = changeInst.getDirectType();
-			if (changeInstType.getName().equals(ServerChangesUtil.CHANGETYPE_TRANS_CHANGE)) {
-			
-				Collection relChanges = ChangeCreateUtil.getChanges(changeKB, changeInst);
-				
-				for (Iterator iter = relChanges.iterator(); iter.hasNext();) {
-					Instance aInst = (Instance) iter.next();
-					TreeTableNode transChild = new TreeTableNode(aInst,changeKB);
-					newNode.addChild(transChild) ;        //if the change is a transaction, its children are the associated changes
-				
-					
-				}
-			} 
+		    Collection relChanges = ChangeCreateUtil.getChanges(changeKB, changeInst);
+            for (Object o : relChanges) {
+                Instance aInst = (Instance) o;
+                insertIntoModel(newNode, aInst);
+            }
+		} 
 			
 			
 		
@@ -192,17 +165,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	
 	private void setNewSearch(String field, String text) {
 		
-		int i;
-		
-		int num = root.getChildCount();
-		if(num!=0){
-		  int[] childIndices = new int[num];
-	      Object[] children = new Object[num];
-	      for(i=0;i<num;i++)
-	        children[i] = root.getChildAt(i);
-	      root.removeChildren();
-		  fireTreeNodesRemoved(getRoot(), rootPath.getPath() , childIndices, children);
-		}
+	    clearModel();
 		Slot author = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_AUTHOR);
 		Slot created = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_CREATED);
 		Slot action = changeKB.getSlot(ServerChangesUtil.SLOT_NAME_ACTION);
@@ -240,25 +203,76 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	}
 	
 	private void setNewFilter() {
-        int i;
-		
-		int num = root.getChildCount();
-		if(num!=0){
-		  int[] childIndices = new int[num];
-	      Object[] children = new Object[num];
-	      for(i=0;i<num;i++)
-	        children[i] = root.getChildAt(i);
-	      root.removeChildren();
-		  fireTreeNodesRemoved(getRoot(), rootPath.getPath() , childIndices, children);
-		}
-		
-	
+        clearModel();
 		for (Iterator iter = completeData.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
 			addChangeData(aInst, false);
-	
 		}
 	
 	}
+    
+    private void clearModel() {
+        int num = root.getChildCount();
+        if(num!=0){
+          int[] childIndices = new int[num];
+          Object[] children = new Object[num];
+          for(int i=0;i<num;i++) {
+            children[i] = root.getChildAt(i);
+          }
+          root.removeChildren();
+          fireTreeNodesRemoved(getRoot(), rootPath.getPath() , childIndices, children);
+          treeMap.clear();
+        }
+    }
+    
+    private TreeTableNode insertIntoModel(TreeTableNode parent, Instance changeInst) {
+        TreeTableNode newNode = treeMap.get(changeInst);
+        if (newNode == null) {
+            newNode = new TreeTableNode(changeInst,changeKB);
+            treeMap.put(changeInst, newNode);
+        }
+        else {
+            removeFromModel(newNode);
+        }
+        parent.addChild(newNode);
+        int[] childIndices = new int[1];
+        if(parent.getChildCount()!=0)
+            childIndices[0]= root.getChildCount()- 1;
+        Object[] children = new Object[1];
+        if(parent.getChildCount()!=0)
+            children[0] = newNode;
+        fireTreeNodesInserted(parent, makePath(parent), childIndices, children);
+        return newNode;
+    }
+    
+    private void removeFromModel(TreeTableNode node) {
+        TreeTableNode parent = node.getParent();
+        Object[] siblings = parent.getChildren();
+        for (int i = 0; i < siblings.length; i++) {
+            if (node.equals(siblings[i])) {;
+                Object[] path = makePath(parent);
+                int[] childIndices = { i };
+                Object[] children = { node };
+                parent.removeChild(node);
+                fireTreeNodesRemoved(parent, path, childIndices, children);
+                return;
+            }
+        }
+        throw new RuntimeException("Help...");
+    }
+    
+    private Object[] makePath(TreeTableNode node) {
+        int len = 1;
+        for (TreeTableNode climber = node; !climber.equals(root); climber = climber.getParent()) {
+            len++;
+        }
+        Object[] path = new Object[len];
+        TreeTableNode climber = node;
+        for(int i = len - 1; i >=0; i--) {
+            path[i] = climber;
+            climber = climber.getParent();
+        }
+        return path;
+    }
 
 }
