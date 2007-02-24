@@ -8,6 +8,7 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 
@@ -65,10 +66,10 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
         String context = "Deleted Class: " + deletedClsName;
         Instance changeInst = ServerChangesUtil.createChange(om,
                                                 changesKb,
-                                                ServerChangesUtil.CHANGETYPE_CLASS_DELETED,
+                                                Model.CHANGETYPE_CLASS_DELETED,
                                                 deletedClsName, 
                                                 context, 
-                                                ServerChangesUtil.CHANGE_LEVEL_INFO);
+                                                Model.CHANGE_LEVEL_INFO);
         ChangesProject.createChange(om, changesKb, changeInst);
     
     }
