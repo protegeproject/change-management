@@ -1,12 +1,18 @@
 package edu.stanford.smi.protegex.server_changes;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Level;
 
 import edu.stanford.smi.protege.Application;
+import edu.stanford.smi.protege.event.ProjectAdapter;
+import edu.stanford.smi.protege.event.ProjectEvent;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
@@ -14,6 +20,7 @@ import edu.stanford.smi.protege.model.WidgetDescriptor;
 import edu.stanford.smi.protege.plugin.ProjectPluginAdapter;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protege.util.MessageError;
 import edu.stanford.smi.protegex.changes.ChangesTab;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesClsListener;
@@ -23,6 +30,7 @@ import edu.stanford.smi.protegex.server_changes.listeners.ChangesKBListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesSlotListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesTransListener;
 import edu.stanford.smi.protegex.server_changes.util.Util;
+import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
 public class ChangesProject extends ProjectPluginAdapter {
 
@@ -37,12 +45,29 @@ public class ChangesProject extends ProjectPluginAdapter {
     
     private static Map<KnowledgeBase, ChangesDb> changesDbMap = new HashMap<KnowledgeBase, ChangesDb>();
 
+    /* ---------------------------- Project Plugin Interfaces ---------------------------- */
 	public void afterLoad(Project p) {
 		if (!isChangesTabProject(p) || p.isMultiUserClient()) {
 			return;
 		}
 		initialize(p);
 	}
+    
+    public void afterSave(Project p) {
+        ArrayList errors = new ArrayList();
+        KnowledgeBase kb = p.getKnowledgeBase();
+        Project changesProject = getChangesProj(kb);
+        if (changesProject != null) {
+            RDFBackend.setSourceFiles(changesProject.getSources(), 
+                                      ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + p.getName() + ".rdfs", 
+                                      ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + p.getName() + ".rdf", 
+                                      ChangesProject.PROTEGE_NAMESPACE);
+            changesProject.setProjectURI(ChangesDb.getAnnotationProjectURI(p));
+
+            changesProject.save(errors);
+            displayErrors(errors);
+        }
+    }
     
     public void beforeClose(Project p) {
         KnowledgeBase kb = p.getKnowledgeBase();
@@ -52,6 +77,7 @@ public class ChangesProject extends ProjectPluginAdapter {
         }
     }
     
+    /* ---------------------------- Project Plugin Interfaces ---------------------------- */
     
     private boolean isChangesTabProject(Project p) {
         String changesTabClassName = ChangesTab.class.getName();
@@ -230,7 +256,21 @@ public class ChangesProject extends ProjectPluginAdapter {
 		return "Changes Project Plugin";
 	}
 
-	public static void main(String[] args) {
+	public static void displayErrors(Collection errors) {
+        Iterator i = errors.iterator();
+        while (i.hasNext()) {
+            Object elem = i.next();         
+            if (elem instanceof Throwable) {
+                Log.getLogger().log(Level.WARNING, "Warnings at loading changes project", (Throwable)elem);
+            } else if (elem instanceof MessageError) {
+                Log.getLogger().log(Level.WARNING, ((MessageError)elem).getMessage(), ((MessageError)elem).getException());
+            } else {
+                Log.getLogger().warning(elem.toString());
+            }
+        }
+    }
+
+    public static void main(String[] args) {
 		Application.main(args);
 	}
 
