@@ -2,6 +2,8 @@ package edu.stanford.smi.protegex.server_changes.listeners;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.event.KnowledgeBaseEvent;
 import edu.stanford.smi.protege.event.KnowledgeBaseListener;
@@ -9,12 +11,14 @@ import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class ChangesKBListener implements KnowledgeBaseListener {
+    private final static Logger log = Log.getLogger(ChangesKBListener.class);
     private KnowledgeBase kb;
     private KnowledgeBase changesKb;
     
@@ -51,7 +55,9 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsDeleted(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void clsDeleted(KnowledgeBaseEvent event) {
-		
+        if (log.isLoggable(Level.FINE)) {
+            log.fine("In class deleted listener");
+        }
 		String oldName = event.getOldName();
 		String deletedClsName = "";
 		if (event.getArgument2() instanceof Cls) {
