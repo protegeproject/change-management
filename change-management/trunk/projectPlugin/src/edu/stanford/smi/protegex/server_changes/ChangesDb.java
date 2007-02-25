@@ -4,10 +4,8 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -24,7 +22,6 @@ import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protege.server.Server;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protege.util.Log;
-import edu.stanford.smi.protege.util.MessageError;
 import edu.stanford.smi.protege.util.URIUtilities;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
@@ -103,45 +100,19 @@ public class ChangesDb {
 
         if (changesProject == null) {
             Log.getLogger().warning("Failed to find or create annotation project");
-            displayErrors(errors);
+            ChangesProject.displayErrors(errors);
         }
 
         changes = changesProject.getKnowledgeBase();
-
-        project.addProjectListener(new ProjectAdapter() {
-            ArrayList errors = new ArrayList();
-            public void projectSaved(ProjectEvent event) {
-	
-            	RDFBackend.setSourceFiles(changesProject.getSources(), ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + project.getName() + ".rdfs", ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + project.getName() + ".rdf", ChangesProject.PROTEGE_NAMESPACE);
-            	changesProject.setProjectURI(getAnnotationProjectURI(project));
-	
-                changesProject.save(errors);
-                displayErrors(errors);          
-            }
-        });
     }
     
-    private static URI getAnnotationProjectURI(Project p) {
+    public static URI getAnnotationProjectURI(Project p) {
         return URIUtilities.createURI(p.getProjectDirectoryURI() + 
                                       "/" + 
                                       ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + 
                                       p.getName() + ".pprj");
     }
 
-    private static void displayErrors(Collection errors) {
-        Iterator i = errors.iterator();
-        while (i.hasNext()) {
-            Object elem = i.next();         
-            if (elem instanceof Throwable) {
-                Log.getLogger().log(Level.WARNING, "Warnings at loading changes project", (Throwable)elem);
-            } else if (elem instanceof MessageError) {
-                Log.getLogger().log(Level.WARNING, ((MessageError)elem).getMessage(), ((MessageError)elem).getException());
-            } else {
-                Log.getLogger().warning(elem.toString());
-            }
-        }
-    }
-    
     private RemoteSession getCurrentSession() {
         RemoteSession session = ServerFrameStore.getCurrentSession();
         if (session != null) return session;
@@ -265,12 +236,21 @@ public class ChangesDb {
         frameIdMap.put(frameId, name);
     }
     
-    public String getName (Frame frame) {
+    public String getPossiblyDeletedFrameName (Frame frame) {
         if (frame.isDeleted()) {
             return (String)frameIdMap.get(frame.getFrameID());
         }
         else {
             return frame.getName();
+        }
+    }
+    
+    public String getPossiblyDeletedBrowserText(Frame frame) {
+        if (frame.isDeleted()) {
+            return (String)frameIdMap.get(frame.getFrameID());
+        }
+        else {
+            return frame.getBrowserText();
         }
     }
 }
