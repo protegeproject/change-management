@@ -13,7 +13,6 @@ import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
-import edu.stanford.smi.protegex.server_changes.*;
 
 
 public class TransactionUtility {
@@ -25,7 +24,6 @@ public class TransactionUtility {
 	private Slot author;
 	private Slot context;
 	private Slot created;
-    private Slot inTransactionSlot;
 	private Slot action;
 	private Slot type;
 	private Slot applyTo;
@@ -42,7 +40,6 @@ public class TransactionUtility {
 		action = cKb.getSlot(Model.SLOT_NAME_ACTION);
 		type = cKb.getSlot(Model.SLOT_NAME_TYPE);
 		applyTo = cKb.getSlot(Model.SLOT_NAME_APPLYTO);
-        inTransactionSlot = cKb.getSlot(Model.SLOT_NAME_IS_IN_TRANSACTION);
 	}
 	
 	public Stack convertTransactions(Stack trans) {
@@ -120,15 +117,7 @@ public class TransactionUtility {
 					firstInst = aInst;
 					firstDeleted = true;
 				}
-				
-//				if (aInst.getDirectType().getName().equals(ChangeCreateUtil.CHANGETYPE_ANNOTATION_ADDED) && !firstAnnotate) {
-//					firstInst = aInst;
-//					firstAnnotate = true;
-//				}
-			}
-			
-		
-			
+			}	
 			tInst = ServerChangesUtil.createTransChange(cKb, transactionLevel(transActions), firstInst);
 		} 
 		
@@ -227,7 +216,6 @@ public class TransactionUtility {
 		cInst.setOwnSlotValue(applyTo, applyToVal);
 		
 		cInst.setOwnSlotValue(type,Model.CHANGE_LEVEL_TRANS);
-        cInst.setOwnSlotValue(inTransactionSlot, false);
         
         cKb.setDirectType(cInst, transChange);
 		return cInst;
