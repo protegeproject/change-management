@@ -344,13 +344,6 @@
 	 rdfs:label="inverse_of_annotates">
 	<rdfs:range rdf:resource="&kb;Annotation"/>
 </rdf:Property>
-<rdf:Property rdf:about="&kb;isInTransaction"
-	 a:maxCardinality="1"
-	 a:range="boolean"
-	 rdfs:label="isInTransaction">
-	<rdfs:domain rdf:resource="&kb;Change"/>
-	<rdfs:range rdf:resource="&rdfs;Literal"/>
-</rdf:Property>
 <rdf:Property rdf:about="&kb;modified"
 	 a:maxCardinality="1"
 	 rdfs:label="modified">
