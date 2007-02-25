@@ -252,7 +252,6 @@ public class ServerChangesUtil {
 		Slot created = cKb.getSlot(Model.SLOT_NAME_CREATED);
 		Slot type = cKb.getSlot(Model.SLOT_NAME_TYPE);
 		Slot changes = cKb.getSlot(Model.SLOT_NAME_CHANGES);
-        Slot inTransactionSlot = cKb.getSlot(Model.SLOT_NAME_IS_IN_TRANSACTION);
 		
 		tInst.setOwnSlotValue(author, repInst.getOwnSlotValue(author));
 		tInst.setOwnSlotValue(action, repInst.getOwnSlotValue(action));
@@ -261,7 +260,6 @@ public class ServerChangesUtil {
 		tInst.setOwnSlotValue(applyTo, repInst.getOwnSlotValue(applyTo));
 		tInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_DISP_TRANS);
 		tInst.setOwnSlotValues(changes, transChanges);
-        tInst.setOwnSlotValue(inTransactionSlot, Boolean.FALSE);
         Model.logChange("Creating Transaction Change", log, Level.FINE, tInst, transChange);
 		cKb.setDirectType(tInst, transChange);
 		
@@ -278,7 +276,6 @@ public class ServerChangesUtil {
 		Slot author = changeKB.getSlot(Model.SLOT_NAME_AUTHOR);
 		Slot context = changeKB.getSlot(Model.SLOT_NAME_CONTEXT);
 		Slot created = changeKB.getSlot(Model.SLOT_NAME_CREATED);
-        Slot inTransaction = changeKB.getSlot(Model.SLOT_NAME_IS_IN_TRANSACTION);
 		Slot type = changeKB.getSlot(Model.SLOT_NAME_TYPE);
 		
 		Instance changeInst = changeKB.createInstance(null, new ArrayList());
@@ -298,7 +295,6 @@ public class ServerChangesUtil {
 		    changeInst.setOwnSlotValue(context, desc);
 		    changeInst.setOwnSlotValue(created, ChangesProject.getTimeStamp());
 		    changeInst.setOwnSlotValue(type, typ);
-		    changeInst.setOwnSlotValue(inTransaction, ChangesProject.getIsInTransaction(currentKB));
 		}
         Model.logChange("Creating change", log, Level.FINE, changeInst, change);
         changeKB.setDirectType(changeInst, change);
