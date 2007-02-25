@@ -43,21 +43,7 @@ public class OwlChangesModelListener extends ModelAdapter{
 	
 
 	public void classDeleted(RDFSClass arg0) {
-//		
-//		String frameID = arg0.getFrameID().toString();
-//
-//		String clsName = Util.getName(frameID);
-//		
-//		
-//		String context = "Class deleted: " + clsName;
-//		
-//		Instance changeInst = ChangeCreateUtil.createChange(
-//												ChangesTab.getChangesKB(),
-//												ChangeCreateUtil.CHANGETYPE_CLASS_DELETED,
-//												clsName, 
-//				               				    context, 
-//												ChangeCreateUtil.CHANGE_LEVEL_INFO);
-//		ChangesTab.createChange(changeInst);
+	    // This can't be done here because of the missing name field.  Look in the kb listener.
 	}
 
 	public void individualCreated(RDFResource arg0) {
@@ -67,33 +53,22 @@ public class OwlChangesModelListener extends ModelAdapter{
 	}
 
 	public void propertyCreated(RDFProperty arg0) {
-		String propName = arg0.getBrowserText();
-		String context = "Property Created: " + propName;
+        String propName = arg0.getBrowserText();
+        String context = "Property Created: " + propName;
 
         ChangesDb changesDb = ChangesProject.getChangesDb(om);
 
-		Instance changeInst = ServerChangesUtil.createChange(om,
-												changesKb,
-												Model.CHANGETYPE_PROPERTY_CREATED,
-												propName, 
-												context, 
-												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(om,changesKb, changeInst);
+        Instance changeInst = ServerChangesUtil.createChange(om,
+                                                changesKb,
+                                                Model.CHANGETYPE_PROPERTY_CREATED,
+                                                propName, 
+                                                context, 
+                                                Model.CHANGE_LEVEL_INFO);
+        ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
 	public void propertyDeleted(RDFProperty arg0) {
-        ChangesDb changesDb = ChangesProject.getChangesDb(om);
-		String propName = changesDb.getName(arg0);
-		String context = "Property Deleted: " + propName;
-		
-		Instance changeInst = ServerChangesUtil.createChange(om,
-												changesKb,
-												Model.CHANGETYPE_PROPERTY_DELETED,
-												propName, 
-												context, 
-												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(om,changesKb, changeInst);
-	
+        // This can't be done here because of the missing name field.  Look in the kb listener.
 	}
 
 	public void resourceNameChanged(RDFResource arg0, String arg1) {
