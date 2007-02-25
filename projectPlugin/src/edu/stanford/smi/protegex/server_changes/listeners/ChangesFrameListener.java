@@ -158,87 +158,69 @@ public class ChangesFrameListener implements FrameListener {
         
         else if (f instanceof Cls) {
            
-          	Cls c = (Cls)f;
-         	String cName = c.getBrowserText();
+            Cls c = (Cls)f;
+            String cName = c.getBrowserText();
             Slot s = event.getSlot();
- 		    String sName = s.getName();
- 		    StringBuffer context = new StringBuffer();
+            String sName = s.getName();
+            StringBuffer context = new StringBuffer();
  	
  		 
  		    
- 		    if(sName.equals(":DOCUMENTATION"))
- 		    {
-              String newSlotValue = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
-              if(newSlotValue.equals(""))
-              {
-            	//REMOVED DOCUMENTATION
-            	context.append("Removed documentation from ");
-            	context.append(cName);
+            if(sName.equals(":DOCUMENTATION")) {
+                    String newSlotValue = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
+                    if(newSlotValue.equals("")) {
+                        //REMOVED DOCUMENTATION
+                        context.append("Removed documentation from ");
+                        context.append(cName);
             	
-            	Instance changeInst = ServerChangesUtil.createChange(kb,
-						changesKb,
-						Model.CHANGETYPE_DOCUMENTATION_REMOVED, 
-						cName, 
-						context.toString(), 
-						Model.CHANGE_LEVEL_INFO);
+                        Instance changeInst = ServerChangesUtil.createChange(kb,
+                                                                             changesKb,
+                                                                             Model.CHANGETYPE_DOCUMENTATION_REMOVED, 
+                                                                             cName, 
+                                                                             context.toString(), 
+                                                                             Model.CHANGE_LEVEL_INFO);
 
-            	ChangesProject.createChange(kb, changesKb, changeInst);
-		   
-            	
-              }
-              else
-              {
-            	// ADDED DOCUMENTATION
-            	  context.append("Added documentation: ");
-            	  context.append(newSlotValue);
-            	  context.append(" to: ");
-            	  context.append(cName);
-            	  Instance changeInst = ServerChangesUtil.createChange(kb,
-    						changesKb,
-    						Model.CHANGETYPE_DOCUMENTATION_ADDED, 
-    						cName, 
-    						context.toString(), 
-    						Model.CHANGE_LEVEL_INFO);
+                        ChangesProject.createChange(kb, changesKb, changeInst);
+                    }
+                    else {
+                        // ADDED DOCUMENTATION
+                        context.append("Added documentation: ");
+                        context.append(newSlotValue);
+                        context.append(" to: ");
+                        context.append(cName);
+                        Instance changeInst = ServerChangesUtil.createChange(kb,
+                                                                             changesKb,
+                                                                             Model.CHANGETYPE_DOCUMENTATION_ADDED, 
+                                                                             cName, 
+                                                                             context.toString(), 
+                                                                             Model.CHANGE_LEVEL_INFO);
             		ChangesProject.createChange(kb, changesKb, changeInst);
-            
-              }
-		      /*ArrayList oldValue = (ArrayList)event.getArgument2();
-		      String oldSlotValue = oldValue.toString();
-		      if( !oldSlotValue.equals("[]"))
-		      {
-	            String oldSlotValueMod = oldSlotValue.substring(1,oldSlotValue.length()-1);
-		      } // old value of the documentation
-*/		      
-
-		   
-		    } // Handles documentation slot
-		
+                    }
+                } // Handles documentation slot
         }
-        
-        else if (f instanceof Instance){
-    		Instance i = (Instance)f;
-         	String iName = i.getBrowserText();
+        else if (f instanceof Instance) {
+            Instance i = (Instance)f;
+            String iName = i.getBrowserText();
             Slot ownS = event.getSlot();
- 		    String ownSName = ownS.getName();
- 		    String newSlotValue = CollectionUtilities.toString(i.getOwnSlotValues(event.getSlot()));
- 		    ArrayList oldValue = (ArrayList)event.getArgument2();
-		    String oldSlotValue = oldValue.toString();
+            String ownSName = ownS.getName();
+            String newSlotValue = CollectionUtilities.toString(i.getOwnSlotValues(event.getSlot()));
+            ArrayList oldValue = (ArrayList)event.getArgument2();
+            String oldSlotValue = oldValue.toString();
 		    
-		    StringBuffer context = new StringBuffer();
-		    context.append("Slot: ");
-		    context.append(ownSName);
-		    context.append(" for Instance: ");
-		    context.append(iName);
-		    context.append(" set to: ");
-		    context.append(newSlotValue);
+            StringBuffer context = new StringBuffer();
+            context.append("Slot: ");
+            context.append(ownSName);
+            context.append(" for Instance: ");
+            context.append(iName);
+            context.append(" set to: ");
+            context.append(newSlotValue);
             Instance changeInst = ServerChangesUtil.createChange(kb,
-    						changesKb,
-    						Model.CHANGETYPE_SLOT_VALUE, 
-    						iName, 
-    						context.toString(), 
-    						Model.CHANGE_LEVEL_INFO);
-
-        	ChangesProject.createChange(kb, changesKb, changeInst);
+                                                                 changesKb,
+                                                                 Model.CHANGETYPE_SLOT_VALUE, 
+                                                                 iName, 
+                                                                 context.toString(), 
+                                                                 Model.CHANGE_LEVEL_INFO);
+            ChangesProject.createChange(kb, changesKb, changeInst);
 		    
     	}
 
