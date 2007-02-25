@@ -75,7 +75,6 @@ public class Model {
     public static final String SLOT_NAME_ASSOC_ANNOTATIONS = "assoc_annotations";
     public static final String SLOT_NAME_AUTHOR = "author";
     public static final String SLOT_NAME_ANNOTATES = "annotates";
-    public static final String SLOT_NAME_IS_IN_TRANSACTION = "isInTransaction";
     public static final String SLOT_NAME_BODY = "body";
     public static final String SLOT_NAME_CHANGES = "Changes";
     public static final String SLOT_NAME_CREATED = "created";
