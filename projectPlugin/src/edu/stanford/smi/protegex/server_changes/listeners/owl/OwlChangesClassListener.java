@@ -1,8 +1,10 @@
 package edu.stanford.smi.protegex.server_changes.listeners.owl;
 
-import edu.stanford.smi.protege.model.FrameID;
+import java.util.logging.Logger;
+
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.owl.model.RDFResource;
@@ -12,9 +14,8 @@ import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.util.Util;
  
-public class OwlChangesClassListener extends ClassAdapter{
+public class OwlChangesClassListener extends ClassAdapter {
     private OWLModel om;
     private KnowledgeBase changesKb;
     
@@ -45,7 +46,7 @@ public class OwlChangesClassListener extends ClassAdapter{
 
 	public void instanceRemoved(RDFSClass arg0, RDFResource arg1) {
         ChangesDb changesDb = ChangesProject.getChangesDb(om);
-		String instName = changesDb.getName(arg1);
+		String instName = changesDb.getPossiblyDeletedFrameName(arg1);
 		StringBuffer context = new StringBuffer();
 		context.append("Instance Removed: ");
 		context.append(instName);
@@ -91,7 +92,7 @@ public class OwlChangesClassListener extends ClassAdapter{
 
 	public void subclassRemoved(RDFSClass arg0, RDFSClass arg1) {
         ChangesDb changesDb = ChangesProject.getChangesDb(om);
-		String clsName = changesDb.getName(arg1);
+		String clsName = changesDb.getPossiblyDeletedFrameName(arg1);
 		StringBuffer context = new StringBuffer();
 		context.append("Subclass Removed: ");
 		context.append(clsName);
@@ -133,7 +134,7 @@ public class OwlChangesClassListener extends ClassAdapter{
 		String a = arg1.getName();
 		String b = arg1.getBrowserText();
         ChangesDb changesDb = ChangesProject.getChangesDb(om);
-		String clsName = changesDb.getName(arg1);
+		String clsName = changesDb.getPossiblyDeletedFrameName(arg1);
 		StringBuffer context = new StringBuffer();
 		context.append("Superclass Removed: ");
 		context.append(clsName);
