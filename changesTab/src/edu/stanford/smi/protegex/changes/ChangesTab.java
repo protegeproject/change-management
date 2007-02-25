@@ -66,9 +66,6 @@ import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
  * 
  */
 public class ChangesTab extends AbstractTabWidget {
-    
-
-	
 	// Main UI tables
 	public static final String HEADERCOMP_NAME_CHANGE_VIEWER = "Change Viewer";
 	public static final String HEADERCOMP_NAME_ANNOTATE_VIEWER = "Annotation Viewer";
@@ -160,40 +157,29 @@ public class ChangesTab extends AbstractTabWidget {
 	// Initialize the plugin
 	public void initialize() {
 
-		currProj = getProject();
-		currKB = currProj.getKnowledgeBase();
-		
-		
-		//Check to see if the project is an OWL one
-		isOwlProject = kbInOwl(currKB);
-		
-		// GET INSTANCE OF CHANGE PROJECT 'changes' and corresponding KB 'cKB' HERE
-		getChangeProject();
-		
-		// ASSUMING THAT THE CHANGES PROJECT EXISTS 
-		
-		// Annotation project exists, load associated changes/annotations
-		//if (createChangeProject()) {
-			initTables();
-			loadExistingData();
-		
-		//} else {
-			//initTables();
-	
-		//}
-		
-        
-	   cKb.addClsListener(new ChangesListener());		
-	   
+	    currProj = getProject();
+	    currKB = currProj.getKnowledgeBase();
 
-       // Initialize the tab text
-		setLabel(CHANGES_TAB_NAME);
-		
-		// Initialize the UI
-		initUI();
-		cTreeTable.getTree().expandPath(cTreeTableModel.getRootPath());
-		//cTreeTable.getTree().setRootVisible(false);
-		
+
+	    //Check to see if the project is an OWL one
+	    isOwlProject = kbInOwl(currKB);
+
+	    // GET INSTANCE OF CHANGE PROJECT 'changes' and corresponding KB 'cKB' HERE
+	    getChangeProject();
+
+	    // ASSUMING THAT THE CHANGES PROJECT EXISTS 
+	    initTables();
+	    loadExistingData();
+
+	    cKb.addClsListener(new ChangesListener());		
+
+
+	    // Initialize the tab text
+	    setLabel(CHANGES_TAB_NAME);
+
+	    // Initialize the UI
+	    initUI();
+	    cTreeTable.getTree().expandPath(cTreeTableModel.getRootPath());
 	}
 
 	
