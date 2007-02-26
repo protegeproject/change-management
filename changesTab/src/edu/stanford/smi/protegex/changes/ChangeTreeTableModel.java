@@ -121,7 +121,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
         TreeTableNode newNode = null;
 		String actionType = Model.getType(changeInst);   
 		if (actionType != null){
-			if (!actionType.equals("ROOT")){
+			if (!actionType.equals(Model.CHANGE_LEVEL_ROOT)){
 			    newNode = insertIntoModel(root, changeInst);
 			    if (completeUpdate) {
 			        completeData.add(changeInst);
