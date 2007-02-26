@@ -7,12 +7,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Stack;
 import java.util.logging.Level;
 
 import edu.stanford.smi.protege.Application;
-import edu.stanford.smi.protege.event.ProjectAdapter;
-import edu.stanford.smi.protege.event.ProjectEvent;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
@@ -54,6 +51,9 @@ public class ChangesProject extends ProjectPluginAdapter {
 	}
     
     public void afterSave(Project p) {
+        if (p.isMultiUserClient()) {
+            return;
+        }
         ArrayList errors = new ArrayList();
         KnowledgeBase kb = p.getKnowledgeBase();
         Project changesProject = getChangesProj(kb);
@@ -70,10 +70,14 @@ public class ChangesProject extends ProjectPluginAdapter {
     }
     
     public void beforeClose(Project p) {
+        if (p.isMultiUserClient()) {
+            return;
+        }
         KnowledgeBase kb = p.getKnowledgeBase();
         ChangesDb changesDb  = getChangesDb(kb);
         if (changesDb != null) {
             changesDb.getChangesKb().dispose();
+            changesDbMap.remove(kb);
         }
     }
     
@@ -108,7 +112,8 @@ public class ChangesProject extends ProjectPluginAdapter {
 		// AT THIS POINT, WE HAVE THE CHANGES PROJECT 'changes' and the KB 'changesKb'. 
 		// Creating the Root of the tree for the UI
 
-		ServerChangesUtil.createChange(currentKB, changesKb, Model.CHANGETYPE_INSTANCE_ADDED,	"ROOT", "ROOT",	"ROOT");
+		ServerChangesUtil.createChange(currentKB, changesKb, Model.CHANGETYPE_INSTANCE_ADDED,	
+                                       Model.CHANGE_LEVEL_ROOT, Model.CHANGE_LEVEL_ROOT,	Model.CHANGE_LEVEL_ROOT);
 
 
 		//Check to see if the project is an OWL one
