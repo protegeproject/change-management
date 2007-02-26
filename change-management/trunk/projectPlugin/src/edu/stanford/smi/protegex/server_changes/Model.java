@@ -17,6 +17,7 @@ public class Model {
     public static final String CHANGE_LEVEL_TRANS_INFO = "transaction_info";
     public static final String CHANGE_LEVEL_TRANS = "transaction";
     public static final String CHANGE_LEVEL_DEBUG = "debug";
+    public static final String CHANGE_LEVEL_ROOT = "ROOT";
  
     // Names of subclasses of Class_Change
     public static final String CHANGETYPE_ANNOTATION_MODIFIED = "Annotation_Modified";
