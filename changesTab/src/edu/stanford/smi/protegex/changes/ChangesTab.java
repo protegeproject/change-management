@@ -408,7 +408,7 @@ public class ChangesTab extends AbstractTabWidget {
         if (currProj.isMultiUserClient()) {
             getServerSideChangeProject();
         }
-        else if (changes == null) {
+        else {
             if (ChangesProject.getChangesProj(currKB) == null) { // the tab has just been configured so the
                 new ChangesProject().afterLoad(currProj);  // project plugin is not initialized                           
             }
