@@ -280,7 +280,7 @@ public class ServerChangesUtil {
 		
 		Instance changeInst = changeKB.createInstance(null, new ArrayList());
 		
-		if(apply.equals("ROOT")){
+		if(apply.equals(Model.CHANGE_LEVEL_ROOT)){
 			changeInst.setOwnSlotValue(action, "Type of change");
 			changeInst.setOwnSlotValue(applyTo, apply);
 			changeInst.setOwnSlotValue(author, "Person who made the change");
