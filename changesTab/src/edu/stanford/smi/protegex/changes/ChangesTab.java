@@ -631,8 +631,6 @@ public class ChangesTab extends AbstractTabWidget {
 			if (cTreeTable.getSelectedRowCount() > 0) {
 				
 				int[] selected = cTreeTable.getSelectedRows();
-				Collection chngInsts = Model.getChangeInsts(cKb);
-				Object[] chngInstArray = chngInsts.toArray();
 				Collection chngInstSelected = new ArrayList();
 				
 				for (int i = 0; i < selected.length; i++) {
