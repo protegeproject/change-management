@@ -76,7 +76,9 @@ public class ChangesProject extends ProjectPluginAdapter {
         KnowledgeBase kb = p.getKnowledgeBase();
         ChangesDb changesDb  = getChangesDb(kb);
         if (changesDb != null) {
-            changesDb.getChangesKb().dispose();
+            if (!p.isMultiUserServer()) {
+                changesDb.getChangesKb().dispose();
+            }
             changesDbMap.remove(kb);
         }
     }
