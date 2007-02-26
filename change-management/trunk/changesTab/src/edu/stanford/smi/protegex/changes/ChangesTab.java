@@ -313,7 +313,7 @@ public class ChangesTab extends AbstractTabWidget {
 		for (Iterator iter = changeInst.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
 			String apply = Model.getApplyTo(aInst);
-			if(apply.equals("ROOT")){
+			if(apply.equals(Model.CHANGE_LEVEL_ROOT)){
 				 ROOT = aInst;
 		         break;
 			}
