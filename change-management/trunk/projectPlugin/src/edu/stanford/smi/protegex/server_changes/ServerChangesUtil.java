@@ -4,6 +4,7 @@ package edu.stanford.smi.protegex.server_changes;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -317,4 +318,30 @@ public class ServerChangesUtil {
 		Model.logChange("Modified name change change", log, Level.FINE, changeInst);
 		return changeInst;
 	}
+
+    public static void updateChangeDbAfterNameChange(KnowledgeBase changesKb, String oldName, String newName){
+        Collection changeList = Model.getChangeInsts(changesKb);
+        String context = null;
+        int len = oldName.length();
+        for (Iterator iter = changeList.iterator(); iter.hasNext();) {
+            Instance cInst = (Instance) iter.next();
+            String applyTo = Model.getApplyTo(cInst);
+            if (applyTo.equals(oldName)){
+                Model.setInstApplyTo(cInst, newName);
+            }
+            /* I dont believe in this...
+    
+            String cCtxt = Model.getContext(cInst);
+            int idx = cCtxt.indexOf(oldName);
+            if(idx!=-1){
+                StringBuffer txt = new StringBuffer(cCtxt);	
+                txt.replace(idx,idx+len,newName);
+                context = txt.toString();
+    
+                Model.setInstContext(cInst, context);
+            }
+            */
+        }
+    
+    }
 }
