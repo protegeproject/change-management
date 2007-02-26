@@ -1,7 +1,5 @@
 package edu.stanford.smi.protegex.server_changes.listeners;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,27 +27,26 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
-	public void clsCreated(KnowledgeBaseEvent event) {
-		
-		Cls createdCls = event.getCls();
-		String clsName = createdCls.getBrowserText();
-		String context = "Created Class: " + clsName;
-		
-		// Create artifical transaction for create class
-		if (!ChangesProject.getIsInTransaction(kb)) {
-			ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_BEGIN);
-			ChangesProject.setInCreateClass(kb, true);
-		} 
-		
-		Instance changeInst = ServerChangesUtil.createChange(kb,
-												changesKb,
-												Model.CHANGETYPE_CLASS_CREATED, 
-												clsName, 
-												context, 
-												Model.CHANGE_LEVEL_INFO);
-		
-		ChangesProject.createChange(kb, changesKb, changeInst);
-	}
+    public void clsCreated(KnowledgeBaseEvent event) {
+        Cls createdCls = event.getCls();
+        String clsName = createdCls.getBrowserText();
+        String context = "Created Class: " + clsName;
+
+        // Create artifical transaction for create class
+        if (!ChangesProject.getIsInTransaction(kb)) {
+            ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_BEGIN);
+            ChangesProject.setInCreateClass(kb, true);
+        } 
+
+        Instance changeInst = ServerChangesUtil.createChange(kb,
+                                                             changesKb,
+                                                             Model.CHANGETYPE_CLASS_CREATED, 
+                                                             clsName, 
+                                                             context, 
+                                                             Model.CHANGE_LEVEL_INFO);
+
+        ChangesProject.createChange(kb, changesKb, changeInst);
+    }
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsDeleted(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
@@ -111,90 +108,61 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#frameNameChanged(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void frameNameChanged(KnowledgeBaseEvent event) {
-		String oldName = event.getOldName();
-		String newName = event.getFrame().getName();
-        ChangesDb changesDb = ChangesProject.getChangesDb(kb);
-		
-		
-		// Update all instances in the change ontology with the oldName to newName
-		updateChanges(oldName,newName);
-		
-		
-		//Don't create a name change if it is a rename right after a creation
-		if (changesDb.createChangeNameContains(oldName)&& needsNameChange(oldName)) {
-			
-		
-			//Instance cChange = (Instance) ChangesProject.createChangeName.get(oldName);
-			//ServerChangesUtil.setInstApplyTo(changesKb, cChange, newName);
-			//updateChangeInstances(cChange, oldName, newName);
-			changesDb.removeChangeName(oldName);
-		
-		}
-		else
-		{		
-		StringBuffer context = new StringBuffer();
-		context.append("Name change from '");
-		context.append(oldName);
-		context.append("' to '");
-		context.append(newName);
-		context.append("'");
-		
-		
-		Instance changeInst = ServerChangesUtil.createNameChange(
-                                                kb,
-												changesKb,
-												Model.CHANGETYPE_NAME_CHANGED,
-												newName, 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO, 
-												oldName, 
-												newName);
-	
-		ChangesProject.createChange(kb, changesKb, changeInst);}
-	}
-	
-	   private boolean needsNameChange(String name) {
-	        boolean needsNameChange = false;
-	        
-	        if (name != null) {
-	            int index = name.lastIndexOf('_');
-	            String possibleIntegerString = name.substring(index + 1);
-	            try {
-	                Integer.parseInt(possibleIntegerString);
-	                needsNameChange = true;
-	            } catch (Exception e) {
-	            }
-	        }
-	        return needsNameChange;
-	    }
+	    String oldName = event.getOldName();
+	    String newName = event.getFrame().getName();
+	    ChangesDb changesDb = ChangesProject.getChangesDb(kb);
+            
+	    // Update all instances in the change ontology with the oldName to newName
+	    ServerChangesUtil.updateChangeDbAfterNameChange(changesKb, oldName,newName);
 
-	private void updateChanges(String oldName, String newName){
-		Collection changeList = Model.getChangeInsts(changesKb);
-		String context = null;
-		int len = oldName.length();
-		for (Iterator iter = changeList.iterator(); iter.hasNext();) {
-			Instance cInst = (Instance) iter.next();
-			String applyTo = Model.getApplyTo(cInst);
-			if (applyTo.equals(oldName)){
-				Model.setInstApplyTo(cInst, newName);
-		  }
-			
-			String cCtxt = Model.getContext(cInst);
-			int idx = cCtxt.indexOf(oldName);
-			if(idx!=-1){
-			StringBuffer txt = new StringBuffer(cCtxt);	
-			txt.replace(idx,idx+len,newName);
-			context = txt.toString();
-			
-			Model.setInstContext(cInst, context);
-			}
-		}
-		
+
+	    //Don't create a name change if it is a rename right after a creation
+	    if (changesDb.createChangeNameContains(oldName)&& needsNameChange(oldName)) {
+
+
+	        //Instance cChange = (Instance) ChangesProject.createChangeName.get(oldName);
+	        //ServerChangesUtil.setInstApplyTo(changesKb, cChange, newName);
+	        //updateChangeInstances(cChange, oldName, newName);
+	        changesDb.removeChangeName(oldName);
+
+	    }
+	    else
+	    {		
+	        StringBuffer context = new StringBuffer();
+	        context.append("Name change from '");
+	        context.append(oldName);
+	        context.append("' to '");
+	        context.append(newName);
+	        context.append("'");
+
+
+	        Instance changeInst = ServerChangesUtil.createNameChange(kb,
+	                                                                 changesKb,
+	                                                                 Model.CHANGETYPE_NAME_CHANGED,
+	                                                                 newName, 
+	                                                                 context.toString(), 
+	                                                                 Model.CHANGE_LEVEL_INFO, 
+	                                                                 oldName, 
+	                                                                 newName);
+
+	        ChangesProject.createChange(kb, changesKb, changeInst);
+	    }
 	}
 	
-	
-	
-	
+	private boolean needsNameChange(String name) {
+	    boolean needsNameChange = false;
+
+	    if (name != null) {
+	        int index = name.lastIndexOf('_');
+	        String possibleIntegerString = name.substring(index + 1);
+	        try {
+	            Integer.parseInt(possibleIntegerString);
+	            needsNameChange = true;
+	        } catch (Exception e) {
+	        }
+	    }
+	    return needsNameChange;
+	}
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#instanceCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
