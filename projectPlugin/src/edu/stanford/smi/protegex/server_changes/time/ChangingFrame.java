@@ -18,8 +18,6 @@ public interface ChangingFrame {
     
     public List<String> getNames();
     
-    public String getNameBefore(Instance change);
-    
     public String getNameJustBefore(Date date);
 
 }
