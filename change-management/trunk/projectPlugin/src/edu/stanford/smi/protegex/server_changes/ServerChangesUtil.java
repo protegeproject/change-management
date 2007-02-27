@@ -229,8 +229,8 @@ public class ServerChangesUtil {
 		Slot modified = cKb.getSlot(Model.SLOT_NAME_MODIFIED);
 		Slot body = cKb.getSlot(Model.SLOT_NAME_BODY);
 		
-		annotateInst.setOwnSlotValue(created, ChangesProject.getTimeStamp());
-		annotateInst.setOwnSlotValue(modified, ChangesProject.getTimeStamp());
+		annotateInst.setOwnSlotValue(created, Model.getTimeStamp());
+		annotateInst.setOwnSlotValue(modified, Model.getTimeStamp());
 		annotateInst.setOwnSlotValue(author, ChangesProject.getUserName(kb));
 		
 		// If no comments are added, add empty string as comment
@@ -294,7 +294,7 @@ public class ServerChangesUtil {
 		    changeInst.setOwnSlotValue(applyTo, apply);
 		    changeInst.setOwnSlotValue(author, ChangesProject.getUserName(currentKB));
 		    changeInst.setOwnSlotValue(context, desc);
-		    changeInst.setOwnSlotValue(created, ChangesProject.getTimeStamp());
+		    changeInst.setOwnSlotValue(created, Model.getTimeStamp());
 		    changeInst.setOwnSlotValue(type, typ);
 		}
         Model.logChange("Creating change", log, Level.FINE, changeInst, change);
