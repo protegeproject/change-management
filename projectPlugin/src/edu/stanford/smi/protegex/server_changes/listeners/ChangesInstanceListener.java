@@ -22,6 +22,7 @@ public class ChangesInstanceListener implements InstanceListener{
 	public void directTypeAdded(InstanceEvent event) {
 		
 		String directType = event.getInstance().getDirectType().getBrowserText();
+                String directTypeName = event.getInstance().getDirectType().getName();
 		String instName = event.getInstance().getBrowserText();
 		
 		StringBuffer context = new StringBuffer();
@@ -34,7 +35,7 @@ public class ChangesInstanceListener implements InstanceListener{
 		Instance changeInst = ServerChangesUtil.createChange(kb,
 												changesKb,
 												Model.CHANGETYPE_DIRECTTYPE_ADDED, 
-												directType, 
+												directTypeName, 
 												context.toString(), 
 												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(kb, changesKb, changeInst);
@@ -44,22 +45,24 @@ public class ChangesInstanceListener implements InstanceListener{
 	 * @see edu.stanford.smi.protege.event.InstanceListener#directTypeRemoved(edu.stanford.smi.protege.event.InstanceEvent)
 	 */
 	public void directTypeRemoved(InstanceEvent event) {
-		String directType = event.getInstance().getDirectType().getBrowserText();
-		String instName = event.getInstance().getBrowserText();
+		String directTypeName = event.getInstance().getDirectType().getName();
+		String directTypeText = event.getInstance().getDirectType().getBrowserText();
+		String instName = event.getInstance().getName();
+                String instText = event.getInstance().getBrowserText();
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Direct Type Removed: ");
-		context.append(directType);
+		context.append(directTypeText);
 		context.append(" (removed from: ");
-		context.append(instName);
+		context.append(instText);
 		context.append(")");
 		
 		Instance changeInst = ServerChangesUtil.createChange(kb,
-												changesKb,
-												Model.CHANGETYPE_DIRECTTYPE_REMOVED,
-												directType, 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
+                                                                     changesKb,
+                                                                     Model.CHANGETYPE_DIRECTTYPE_REMOVED,
+                                                                     directTypeName, 
+                                                                     context.toString(), 
+                                                                     Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 }

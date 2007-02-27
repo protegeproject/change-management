@@ -81,11 +81,11 @@ public class ChangesSlotListener implements SlotListener{
 			String context = "Direct Subslot Added: " + eventSlot.getBrowserText();
 			
 			Instance changeInst = ServerChangesUtil.createChange(kb,
-													changesKb,
-													Model.CHANGETYPE_SUBSLOT_ADDED,
-													eventSlot.getBrowserText(), 
-													context, 
-													Model.CHANGE_LEVEL_INFO);
+                                                                             changesKb,
+                                                                             Model.CHANGETYPE_SUBSLOT_ADDED,
+                                                                             eventSlot.getName(), 
+                                                                             context, 
+                                                                             Model.CHANGE_LEVEL_INFO);
 			ChangesProject.createChange(kb, changesKb, changeInst);
 			
 		}
@@ -102,7 +102,7 @@ public class ChangesSlotListener implements SlotListener{
 			Instance changeInst = ServerChangesUtil.createChange(kb,
 													changesKb,
 													Model.CHANGETYPE_SUBSLOT_REMOVED,
-													eventSlot.getBrowserText(), 
+													eventSlot.getName(), 
 													context, 
 													Model.CHANGE_LEVEL_INFO);
 			ChangesProject.createChange(kb, changesKb, changeInst);
@@ -125,11 +125,11 @@ public class ChangesSlotListener implements SlotListener{
 			String context = "Direct Superslot Added: " + eventSlot.getBrowserText();
 			
 			Instance changeInst = ServerChangesUtil.createChange(kb,
-													changesKb,
-													Model.CHANGETYPE_SUPERSLOT_ADDED,
-													eventSlot.getBrowserText(), 
-													context, 
-													Model.CHANGE_LEVEL_INFO);
+                                                                             changesKb,
+                                                                             Model.CHANGETYPE_SUPERSLOT_ADDED,
+                                                                             eventSlot.getName(), 
+                                                                             context, 
+                                                                             Model.CHANGE_LEVEL_INFO);
 			ChangesProject.createChange(kb, changesKb, changeInst);
 			
 		}
@@ -144,11 +144,11 @@ public class ChangesSlotListener implements SlotListener{
 			String context = "Direct Superslot Removed: " + eventSlot.getBrowserText();
 			
 			Instance changeInst = ServerChangesUtil.createChange(kb,
-													changesKb,
-													Model.CHANGETYPE_SUPERSLOT_REMOVED,
-													eventSlot.getBrowserText(), 
-													context, 
-													Model.CHANGE_LEVEL_INFO);
+                                                                             changesKb,
+                                                                             Model.CHANGETYPE_SUPERSLOT_REMOVED,
+                                                                             eventSlot.getName(), 
+                                                                             context, 
+                                                                             Model.CHANGE_LEVEL_INFO);
 			
 			ChangesProject.createChange(kb, changesKb, changeInst);
 		}
