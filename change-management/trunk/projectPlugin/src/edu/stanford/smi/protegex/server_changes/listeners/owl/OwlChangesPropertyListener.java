@@ -34,29 +34,30 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		Instance changeInst = ServerChangesUtil.createChange(om,
 		                                                     changesKb,
 		                                                     Model.CHANGETYPE_SUBPROPERTY_ADDED,
-		                                                     arg0.getBrowserText(), 
+		                                                     arg0.getName(), 
 		                                                     context.toString(), 
 		                                                     Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om, changesKb, changeInst);
 	}
 
 	public void subpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
-        String browserText0 = changesDb.getPossiblyDeletedBrowserText(arg0);
+            String browserText0 = changesDb.getPossiblyDeletedBrowserText(arg0);
+            String name0 = changesDb.getPossiblyDeletedFrameName(arg0);
         
-		StringBuffer context = new StringBuffer();
-		context.append("Subproperty Removed: ");
-		context.append(browserText0);
-		context.append(" (removed from: ");
-		context.append(arg1.getBrowserText());
-		context.append(")");
+            StringBuffer context = new StringBuffer();
+            context.append("Subproperty Removed: ");
+            context.append(browserText0);
+            context.append(" (removed from: ");
+            context.append(arg1.getBrowserText());
+            context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(om,
-		                                                     changesKb,
-		                                                     Model.CHANGETYPE_SUBPROPERTY_REMOVED,
-		                                                     browserText0, 
-		                                                     context.toString(), 
-		                                                     Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(om,changesKb, changeInst);
+            Instance changeInst = ServerChangesUtil.createChange(om,
+                                                                 changesKb,
+                                                                 Model.CHANGETYPE_SUBPROPERTY_REMOVED,
+                                                                 name0, 
+                                                                 context.toString(), 
+                                                                 Model.CHANGE_LEVEL_INFO);
+            ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
 	public void superpropertyAdded(RDFProperty arg0, RDFProperty arg1) {
@@ -67,18 +68,18 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(arg1.getBrowserText());
 		context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(
-                                                                     om,
-												changesKb,
-												Model.CHANGETYPE_SUPERPROPERTY_ADDED,
-												arg0.getBrowserText(), 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
+		Instance changeInst = ServerChangesUtil.createChange(om,
+                                                                     changesKb,
+                                                                     Model.CHANGETYPE_SUPERPROPERTY_ADDED,
+                                                                     arg0.getName(), 
+                                                                     context.toString(), 
+                                                                     Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
 	public void superpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
         String browserText0 = changesDb.getPossiblyDeletedBrowserText(arg0);
+        String name0 = changesDb.getPossiblyDeletedFrameName(arg0);
         String browserText1 = changesDb.getPossiblyDeletedBrowserText(arg1);
 		StringBuffer context = new StringBuffer();
 		context.append("Superproperty Removed: ");
@@ -90,49 +91,53 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		Instance changeInst = ServerChangesUtil.createChange(om,
 		                                                     changesKb,
 		                                                     Model.CHANGETYPE_SUPERPROPERTY_REMOVED,
-		                                                     browserText0, 
+		                                                     name0, 
 		                                                     context.toString(),
 		                                                     Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
 	public void unionDomainClassAdded(RDFProperty arg0, RDFSClass arg1) {
-		String propName = arg0.getBrowserText();
-		String clsName = arg1.getBrowserText();
+		String propText = arg0.getBrowserText();
+		String propName = arg0.getName();
+		String clsName = arg1.getName();
+		String clsText = arg1.getBrowserText();
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Domain Property Added: ");
-		context.append(propName);
+		context.append(propText);
 		context.append("(added to: ");
-		context.append(clsName);
+		context.append(clsText);
 		context.append(")");
 				
 		Instance changeInst = ServerChangesUtil.createChange(om,
-												changesKb,
-												Model.CHANGETYPE_DOMAIN_PROP_ADDED,
-												clsName, 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
+                                                                     changesKb,
+                                                                     Model.CHANGETYPE_DOMAIN_PROP_ADDED,
+                                                                     clsName, 
+                                                                     context.toString(), 
+                                                                     Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
 	public void unionDomainClassRemoved(RDFProperty arg0, RDFSClass arg1) {
-		String propName = changesDb.getPossiblyDeletedBrowserText(arg0);
-		String clsName = changesDb.getPossiblyDeletedBrowserText(arg1);
+		String propName = changesDb.getPossiblyDeletedFrameName(arg0);
+		String propText = changesDb.getPossiblyDeletedBrowserText(arg0);
+		String clsName = changesDb.getPossiblyDeletedFrameName(arg1);
+		String clsText = changesDb.getPossiblyDeletedBrowserText(arg1);
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Domain Property Removed: ");
 		context.append(propName);
 		context.append("(removed from: ");
-		context.append(clsName);
+		context.append(clsText);
 		context.append(")");
 		
 		Instance changeInst = ServerChangesUtil.createChange(om,
-												changesKb,
-												Model.CHANGETYPE_DOMAIN_PROP_REMOVED,
-												clsName, 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
+                                                                     changesKb,
+                                                                     Model.CHANGETYPE_DOMAIN_PROP_REMOVED,
+                                                                     clsName, 
+                                                                     context.toString(), 
+                                                                     Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 

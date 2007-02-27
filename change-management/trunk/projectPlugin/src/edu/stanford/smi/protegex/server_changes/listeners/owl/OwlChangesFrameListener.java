@@ -73,37 +73,34 @@ public class OwlChangesFrameListener implements FrameListener {
         else if (f instanceof Cls) {
            
           	Cls c = (Cls)f;
-         	String cName = c.getBrowserText();
-            Slot s = event.getSlot();
-            ArrayList oldValue = (ArrayList)event.getArgument2();
- 		    String sName = s.getName();
+         	String cText = c.getBrowserText();
+                String cName = c.getName();
+                Slot s = event.getSlot();
+                ArrayList oldValue = (ArrayList)event.getArgument2();
+                String sName = s.getName();
  		
- 		    StringBuffer context = new StringBuffer();
- 		    String newSlotValue = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
- 		    String newSlotValue1 = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
- 		    
- 		    if(s instanceof DefaultOWLDatatypeProperty){
- 		        DefaultOWLDatatypeProperty sProp = (DefaultOWLDatatypeProperty)s;
- 		        boolean isAnnotation = sProp.isAnnotationProperty();
- 		        
+                StringBuffer context = new StringBuffer();
+                String newSlotValue = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
+                String newSlotValue1 = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
+ 		
+                if(s instanceof DefaultOWLDatatypeProperty){
+                    DefaultOWLDatatypeProperty sProp = (DefaultOWLDatatypeProperty)s;
+                    boolean isAnnotation = sProp.isAnnotationProperty();
+                        
  		        if(isAnnotation){
  		        	if(newSlotValue == null || newSlotValue.equals("")){
  		        	  context.append("Annotation Removed: ");
  		        	  context.append(sName);
  		        	  context.append(" from class: ");
- 		        	  context.append(cName);
+ 		        	  context.append(cText);
  		        	  
-// 		     		if (!ChangesTab.getIsInTransaction()) {
-// 		   			ChangesTab.createTransactionChange(om, ChangesTab.TRANS_SIGNAL_TRANS_BEGIN);
-// 		   			ChangesTab.setInRemoveAnnotation(true);
-// 		   		    } 
  		        	  
  		        	  Instance changeInst = ServerChangesUtil.createChange(om,
- 								changesKb,
- 								Model.CHANGETYPE_ANNOTATION_REMOVED, 
- 								cName, 
- 								context.toString(), 
- 								Model.CHANGE_LEVEL_INFO);
+                                                                                       changesKb,
+                                                                                       Model.CHANGETYPE_ANNOTATION_REMOVED, 
+                                                                                       cName, 
+                                                                                       context.toString(), 
+                                                                                       Model.CHANGE_LEVEL_INFO);
 
  		        		ChangesProject.createChange(om,changesKb, changeInst);
  		        	}//Annotation deleted
@@ -177,28 +174,29 @@ public class OwlChangesFrameListener implements FrameListener {
         
         else if (f instanceof Instance){
     		Instance i = (Instance)f;
-         	String iName = i.getBrowserText();
-            Slot ownS = event.getSlot();
-    	    String ownSName = ownS.getName();
+         	String iName = i.getName();
+                String iText = i.getBrowserText();
+                Slot ownS = event.getSlot();
+                String ownSName = ownS.getName();
     		String newSlotValue = CollectionUtilities.toString(i.getOwnSlotValues(event.getSlot()));
-    	    ArrayList oldValue = (ArrayList)event.getArgument2();
-    	    String oldSlotValue = oldValue.toString();
+                ArrayList oldValue = (ArrayList)event.getArgument2();
+                String oldSlotValue = oldValue.toString();
     	    
     	    StringBuffer context = new StringBuffer();
-    	    if(!ownSName.equals("rdf:type")){
-    	    context.append("Slot: ");
-    	    context.append(ownSName);
-    	    context.append(" for Instance: ");
-    	    context.append(iName);
-    	    context.append(" set to: ");
-    	    context.append(newSlotValue);
-            Instance changeInst = ServerChangesUtil.createChange(om,
-    						changesKb,
-    						Model.CHANGETYPE_SLOT_VALUE, 
-    						iName, 
-    						context.toString(), 
-    						Model.CHANGE_LEVEL_INFO);
-        	ChangesProject.createChange(om,changesKb, changeInst);
+    	    if(!ownSName.equals("rdf:type")) {
+                context.append("Slot: ");
+                context.append(ownSName);
+                context.append(" for Instance: ");
+                context.append(iText);
+                context.append(" set to: ");
+                context.append(newSlotValue);
+                Instance changeInst = ServerChangesUtil.createChange(om,
+                                                                     changesKb,
+                                                                     Model.CHANGETYPE_SLOT_VALUE, 
+                                                                     iName, 
+                                                                     context.toString(), 
+                                                                     Model.CHANGE_LEVEL_INFO);
+                ChangesProject.createChange(om,changesKb, changeInst);
          
     	    } 
     	}

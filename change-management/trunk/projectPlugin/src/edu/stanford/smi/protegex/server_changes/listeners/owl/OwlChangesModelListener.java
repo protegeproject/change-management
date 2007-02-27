@@ -25,8 +25,9 @@ public class OwlChangesModelListener extends ModelAdapter{
     }
 
     public void classCreated(RDFSClass arg0) {
-        String clsName = arg0.getBrowserText();
-        String context = "Created Class: " + clsName;
+        String clsName = arg0.getName();
+        String clsText = arg0.getBrowserText();
+        String context = "Created Class: " + clsText;
         Instance changeInst = ServerChangesUtil.createChange(om,
                                                              changesKb,
                                                              Model.CHANGETYPE_CLASS_CREATED,
@@ -50,8 +51,9 @@ public class OwlChangesModelListener extends ModelAdapter{
     }
 
     public void propertyCreated(RDFProperty arg0) {
-        String propName = arg0.getBrowserText();
-        String context = "Property Created: " + propName;
+        String propName = arg0.getName();
+        String propText = arg0.getBrowserText();
+        String context = "Property Created: " + propText;
 
         ChangesDb changesDb = ChangesProject.getChangesDb(om);
 
