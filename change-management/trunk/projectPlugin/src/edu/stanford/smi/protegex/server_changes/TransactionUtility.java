@@ -212,7 +212,7 @@ public class TransactionUtility {
 		cInst.setOwnSlotValue(author, ChangesProject.getUserName(currentKB));
 		cInst.setOwnSlotValue(action, act);
 		cInst.setOwnSlotValue(context, contextVal);
-		cInst.setOwnSlotValue(created, ChangesProject.getTimeStamp());
+		cInst.setOwnSlotValue(created, Model.getTimeStamp());
 		cInst.setOwnSlotValue(applyTo, applyToVal);
 		
 		cInst.setOwnSlotValue(type,Model.CHANGE_LEVEL_TRANS);
