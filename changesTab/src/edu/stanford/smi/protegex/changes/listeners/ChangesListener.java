@@ -19,11 +19,11 @@ public class ChangesListener implements ClsListener{
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.ClsListener#directInstanceAdded(edu.stanford.smi.protege.event.ClsEvent)
 	 */
-	public void directInstanceAdded(ClsEvent event) {
-		Instance addedInst = event.getInstance();
+    public void directInstanceAdded(ClsEvent event) {
+        Instance addedInst = event.getInstance();
         Model.logChange("ChangeTab listener received change", log, Level.FINE, addedInst);
-		ChangesTab.createChange(addedInst);
-	}
+        ChangesTab.createChange(addedInst);
+    }
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.ClsListener#directInstanceRemoved(edu.stanford.smi.protege.event.ClsEvent)
