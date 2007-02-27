@@ -1,9 +1,7 @@
 package edu.stanford.smi.protegex.server_changes;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -207,16 +205,6 @@ public class ChangesProject extends ProjectPluginAdapter {
 		return currentKB.getUserName();
 	}
 
-	public static String getTimeStamp() {
-		Date currTime = new Date();
-
-		String datePattern = "MM/dd/yyyy HH:mm:ss zzz";
-		SimpleDateFormat format = new SimpleDateFormat(datePattern);
-		String time = format.format(currTime);
-
-		return time;
-	}
-	
 	public static boolean getIsInTransaction(KnowledgeBase kb) {
         ChangesDb changesDb = getChangesDb(kb);
 		return changesDb.isInTransaction();
