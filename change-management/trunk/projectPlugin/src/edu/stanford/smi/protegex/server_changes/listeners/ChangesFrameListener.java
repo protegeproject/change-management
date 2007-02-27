@@ -176,7 +176,7 @@ public class ChangesFrameListener implements FrameListener {
                         Instance changeInst = ServerChangesUtil.createChange(kb,
                                                                              changesKb,
                                                                              Model.CHANGETYPE_DOCUMENTATION_REMOVED, 
-                                                                             cName, 
+                                                                             s.getName(), 
                                                                              context.toString(), 
                                                                              Model.CHANGE_LEVEL_INFO);
 
@@ -191,7 +191,7 @@ public class ChangesFrameListener implements FrameListener {
                         Instance changeInst = ServerChangesUtil.createChange(kb,
                                                                              changesKb,
                                                                              Model.CHANGETYPE_DOCUMENTATION_ADDED, 
-                                                                             cName, 
+                                                                             s.getName(), 
                                                                              context.toString(), 
                                                                              Model.CHANGE_LEVEL_INFO);
             		ChangesProject.createChange(kb, changesKb, changeInst);
@@ -217,7 +217,7 @@ public class ChangesFrameListener implements FrameListener {
             Instance changeInst = ServerChangesUtil.createChange(kb,
                                                                  changesKb,
                                                                  Model.CHANGETYPE_SLOT_VALUE, 
-                                                                 iName, 
+                                                                 i.getName(), 
                                                                  context.toString(), 
                                                                  Model.CHANGE_LEVEL_INFO);
             ChangesProject.createChange(kb, changesKb, changeInst);

@@ -29,7 +29,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 */
     public void clsCreated(KnowledgeBaseEvent event) {
         Cls createdCls = event.getCls();
-        String clsName = createdCls.getBrowserText();
+        String clsName = createdCls.getName();
         String context = "Created Class: " + clsName;
 
         // Create artifical transaction for create class
@@ -52,26 +52,26 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsDeleted(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void clsDeleted(KnowledgeBaseEvent event) {
-        if (log.isLoggable(Level.FINE)) {
-            log.fine("In class deleted listener");
-        }
-		String oldName = event.getOldName();
-		String deletedClsName = "";
-		if (event.getArgument2() instanceof Cls) {
-			Cls deletedCls = (Cls) event.getArgument2();
-			deletedClsName = deletedCls.getBrowserText();
-		} else {
-			deletedClsName = oldName;
-		}
+            if (log.isLoggable(Level.FINE)) {
+                log.fine("In class deleted listener");
+            }
+            String oldName = event.getOldName();
+            String deletedClsName = "";
+            if (event.getArgument2() instanceof Cls) {
+                Cls deletedCls = (Cls) event.getArgument2();
+                deletedClsName = deletedCls.getName();
+            } else {
+                deletedClsName = oldName;
+            }
 		
-		String context = "Deleted Class: " + deletedClsName;
-		Instance changeInst = ServerChangesUtil.createChange(kb,
-												changesKb,
-												Model.CHANGETYPE_CLASS_DELETED,
-												deletedClsName, 
-												context, 
-												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(kb, changesKb, changeInst);
+            String context = "Deleted Class: " + deletedClsName;
+            Instance changeInst = ServerChangesUtil.createChange(kb,
+                                                                 changesKb,
+                                                                 Model.CHANGETYPE_CLASS_DELETED,
+                                                                 deletedClsName, 
+                                                                 context, 
+                                                                 Model.CHANGE_LEVEL_INFO);
+            ChangesProject.createChange(kb, changesKb, changeInst);
 	}
 
 	/* (non-Javadoc)
