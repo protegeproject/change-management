@@ -1,12 +1,16 @@
 package edu.stanford.smi.protegex.server_changes;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.util.Log;
 
 public class Model {
 
@@ -90,12 +94,53 @@ public class Model {
     public static final String CLS_NAME_CHANGE = "Change";
     public static final String CLS_NAME_ANNOTATE = "Annotation";
     
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss zzz");
+    
     private KnowledgeBase changesKB;
    
     public Model(KnowledgeBase changesKB) {
         this.changesKB = changesKB;
     }
+    
+    /* --------------------- gete ontology classes  --------------------- */
+    
+    public Cls getClassCreatedClass() {
+        return changesKB.getCls(CHANGETYPE_CLASS_CREATED);
+    }
+    
+    public Cls getClassDeletedClass() {
+        return changesKB.getCls(CHANGETYPE_CLASS_DELETED);
+    }
+    
+    public Cls getSlotCreatedClass() {
+        return changesKB.getCls(CHANGETYPE_SLOT_CREATED);
+    }
+    
+    public Cls getSlotDeletedClass() {
+        return changesKB.getCls(CHANGETYPE_SLOT_DELETED);
+    }
+    
+    public Cls getPropertyCreatedClass() {
+        return changesKB.getCls(CHANGETYPE_PROPERTY_CREATED);
+    }
+    
+    public Cls getPropertyDeletedClass() {
+        return changesKB.getCls(CHANGETYPE_PROPERTY_DELETED);
+    }
+    
+    public Cls getInstanceCreatedClass() {
+        return changesKB.getCls(CHANGETYPE_INSTANCE_ADDED);
+    }
+    
+    public Cls getInstanceDeletedClass() {
+        return changesKB.getCls(CHANGETYPE_INSTANCE_REMOVED);
+    }
+    
+    public Cls getNameChangedClass() {
+        return changesKB.getCls(CHANGETYPE_NAME_CHANGED);
+    }
 
+    /* --------------------- get slot value methods --------------------- */
     public static String getAction(Instance aInst) {
         KnowledgeBase cKb = aInst.getKnowledgeBase();
     	return (String) aInst.getOwnSlotValue(cKb.getSlot(SLOT_NAME_ACTION));
@@ -193,6 +238,21 @@ public class Model {
         Cls cls = aInst.getDirectType();
         logChange(msg, log, level, aInst, cls);
     }
+    
+    public static String getTimeStamp() {
+        Date currTime = new Date();
+        String time = DATE_FORMAT.format(currTime);
+        return time;
+    }
+    
+    public static Date parseDate(String date) {
+        try {
+            return DATE_FORMAT.parse(date);
+        } catch (ParseException e) {
+            Log.getLogger().warning("Could not parse date: " + date + " exception = " + e);
+            return null;
+        }
+    }
         
     public static void logChange(String msg, Logger log, Level level, Instance aInst, Cls cls) {
         if (!log.isLoggable(level)) {
@@ -208,6 +268,8 @@ public class Model {
         log.log(level, "\tDirect type = " + cls);
         log.log(level, "\tFrame ID = " + aInst.getFrameID().getLocalPart());
     }
+
+
     
     
 
