@@ -21,6 +21,8 @@ import edu.stanford.smi.protege.server.Server;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.URIUtilities;
+import edu.stanford.smi.protegex.server_changes.time.ChangingFrameManager;
+import edu.stanford.smi.protegex.server_changes.time.ChangingFrameManagerImpl;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
 public class ChangesDb {
@@ -28,6 +30,7 @@ public class ChangesDb {
     private KnowledgeBase changes;
     private Project changesProject;
     private TransactionUtility transactionUtility;
+    private ChangingFrameManager frameManager;
     
     private Map<RemoteSession, Integer> transCount = new HashMap<RemoteSession, Integer>();
     private Map<RemoteSession, Stack> transStack   = new HashMap<RemoteSession, Stack>();
@@ -43,6 +46,7 @@ public class ChangesDb {
     public ChangesDb(KnowledgeBase kb) {
         getOrCreateChangesProject(kb);
         transactionUtility = new TransactionUtility(kb, changes);
+        frameManager = new ChangingFrameManagerImpl(changes);
     }
     
     private void getOrCreateChangesProject(KnowledgeBase kb) {
@@ -250,5 +254,9 @@ public class ChangesDb {
         else {
             return frame.getBrowserText();
         }
+    }
+    
+    public ChangingFrameManager getFrameManager() {
+        return frameManager;
     }
 }
