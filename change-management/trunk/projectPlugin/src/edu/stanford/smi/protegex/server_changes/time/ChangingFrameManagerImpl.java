@@ -161,6 +161,7 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
      */
     protected static int findPreviousChange(Date d, List<Instance> changes) {
         if (log.isLoggable(Level.FINE)) {
+            log.fine("--------------------------------------Starting findPreviousChange");
             log.fine("Finding change just before " + d);
             if (changes.isEmpty()) {
                 log.fine("no changes");
@@ -184,7 +185,7 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
         change_date = Model.parseDate(Model.getCreated(lastChange));
         compare = d.compareTo(change_date);
         if (compare > 0) {
-            return changes.size();
+            return changes.size() - 1;
         }
         return findPreviousChange(d, changes, 0, changes.size() - 1);
     }
@@ -301,6 +302,11 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
         }
 
         /* ----------------------- Interfaces ----------------------- */
+        
+        public ChangingFrameManager getFrameManager() {
+            return ChangingFrameManagerImpl.this;
+        }
+        
         public List<Instance> getChanges() {
             return frame_changes;
         }
@@ -340,6 +346,17 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
 
         public List<String> getNames() {
             return names;
+        }
+        
+        public String toString() {
+            if (final_name != null) {
+                return final_name;
+            }
+            else if (!name_changes.isEmpty()) {
+                Instance last_delete = name_changes.get(name_changes.size()-1);
+                return Model.getApplyTo(last_delete);
+            }
+            else return initial_name;
         }
     }
 }

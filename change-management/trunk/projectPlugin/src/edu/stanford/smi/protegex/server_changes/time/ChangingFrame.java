@@ -8,6 +8,8 @@ import edu.stanford.smi.protege.model.Instance;
 
 public interface ChangingFrame {
     
+    public ChangingFrameManager getFrameManager();
+    
     public List<Instance> getChanges();
     
     public List<Instance> getCompositeChanges();
@@ -19,5 +21,7 @@ public interface ChangingFrame {
     public List<String> getNames();
     
     public String getNameJustBefore(Date date);
+    
+    public String toString();
 
 }
