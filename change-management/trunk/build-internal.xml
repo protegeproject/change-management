@@ -3,7 +3,8 @@
 
 	<property name = "project.name" value = "change-management"/>
 	<property name = "build.dir" value = "./build"/>
-	<property name = "build.src" value = "${build.dir}/src"/>
+	<property name = "build.src.tab" value = "${build.dir}/changesTab/src"/>
+	<property name = "build.src.pplugin" value = "${build.dir}/projectPlugin/src"/>
 	<property name = "build.dest" value = "${build.dir}/classes"/>
 	<property name = "lib.dir" value = "./lib"/>
 	<property name = "docs.dir" value = "./docs"/>
@@ -24,7 +25,8 @@
 	<!-- PREPARE-SRC -->
 	<!-- =================================================================== -->
 	<target name = "prepare-src" depends = "init">
-		<mkdir dir = "${build.src}"/>
+		<mkdir dir = "${build.src.tab}"/>
+		<mkdir dir = "${build.src.pplugin}"/>
 		<mkdir dir = "${build.dest}"/>
 		<mkdir dir = "${dist.dir}"/>
 
@@ -33,7 +35,10 @@
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk ../${project.name} --non-recursive"/>
 		</exec>
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
-			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/src ../${project.name}/build/src"/>
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/changesTab/src ../${project.name}/${build.src.tab}"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/projectPlugin/src ../${project.name}/${build.src.pplugin}"/>
 		</exec>
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/docs ../${project.name}/docs"/>
@@ -44,7 +49,10 @@
 
 		<!-- add license text to top of source files -->
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
-			<arg line = "/c merge_license_with_source ../${project.name}/build/src"/>
+			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.tab}"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.pplugin}"/>
 		</exec>
 	</target>
 
@@ -53,7 +61,7 @@
 	<!-- Compile the source directory. -->
 	<!-- =================================================================== -->
 	<target name = "compile" depends = "prepare-src">
-		<javac srcdir = "${build.src}" destdir = "${build.dest}" deprecation = "${deprecation}" debug = "${debug}" optimize = "${optimize}" includeAntRuntime = "${includeAntRuntime}">
+		<javac srcdir = "${build.src.tab}:${build.src.pplugin}" destdir = "${build.dest}" deprecation = "${deprecation}" debug = "${debug}" optimize = "${optimize}" includeAntRuntime = "${includeAntRuntime}">
 			<classpath>
 				<pathelement path = "${protege.jar}"/>
 				<pathelement path = "${protege-owl.jar}"/>
@@ -70,7 +78,7 @@
 	<!-- Create the class package. -->
 	<!-- =================================================================== -->
 	<target name = "jar" depends = "compile">
-		<jar jarfile = "${dist.dir}/${project.name}.jar" basedir = "${build.dest}" manifest = "${build.src}/META-INF//MANIFEST.MF"/>
+		<jar jarfile = "${dist.dir}/${project.name}.jar" basedir = "${build.dest}" manifest = "${build.src.tab}/META-INF/MANIFEST.MF"/>
 	</target>
 
 	<!-- =================================================================== -->
