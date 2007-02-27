@@ -26,10 +26,10 @@ import edu.stanford.smi.protegex.changes.AnnotationTableModel;
 import edu.stanford.smi.protegex.changes.ChangeCreateUtil;
 import edu.stanford.smi.protegex.changes.ChangeTableModel;
 import edu.stanford.smi.protegex.changes.ChangesTab;
-import edu.stanford.smi.protegex.changes.InstanceDateComparator;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
 import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.util.InstanceDateComparator;
 
 public class ChangeAnnotateWindow {
 
