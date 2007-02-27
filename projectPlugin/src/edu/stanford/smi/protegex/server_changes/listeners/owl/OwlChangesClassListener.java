@@ -25,10 +25,11 @@ public class OwlChangesClassListener extends ClassAdapter {
     }
 
 	public void instanceAdded(RDFSClass arg0, RDFResource arg1) {
-		String instName = arg1.getBrowserText();
+		String instText = arg1.getBrowserText();
+                String instName = arg1.getName();
 		StringBuffer context = new StringBuffer();
 		context.append("Instance Added: ");
-		context.append(instName);
+		context.append(instText);
 		context.append(" (instance of: " );
 		context.append(arg0.getBrowserText() );
 		context.append(")");
@@ -36,31 +37,32 @@ public class OwlChangesClassListener extends ClassAdapter {
 		// Update frames map
         ChangesDb changesDb = ChangesProject.getChangesDb(om);
 		Instance changeInst = ServerChangesUtil.createChange(om,
-												changesKb,
-												Model.CHANGETYPE_INSTANCE_ADDED,
-												instName, 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
+                                                                     changesKb,
+                                                                     Model.CHANGETYPE_INSTANCE_ADDED,
+                                                                     instName, 
+                                                                     context.toString(), 
+                                                                     Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
 	public void instanceRemoved(RDFSClass arg0, RDFResource arg1) {
-        ChangesDb changesDb = ChangesProject.getChangesDb(om);
-		String instName = changesDb.getPossiblyDeletedFrameName(arg1);
-		StringBuffer context = new StringBuffer();
-		context.append("Instance Removed: ");
-		context.append(instName);
-		context.append(" (instance of: ");
-		context.append(arg0.getBrowserText());
-		context.append(")");
-		
-		Instance changeInst = ServerChangesUtil.createChange(om,
-												changesKb,
-												Model.CHANGETYPE_INSTANCE_REMOVED,
-												instName, 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(om,changesKb, changeInst);
+            ChangesDb changesDb = ChangesProject.getChangesDb(om);
+            String instName = changesDb.getPossiblyDeletedFrameName(arg1);
+            String instText = changesDb.getPossiblyDeletedBrowserText(arg1);
+            StringBuffer context = new StringBuffer();
+            context.append("Instance Removed: ");
+            context.append(instText);
+            context.append(" (instance of: ");
+            context.append(arg0.getBrowserText());
+            context.append(")");
+            
+            Instance changeInst = ServerChangesUtil.createChange(om,
+                                                                 changesKb,
+                                                                 Model.CHANGETYPE_INSTANCE_REMOVED,
+                                                                 instName, 
+                                                                 context.toString(), 
+                                                                 Model.CHANGE_LEVEL_INFO);
+            ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
 	public void addedToUnionDomainOf(RDFSClass arg0, RDFProperty arg1) {
@@ -70,7 +72,8 @@ public class OwlChangesClassListener extends ClassAdapter {
 	}
 
 	public void subclassAdded(RDFSClass arg0, RDFSClass arg1) {
-		String clsName = arg1.getBrowserText();
+		String clsName = arg1.getName();
+                String clsText = arg1.getBrowserText();
 		StringBuffer context = new StringBuffer();
 		context.append("Subclass Added: ");
 		context.append(clsName);
@@ -79,61 +82,58 @@ public class OwlChangesClassListener extends ClassAdapter {
 		context.append(")");
 		
 		// Update frames map
-        ChangesDb changesDb = ChangesProject.getChangesDb(om);
-		
 		Instance changeInst = ServerChangesUtil.createChange(om,
-												changesKb,
-												Model.CHANGETYPE_SUBCLASS_ADDED,
-												clsName, 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
+                                                                     changesKb,
+                                                                     Model.CHANGETYPE_SUBCLASS_ADDED,
+                                                                     clsName, 
+                                                                     context.toString(), 
+                                                                     Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
 	public void subclassRemoved(RDFSClass arg0, RDFSClass arg1) {
-        ChangesDb changesDb = ChangesProject.getChangesDb(om);
-		String clsName = changesDb.getPossiblyDeletedFrameName(arg1);
-		StringBuffer context = new StringBuffer();
-		context.append("Subclass Removed: ");
-		context.append(clsName);
-		context.append(" (removed from: ");
-		context.append(arg0.getBrowserText());
-		context.append(")");
-		
-		Instance changeInst = ServerChangesUtil.createChange(om,
-												changesKb,
-												Model.CHANGETYPE_SUBCLASS_REMOVED,
-												clsName, 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(om,changesKb, changeInst);
+            ChangesDb changesDb = ChangesProject.getChangesDb(om);
+            String clsName = changesDb.getPossiblyDeletedFrameName(arg1);
+            StringBuffer context = new StringBuffer();
+            context.append("Subclass Removed: ");
+            context.append(clsName);
+            context.append(" (removed from: ");
+            context.append(arg0.getBrowserText());
+            context.append(")");
+            
+            Instance changeInst = ServerChangesUtil.createChange(om,
+                                                                 changesKb,
+                                                                 Model.CHANGETYPE_SUBCLASS_REMOVED,
+                                                                 clsName, 
+                                                                 context.toString(), 
+                                                                 Model.CHANGE_LEVEL_INFO);
+            ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
 	public void superclassAdded(RDFSClass arg0, RDFSClass arg1) {
-		String clsName = arg1.getBrowserText();
+		String clsName = arg1.getName();
+                String clsText = arg1.getBrowserText();
 		StringBuffer context = new StringBuffer();
 		context.append("Superclass Added: ");
-		context.append(clsName);
+		context.append(clsText);
 		context.append(" (added to: ");
 		context.append(arg0.getBrowserText());
 		context.append(")");
 		
 		// Update frames map
-        ChangesDb changesDb = ChangesProject.getChangesDb(om);
-		
 		Instance changeInst = ServerChangesUtil.createChange(om,
-												changesKb,
-												Model.CHANGETYPE_SUPERCLASS_ADDED,
-												clsName, 
-												context.toString(),
-												Model.CHANGE_LEVEL_INFO);
+                                                                     changesKb,
+                                                                     Model.CHANGETYPE_SUPERCLASS_ADDED,
+                                                                     clsName, 
+                                                                     context.toString(),
+                                                                     Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 
 	public void superclassRemoved(RDFSClass arg0, RDFSClass arg1) {
 		String a = arg1.getName();
 		String b = arg1.getBrowserText();
-        ChangesDb changesDb = ChangesProject.getChangesDb(om);
+                ChangesDb changesDb = ChangesProject.getChangesDb(om);
 		String clsName = changesDb.getPossiblyDeletedFrameName(arg1);
 		StringBuffer context = new StringBuffer();
 		context.append("Superclass Removed: ");
@@ -143,11 +143,11 @@ public class OwlChangesClassListener extends ClassAdapter {
 		context.append(")");
 		
 		Instance changeInst = ServerChangesUtil.createChange(om,
-												changesKb,
-												Model.CHANGETYPE_SUPERCLASS_REMOVED,
-												clsName, 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
+                                                                     changesKb,
+                                                                     Model.CHANGETYPE_SUPERCLASS_REMOVED,
+                                                                     clsName, 
+                                                                     context.toString(), 
+                                                                     Model.CHANGE_LEVEL_INFO);
 		ChangesProject.createChange(om,changesKb, changeInst);
 	}
 }
