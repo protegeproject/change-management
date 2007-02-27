@@ -46,6 +46,9 @@
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/lib ../${project.name}/lib"/>
 		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/projects ../${project.name}/projects"/>
+		</exec>
 
 		<!-- add license text to top of source files -->
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
