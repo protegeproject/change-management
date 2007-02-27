@@ -75,6 +75,7 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
         currentNameMap   = new HashMap<String, ChangingFrameImpl>();
         synchronized (changekb) {
             List kbchanges = new ArrayList(Model.getChangeInsts(changekb));
+            removeRoots(kbchanges);
             Collections.sort(kbchanges, new InstanceDateComparator(changekb));
             for (Object o : kbchanges) {
                 addChange((Instance) o);
@@ -82,7 +83,18 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
         }
     }
     
+    private void removeRoots(Collection<Instance> changes) {
+        Collection<Instance> roots = new ArrayList<Instance>();
+        for (Instance change : changes) {
+            if (Model.getType(change).equals(Model.CHANGE_LEVEL_ROOT)) {
+                roots.add(change);
+            }
+        }
+        changes.removeAll(roots);
+    }
+    
     public void addChange(Instance change) {
+        if (Model.getType(change).equals(Model.CHANGE_LEVEL_ROOT)) return;
         synchronized (changekb) {
             Model.logChange("Adding change to changing frame manager", log, Level.FINE, change);
 
