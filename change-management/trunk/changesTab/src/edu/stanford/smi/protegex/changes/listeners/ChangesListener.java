@@ -7,22 +7,32 @@ import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.event.ClsEvent;
 import edu.stanford.smi.protege.event.ClsListener;
+import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
+import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.changes.ChangesTab;
-import edu.stanford.smi.protegex.server_changes.Model;
+import edu.stanford.smi.protegex.server_changes.model.Model;
 
 
 public class ChangesListener implements ClsListener{
     private final static Logger log = Log.getLogger(ChangesListener.class);
+    
+    private Cls changes_class;
+    
+    public ChangesListener(KnowledgeBase changes_kb) {
+        changes_class = new Model(changes_kb).getChangeClass();
+    }
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.ClsListener#directInstanceAdded(edu.stanford.smi.protege.event.ClsEvent)
 	 */
     public void directInstanceAdded(ClsEvent event) {
         Instance addedInst = event.getInstance();
-        Model.logChange("ChangeTab listener received change", log, Level.FINE, addedInst);
-        ChangesTab.createChange(addedInst);
+        if (addedInst.hasType(changes_class)) {
+            Model.logChange("ChangeTab listener received change", log, Level.FINE, addedInst);
+            ChangesTab.createChange(addedInst);
+        }
     }
 
 	/* (non-Javadoc)
