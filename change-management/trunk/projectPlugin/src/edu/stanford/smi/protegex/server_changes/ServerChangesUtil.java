@@ -13,6 +13,8 @@ import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.Timestamp;
 
 public class ServerChangesUtil {
     private static final Logger log = Log.getLogger(ServerChangesUtil.class);
@@ -67,7 +69,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(applyTo, apply);
 		changeInst.setOwnSlotValue(author, "");
 		changeInst.setOwnSlotValue(context, desc);
-		changeInst.setOwnSlotValue(created, "");
+        Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
         Model.logChange("Creating change instance for added template slot", log, Level.FINE, changeInst, tempSlotAddCls);
 		cKb.setDirectType(changeInst, tempSlotAddCls);
@@ -93,7 +95,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(applyTo, apply);
 		changeInst.setOwnSlotValue(author, "");
 		changeInst.setOwnSlotValue(context, desc);
-		changeInst.setOwnSlotValue(created, "");
+        Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, "transaction");
         Model.logChange("Creating new change for added restriction", log, Level.FINE, changeInst, restrAddCls);
 		cKb.setDirectType(changeInst, restrAddCls);
@@ -120,7 +122,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(applyTo, apply);
 		changeInst.setOwnSlotValue(author, "");
 		changeInst.setOwnSlotValue(context, desc);
-		changeInst.setOwnSlotValue(created, "");
+        Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, "transaction");
 		Model.logChange("Creating new change for removed restriction", log, Level.FINE, changeInst, restrRemCls);
 		cKb.setDirectType(changeInst, restrRemCls);
@@ -147,7 +149,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(applyTo, apply);
 		changeInst.setOwnSlotValue(author, "");
 		changeInst.setOwnSlotValue(context, desc);
-		changeInst.setOwnSlotValue(created, "");
+        Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
 		Model.logChange("Creating change for removed template slot", log, Level.FINE, changeInst, tempSlotRemCls);
 		cKb.setDirectType(changeInst, tempSlotRemCls);
@@ -173,7 +175,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(applyTo, apply);
 		changeInst.setOwnSlotValue(author, "");
 		changeInst.setOwnSlotValue(context, desc);
-		changeInst.setOwnSlotValue(created, "");
+        Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
 		Model.logChange("Creating new change for deleted class", log, Level.FINE, changeInst, deleteCls);
 		cKb.setDirectType(changeInst, deleteCls);
@@ -199,7 +201,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(applyTo, newName);
 		changeInst.setOwnSlotValue(author, "");
 		changeInst.setOwnSlotValue(context, desc);
-		changeInst.setOwnSlotValue(created, "");
+        Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
 		Model.logChange("Creating new change for renamed class", log, Level.FINE, changeInst, nameChangeCls);
 		cKb.setDirectType(changeInst, nameChangeCls);
@@ -223,14 +225,15 @@ public class ServerChangesUtil {
 	
 	public static Instance updateAnnotation(KnowledgeBase kb,
                                             KnowledgeBase cKb, Instance annotateInst) {
-		
-		Slot created = cKb.getSlot(Model.SLOT_NAME_CREATED);
+
 		Slot author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
 		Slot modified = cKb.getSlot(Model.SLOT_NAME_MODIFIED);
 		Slot body = cKb.getSlot(Model.SLOT_NAME_BODY);
-		
-		annotateInst.setOwnSlotValue(created, Model.getTimeStamp());
-		annotateInst.setOwnSlotValue(modified, Model.getTimeStamp());
+        
+        Timestamp now = Timestamp.getTimestamp();
+        now.setTimestamp(annotateInst);
+        now.setTimestamp(annotateInst, modified);
+
 		annotateInst.setOwnSlotValue(author, ChangesProject.getUserName(kb));
 		
 		// If no comments are added, add empty string as comment
@@ -241,23 +244,30 @@ public class ServerChangesUtil {
 		Model.logChange("Updated Annotation", log, Level.FINE, annotateInst);
 		return annotateInst;	
 	}
-	
-	public static Instance createTransChange(KnowledgeBase cKb, Collection transChanges, Instance repInst) {
-		Cls transChange = cKb.getCls(Model.CHANGETYPE_TRANS_CHANGE);
+    
+    public static Instance createTransChange(KnowledgeBase cKb, Collection transChanges, Instance repInst) {
+        Slot context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
+        return createTransChange(cKb, transChanges, repInst, (String) repInst.getOwnSlotValue(context));
+    }
+    
+    public static Instance createTransChange(KnowledgeBase cKb, 
+                                             Collection transChanges, 
+                                             Instance repInst,
+                                             String altContext) {
+    	Cls transChange = cKb.getCls(Model.CHANGETYPE_TRANS_CHANGE);
 		Instance tInst = cKb.createInstance(null, new ArrayList());
 		
 		Slot applyTo = cKb.getSlot(Model.SLOT_NAME_APPLYTO);
 		Slot author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
 		Slot action = cKb.getSlot(Model.SLOT_NAME_ACTION);
-		Slot context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
-		Slot created = cKb.getSlot(Model.SLOT_NAME_CREATED);
+        Slot context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
 		Slot type = cKb.getSlot(Model.SLOT_NAME_TYPE);
 		Slot changes = cKb.getSlot(Model.SLOT_NAME_CHANGES);
 		
 		tInst.setOwnSlotValue(author, repInst.getOwnSlotValue(author));
 		tInst.setOwnSlotValue(action, repInst.getOwnSlotValue(action));
-		tInst.setOwnSlotValue(context, repInst.getOwnSlotValue(context));
-		tInst.setOwnSlotValue(created, repInst.getOwnSlotValue(created));
+		tInst.setOwnSlotValue(context, altContext);
+        Timestamp.getTimestamp().setTimestamp(tInst);
 		tInst.setOwnSlotValue(applyTo, repInst.getOwnSlotValue(applyTo));
 		tInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_DISP_TRANS);
 		tInst.setOwnSlotValues(changes, transChanges);
@@ -286,7 +296,6 @@ public class ServerChangesUtil {
 			changeInst.setOwnSlotValue(applyTo, apply);
 			changeInst.setOwnSlotValue(author, "Person who made the change");
 			changeInst.setOwnSlotValue(context, "Details of the action");
-			changeInst.setOwnSlotValue(created, "Date and time the change was made");
 			changeInst.setOwnSlotValue(type, typ);	
 		}
 		else{
@@ -294,7 +303,7 @@ public class ServerChangesUtil {
 		    changeInst.setOwnSlotValue(applyTo, apply);
 		    changeInst.setOwnSlotValue(author, ChangesProject.getUserName(currentKB));
 		    changeInst.setOwnSlotValue(context, desc);
-		    changeInst.setOwnSlotValue(created, Model.getTimeStamp());
+            Timestamp.getTimestamp().setTimestamp(changeInst);
 		    changeInst.setOwnSlotValue(type, typ);
 		}
         Model.logChange("Creating change", log, Level.FINE, changeInst, change);
@@ -318,30 +327,15 @@ public class ServerChangesUtil {
 		Model.logChange("Modified name change change", log, Level.FINE, changeInst);
 		return changeInst;
 	}
-
-    public static void updateChangeDbAfterNameChange(KnowledgeBase changesKb, String oldName, String newName){
-        Collection changeList = Model.getChangeInsts(changesKb);
-        String context = null;
-        int len = oldName.length();
-        for (Iterator iter = changeList.iterator(); iter.hasNext();) {
-            Instance cInst = (Instance) iter.next();
-            String applyTo = Model.getApplyTo(cInst);
-            if (applyTo.equals(oldName)){
-                Model.setInstApplyTo(cInst, newName);
-            }
-            /* I dont believe in this...
     
-            String cCtxt = Model.getContext(cInst);
-            int idx = cCtxt.indexOf(oldName);
-            if(idx!=-1){
-                StringBuffer txt = new StringBuffer(cCtxt);	
-                txt.replace(idx,idx+len,newName);
-                context = txt.toString();
-    
-                Model.setInstContext(cInst, context);
+    public static Collection<Instance> removeRoots(Collection<Instance> changes) {
+        Collection<Instance> roots = new ArrayList<Instance>();
+        for (Instance change : changes) {
+            if (Model.getType(change).equals(Model.CHANGE_LEVEL_ROOT)) {
+                roots.add(change);
             }
-            */
         }
-    
+        changes.removeAll(roots);
+        return changes;
     }
-}
+ }
