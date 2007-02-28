@@ -58,9 +58,9 @@ import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
 import edu.stanford.smi.protegex.changes.ui.JTreeTable;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.GetAnnotationProjectName;
-import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.util.InstanceDateComparator;
+import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.InstanceDateComparator;
  
 /**
  * Change Management Tab widget
@@ -172,7 +172,7 @@ public class ChangesTab extends AbstractTabWidget {
 	    initTables();
 	    loadExistingData();
 
-	    cKb.addClsListener(new ChangesListener());		
+	    cKb.addClsListener(new ChangesListener(cKb));		
 
 
 	    // Initialize the tab text
