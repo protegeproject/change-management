@@ -21,6 +21,8 @@ import edu.stanford.smi.protege.server.Server;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.URIUtilities;
+import edu.stanford.smi.protegex.server_changes.model.Model;    
+import edu.stanford.smi.protegex.server_changes.model.Timestamp;
 import edu.stanford.smi.protegex.server_changes.time.ChangingFrameManager;
 import edu.stanford.smi.protegex.server_changes.time.ChangingFrameManagerImpl;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
@@ -29,6 +31,7 @@ public class ChangesDb {
 
     private KnowledgeBase changes;
     private Project changesProject;
+    Model model;
     private TransactionUtility transactionUtility;
     private ChangingFrameManager frameManager;
     
@@ -39,14 +42,15 @@ public class ChangesDb {
     private Set<RemoteSession> inCreateClass = new HashSet<RemoteSession>();
     private Set<RemoteSession> inCreateSlot  = new HashSet<RemoteSession>();
     
-    private Map<String, Instance> createChangeName = new HashMap<String, Instance>();
+    private Map<String, Instance> lastCreateByName = new HashMap<String, Instance>();
     
     private HashMap<FrameID, String> frameIdMap = new HashMap<FrameID, String>();
     
     public ChangesDb(KnowledgeBase kb) {
         getOrCreateChangesProject(kb);
+        model = new Model(changes);
         transactionUtility = new TransactionUtility(kb, changes);
-        frameManager = new ChangingFrameManagerImpl(changes);
+        Timestamp.initialize(changes);
     }
     
     private void getOrCreateChangesProject(KnowledgeBase kb) {
@@ -131,6 +135,10 @@ public class ChangesDb {
     
     public Project getChangesProject() {
         return changesProject;
+    }
+    
+    public Model getModel() {
+        return model;
     }
     
     public TransactionUtility getTransactionUtility() {
@@ -222,16 +230,16 @@ public class ChangesDb {
         }
     }
     
-    public boolean createChangeNameContains(String name) {
-        return createChangeName.containsKey(name);
+    public Instance getRecentCreate(String name) {
+        return lastCreateByName.get(name);
     }
     
-    public void removeChangeName(String name) {
-        createChangeName.remove(name);
+    public void removeRecentCreate(String name) {
+        lastCreateByName.remove(name);
     }
     
-    public void addChangeName(String name, Instance change) {
-        createChangeName.put(name, change);
+    public void addRecentCreate(String name, Instance change) {
+        lastCreateByName.put(name, change);
     }
     
     public void updateMap(FrameID frameId, String name) {
@@ -257,6 +265,9 @@ public class ChangesDb {
     }
     
     public ChangingFrameManager getFrameManager() {
+        if (frameManager == null) {
+            frameManager = new ChangingFrameManagerImpl(changes);
+        }
         return frameManager;
     }
 }
