@@ -7,7 +7,8 @@ import javax.swing.table.AbstractTableModel;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Cls;
-import edu.stanford.smi.protegex.server_changes.Model;
+import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.Timestamp;
 
 /**
  * The tabel model for the annotation specific table
@@ -109,7 +110,7 @@ public class AnnotationTableModel extends AbstractTableModel{
 		case 2:
 			return Model.getAuthor(aInst);
 		case 3: 
-			return Model.getCreated(aInst);
+			return Timestamp.getTimestamp(aInst).getDateString();
 		case 0:
 			return annotType.getName(); 
 		/*case 3:
