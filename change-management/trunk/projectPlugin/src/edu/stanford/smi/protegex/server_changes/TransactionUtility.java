@@ -13,6 +13,8 @@ import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.Timestamp;
 
 
 public class TransactionUtility {
@@ -53,22 +55,7 @@ public class TransactionUtility {
 		Collections.reverse(aTrans);
 		trans.push(aTrans);
 		return trans;
-	}
-	
-	// Display transation
-	public void displayTransactions(Stack trans) {
-		
-		for (Iterator iter = trans.iterator(); iter.hasNext();) {
-			Object element = (Object) iter.next();
-			
-			if (element instanceof Instance) {
-				Instance aElem = (Instance) element;
-				
-			} else if (element instanceof Stack) {
-				displayTransactions((Stack) element);
-			}
-		}
-	}
+    }
 	
 	public Instance findAggAction(Stack transStack, boolean isOwl) {
 		
@@ -212,7 +199,7 @@ public class TransactionUtility {
 		cInst.setOwnSlotValue(author, ChangesProject.getUserName(currentKB));
 		cInst.setOwnSlotValue(action, act);
 		cInst.setOwnSlotValue(context, contextVal);
-		cInst.setOwnSlotValue(created, Model.getTimeStamp());
+        Timestamp.getTimestamp().setTimestamp(cInst);
 		cInst.setOwnSlotValue(applyTo, applyToVal);
 		
 		cInst.setOwnSlotValue(type,Model.CHANGE_LEVEL_TRANS);
