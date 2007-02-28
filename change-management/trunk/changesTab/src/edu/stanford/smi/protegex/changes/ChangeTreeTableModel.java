@@ -12,7 +12,7 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protegex.changes.ui.AbstractTreeTableModel;
 import edu.stanford.smi.protegex.changes.ui.TreeTableModel;
-import edu.stanford.smi.protegex.server_changes.Model;
+import edu.stanford.smi.protegex.server_changes.model.Model;
 
 public class ChangeTreeTableModel extends AbstractTreeTableModel implements TreeTableModel{
 
