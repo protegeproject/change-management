@@ -5,8 +5,9 @@ import java.util.List;
 
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesKBListener;
+import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.Timestamp;
 
 
 public class TreeTableNode {
@@ -38,7 +39,7 @@ public class TreeTableNode {
 			
 			break;
 		case 3: 
-			ctxt = Model.getCreated(changeInst);
+			ctxt = Timestamp.getTimestamp(changeInst).getDateString();
 	         
 			break;
 		case 0: 

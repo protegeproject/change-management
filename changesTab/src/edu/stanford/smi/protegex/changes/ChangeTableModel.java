@@ -11,8 +11,9 @@ import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
-import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.Timestamp;
 
 public class ChangeTableModel extends AbstractTableModel {
 
@@ -120,7 +121,7 @@ public class ChangeTableModel extends AbstractTableModel {
 			ctxt = Model.getAuthor(aInst);
 		    break;
 		case 3: 
-			ctxt = Model.getCreated(aInst);
+			ctxt = Timestamp.getTimestamp(aInst).getDateString();
 			break;
 		case 0: 
 			ctxt = ChangeCreateUtil.getActionDisplay(changeKB, aInst);
