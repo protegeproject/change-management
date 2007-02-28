@@ -3,14 +3,17 @@ package edu.stanford.smi.protegex.server_changes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import edu.stanford.smi.protege.Application;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
+import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.model.WidgetDescriptor;
 import edu.stanford.smi.protege.plugin.ProjectPluginAdapter;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
@@ -24,6 +27,7 @@ import edu.stanford.smi.protegex.server_changes.listeners.ChangesInstanceListene
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesKBListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesSlotListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesTransListener;
+import edu.stanford.smi.protegex.server_changes.model.Model;
 import edu.stanford.smi.protegex.server_changes.util.Util;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
@@ -143,32 +147,56 @@ public class ChangesProject extends ProjectPluginAdapter {
     
 
 
-	public static void createChange(KnowledgeBase currentKB, 
-                                    KnowledgeBase changesKb, 
-                                    Instance aChange){
+	public static void postProcessChange(KnowledgeBase currentKB, 
+	                                     KnowledgeBase changesKb, 
+	                                     Instance aChange){
         ChangesDb changesDb = getChangesDb(currentKB);
 		if (changesDb.isInTransaction()) {
 			changesDb.pushTransStack(aChange);
 		}
-		
-		checkForCreateChange(changesDb, changesKb, aChange);	
-		
+        checkForCreateChange(currentKB, changesKb, changesDb, aChange);
 	}
 	
 	
 	// takes care of case when class is created & then renamed - Adding original name of class and change instance to HashMap
-	private static void checkForCreateChange(ChangesDb changesDb, KnowledgeBase changesKb, Instance aChange) {
-		String changeAction = Model.getAction(aChange);
-		if  ( (changeAction != null) && (changeAction.equals(Model.CHANGETYPE_CLASS_CREATED)
-				|| changeAction.equals(Model.CHANGETYPE_SLOT_CREATED)
-				|| changeAction.equals(Model.CHANGETYPE_PROPERTY_CREATED)
-				))
-				{
-			
-			changesDb.addChangeName(Model.getApplyTo(aChange), aChange);
+	private static void checkForCreateChange(KnowledgeBase currentKB, 
+                                             KnowledgeBase changesKb, 
+                                             ChangesDb changesDb, 
+                                             Instance aChange) {
+        Model model = changesDb.getModel();
+        Collection direct_types = aChange.getDirectTypes();
+		if  (direct_types.contains(model.getClassCreatedClass()) ||
+                direct_types.contains(model.getSlotCreatedClass()) ||
+		        direct_types.contains(model.getPropertyCreatedClass())) {
+			changesDb.addRecentCreate(Model.getApplyTo(aChange), aChange);
 		}
-	}
-
+        if (direct_types.contains(model.getNameChangedClass())) {
+            String oldName = Model.getNameChangedOldName(aChange);
+            String newName = Model.getNameChangedNewName(aChange);
+            possiblyCombineWithCreate(currentKB, changesKb, changesDb, 
+                                      aChange, oldName, newName);
+        }
+    }
+    
+    private static void possiblyCombineWithCreate(KnowledgeBase kb, KnowledgeBase changesKb, ChangesDb changesDb,
+                                                  Instance changeInst, String oldName, String newName) {
+        Model model = changesDb.getModel();
+        Instance createOp = changesDb.getRecentCreate(oldName);
+        if (createOp != null) {
+            Instance createTrans = (Instance) createOp.getOwnSlotValue(model.getPartOfTransactionSlot());
+            if (createTrans != null) {
+                createOp = createTrans;
+            }
+            changesDb.removeRecentCreate(oldName);
+            Set<Instance> changes = new HashSet<Instance>();
+            changes.add(changeInst);
+            changes.add(createOp);
+            Instance transaction = ServerChangesUtil.createTransChange(changesKb, changes, createOp, 
+                                                                      "Created " + newName);
+            ChangesProject.postProcessChange(kb, changesKb,  transaction);
+        }
+    }
+        
 	public static void createTransactionChange(KnowledgeBase currentKB, String typ) {
         ChangesDb changesDb = changesDbMap.get(currentKB);
         TransactionUtility tu = changesDb.getTransactionUtility();
