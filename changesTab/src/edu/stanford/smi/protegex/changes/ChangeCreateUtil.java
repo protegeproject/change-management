@@ -6,7 +6,7 @@ import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
-import edu.stanford.smi.protegex.server_changes.Model;
+import edu.stanford.smi.protegex.server_changes.model.Model;
 
 public class ChangeCreateUtil {
 
