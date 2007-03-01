@@ -158,20 +158,20 @@ public class Model {
         return property_deleted_class    ;
     }
 
-    private Cls instance_created_class;
-    public Cls getInstanceCreatedClass() {
-        if (instance_created_class == null) {
-            instance_created_class = changesKB.getCls(CHANGETYPE_INSTANCE_ADDED);
+    private Cls instance_added_class;
+    public Cls getInstanceAddedClass() {
+        if (instance_added_class == null) {
+            instance_added_class = changesKB.getCls(CHANGETYPE_INSTANCE_ADDED);
         }
-        return instance_created_class;
+        return instance_added_class;
     }
 
-    private Cls instance_deleted_class;
-    public Cls getInstanceDeletedClass() {
-        if (instance_deleted_class == null) {
-            instance_deleted_class = changesKB.getCls(CHANGETYPE_INSTANCE_REMOVED);
+    private Cls instance_removed_class;
+    public Cls getInstanceRemovedClass() {
+        if (instance_removed_class == null) {
+            instance_removed_class = changesKB.getCls(CHANGETYPE_INSTANCE_REMOVED);
         }
-        return instance_deleted_class;
+        return instance_removed_class;
     }
     
     private Cls name_changed_class;
