@@ -334,11 +334,10 @@
 </rdf:Property>
 <rdf:Property rdf:about="&kb;created"
 	 a:maxCardinality="1"
-	 a:range="integer"
 	 rdfs:label="created">
 	<rdfs:domain rdf:resource="&kb;Annotation"/>
 	<rdfs:domain rdf:resource="&kb;Change"/>
-	<rdfs:range rdf:resource="&rdfs;Literal"/>
+	<rdfs:range rdf:resource="&kb;Timestamp"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;date"
 	 a:maxCardinality="1"
