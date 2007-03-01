@@ -7,8 +7,8 @@ import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.model.Model;
 
 
 public class ChangesSlotListener implements SlotListener{
@@ -39,7 +39,7 @@ public class ChangesSlotListener implements SlotListener{
 													context.toString(), 
 													Model.CHANGE_LEVEL_INFO);
 		
-			ChangesProject.createChange(kb, changesKb, changeInst);
+			ChangesProject.postProcessChange(kb, changesKb, changeInst);
 			// Create artificial transaction for create slot
 			if (ChangesProject.getInCreateSlot(kb) && ChangesProject.getIsInTransaction(kb)) {
 				ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_END);
@@ -67,7 +67,7 @@ public class ChangesSlotListener implements SlotListener{
 													theCls.getName(), 
 													context.toString(),
 													Model.CHANGE_LEVEL_INFO);
-			ChangesProject.createChange(kb, changesKb, changeInst);
+			ChangesProject.postProcessChange(kb, changesKb, changeInst);
 	
 		}
 	}
@@ -86,7 +86,7 @@ public class ChangesSlotListener implements SlotListener{
                                                                              eventSlot.getName(), 
                                                                              context, 
                                                                              Model.CHANGE_LEVEL_INFO);
-			ChangesProject.createChange(kb, changesKb, changeInst);
+			ChangesProject.postProcessChange(kb, changesKb, changeInst);
 			
 		}
 	}
@@ -105,7 +105,7 @@ public class ChangesSlotListener implements SlotListener{
 													eventSlot.getName(), 
 													context, 
 													Model.CHANGE_LEVEL_INFO);
-			ChangesProject.createChange(kb, changesKb, changeInst);
+			ChangesProject.postProcessChange(kb, changesKb, changeInst);
 		
 		}
 	}
@@ -130,7 +130,7 @@ public class ChangesSlotListener implements SlotListener{
                                                                              eventSlot.getName(), 
                                                                              context, 
                                                                              Model.CHANGE_LEVEL_INFO);
-			ChangesProject.createChange(kb, changesKb, changeInst);
+			ChangesProject.postProcessChange(kb, changesKb, changeInst);
 			
 		}
 	}
@@ -150,7 +150,7 @@ public class ChangesSlotListener implements SlotListener{
                                                                              context, 
                                                                              Model.CHANGE_LEVEL_INFO);
 			
-			ChangesProject.createChange(kb, changesKb, changeInst);
+			ChangesProject.postProcessChange(kb, changesKb, changeInst);
 		}
 	}
 }
