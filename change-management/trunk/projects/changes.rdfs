@@ -265,6 +265,10 @@
 	 rdfs:label="TemplateSlot_Removed">
 	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
 </rdfs:Class>
+<rdfs:Class rdf:about="&kb;Timestamp"
+	 rdfs:label="Timestamp">
+	<rdfs:subClassOf rdf:resource="&rdfs;Resource"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;TransChange"
 	 rdfs:label="TransChange">
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
@@ -317,11 +321,6 @@
 	<rdfs:domain rdf:resource="&kb;Annotation"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
-<rdf:Property rdf:about="&kb;changes_Slot_9"
-	 a:maxCardinality="1"
-	 rdfs:label="changes_Slot_9">
-	<rdfs:range rdf:resource="&rdfs;Literal"/>
-</rdf:Property>
 <rdf:Property rdf:about="&kb;comment"
 	 rdfs:label="comment">
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
@@ -335,9 +334,16 @@
 </rdf:Property>
 <rdf:Property rdf:about="&kb;created"
 	 a:maxCardinality="1"
+	 a:range="integer"
 	 rdfs:label="created">
 	<rdfs:domain rdf:resource="&kb;Annotation"/>
 	<rdfs:domain rdf:resource="&kb;Change"/>
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;date"
+	 a:maxCardinality="1"
+	 rdfs:label="date">
+	<rdfs:domain rdf:resource="&kb;Timestamp"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;inverse_of_annotates"
@@ -368,6 +374,7 @@
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;part_of_Transaction"
+	 a:maxCardinality="1"
 	 rdfs:label="part_of_Transaction">
 	<rdfs:domain rdf:resource="&kb;Change"/>
 	<a:inverseProperty rdf:resource="&kb;Changes"/>
@@ -377,6 +384,13 @@
 	 a:maxCardinality="1"
 	 rdfs:label="related">
 	<rdfs:domain rdf:resource="&kb;Annotation"/>
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;sequence"
+	 a:maxCardinality="1"
+	 a:range="integer"
+	 rdfs:label="sequence">
+	<rdfs:domain rdf:resource="&kb;Timestamp"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;subject"
