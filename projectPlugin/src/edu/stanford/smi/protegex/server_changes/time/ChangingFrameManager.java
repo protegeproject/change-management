@@ -1,5 +1,7 @@
 package edu.stanford.smi.protegex.server_changes.time;
 
+import java.util.Collection;
+
 import edu.stanford.smi.protege.model.Instance;
 
 public interface ChangingFrameManager {
@@ -17,4 +19,9 @@ public interface ChangingFrameManager {
     
     public ChangingFrame getApplyTo(Instance annotateableThing);
     
+    public Collection<ChangingFrame> getModifiedFrames();
+    
+    public Collection<String> getUsers();
+    
+    public Collection<ChangingFrame> getFramesTouchedByUser(String user);
 }

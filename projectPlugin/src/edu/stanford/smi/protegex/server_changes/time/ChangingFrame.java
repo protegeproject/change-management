@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.stanford.smi.protege.model.Instance;
+import edu.stanford.smi.protegex.server_changes.model.Timestamp;
 
 public interface ChangingFrame {
     
@@ -20,7 +21,9 @@ public interface ChangingFrame {
     
     public List<String> getNames();
     
-    public String getNameJustBefore(Date date);
+    public String getNameJustBefore(Instance change);
+    
+    public String getNameJustBefore(Timestamp date);
     
     public String toString();
 

@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,8 +18,10 @@ import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.Log;
-import edu.stanford.smi.protegex.server_changes.Model;
-import edu.stanford.smi.protegex.server_changes.util.InstanceDateComparator;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.Timestamp;
+import edu.stanford.smi.protegex.server_changes.model.InstanceDateComparator;
 
 public class ChangingFrameManagerImpl implements ChangingFrameManager {
     private static Logger log = Log.getLogger(ChangingFrameManagerImpl.class);
@@ -36,9 +40,10 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
     
     private Cls nameChangeClass;
     
-    private Map<Instance, ChangingFrameImpl> applyToMap;
-    private Map<String, List<Instance>> changesByNameMap;
-    private Map<String, ChangingFrameImpl> currentNameMap;
+    private Map<String, ChangingFrameImpl> nameToFrameMap;
+    private Map<Instance, ChangingFrameImpl> changeToChangedFrameMap;
+    private Map<String, List<Instance>> applyToToChangeMap;
+    private Map<String, Set<ChangingFrame>> userToChangedFrameMap;
     
     public ChangingFrameManagerImpl(KnowledgeBase changekb) {
         this.changekb = changekb;
@@ -70,12 +75,14 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
     
     @SuppressWarnings("unchecked")
     private void initialize() {
-        applyToMap       = new HashMap<Instance, ChangingFrameImpl>();
-        changesByNameMap = new HashMap<String, List<Instance>>();
-        currentNameMap   = new HashMap<String, ChangingFrameImpl>();
+        nameToFrameMap = new HashMap<String, ChangingFrameImpl>();
+        changeToChangedFrameMap = new HashMap<Instance, ChangingFrameImpl>();
+        applyToToChangeMap = new HashMap<String, List<Instance>>();
+        userToChangedFrameMap = new HashMap<String, Set<ChangingFrame>>();
+        
         synchronized (changekb) {
             List kbchanges = new ArrayList(Model.getChangeInsts(changekb));
-            removeRoots(kbchanges);
+            ServerChangesUtil.removeRoots(kbchanges);
             Collections.sort(kbchanges, new InstanceDateComparator(changekb));
             for (Object o : kbchanges) {
                 addChange((Instance) o);
@@ -83,54 +90,86 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
         }
     }
     
-    private void removeRoots(Collection<Instance> changes) {
-        Collection<Instance> roots = new ArrayList<Instance>();
-        for (Instance change : changes) {
-            if (Model.getType(change).equals(Model.CHANGE_LEVEL_ROOT)) {
-                roots.add(change);
-            }
-        }
-        changes.removeAll(roots);
-    }
-    
     public void addChange(Instance change) {
         if (Model.getType(change).equals(Model.CHANGE_LEVEL_ROOT)) return;
         synchronized (changekb) {
             Model.logChange("Adding change to changing frame manager", log, Level.FINE, change);
-
             Collection direct_types = change.getDirectTypes();
-            String old_frame_name;
-            if (!isNameChange(direct_types)) {
-                old_frame_name = Model.getApplyTo(change);
-            }
-            else {
-                old_frame_name = Model.getNameChangedOldName(change);
-            }
-            ChangingFrameImpl frame = currentNameMap.get(old_frame_name);
-            if (frame == null) {
-                frame = new ChangingFrameImpl(old_frame_name);
-                currentNameMap.put(old_frame_name, frame);
-            }
+            
+            ChangingFrameImpl frame = updateNameToFrameMap(change, direct_types);
 
             frame.addChange(change, direct_types);
-
-            applyToMap.put(change, frame);
-            List<Instance> changesForName = changesByNameMap.get(old_frame_name);
-            if (changesForName == null) {
-                changesForName = new ArrayList<Instance>();
-                changesByNameMap.put(old_frame_name, changesForName);
+            
+            updateChangeToChangedFrameMap(change, frame);
+            updateApplyToToChangeMap(change);
+            updateUserToChangedFrameMap(change, frame);
+        }
+    }
+    
+    private ChangingFrameImpl updateNameToFrameMap(Instance change, 
+                                                   Collection direct_types) {
+        ChangingFrameImpl frame = null;
+        if (isNameChange(direct_types)) {
+            String old_name = Model.getNameChangedOldName(change);
+            String new_name = Model.getNameChangedNewName(change);
+            frame = nameToFrameMap.get(old_name);
+            if (frame == null) {
+                frame = new ChangingFrameImpl(old_name);  // names will be fixed later
+                nameToFrameMap.put(new_name, frame);
             }
-            changesForName.add(change);
-
-            if (isNameChange(direct_types)) {
-                String new_name = Model.getNameChangedNewName(change);
-                currentNameMap.remove(old_frame_name);
-                currentNameMap.put(new_name, frame);
-            }
-            else if (isDeleteChange(direct_types)) {
-                currentNameMap.remove(old_frame_name);
+            else {
+                nameToFrameMap.remove(old_name);
+                nameToFrameMap.put(new_name, frame);
             }
         }
+        else if (isCreateChange(direct_types)) {
+            String name = Model.getApplyTo(change);
+            frame = new ChangingFrameImpl(name);
+            nameToFrameMap.put(name, frame);
+        }
+        else if (isDeleteChange(direct_types)) {
+            String frame_name = Model.getApplyTo(change);
+            frame = nameToFrameMap.get(frame_name);
+            if (frame == null) {
+                frame = new ChangingFrameImpl(frame_name);
+            }
+            else {
+                nameToFrameMap.remove(frame_name);
+            }
+        }
+        else {
+            String name = Model.getApplyTo(change);
+            frame = nameToFrameMap.get(name);
+            if (frame == null) {
+                frame = new ChangingFrameImpl(name);
+                nameToFrameMap.put(name, frame);
+            }
+        }
+        return frame;
+    }
+    
+    private void updateChangeToChangedFrameMap(Instance change, ChangingFrameImpl frame) {
+        changeToChangedFrameMap.put(change, frame);
+    }
+    
+    private void updateApplyToToChangeMap(Instance change) {
+        String change_name = Model.getApplyTo(change);
+        List<Instance> changesForName = applyToToChangeMap.get(change_name);
+        if (changesForName == null) {
+            changesForName = new ArrayList<Instance>();
+            applyToToChangeMap.put(change_name, changesForName);
+        }
+        changesForName.add(change);
+    }
+    
+    private void updateUserToChangedFrameMap(Instance change, ChangingFrameImpl frame) {
+        String user = Model.getAuthor(change);
+        Set<ChangingFrame> frames = userToChangedFrameMap.get(user);
+        if (frames == null) {
+            frames = new HashSet<ChangingFrame>();
+            userToChangedFrameMap.put(user, frames);
+        }
+        frames.add(frame);
     }
     
     protected boolean isCreateChange(Collection direct_types) {
@@ -159,7 +198,7 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
      * @param changes a list of changes that has been sorted by date.
      * @return
      */
-    protected static int findPreviousChange(Date d, List<Instance> changes) {
+    protected static int findPreviousChange(Timestamp d, List<Instance> changes) {
         if (log.isLoggable(Level.FINE)) {
             log.fine("--------------------------------------Starting findPreviousChange");
             log.fine("Finding change just before " + d);
@@ -167,13 +206,13 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
                 log.fine("no changes");
             }
             else {
-                log.fine("First change date = " + Model.getCreated(changes.get(0)));
-                log.fine("Last change date = " + Model.getCreated(changes.get(changes.size()-1)));
+                log.fine("First change date = " + Timestamp.getTimestamp(changes.get(0)));
+                log.fine("Last change date = " + Timestamp.getTimestamp(changes.get(changes.size()-1)));
             }
         }
         if (changes.isEmpty()) return -1;
         Instance firstChange = changes.get(0);
-        Date change_date = Model.parseDate(Model.getCreated(firstChange));
+        Timestamp change_date = Timestamp.getTimestamp(firstChange);
         int compare = d.compareTo(change_date);
         if (compare <= 0) {
             return -1;
@@ -182,7 +221,7 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
             return 0;
         }
         Instance lastChange = changes.get(changes.size() - 1);
-        change_date = Model.parseDate(Model.getCreated(lastChange));
+        change_date = Timestamp.getTimestamp(lastChange);
         compare = d.compareTo(change_date);
         if (compare > 0) {
             return changes.size() - 1;
@@ -194,18 +233,18 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
      * Just like the other findPreviousChange but in this one the date for changes[start]
      * is strictly less than d which is less than or equal to the date for changes[end].
      */
-    private static int findPreviousChange(Date d, List<Instance> changes, int start, int end) {
+    private static int findPreviousChange(Timestamp d, List<Instance> changes, int start, int end) {
         if (log.isLoggable(Level.FINE)) {
             log.fine("\tLooking between index " + start + " and " + end);
-            log.fine("\tStart date = " + Model.getCreated(changes.get(start)));
-            log.fine("\tEnd date = " + Model.getCreated(changes.get(end)));
+            log.fine("\tStart date = " + Timestamp.getTimestamp(changes.get(start)));
+            log.fine("\tEnd date = " + Timestamp.getTimestamp(changes.get(end)));
         }
         if (end == start + 1) {
             return start;
         }
         int middle = (start + end) / 2;
         Instance middle_change = changes.get(middle);
-        Date change_date = Model.parseDate(Model.getCreated(middle_change));
+        Timestamp change_date = Timestamp.getTimestamp(middle_change);
         int compare = d.compareTo(change_date);
         if (compare <= 0) {
             return findPreviousChange(d, changes, start, middle);
@@ -217,50 +256,64 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
     
 
     /* ----------------------- Interfaces ----------------------- */
+    
+    
     public ChangingFrame getChangingFrame(Instance change) {
         synchronized (changekb) {
-            return applyToMap.get(change);
+            return changeToChangedFrameMap.get(change);
         }
     }
 
     public ChangingFrame getChangingFrameByInitialName(String name) {
         synchronized (changekb) {
-            List<Instance> changesForName = changesByNameMap.get(name);
+            List<Instance> changesForName = applyToToChangeMap.get(name);
             if (changesForName ==null || changesForName.isEmpty()) {
-                return currentNameMap.get(name);
+                return nameToFrameMap.get(name);
             }
             Instance change = changesForName.get(0);
             Collection direct_types = change.getDirectTypes();
             if (isCreateChange(direct_types)) {
                 return null;
             }
-            return applyToMap.get(change);
+            return changeToChangedFrameMap.get(change);
         }
     }
 
     public ChangingFrame getChangingFrameByLatestName(String name) {
         synchronized (changekb) {
-            return currentNameMap.get(name);
+            return nameToFrameMap.get(name);
         }
     }
 
     public ChangingFrame getApplyTo(Instance annotateableThing) {
-        Date d = Model.parseDate(Model.getCreated(annotateableThing));
+        Timestamp d = Timestamp.getTimestamp(annotateableThing);
         String applyTo = Model.getApplyTo(annotateableThing);
-        List<Instance> changesForName = changesByNameMap.get(applyTo);
+        List<Instance> changesForName = applyToToChangeMap.get(applyTo);
         if (changesForName == null || changesForName.isEmpty()) {
             ChangingFrameImpl frame = new ChangingFrameImpl(applyTo);
-            currentNameMap.put(applyTo, frame);
+            nameToFrameMap.put(applyTo, frame);
             return frame;
         }
         int index = findPreviousChange(d, changesForName);
         if (index < 0) {
-            return applyToMap.get(changesForName.get(0));
+            return changeToChangedFrameMap.get(changesForName.get(0));
         }
-        else return applyToMap.get(changesForName.get(index));
+        else return changeToChangedFrameMap.get(changesForName.get(index));
     }
     
+    @SuppressWarnings("unchecked")
+    public Collection<ChangingFrame> getModifiedFrames() {
+        return (Collection) changeToChangedFrameMap.values();
+    }
     
+    public Collection<String> getUsers() {
+        return userToChangedFrameMap.keySet();
+    }
+    
+    public Set<ChangingFrame> getFramesTouchedByUser(String user) {
+        return userToChangedFrameMap.get(user);
+    }
+
     /* ------------------------------------------------------------------------------- */
 
     public class ChangingFrameImpl implements ChangingFrame {
@@ -279,13 +332,24 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
         }
         
         protected void addChange(Instance change, Collection direct_types) {
+            updateChanges(change);
+            updateCompositeChanges(change);
+            updateNames(change, direct_types);
+        }
+        
+        private void updateChanges(Instance change) {
             frame_changes.add(change);
+        }
+        
+        private void updateCompositeChanges(Instance change) {
             composite_frame_changes.add(change);
-            
             Collection subChanges = Model.getChanges(change);
             if (subChanges != null && !subChanges.isEmpty()) {
                 composite_frame_changes.removeAll(subChanges);
             }
+        }
+        
+        private void updateNames(Instance change, Collection direct_types) {
             if (isCreateChange(direct_types)) {
                 initial_name = null;
                 name_changes.add(change);
@@ -298,8 +362,9 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
                 final_name = Model.getNameChangedNewName(change);
                 names.add(final_name);
                 name_changes.add(change);
-            }
+            }    
         }
+        
 
         /* ----------------------- Interfaces ----------------------- */
         
@@ -322,8 +387,12 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
         public String getInitialName() {
             return initial_name;
         }
+        
+        public String getNameJustBefore(Instance change) {
+            return getNameJustBefore(Timestamp.getTimestamp(change));
+        }
 
-        public String getNameJustBefore(Date date) {
+        public String getNameJustBefore(Timestamp date) {
             int index = findPreviousChange(date, name_changes);
             if (index < 0) {
                 return initial_name;
@@ -349,14 +418,20 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
         }
         
         public String toString() {
-            if (final_name != null) {
-                return final_name;
+            if (initial_name == null && final_name == null) {
+                Instance last_change = name_changes.get(name_changes.size() -1);
+                String last_name = Model.getApplyTo(last_change);
+                return "Created & Deleted - last known name = " + last_name;
             }
-            else if (!name_changes.isEmpty()) {
-                Instance last_delete = name_changes.get(name_changes.size()-1);
-                return Model.getApplyTo(last_delete);
+            else if (initial_name == null) {
+                return "Created <" + final_name + ">";
             }
-            else return initial_name;
+            else if (final_name == null) {
+                return "Deleted <" + initial_name + ">";
+            }
+            else {
+                return final_name + (initial_name.equals(final_name) ? "" : " (renamed)");
+            }
         }
     }
 }
