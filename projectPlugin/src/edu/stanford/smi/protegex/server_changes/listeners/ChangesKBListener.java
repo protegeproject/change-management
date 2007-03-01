@@ -1,5 +1,7 @@
 package edu.stanford.smi.protegex.server_changes.listeners;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,17 +14,19 @@ import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.model.Model;
 
 public class ChangesKBListener implements KnowledgeBaseListener {
     private final static Logger log = Log.getLogger(ChangesKBListener.class);
     private KnowledgeBase kb;
     private KnowledgeBase changesKb;
+    private ChangesDb changesDb;
     
     public ChangesKBListener(KnowledgeBase kb) {
         this.kb = kb;
         changesKb = ChangesProject.getChangesKB(kb);
+        changesDb = ChangesProject.getChangesDb(kb);
     }
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
@@ -45,7 +49,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
                                                              context, 
                                                              Model.CHANGE_LEVEL_INFO);
 
-        ChangesProject.createChange(kb, changesKb, changeInst);
+        ChangesProject.postProcessChange(kb, changesKb, changeInst);
     }
 
 	/* (non-Javadoc)
@@ -71,7 +75,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
                                                                  deletedClsName, 
                                                                  context, 
                                                                  Model.CHANGE_LEVEL_INFO);
-            ChangesProject.createChange(kb, changesKb, changeInst);
+            ChangesProject.postProcessChange(kb, changesKb, changeInst);
 	}
 
 	/* (non-Javadoc)
@@ -111,57 +115,25 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	    String oldName = event.getOldName();
 	    String newName = event.getFrame().getName();
 	    ChangesDb changesDb = ChangesProject.getChangesDb(kb);
-            
-	    // Update all instances in the change ontology with the oldName to newName
-	    ServerChangesUtil.updateChangeDbAfterNameChange(changesKb, oldName,newName);
+
+	    StringBuffer context = new StringBuffer();
+	    context.append("Name change from '");
+	    context.append(oldName);
+	    context.append("' to '");
+	    context.append(newName);
+	    context.append("'");
 
 
-	    //Don't create a name change if it is a rename right after a creation
-	    if (changesDb.createChangeNameContains(oldName)&& needsNameChange(oldName)) {
+	    Instance changeInst = ServerChangesUtil.createNameChange(kb,
+	                                                             changesKb,
+	                                                             Model.CHANGETYPE_NAME_CHANGED,
+	                                                             newName, 
+	                                                             context.toString(), 
+	                                                             Model.CHANGE_LEVEL_INFO, 
+	                                                             oldName, 
+	                                                             newName);
 
-
-	        //Instance cChange = (Instance) ChangesProject.createChangeName.get(oldName);
-	        //ServerChangesUtil.setInstApplyTo(changesKb, cChange, newName);
-	        //updateChangeInstances(cChange, oldName, newName);
-	        changesDb.removeChangeName(oldName);
-
-	    }
-	    else
-	    {		
-	        StringBuffer context = new StringBuffer();
-	        context.append("Name change from '");
-	        context.append(oldName);
-	        context.append("' to '");
-	        context.append(newName);
-	        context.append("'");
-
-
-	        Instance changeInst = ServerChangesUtil.createNameChange(kb,
-	                                                                 changesKb,
-	                                                                 Model.CHANGETYPE_NAME_CHANGED,
-	                                                                 newName, 
-	                                                                 context.toString(), 
-	                                                                 Model.CHANGE_LEVEL_INFO, 
-	                                                                 oldName, 
-	                                                                 newName);
-
-	        ChangesProject.createChange(kb, changesKb, changeInst);
-	    }
-	}
-	
-	private boolean needsNameChange(String name) {
-	    boolean needsNameChange = false;
-
-	    if (name != null) {
-	        int index = name.lastIndexOf('_');
-	        String possibleIntegerString = name.substring(index + 1);
-	        try {
-	            Integer.parseInt(possibleIntegerString);
-	            needsNameChange = true;
-	        } catch (Exception e) {
-	        }
-	    }
-	    return needsNameChange;
+	    ChangesProject.postProcessChange(kb, changesKb, changeInst);
 	}
 
 	/* (non-Javadoc)
@@ -196,7 +168,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 												slotName, 
 												context, 
 												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(kb, changesKb, changeInst);
+		ChangesProject.postProcessChange(kb, changesKb, changeInst);
 	}
 
 	/* (non-Javadoc)
@@ -219,7 +191,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 												deletedSlotName, 
 												context, 
 												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(kb, changesKb, changeInst);
+		ChangesProject.postProcessChange(kb, changesKb, changeInst);
 	
 	}
 }
