@@ -192,7 +192,7 @@ public class ChangesProject extends ProjectPluginAdapter {
             changes.add(changeInst);
             changes.add(createOp);
             Instance transaction = ServerChangesUtil.createTransChange(changesKb, changes, createOp, 
-                                                                      "Created " + newName);
+                                                                      newName, "Created " + newName);
             ChangesProject.postProcessChange(kb, changesKb,  transaction);
         }
     }
