@@ -246,13 +246,17 @@ public class ServerChangesUtil {
 	}
     
     public static Instance createTransChange(KnowledgeBase cKb, Collection transChanges, Instance repInst) {
+        Slot applyTo = cKb.getSlot(Model.SLOT_NAME_APPLYTO);
         Slot context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
-        return createTransChange(cKb, transChanges, repInst, (String) repInst.getOwnSlotValue(context));
+        return createTransChange(cKb, transChanges, repInst, 
+                                 (String) repInst.getOwnSlotValue(applyTo),
+                                 (String) repInst.getOwnSlotValue(context));
     }
     
     public static Instance createTransChange(KnowledgeBase cKb, 
                                              Collection transChanges, 
                                              Instance repInst,
+                                             String altApplyTo,
                                              String altContext) {
     	Cls transChange = cKb.getCls(Model.CHANGETYPE_TRANS_CHANGE);
 		Instance tInst = cKb.createInstance(null, new ArrayList());
@@ -268,7 +272,7 @@ public class ServerChangesUtil {
 		tInst.setOwnSlotValue(action, repInst.getOwnSlotValue(action));
 		tInst.setOwnSlotValue(context, altContext);
         Timestamp.getTimestamp().setTimestamp(tInst);
-		tInst.setOwnSlotValue(applyTo, repInst.getOwnSlotValue(applyTo));
+		tInst.setOwnSlotValue(applyTo, altApplyTo);
 		tInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_DISP_TRANS);
 		tInst.setOwnSlotValues(changes, transChanges);
         Model.logChange("Creating Transaction Change", log, Level.FINE, tInst, transChange);
