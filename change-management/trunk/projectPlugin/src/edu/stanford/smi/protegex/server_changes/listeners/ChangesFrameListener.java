@@ -11,8 +11,8 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.CollectionUtilities;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.model.Model;
 
 
 public class ChangesFrameListener implements FrameListener {
@@ -84,7 +84,7 @@ public class ChangesFrameListener implements FrameListener {
 	       						context.toString(), 
 	       						Model.CHANGE_LEVEL_INFO);
 
-	           	ChangesProject.createChange(kb, changesKb, changeInst);
+	           	ChangesProject.postProcessChange(kb, changesKb, changeInst);
 		    }
             if(ownSName.equals(":SLOT-NUMERIC-MINIMUM")){
          	   context.append("Minimum value for: ");
@@ -98,7 +98,7 @@ public class ChangesFrameListener implements FrameListener {
        						context.toString(), 
        						Model.CHANGE_LEVEL_INFO);
 
-           	ChangesProject.createChange(kb, changesKb, changeInst);
+           	ChangesProject.postProcessChange(kb, changesKb, changeInst);
 		    	
 		    }
 		    
@@ -117,7 +117,7 @@ public class ChangesFrameListener implements FrameListener {
        						context.toString(), 
        						Model.CHANGE_LEVEL_INFO);
 
-              	ChangesProject.createChange(kb, changesKb, changeInst);
+              	ChangesProject.postProcessChange(kb, changesKb, changeInst);
         			
         		}
         		
@@ -136,7 +136,7 @@ public class ChangesFrameListener implements FrameListener {
        						context.toString(), 
        						Model.CHANGE_LEVEL_INFO);
 
-              	ChangesProject.createChange(kb, changesKb, changeInst);
+              	ChangesProject.postProcessChange(kb, changesKb, changeInst);
             	}
             	else{
             		//maximum values set to -
@@ -150,7 +150,7 @@ public class ChangesFrameListener implements FrameListener {
        						sName, 
        						context.toString(), 
        						Model.CHANGE_LEVEL_INFO);
-              	ChangesProject.createChange(kb, changesKb, changeInst);
+              	ChangesProject.postProcessChange(kb, changesKb, changeInst);
             	}
         		
         	}
@@ -180,7 +180,7 @@ public class ChangesFrameListener implements FrameListener {
                                                                              context.toString(), 
                                                                              Model.CHANGE_LEVEL_INFO);
 
-                        ChangesProject.createChange(kb, changesKb, changeInst);
+                        ChangesProject.postProcessChange(kb, changesKb, changeInst);
                     }
                     else {
                         // ADDED DOCUMENTATION
@@ -194,7 +194,7 @@ public class ChangesFrameListener implements FrameListener {
                                                                              s.getName(), 
                                                                              context.toString(), 
                                                                              Model.CHANGE_LEVEL_INFO);
-            		ChangesProject.createChange(kb, changesKb, changeInst);
+            		ChangesProject.postProcessChange(kb, changesKb, changeInst);
                     }
                 } // Handles documentation slot
         }
@@ -220,7 +220,7 @@ public class ChangesFrameListener implements FrameListener {
                                                                  i.getName(), 
                                                                  context.toString(), 
                                                                  Model.CHANGE_LEVEL_INFO);
-            ChangesProject.createChange(kb, changesKb, changeInst);
+            ChangesProject.postProcessChange(kb, changesKb, changeInst);
 		    
     	}
 

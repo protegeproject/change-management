@@ -5,8 +5,8 @@ import edu.stanford.smi.protege.event.InstanceListener;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.model.Model;
 
 public class ChangesInstanceListener implements InstanceListener{
     private KnowledgeBase kb;
@@ -38,7 +38,7 @@ public class ChangesInstanceListener implements InstanceListener{
 												directTypeName, 
 												context.toString(), 
 												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(kb, changesKb, changeInst);
+		ChangesProject.postProcessChange(kb, changesKb, changeInst);
 	}
 
 	/* (non-Javadoc)
@@ -63,6 +63,6 @@ public class ChangesInstanceListener implements InstanceListener{
                                                                      directTypeName, 
                                                                      context.toString(), 
                                                                      Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(kb, changesKb, changeInst);
+		ChangesProject.postProcessChange(kb, changesKb, changeInst);
 	}
 }
