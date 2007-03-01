@@ -31,12 +31,10 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
     private Cls classCreatedClass;
     private Cls propertyCreatedClass;
     private Cls slotCreatedClass;
-    private Cls instanceCreatedClass;
     
     private Cls classDeletedClass;
     private Cls propertyDeletedClass;
     private Cls slotDeletedClass;
-    private Cls instanceDeletedClass;
     
     private Cls nameChangeClass;
     
@@ -63,12 +61,10 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
         classCreatedClass = model.getClassCreatedClass();
         propertyCreatedClass = model.getPropertyCreatedClass();
         slotCreatedClass = model.getSlotCreatedClass();
-        instanceCreatedClass = model.getInstanceCreatedClass();
         
         classDeletedClass = model.getClassDeletedClass();
         propertyDeletedClass = model.getPropertyDeletedClass();
         slotDeletedClass = model.getSlotDeletedClass();
-        instanceDeletedClass = model.getInstanceDeletedClass();
         
         nameChangeClass = model.getNameChangedClass();
     }
@@ -175,15 +171,13 @@ public class ChangingFrameManagerImpl implements ChangingFrameManager {
     protected boolean isCreateChange(Collection direct_types) {
         return direct_types.contains(classCreatedClass) ||
                direct_types.contains(propertyCreatedClass) ||
-               direct_types.contains(slotCreatedClass) ||
-               direct_types.contains(instanceCreatedClass);
+               direct_types.contains(slotCreatedClass);
     }
     
     protected boolean isDeleteChange(Collection direct_types) {
         return direct_types.contains(classDeletedClass) || 
                direct_types.contains(propertyDeletedClass) || 
-               direct_types.contains(slotDeletedClass) ||
-               direct_types.contains(instanceDeletedClass);
+               direct_types.contains(slotDeletedClass);
     }
     
     protected boolean isNameChange(Collection direct_types) {
