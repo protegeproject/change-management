@@ -10,8 +10,8 @@ import edu.stanford.smi.protegex.owl.model.RDFSClass;
 import edu.stanford.smi.protegex.owl.model.event.ModelAdapter;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.model.Model;
 import edu.stanford.smi.protegex.server_changes.util.Util;
 
 public class OwlChangesModelListener extends ModelAdapter{
@@ -34,7 +34,7 @@ public class OwlChangesModelListener extends ModelAdapter{
                                                              clsName, 
                                                              context, 
                                                              Model.CHANGE_LEVEL_INFO);
-        ChangesProject.createChange(om,changesKb, changeInst);
+        ChangesProject.postProcessChange(om,changesKb, changeInst);
     }
 
 
@@ -55,15 +55,13 @@ public class OwlChangesModelListener extends ModelAdapter{
         String propText = arg0.getBrowserText();
         String context = "Property Created: " + propText;
 
-        ChangesDb changesDb = ChangesProject.getChangesDb(om);
-
         Instance changeInst = ServerChangesUtil.createChange(om,
                                                              changesKb,
                                                              Model.CHANGETYPE_PROPERTY_CREATED,
                                                              propName, 
                                                              context, 
                                                              Model.CHANGE_LEVEL_INFO);
-        ChangesProject.createChange(om,changesKb, changeInst);
+        ChangesProject.postProcessChange(om,changesKb, changeInst);
     }
 
     public void propertyDeleted(RDFProperty arg0) {
@@ -73,8 +71,6 @@ public class OwlChangesModelListener extends ModelAdapter{
     public void resourceNameChanged(RDFResource arg0, String arg1) {
         String oldName = arg1;
         String newName = arg0.getName();
-        
-        ServerChangesUtil.updateChangeDbAfterNameChange(changesKb, oldName, newName);
 
         StringBuffer context = new StringBuffer();
         context.append("Name change from '");
@@ -93,7 +89,7 @@ public class OwlChangesModelListener extends ModelAdapter{
                                                                  Model.CHANGE_LEVEL_INFO, 
                                                                  oldName, 
                                                                  newName);
-        ChangesProject.createChange(om, changesKb, changeInst);
+        ChangesProject.postProcessChange(om, changesKb, changeInst);
 
     }
 }

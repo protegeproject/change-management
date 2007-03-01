@@ -13,8 +13,8 @@ import edu.stanford.smi.protege.util.CollectionUtilities;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.impl.DefaultOWLDatatypeProperty;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.model.Model;
 
 public class OwlChangesFrameListener implements FrameListener {
     private OWLModel om;
@@ -102,7 +102,7 @@ public class OwlChangesFrameListener implements FrameListener {
                                                                                        context.toString(), 
                                                                                        Model.CHANGE_LEVEL_INFO);
 
- 		        		ChangesProject.createChange(om,changesKb, changeInst);
+ 		        		ChangesProject.postProcessChange(om,changesKb, changeInst);
  		        	}//Annotation deleted
  		        	else{
  		        		boolean isAdd = true;
@@ -136,7 +136,7 @@ public class OwlChangesFrameListener implements FrameListener {
  	 								context.toString(), 
  	 								Model.CHANGE_LEVEL_INFO);
 
- 	 		      	ChangesProject.createChange(om,changesKb, changeInst);
+ 	 		      	ChangesProject.postProcessChange(om,changesKb, changeInst);
  	 		            
 // 	 		      	    if (ChangesTab.getIsInTransaction() && ChangesTab.getInRemoveAnnotation()) {
 // 	 					ChangesTab.createTransactionChange(om, ChangesTab.TRANS_SIGNAL_TRANS_END);
@@ -166,7 +166,7 @@ public class OwlChangesFrameListener implements FrameListener {
 
             
             	
-          	ChangesProject.createChange(om,changesKb, changeInst);
+          	ChangesProject.postProcessChange(om,changesKb, changeInst);
 		   
 		    } // Handles disjoints
 		
@@ -196,7 +196,7 @@ public class OwlChangesFrameListener implements FrameListener {
                                                                      iName, 
                                                                      context.toString(), 
                                                                      Model.CHANGE_LEVEL_INFO);
-                ChangesProject.createChange(om,changesKb, changeInst);
+                ChangesProject.postProcessChange(om,changesKb, changeInst);
          
     	    } 
     	}

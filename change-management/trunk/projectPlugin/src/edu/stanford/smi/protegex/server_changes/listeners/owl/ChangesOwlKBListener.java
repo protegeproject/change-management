@@ -14,8 +14,8 @@ import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.model.Model;
 
 
 public class ChangesOwlKBListener implements KnowledgeBaseListener {
@@ -50,7 +50,7 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
                                                              deletedClsName, 
                                                              context, 
                                                              Model.CHANGE_LEVEL_INFO);
-        ChangesProject.createChange(om, changesKb, changeInst);
+        ChangesProject.postProcessChange(om, changesKb, changeInst);
     }
 
 
@@ -132,7 +132,7 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
                                                                  propName, 
                                                                  context, 
                                                                  Model.CHANGE_LEVEL_INFO);
-            ChangesProject.createChange(om,changesKb, changeInst);
+            ChangesProject.postProcessChange(om,changesKb, changeInst);
         }
 	}
     

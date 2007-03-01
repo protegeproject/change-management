@@ -12,8 +12,8 @@ import edu.stanford.smi.protegex.owl.model.RDFSClass;
 import edu.stanford.smi.protegex.owl.model.event.ClassAdapter;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.Model;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
+import edu.stanford.smi.protegex.server_changes.model.Model;
  
 public class OwlChangesClassListener extends ClassAdapter {
     private OWLModel om;
@@ -42,7 +42,7 @@ public class OwlChangesClassListener extends ClassAdapter {
                                                                      instName, 
                                                                      context.toString(), 
                                                                      Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(om,changesKb, changeInst);
+		ChangesProject.postProcessChange(om,changesKb, changeInst);
 	}
 
 	public void instanceRemoved(RDFSClass arg0, RDFResource arg1) {
@@ -62,7 +62,7 @@ public class OwlChangesClassListener extends ClassAdapter {
                                                                  instName, 
                                                                  context.toString(), 
                                                                  Model.CHANGE_LEVEL_INFO);
-            ChangesProject.createChange(om,changesKb, changeInst);
+            ChangesProject.postProcessChange(om,changesKb, changeInst);
 	}
 
 	public void addedToUnionDomainOf(RDFSClass arg0, RDFProperty arg1) {
@@ -88,7 +88,7 @@ public class OwlChangesClassListener extends ClassAdapter {
                                                                      clsName, 
                                                                      context.toString(), 
                                                                      Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(om,changesKb, changeInst);
+		ChangesProject.postProcessChange(om,changesKb, changeInst);
 	}
 
 	public void subclassRemoved(RDFSClass arg0, RDFSClass arg1) {
@@ -107,7 +107,7 @@ public class OwlChangesClassListener extends ClassAdapter {
                                                                  clsName, 
                                                                  context.toString(), 
                                                                  Model.CHANGE_LEVEL_INFO);
-            ChangesProject.createChange(om,changesKb, changeInst);
+            ChangesProject.postProcessChange(om,changesKb, changeInst);
 	}
 
 	public void superclassAdded(RDFSClass arg0, RDFSClass arg1) {
@@ -127,7 +127,7 @@ public class OwlChangesClassListener extends ClassAdapter {
                                                                      clsName, 
                                                                      context.toString(),
                                                                      Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(om,changesKb, changeInst);
+		ChangesProject.postProcessChange(om,changesKb, changeInst);
 	}
 
 	public void superclassRemoved(RDFSClass arg0, RDFSClass arg1) {
@@ -148,6 +148,6 @@ public class OwlChangesClassListener extends ClassAdapter {
                                                                      clsName, 
                                                                      context.toString(), 
                                                                      Model.CHANGE_LEVEL_INFO);
-		ChangesProject.createChange(om,changesKb, changeInst);
+		ChangesProject.postProcessChange(om,changesKb, changeInst);
 	}
 }
