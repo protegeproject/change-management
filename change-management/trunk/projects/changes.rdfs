@@ -332,6 +332,12 @@
 	<rdfs:domain rdf:resource="&kb;Change"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
+<rdf:Property rdf:about="&kb;created"
+	 a:maxCardinality="1"
+	 rdfs:label="created">
+	<rdfs:domain rdf:resource="&kb;Annotation"/>
+	<rdfs:range rdf:resource="&kb;Timestamp"/>
+</rdf:Property>
 <rdf:Property rdf:about="&kb;currentName"
 	 a:maxCardinality="1"
 	 rdfs:label="currentName">
@@ -352,7 +358,7 @@
 	 a:maxCardinality="1"
 	 rdfs:label="modified">
 	<rdfs:domain rdf:resource="&kb;Annotation"/>
-	<rdfs:range rdf:resource="&rdfs;Literal"/>
+	<rdfs:range rdf:resource="&kb;Timestamp"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;name"
 	 a:maxCardinality="1"
@@ -406,7 +412,6 @@
 <rdf:Property rdf:about="&kb;timestamp"
 	 a:maxCardinality="1"
 	 rdfs:label="timestamp">
-	<rdfs:domain rdf:resource="&kb;Annotation"/>
 	<rdfs:domain rdf:resource="&kb;Change"/>
 	<rdfs:range rdf:resource="&kb;Timestamp"/>
 </rdf:Property>
