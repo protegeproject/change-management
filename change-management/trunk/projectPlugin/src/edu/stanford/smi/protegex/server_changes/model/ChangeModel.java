@@ -13,7 +13,8 @@ public class ChangeModel {
     private EnumMap<ChangeCls, Cls> clsMap = new EnumMap<ChangeCls, Cls>(ChangeCls.class);
     private EnumMap<SlotCls, Slot> slotMap = new EnumMap<SlotCls, Slot>(SlotCls.class);
     
-    // not recommended style but it is very convenient for the enum name to be the name.
+    // not recommended style but it is very convenient (pretty?) for the enum name to be the name.
+    // alternatively I could use a constructor...
     public enum ChangeCls {
         Annotation,
         Change,
