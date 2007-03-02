@@ -3337,7 +3337,8 @@
 		[changes_ProjectKB_Instance_103]
 		[changes_ProjectKB_Instance_97]
 		[changes_ProjectKB_Instance_67]
-		[changes_ProjectKB_Instance_55]))
+		[changes_ProjectKB_Instance_55])
+		(java_packages "edu.stanford.smi.protegex.server_changes.model.generated"))
 
 ([QUERIES_TAB] of  Widget
 
