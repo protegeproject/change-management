@@ -49,12 +49,6 @@
 	 rdfs:label="Change">
 	<rdfs:subClassOf rdf:resource="&kb;AnnotatableThing"/>
 </rdfs:Class>
-<rdf:Property rdf:about="&kb;Changes"
-	 rdfs:label="Changes">
-	<rdfs:range rdf:resource="&kb;Change"/>
-	<rdfs:domain rdf:resource="&kb;TransChange"/>
-	<a:inverseProperty rdf:resource="&kb;part_of_Transaction"/>
-</rdf:Property>
 <rdfs:Class rdf:about="&kb;Class_Change"
 	 a:role="abstract"
 	 rdfs:label="Class_Change">
@@ -72,6 +66,10 @@
 	 rdfs:comment="A class of Annotations representing general comments"
 	 rdfs:label="Comment">
 	<rdfs:subClassOf rdf:resource="&kb;Annotation"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;CompositeChange"
+	 rdfs:label="CompositeChange">
+	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;DirectType_Added"
 	 rdfs:label="DirectType_Added">
@@ -269,10 +267,6 @@
 	 rdfs:label="Timestamp">
 	<rdfs:subClassOf rdf:resource="&rdfs;Resource"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;TransChange"
-	 rdfs:label="TransChange">
-	<rdfs:subClassOf rdf:resource="&kb;Change"/>
-</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Vote"
 	 a:role="abstract"
 	 rdfs:label="Vote">
@@ -292,17 +286,17 @@
 	 rdfs:label="annotates">
 	<rdfs:range rdf:resource="&kb;AnnotatableThing"/>
 	<rdfs:domain rdf:resource="&kb;Annotation"/>
-	<a:inverseProperty rdf:resource="&kb;assoc_annotations"/>
+	<a:inverseProperty rdf:resource="&kb;associatedAnnotations"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;applyTo"
 	 a:maxCardinality="1"
 	 rdfs:label="applyTo">
 	<rdfs:domain rdf:resource="&kb;Change"/>
-	<rdfs:domain rdf:resource="&kb;Ontology_Component"/>
-	<rdfs:range rdf:resource="&rdfs;Literal"/>
+	<rdfs:range rdf:resource="&kb;Ontology_Component"/>
+	<a:inverseProperty rdf:resource="&kb;changes"/>
 </rdf:Property>
-<rdf:Property rdf:about="&kb;assoc_annotations"
-	 rdfs:label="assoc_annotations">
+<rdf:Property rdf:about="&kb;associatedAnnotations"
+	 rdfs:label="associatedAnnotations">
 	<rdfs:domain rdf:resource="&kb;AnnotatableThing"/>
 	<rdfs:range rdf:resource="&kb;Annotation"/>
 	<rdfs:domain rdf:resource="&kb;Change"/>
@@ -321,6 +315,12 @@
 	<rdfs:domain rdf:resource="&kb;Annotation"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
+<rdf:Property rdf:about="&kb;changes"
+	 rdfs:label="changes">
+	<rdfs:range rdf:resource="&kb;Change"/>
+	<rdfs:domain rdf:resource="&kb;Ontology_Component"/>
+	<a:inverseProperty rdf:resource="&kb;applyTo"/>
+</rdf:Property>
 <rdf:Property rdf:about="&kb;comment"
 	 rdfs:label="comment">
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
@@ -332,12 +332,11 @@
 	<rdfs:domain rdf:resource="&kb;Change"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
-<rdf:Property rdf:about="&kb;created"
+<rdf:Property rdf:about="&kb;currentName"
 	 a:maxCardinality="1"
-	 rdfs:label="created">
-	<rdfs:domain rdf:resource="&kb;Annotation"/>
-	<rdfs:domain rdf:resource="&kb;Change"/>
-	<rdfs:range rdf:resource="&kb;Timestamp"/>
+	 rdfs:label="currentName">
+	<rdfs:domain rdf:resource="&kb;Ontology_Component"/>
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;date"
 	 a:maxCardinality="1"
@@ -372,12 +371,12 @@
 	<rdfs:domain rdf:resource="&kb;Name_Changed"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
-<rdf:Property rdf:about="&kb;part_of_Transaction"
+<rdf:Property rdf:about="&kb;partOfCompositeChange"
 	 a:maxCardinality="1"
-	 rdfs:label="part_of_Transaction">
+	 rdfs:label="partOfCompositeChange">
 	<rdfs:domain rdf:resource="&kb;Change"/>
-	<a:inverseProperty rdf:resource="&kb;Changes"/>
-	<rdfs:range rdf:resource="&kb;TransChange"/>
+	<rdfs:range rdf:resource="&kb;CompositeChange"/>
+	<a:inverseProperty rdf:resource="&kb;subChanges"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;related"
 	 a:maxCardinality="1"
@@ -392,11 +391,24 @@
 	<rdfs:domain rdf:resource="&kb;Timestamp"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
+<rdf:Property rdf:about="&kb;subChanges"
+	 rdfs:label="subChanges">
+	<rdfs:range rdf:resource="&kb;Change"/>
+	<rdfs:domain rdf:resource="&kb;CompositeChange"/>
+	<a:inverseProperty rdf:resource="&kb;partOfCompositeChange"/>
+</rdf:Property>
 <rdf:Property rdf:about="&kb;subject"
 	 a:maxCardinality="1"
 	 rdfs:label="subject">
 	<rdfs:domain rdf:resource="&kb;Proposal"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;timestamp"
+	 a:maxCardinality="1"
+	 rdfs:label="timestamp">
+	<rdfs:domain rdf:resource="&kb;Annotation"/>
+	<rdfs:domain rdf:resource="&kb;Change"/>
+	<rdfs:range rdf:resource="&kb;Timestamp"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;title"
 	 a:maxCardinality="1"
@@ -439,12 +451,5 @@
 	<a:allowedValues>****</a:allowedValues>
 	<a:allowedValues>*****</a:allowedValues>
 	<a:allowedValues>No_Vote</a:allowedValues>
-</a:OverridingProperty>
-<a:OverridingProperty rdf:about="&a;Ontology_Component_applyTo"
-	 a:maxCardinality="1">
-	<rdfs:comment>This should not really be applyTo, but "name", but tihs is done just for testing purpose of the implementation. Later it should be changed to "name"</rdfs:comment>
-	<a:domain rdf:resource="&kb;Ontology_Component"/>
-	<a:overriddenProperty rdf:resource="&kb;applyTo"/>
-	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </a:OverridingProperty>
 </rdf:RDF>
