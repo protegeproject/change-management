@@ -13,6 +13,7 @@ import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.Model;
 import edu.stanford.smi.protegex.server_changes.model.Timestamp;
 
@@ -45,7 +46,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
 		changeInst.setOwnSlotValue(created, "");
 		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
-		Model.logChange("Creating new change instance for new class", log, Level.FINE, changeInst, createCls);
+		ChangeModel.logAnnotatableThing("Creating new change instance for new class", log, Level.FINE, changeInst, createCls);
 		cKb.setDirectType(changeInst, createCls);
 		
 		return changeInst;
@@ -71,7 +72,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
         Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
-        Model.logChange("Creating change instance for added template slot", log, Level.FINE, changeInst, tempSlotAddCls);
+        ChangeModel.logAnnotatableThing("Creating change instance for added template slot", log, Level.FINE, changeInst, tempSlotAddCls);
 		cKb.setDirectType(changeInst, tempSlotAddCls);
 		return changeInst;
 		
@@ -97,7 +98,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
         Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, "transaction");
-        Model.logChange("Creating new change for added restriction", log, Level.FINE, changeInst, restrAddCls);
+        ChangeModel.logAnnotatableThing("Creating new change for added restriction", log, Level.FINE, changeInst, restrAddCls);
 		cKb.setDirectType(changeInst, restrAddCls);
 		return changeInst;
 		
@@ -124,7 +125,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
         Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, "transaction");
-		Model.logChange("Creating new change for removed restriction", log, Level.FINE, changeInst, restrRemCls);
+		ChangeModel.logAnnotatableThing("Creating new change for removed restriction", log, Level.FINE, changeInst, restrRemCls);
 		cKb.setDirectType(changeInst, restrRemCls);
 
 		return changeInst;
@@ -151,7 +152,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
         Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
-		Model.logChange("Creating change for removed template slot", log, Level.FINE, changeInst, tempSlotRemCls);
+		ChangeModel.logAnnotatableThing("Creating change for removed template slot", log, Level.FINE, changeInst, tempSlotRemCls);
 		cKb.setDirectType(changeInst, tempSlotRemCls);
 		
 		return changeInst;
@@ -177,7 +178,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
         Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
-		Model.logChange("Creating new change for deleted class", log, Level.FINE, changeInst, deleteCls);
+		ChangeModel.logAnnotatableThing("Creating new change for deleted class", log, Level.FINE, changeInst, deleteCls);
 		cKb.setDirectType(changeInst, deleteCls);
 
 		return changeInst;
@@ -203,7 +204,7 @@ public class ServerChangesUtil {
 		changeInst.setOwnSlotValue(context, desc);
         Timestamp.getTimestamp().setTimestamp(changeInst);
 		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
-		Model.logChange("Creating new change for renamed class", log, Level.FINE, changeInst, nameChangeCls);
+		ChangeModel.logAnnotatableThing("Creating new change for renamed class", log, Level.FINE, changeInst, nameChangeCls);
 		cKb.setDirectType(changeInst, nameChangeCls);
 
 		return changeInst;
@@ -217,7 +218,7 @@ public class ServerChangesUtil {
 		Instance annotateInst = cKb.createInstance(null, new ArrayList());
 		annotateInst.setOwnSlotValues(annotates, changeInsts);
 		//annotateInst.setOwnSlotValue(title, annotateInst.getName());
-        Model.logChange("Creating change for annotation", log, Level.FINE, annotateInst, annotate);
+        ChangeModel.logAnnotatableThing("Creating change for annotation", log, Level.FINE, annotateInst, annotate);
 		cKb.setDirectType(annotateInst, annotate);
 
 		return annotateInst;
@@ -241,7 +242,7 @@ public class ServerChangesUtil {
 		if (bdy == null) {
 			annotateInst.setOwnSlotValue(body, "");
 		}
-		Model.logChange("Updated Annotation", log, Level.FINE, annotateInst);
+		ChangeModel.logAnnotatableThing("Updated Annotation", log, Level.FINE, annotateInst);
 		return annotateInst;	
 	}
     
@@ -275,7 +276,7 @@ public class ServerChangesUtil {
 		tInst.setOwnSlotValue(applyTo, altApplyTo);
 		tInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_DISP_TRANS);
 		tInst.setOwnSlotValues(changes, transChanges);
-        Model.logChange("Creating Transaction Change", log, Level.FINE, tInst, transChange);
+        ChangeModel.logAnnotatableThing("Creating Transaction Change", log, Level.FINE, tInst, transChange);
 		cKb.setDirectType(tInst, transChange);
 		
 		return tInst;
@@ -310,7 +311,7 @@ public class ServerChangesUtil {
             Timestamp.getTimestamp().setTimestamp(changeInst);
 		    changeInst.setOwnSlotValue(type, typ);
 		}
-        Model.logChange("Creating change", log, Level.FINE, changeInst, change);
+        ChangeModel.logAnnotatableThing("Creating change", log, Level.FINE, changeInst, change);
         changeKB.setDirectType(changeInst, change);
 		return changeInst;
 	}
@@ -328,7 +329,7 @@ public class ServerChangesUtil {
 		Instance changeInst = createChange(currentKB, changeKB, changeClsName, apply, desc, typ);
 		changeInst.setOwnSlotValue(oldN, oldName);
 		changeInst.setOwnSlotValue(newN, newName);
-		Model.logChange("Modified name change change", log, Level.FINE, changeInst);
+		ChangeModel.logAnnotatableThing("Modified name change change", log, Level.FINE, changeInst);
 		return changeInst;
 	}
     
