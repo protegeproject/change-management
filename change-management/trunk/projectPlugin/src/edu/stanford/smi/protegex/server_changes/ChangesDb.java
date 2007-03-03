@@ -21,19 +21,19 @@ import edu.stanford.smi.protege.server.Server;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.URIUtilities;
-import edu.stanford.smi.protegex.server_changes.model.Model;    
-import edu.stanford.smi.protegex.server_changes.model.Timestamp;
-import edu.stanford.smi.protegex.server_changes.time.ChangingFrameManager;
-import edu.stanford.smi.protegex.server_changes.time.ChangingFrameManagerImpl;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
+import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
 public class ChangesDb {
 
     private KnowledgeBase changes;
     private Project changesProject;
-    Model model;
+    ChangeModel model;
     private TransactionUtility transactionUtility;
-    private ChangingFrameManager frameManager;
     
     private Map<RemoteSession, Integer> transCount = new HashMap<RemoteSession, Integer>();
     private Map<RemoteSession, Stack> transStack   = new HashMap<RemoteSession, Stack>();
@@ -44,13 +44,17 @@ public class ChangesDb {
     
     private Map<String, Instance> lastCreateByName = new HashMap<String, Instance>();
     
-    private HashMap<FrameID, String> frameIdMap = new HashMap<FrameID, String>();
+    private Map<FrameID, String> frameIdMap = new HashMap<FrameID, String>();
+    
+    private Map<String, Ontology_Component> nameToOntologyComponentMap
+                    = new HashMap<String, Ontology_Component>();
     
     public ChangesDb(KnowledgeBase kb) {
         getOrCreateChangesProject(kb);
-        model = new Model(changes);
+        model = new ChangeModel(changes);
         transactionUtility = new TransactionUtility(kb, changes);
-        Timestamp.initialize(changes);
+        Timestamp.initialize(model);
+        addNameChangeListener(kb);
     }
     
     private void getOrCreateChangesProject(KnowledgeBase kb) {
@@ -69,8 +73,6 @@ public class ChangesDb {
             return;
         }
 
-        boolean annotationsProjectExist = false;
-
         ArrayList errors = new ArrayList();
 
         URI annotationProjURI = getAnnotationProjectURI(project);
@@ -82,8 +84,6 @@ public class ChangesDb {
             //annotation ontology exists                    
             changesProject = Project.loadProjectFromURI(annotationProjURI, errors);
 
-            annotationsProjectExist = true;
-
         } else {
             //annotations ontology does not exist and it will be created
             URI changeOntURI = null;
@@ -93,14 +93,11 @@ public class ChangesDb {
                 Log.getLogger().log(Level.WARNING, "Could not find Changes Ontology", e);
             }
 
-            RDFBackend rdfBackendFactory = new RDFBackend();
-
             changesProject = Project.loadProjectFromURI(changeOntURI, errors);
 
             RDFBackend.setSourceFiles(changesProject.getSources(), ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + project.getName() + ".rdfs", ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + project.getName() + ".rdf", ChangesProject.PROTEGE_NAMESPACE);
             changesProject.setProjectURI(annotationProjURI);
 
-            annotationsProjectExist = false;
         }
 
 
@@ -117,6 +114,17 @@ public class ChangesDb {
                                       "/" + 
                                       ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + 
                                       p.getName() + ".pprj");
+    }
+    
+    private void addNameChangeListener(KnowledgeBase kb) {
+        synchronized (changes) {
+            for (Object o : model.getCls(ChangeCls.Change).getInstances()) {
+                Change change = (Change) o;
+                if (model.isCreateChange(change)) {
+                    
+                }
+            }
+        }
     }
 
     private RemoteSession getCurrentSession() {
@@ -137,7 +145,7 @@ public class ChangesDb {
         return changesProject;
     }
     
-    public Model getModel() {
+    public ChangeModel getModel() {
         return model;
     }
     
@@ -262,12 +270,5 @@ public class ChangesDb {
         else {
             return frame.getBrowserText();
         }
-    }
-    
-    public ChangingFrameManager getFrameManager() {
-        if (frameManager == null) {
-            frameManager = new ChangingFrameManagerImpl(changes);
-        }
-        return frameManager;
     }
 }
