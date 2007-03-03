@@ -84,6 +84,18 @@
      <mkdir dir = "${plugins}/${plugin_dist}"/>
    </target>  
 
+   <target name = "generateModel" depends = "checkProtegeLibsAndReport">
+     <fail unless="protege.home.set"
+           message="in place model generation not supported yet"/>
+     <java classname="edu.stanford.smi.protegex.jsave.protege2java" fork="true" failonerror="true">
+       <classpath>
+         <pathelement location = "${protege.lib}"/>
+         <pathelement location = "${lib}/jsave.jar"/>
+       </classpath>
+       <jvmarg value="-Dprotege.dir=${protege.home}"/>
+       <arg value="jsave.cfg"/>
+     </java>
+   </target> 
 
    <target name = "compile" depends = "init, checkProtegeLibsAndReport">    
      <javac srcdir = "${pplugin.src}:${tab.src}" 
