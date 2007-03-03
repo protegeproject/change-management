@@ -52,15 +52,13 @@ import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
 import edu.stanford.smi.protegex.changes.action.ChangesSearchClear;
 import edu.stanford.smi.protegex.changes.action.ChangesSearchExecute;
 import edu.stanford.smi.protegex.changes.listeners.ChangesListener;
-import edu.stanford.smi.protegex.changes.ui.AbstractTreeTableModel;
 import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
 import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
 import edu.stanford.smi.protegex.changes.ui.JTreeTable;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.GetAnnotationProjectName;
-import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.Model;
 import edu.stanford.smi.protegex.server_changes.model.InstanceDateComparator;
+import edu.stanford.smi.protegex.server_changes.model.Model;
  
 /**
  * Change Management Tab widget
