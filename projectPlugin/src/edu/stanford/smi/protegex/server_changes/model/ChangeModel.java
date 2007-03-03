@@ -2,16 +2,38 @@ package edu.stanford.smi.protegex.server_changes.model;
 
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Class_Created;
+import edu.stanford.smi.protegex.server_changes.model.generated.Class_Deleted;
+import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
+import edu.stanford.smi.protegex.server_changes.model.generated.Property_Created;
+import edu.stanford.smi.protegex.server_changes.model.generated.Property_Deleted;
+import edu.stanford.smi.protegex.server_changes.model.generated.Slot_Created;
+import edu.stanford.smi.protegex.server_changes.model.generated.Slot_Deleted;
+import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 public class ChangeModel {
+    public final static String CHANGE_TYPE_ROOT = "Root";
+    
+    public final static String CHANGE_LEVEL_INFO = "info";
+    
+    
     private KnowledgeBase changes_kb;
     private EnumMap<ChangeCls, Cls> clsMap = new EnumMap<ChangeCls, Cls>(ChangeCls.class);
-    private EnumMap<SlotCls, Slot> slotMap = new EnumMap<SlotCls, Slot>(SlotCls.class);
+    private EnumMap<ChangeSlot, Slot> slotMap = new EnumMap<ChangeSlot, Slot>(ChangeSlot.class);
+    
+    
+    public ChangeModel(KnowledgeBase changes_kb) {
+        this.changes_kb = changes_kb;
+    }
     
     // not recommended style but it is very convenient (pretty?) for the enum name to be the name.
     // alternatively I could use a constructor...
@@ -26,17 +48,22 @@ public class ChangeModel {
         Property_Change,
         Slot_Change,
         CompositeChange,
-        Timestamp
+        Timestamp;
+        
+
     }
     
-    public enum SlotCls {
+    public enum ChangeSlot {
         action,
         applyTo,
         annotates,
         associatedAnnotations,
         author,
         body,
-        changes
+        changes,
+        date,
+        sequence,
+        timestamp
     }
     
     public Cls getCls(ChangeCls c) {
@@ -49,7 +76,7 @@ public class ChangeModel {
     }
     
     
-    public Slot getSlot(SlotCls s) {
+    public Slot getSlot(ChangeSlot s) {
         Slot slot = slotMap.get(s);
         if (slot == null) {
             slot = changes_kb.getSlot(s.name());
@@ -58,13 +85,66 @@ public class ChangeModel {
         return slot;
     }
     
-    public Object getDirectValue(Instance i, SlotCls s) {
+    public Object getDirectValue(Instance i, ChangeSlot s) {
         return i.getDirectOwnSlotValue(getSlot(s));
     }
     
-    public Collection getDirectValues(Instance i, SlotCls s) {
+    public Collection getDirectValues(Instance i, ChangeSlot s) {
         return i.getDirectOwnSlotValues(getSlot(s));
     }
     
+    public Instance createInstance(ChangeCls cls) {
+        return getCls(cls).createDirectInstance(null);
+    }
+    
+    public boolean isCreateChange(Instance change) {
+        return change instanceof Class_Created ||
+               change instanceof Property_Created ||
+               change instanceof Slot_Created;
+    }
+    
+    public boolean isDeleteChange(Instance change) {
+        return change instanceof Class_Deleted ||
+               change instanceof Property_Deleted ||
+               change instanceof Slot_Deleted;
+    }
+    
+    public boolean isNameChange(Instance change) {
+        return change instanceof Name_Changed;
+    }
+    
+    /*
+     * utility for debug sessions...
+     */
+    public static void logAnnotatableThing(Instance i) {
+        logAnnotatableThing("debug:", Log.getLogger(), Level.CONFIG, i);
+    }
 
+
+    public static void logAnnotatableThing(String msg, Logger log, Level level, Instance aInst, Cls cls) {
+        if (!log.isLoggable(level)) {
+            return;
+        }
+        log.log(level, msg);
+        if (aInst instanceof Change) {
+            Change change = (Change) aInst;
+            log.log(level, "\tAction = " + change.getAction());
+            log.log(level, "\tApplyTo = " + change.getApplyTo());
+            log.log(level, "\tAuthor = " + change.getAuthor());
+            log.log(level, "\tContext = " + change.getContext());
+            log.log(level, "\tCreated = " + change.getTimestamp().get);
+            log.log(level, "\tType = " + change.getType());
+        }
+        log.log(level, "\tDirect type = " + cls);
+        log.log(level, "\tFrame ID = " + aInst.getFrameID().getLocalPart());
+    }
+
+
+    public static void logAnnotatableThing(String msg, Logger log, Level level, Instance aInst) {
+        if (!log.isLoggable(level)) {
+            return;
+        }
+        Cls cls = aInst.getDirectType();
+        ChangeModel.logAnnotatableThing(msg, log, level, aInst, cls);
+    }
 }
