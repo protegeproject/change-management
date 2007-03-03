@@ -12,6 +12,7 @@ import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.changes.ChangesTab;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.Model;
 
 
@@ -30,7 +31,7 @@ public class ChangesListener implements ClsListener{
     public void directInstanceAdded(ClsEvent event) {
         Instance addedInst = event.getInstance();
         if (addedInst.hasType(changes_class)) {
-            Model.logChange("ChangeTab listener received change", log, Level.FINE, addedInst);
+            ChangeModel.logAnnotatableThing("ChangeTab listener received change", log, Level.FINE, addedInst);
             ChangesTab.createChange(addedInst);
         }
     }
