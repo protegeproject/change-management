@@ -5,27 +5,31 @@ import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.event.KnowledgeBaseEvent;
 import edu.stanford.smi.protege.event.KnowledgeBaseListener;
-import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 
 
 public class ChangesOwlKBListener implements KnowledgeBaseListener {
     private static final Logger log = Log.getLogger(ChangesOwlKBListener.class);
     private OWLModel om;
     private KnowledgeBase changesKb;
+    private ChangeModel model;
     
     public ChangesOwlKBListener(OWLModel om) {
         this.om = om;
-        changesKb = ChangesProject.getChangesKB(om);
+        ChangesDb db = ChangesProject.getChangesDb(om);
+        changesKb = db.getChangesKb();
+        model = db.getModel();
     }
 
 	/* (non-Javadoc)
@@ -46,10 +50,11 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
         String context = "Deleted Class: " + deletedClsName;
         Instance changeInst = ServerChangesUtil.createChange(om,
                                                              changesKb,
-                                                             Model.CHANGETYPE_CLASS_DELETED,
+                                                             ChangeCls.Class_Deleted,
                                                              deletedClsName, 
                                                              context, 
-                                                             Model.CHANGE_LEVEL_INFO);
+                                                             ChangeModel.CHANGE_LEVEL_INFO);
+        changeInst.get
         ChangesProject.postProcessChange(om, changesKb, changeInst);
     }
 

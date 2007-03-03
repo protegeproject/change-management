@@ -1,6 +1,8 @@
 package edu.stanford.smi.protegex.server_changes.listeners.owl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 
 import edu.stanford.smi.protege.event.FrameEvent;
 import edu.stanford.smi.protege.event.FrameListener;
@@ -60,117 +62,126 @@ public class OwlChangesFrameListener implements FrameListener {
 		
 	}
 
-	public void ownSlotValueChanged(FrameEvent event) {
-    	
-    	Frame f = event.getFrame();
-        if (f instanceof Slot) {
-           
+	@SuppressWarnings("unchecked")
+    public void ownSlotValueChanged(FrameEvent event) {
+
+	    Frame f = event.getFrame();
+	    if (f instanceof Slot) {
+	        // not handled yet...
+	    }
+	    else if (f instanceof Cls) {
+
+	        Cls c = (Cls)f;
+            Slot slot = event.getSlot();
+	        String cText = c.getBrowserText();
+	        String cName = c.getName();
+	        Slot s = event.getSlot();
+	        ArrayList oldSlotValues = (ArrayList) event.getOldValues();
+	        String sName = s.getName();
+
+	        StringBuffer context = new StringBuffer();
             
-        }
-        
-    	
-        
-        else if (f instanceof Cls) {
-           
-          	Cls c = (Cls)f;
-         	String cText = c.getBrowserText();
-                String cName = c.getName();
-                Slot s = event.getSlot();
-                ArrayList oldValue = (ArrayList)event.getArgument2();
-                String sName = s.getName();
- 		
-                StringBuffer context = new StringBuffer();
-                String newSlotValue = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
-                String newSlotValue1 = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
- 		
-                if(s instanceof DefaultOWLDatatypeProperty){
-                    DefaultOWLDatatypeProperty sProp = (DefaultOWLDatatypeProperty)s;
-                    boolean isAnnotation = sProp.isAnnotationProperty();
+	        if(s instanceof DefaultOWLDatatypeProperty){
+	            DefaultOWLDatatypeProperty sProp = (DefaultOWLDatatypeProperty)s;
+	            boolean isAnnotation = sProp.isAnnotationProperty();
+
+	            if(isAnnotation){
+                    Collection newSlotValues = c.getOwnSlotValues(slot);
+                    if ((newSlotValues == null && oldSlotValues  == null) || newSlotValues.equals(oldSlotValues)) {
+                        return;
+                    }
+                    if (newSlotValues == null || newSlotValues.isEmpty()){
+	                    context.append("Annotation Removed: ");
+	                    context.append(sName);
+	                    context.append(" from class: ");
+	                    context.append(cText);
+
+	                    Instance changeInst = ServerChangesUtil.createChange(om,
+	                                                                         changesKb,
+	                                                                         Model.CHANGETYPE_ANNOTATION_REMOVED, 
+	                                                                         cName, 
+	                                                                         context.toString(), 
+	                                                                         Model.CHANGE_LEVEL_INFO);
+
+	                    ChangesProject.postProcessChange(om,changesKb, changeInst);
+	                }//Annotation deleted
+	                else if (oldSlotValues == null || oldSlotValues.isEmpty()) {
+
+
+	                        context.append("Annotation Added: ");
+	                        context.append(sName);
+	                        context.append(": ");
+
+	                        context.append("'");
+	                        context.append(CollectionUtilities.toString(newSlotValues));
+	                        context.append("'");
+	                        context.append(" to class: ");
+	                        context.append(cName);
+
+	                        Instance changeInst = ServerChangesUtil.createChange(om,
+	                                                                             changesKb,
+	                                                                             Model.CHANGETYPE_ANNOTATION_ADDED, 
+	                                                                             cName, 
+	                                                                             context.toString(), 
+	                                                                             Model.CHANGE_LEVEL_INFO);
+
+	                        ChangesProject.postProcessChange(om,changesKb, changeInst);
+
+	                }
+                    else {
+                        context.append("Annotation Modified: ");
+                        context.append("annotation ");
+                        context.append(sName);
+                        context.append(" for class: ");
+                        context.append(cName);
                         
- 		        if(isAnnotation){
- 		        	if(newSlotValue == null || newSlotValue.equals("")){
- 		        	  context.append("Annotation Removed: ");
- 		        	  context.append(sName);
- 		        	  context.append(" from class: ");
- 		        	  context.append(cText);
- 		        	  
- 		        	  
- 		        	  Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                                       changesKb,
-                                                                                       Model.CHANGETYPE_ANNOTATION_REMOVED, 
-                                                                                       cName, 
-                                                                                       context.toString(), 
-                                                                                       Model.CHANGE_LEVEL_INFO);
+                        Instance changeInst = ServerChangesUtil.createChange(om,
+                                                                             changesKb,
+                                                                             Model.CHANGETYPE_ANNOTATION_MODIFIED, 
+                                                                             cName, 
+                                                                             context.toString(), 
+                                                                             Model.CHANGE_LEVEL_INFO);
 
- 		        		ChangesProject.postProcessChange(om,changesKb, changeInst);
- 		        	}//Annotation deleted
- 		        	else{
- 		        		boolean isAdd = true;
- 		        		if(!(oldValue == null) && !oldValue.isEmpty()) {
- 		        		    String oldSlotValue = oldValue.toString();        
- 		 	              String oldSlotValueMod = oldSlotValue.substring(1,oldSlotValue.length()-1);
- 		 	              String slotCompare = oldSlotValueMod.concat(", ");
- 		 	              //System.out.println("OLD: "+oldSlotValueMod+"Length: "+oldSlotValueMod.length());
- 		 	              //System.out.println("SLOT COMPARE: "+slotCompare+"Length: "+slotCompare.length());
- 		 	              //System.out.println("NEW: "+newSlotValue+"Length: "+newSlotValue.length());
- 		 	              if(newSlotValue.equals(slotCompare)|| newSlotValue.concat(", ").equals(oldSlotValueMod))
- 		 	            	  isAdd = false;
- 		 		        } // if the old & new values of the slot are same - don't count it as an annotation added change.
- 		        		
- 		        		if(isAdd){
- 		        	
- 		        		context.append("Annotation Added: ");
- 	 		        	context.append(sName);
- 	 		        	context.append(": ");
- 	 		        
- 	 		        	context.append("'");
- 	 		        	context.append(newSlotValue);
- 	 		        	context.append("'");
- 	 		        	context.append(" to class: ");
- 	 		        	context.append(cName);
- 	 		        	  
- 	 		        	Instance changeInst = ServerChangesUtil.createChange(om,
- 	 								changesKb,
- 	 								Model.CHANGETYPE_ANNOTATION_ADDED, 
- 	 								cName, 
- 	 								context.toString(), 
- 	 								Model.CHANGE_LEVEL_INFO);
+                        ChangesProject.postProcessChange(om, changesKb, changeInst);
+                    }
+	            }// handles annotations
+	        }
 
- 	 		      	ChangesProject.postProcessChange(om,changesKb, changeInst);
- 	 		            
-// 	 		      	    if (ChangesTab.getIsInTransaction() && ChangesTab.getInRemoveAnnotation()) {
-// 	 					ChangesTab.createTransactionChange(om, ChangesTab.TRANS_SIGNAL_TRANS_END);
-// 	 					ChangesTab.setInRemoveAnnotation(false);
-// 	 				    }
-		        		}
- 		        	}
- 		        }// handles annotations
- 		    }
- 		    
- 		    
- 		    if(sName.equals("owl:disjointWith"))
- 		    { 
-              
-            
-              context.append("Added disjoint class(es): ");
-              context.append(newSlotValue);
-              context.append(" to: ");
-              context.append(cName);
-            	
-              Instance changeInst = ServerChangesUtil.createChange(om,
-						changesKb,
-						Model.CHANGETYPE_DISJOINT_CLASS_ADDED, 
-						cName, 
-						context.toString(), 
-						Model.CHANGE_LEVEL_INFO);
 
-            
-            	
-          	ChangesProject.postProcessChange(om,changesKb, changeInst);
-		   
-		    } // Handles disjoints
-		
-        }
+	        if(sName.equals("owl:disjointWith")) { 
+                Collection newSlotValues = c.getOwnSlotValues(slot);
+                Collection deleted = new HashSet(oldSlotValues);
+                deleted.removeAll(newSlotValues);
+                Collection added = new HashSet(newSlotValues);
+                added.removeAll(oldSlotValues);
+                if (added.isEmpty() && deleted.isEmpty()) {
+                    return;
+                }
+                if (!added.isEmpty()) {
+                    context.append("Added disjoint class(es): ");
+                    context.append(CollectionUtilities.toString(added));
+                }
+                if (!deleted.isEmpty()) {
+                    context.append("removed disjoint class(es): ");
+                    context.append(CollectionUtilities.toString(deleted));
+                }
+	            context.append(" to: ");
+	            context.append(cName);
+
+	            Instance changeInst = ServerChangesUtil.createChange(om,
+	                                                                 changesKb,
+	                                                                 Model.CHANGETYPE_DISJOINT_CLASS_ADDED, 
+	                                                                 cName, 
+	                                                                 context.toString(), 
+	                                                                 Model.CHANGE_LEVEL_INFO);
+
+
+
+	            ChangesProject.postProcessChange(om,changesKb, changeInst);
+
+	        } // Handles disjoints
+
+	    }
         
         else if (f instanceof Instance){
     		Instance i = (Instance)f;
