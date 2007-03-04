@@ -55,6 +55,7 @@ import edu.stanford.smi.protegex.changes.listeners.ChangesListener;
 import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
 import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
 import edu.stanford.smi.protegex.changes.ui.JTreeTable;
+import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.GetAnnotationProjectName;
 import edu.stanford.smi.protegex.server_changes.model.InstanceDateComparator;
@@ -91,8 +92,9 @@ public class ChangesTab extends AbstractTabWidget {
 	private static final String CHANGES_TAB_NAME = "Changes";
 
 	private static Project currProj;
-	private static Project changes;
-	private static KnowledgeBase cKb;
+	private static Project changes_project;
+    private static ChangesDb changes_db;
+	private static KnowledgeBase changes_kb;
 	private static KnowledgeBase currKB;
 	
 	private static JTable cTable;
@@ -146,11 +148,11 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 	
 	public static KnowledgeBase getChangesKB() {
-		return cKb;
+		return changes_kb;
 	}
 	
 	public static Project getChangesProj() {
-		return changes;
+		return changes_project;
 	}
 	
 	// Initialize the plugin
@@ -170,7 +172,7 @@ public class ChangesTab extends AbstractTabWidget {
 	    initTables();
 	    loadExistingData();
 
-	    cKb.addClsListener(new ChangesListener(cKb));		
+	    changes_kb.addFrameListener(new ChangesListener(changes_db.getModel()));		
 
 
 	    // Initialize the tab text
@@ -184,11 +186,11 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	private void initUI() {
 		// Create menu item
-		cMenu = new ChangeMenu(cKb,changes);
+		cMenu = new ChangeMenu(changes_kb,changes_project);
 		JMenuBar menuBar = getMainWindowMenuBar();
 	    menuBar.add (cMenu);
 
-		aTable.addMouseListener(new AnnotationShowAction(aTable, aTableModel, changes));
+		aTable.addMouseListener(new AnnotationShowAction(aTable, aTableModel, changes_project));
 		JScrollPane scroll = ComponentFactory.createScrollPane(cTreeTable);
 
 		JScrollPane scroll2 = ComponentFactory.createScrollPane(aTable);
@@ -306,8 +308,8 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		// GETTING THE ROOT INSTANCE TO CREATE ROOT OF THE TREE
 		
-		Cls chgs = cKb.getCls("Instance_Added");
-		Collection changeInst = cKb.getInstances(chgs);
+		Cls chgs = changes_kb.getCls("Instance_Added");
+		Collection changeInst = changes_kb.getInstances(chgs);
 		Instance ROOT = null;
 		for (Iterator iter = changeInst.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
@@ -319,14 +321,14 @@ public class ChangesTab extends AbstractTabWidget {
 			
 		}
 	
-		TreeTableNode root = new TreeTableNode(ROOT,cKb);
+		TreeTableNode root = new TreeTableNode(ROOT,changes_kb);
 		
 		
-		cTableModel = new ChangeTableModel(cKb);
-		acTableModel = new ChangeTableModel(cKb);
+		cTableModel = new ChangeTableModel(changes_kb);
+		acTableModel = new ChangeTableModel(changes_kb);
 
-		aTableModel = new AnnotationTableModel(cKb);
-		cTreeTableModel = new ChangeTreeTableModel(root, cKb);
+		aTableModel = new AnnotationTableModel(changes_kb);
+		cTreeTableModel = new ChangeTreeTableModel(root, changes_kb);
 		
 		cTable = new JTable(cTableModel);
 		acTable = new JTable(acTableModel);
@@ -371,7 +373,7 @@ public class ChangesTab extends AbstractTabWidget {
 					editInst.setEnabled(true);
 					int selectedRow = lsm.getMinSelectionIndex();
 					String instName = aTableModel.getInstanceName(selectedRow);
-					Instance selectedInst = cKb.getInstance(instName);
+					Instance selectedInst = changes_kb.getInstance(instName);
 					acTableModel.setChanges(Model.getAnnotationChanges(selectedInst));
 				} 
 			}
@@ -411,8 +413,9 @@ public class ChangesTab extends AbstractTabWidget {
             if (ChangesProject.getChangesProj(currKB) == null) { // the tab has just been configured so the
                 new ChangesProject().afterLoad(currProj);  // project plugin is not initialized                           
             }
-            changes = ChangesProject.getChangesProj(currKB);
-            cKb = changes.getKnowledgeBase();
+            changes_project = ChangesProject.getChangesProj(currKB);
+            changes_kb = changes_project.getKnowledgeBase();
+            changes_db = ChangesProject.getChangesDb(currKB);
         }
     }
     
@@ -426,8 +429,8 @@ public class ChangesTab extends AbstractTabWidget {
         RemoteProjectManager manager = RemoteProjectManager.getInstance();
         FrameStoreManager fsmanager = ((DefaultKnowledgeBase) currKB).getFrameStoreManager();
         RemoteClientFrameStore rcfs = (RemoteClientFrameStore) fsmanager.getFrameStoreFromClass(RemoteClientFrameStore.class);
-        changes = manager.connectToProject(rcfs.getRemoteServer(), rcfs.getSession(), annotationName);
-        cKb = changes.getKnowledgeBase();
+        changes_project = manager.connectToProject(rcfs.getRemoteServer(), rcfs.getSession(), annotationName);
+        changes_kb = changes_project.getKnowledgeBase();
     }
     
 	private static void displayErrors(Collection errors) {
@@ -445,8 +448,8 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	
 	private static void loadExistingData() {
-		Collection annotateInsts = Model.getAnnotationInsts(cKb);
-		Collection changeInsts = Model.getChangeInsts(cKb);
+		Collection annotateInsts = Model.getAnnotationInsts(changes_kb);
+		Collection changeInsts = Model.getChangeInsts(changes_kb);
 		
 		loadChanges(changeInsts);
 		loadAnnotations(annotateInsts);
@@ -456,7 +459,7 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	private static void loadChanges(Collection changeInsts) {
 		ArrayList changeList = new ArrayList(changeInsts);
-		Collections.sort(changeList, new InstanceDateComparator(cKb));
+		Collections.sort(changeList, new InstanceDateComparator(changes_kb));
 		
 		for (Iterator iter = changeList.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
@@ -570,7 +573,7 @@ public class ChangesTab extends AbstractTabWidget {
 	private static void loadAnnotations(Collection annotateInsts) {
 		
 		ArrayList annotationList = new ArrayList(annotateInsts);
-		Collections.sort(annotationList, new InstanceDateComparator(cKb));
+		Collections.sort(annotationList, new InstanceDateComparator(changes_kb));
 		
 		for (Iterator iter = annotationList.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
@@ -587,13 +590,13 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 	
 	public static void createAnnotation(Instance annotateInst) {
-		Slot body = cKb.getSlot(Model.SLOT_NAME_BODY);
+		Slot body = changes_kb.getSlot(Model.SLOT_NAME_BODY);
 		Object bdy = annotateInst.getOwnSlotValue(body);
 		if (bdy == null) {
-			cKb.deleteInstance(annotateInst);
+			changes_kb.deleteInstance(annotateInst);
 		}
 		else{
-		annotateInst = ChangeCreateUtil.updateAnnotation(cKb, annotateInst);
+		annotateInst = ChangeCreateUtil.updateAnnotation(changes_kb, annotateInst);
 		aTableModel.addAnnotationData(annotateInst);
 		}
 	}
@@ -638,8 +641,8 @@ public class ChangesTab extends AbstractTabWidget {
 					chngInstSelected.add(changeInst);
 				}
 			    String annotType = (String)annTypes.getSelectedItem();
-				annotateInst = ChangeCreateUtil.createAnnotation(cKb, annotType, chngInstSelected);
-				JFrame edit = changes.show(annotateInst);
+				annotateInst = ChangeCreateUtil.createAnnotation(changes_kb, annotType, chngInstSelected);
+				JFrame edit = changes_project.show(annotateInst);
 				
 				edit.addWindowListener(new WindowListener() {
 					
@@ -687,8 +690,8 @@ public class ChangesTab extends AbstractTabWidget {
 				aTableModel.removeAnnotationData(aTable.getSelectedRows());
 			} else if (numSelect == 1) {
 				String delName = aTableModel.getInstanceName(aTable.getSelectedRow());
-				Instance instToDel = cKb.getInstance(delName);
-				cKb.deleteInstance(instToDel);
+				Instance instToDel = changes_kb.getInstance(delName);
+				changes_kb.deleteInstance(instToDel);
 				aTableModel.removeAnnotationData(aTable.getSelectedRow());
 			}
 			
@@ -715,9 +718,9 @@ public class ChangesTab extends AbstractTabWidget {
 			if (numSelect == 1) {
 				String instEditName = aTableModel.getInstanceName(aTable.getSelectedRow());
 				
-				instToEdit = cKb.getInstance(instEditName);
+				instToEdit = changes_kb.getInstance(instEditName);
 				
-				JFrame edit = changes.show(instToEdit);
+				JFrame edit = changes_project.show(instToEdit);
 				edit.addWindowListener(new WindowListener() {
 					public void windowOpened(WindowEvent arg0) {
 					}

@@ -22,6 +22,8 @@ import edu.stanford.smi.protege.ui.ProjectView;
 import edu.stanford.smi.protege.widget.TabWidget;
 import edu.stanford.smi.protegex.changes.ChangeCreateUtil;
 import edu.stanford.smi.protegex.changes.ChangesTab;
+import edu.stanford.smi.protegex.server_changes.ChangesDb;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 
 public class ChangeMenu extends JMenu {
 
@@ -33,16 +35,18 @@ public class ChangeMenu extends JMenu {
 	protected SelectedChangeInfo selChangeInfo = new SelectedChangeInfo();
 	protected Instance lastInst;
 	
-	private KnowledgeBase cKb;
-	private Project changeProj;
+	private KnowledgeBase change_kb;
+	private Project change_project;
+    private ChangeModel change_model;
 	private Instance annotateInst;
 	
-	public ChangeMenu(KnowledgeBase cKb, Project changeProj) {
+	public ChangeMenu(ChangesDb change_db) {
 		super(MENU_TITLE);
 		setMnemonic(KeyEvent.VK_C);
 		
-		this.cKb = cKb;
-		this.changeProj = changeProj;
+		this.change_kb = change_db.getChangesKb();
+		this.change_project = change_kb.getProject();
+        this.change_model = change_db.getModel();
 		
 		JMenuItem annotate = new JMenuItem(MENU_ITEM_ANNOTATE_LAST);
 		JMenuItem changeInfo = new JMenuItem(MENU_ITEM_CHANGE_INFO);
@@ -73,9 +77,9 @@ public class ChangeMenu extends JMenu {
 		public void actionPerformed(ActionEvent arg0) {
 			Collection changeInsts = new ArrayList();
 			changeInsts.add(lastInst);
-			annotateInst = ChangeCreateUtil.createAnnotation(cKb, "Comment", changeInsts);
+			annotateInst = ChangeCreateUtil.createAnnotation(change_kb, "Comment", changeInsts);
 			
-			JFrame aEdit = changeProj.show(annotateInst);
+			JFrame aEdit = change_project.show(annotateInst);
 			aEdit.addWindowListener(new WindowListener() {
 				
 				public void windowClosed(WindowEvent arg0) {
@@ -121,7 +125,7 @@ public class ChangeMenu extends JMenu {
 			String className = null;
 			if (elem instanceof Cls) {
 				className = ((Cls)elem).getName();
-				ChangeAnnotateWindow cmWindow = new ChangeAnnotateWindow(cKb, className, true);
+				ChangeAnnotateWindow cmWindow = new ChangeAnnotateWindow(change_model, className, true);
 				cmWindow.show();
 			}
 		}
