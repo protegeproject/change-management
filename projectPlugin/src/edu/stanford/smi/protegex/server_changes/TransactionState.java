@@ -36,6 +36,10 @@ public class TransactionState {
         return changeStack.size() != 0;
     }
     
+    public void addToTransaction(Change change) {
+        changeStack.peek().add(change);
+    }
+    
     public void beginTransaction(String name) {
         changeStack.push(new Stack<Change>());
         transactionNameStack.push(name);
