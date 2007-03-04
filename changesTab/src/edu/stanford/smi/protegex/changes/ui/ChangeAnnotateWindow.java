@@ -18,18 +18,20 @@ import javax.swing.ListSelectionModel;
 
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protege.ui.HeaderComponent;
 import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.LabeledComponent;
 import edu.stanford.smi.protegex.changes.AnnotationTableModel;
-import edu.stanford.smi.protegex.changes.ChangeCreateUtil;
 import edu.stanford.smi.protegex.changes.ChangeTableModel;
 import edu.stanford.smi.protegex.changes.ChangesTab;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
-import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.InstanceDateComparator;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 
 public class ChangeAnnotateWindow {
 
@@ -42,14 +44,16 @@ public class ChangeAnnotateWindow {
 	private JTable cTable;
 	private JTable aTable;
 	
-	private KnowledgeBase cKb;
+    private ChangeModel change_model;
+	private KnowledgeBase change_kb;
 	private String clsName;
 	private List<String> names = new ArrayList<String>();
 	private boolean nameChangeOn;
 
 	
-	public ChangeAnnotateWindow(KnowledgeBase cKb, String clsName, boolean nameChangeOn) {
-		this.cKb = cKb;
+	public ChangeAnnotateWindow(ChangeModel change_model, String clsName, boolean nameChangeOn) {
+        this.change_model = change_model;
+		this.change_kb = change_model.getChangeKb();
 		this.clsName = clsName;
 		this.nameChangeOn = nameChangeOn;
 	}
@@ -68,10 +72,11 @@ public class ChangeAnnotateWindow {
 		
 		JPanel cmPanel = new JPanel();
 	
-		cTableModel = new ChangeTableModel(cKb);
-		aTableModel = new AnnotationTableModel(cKb);
+		cTableModel = new ChangeTableModel(change_kb);
+		aTableModel = new AnnotationTableModel(change_kb);
 		
-		Collection changes = Model.getChangeInsts(cKb);
+		List<Instance> changes = new ArrayList<Instance>(change_model.getCls(ChangeCls.Change).getInstances());
+        Collections.sort(changes, new InstanceDateComparator(change_kb));
 		List<Instance> relChanges = new ArrayList<Instance>();
 		List<Instance> assocAnnotations = new ArrayList<Instance>();
 		HashMap uniqueSet = new HashMap();
@@ -85,16 +90,14 @@ public class ChangeAnnotateWindow {
 		}
 		names.add(clsName);
 		
-		for (Iterator iter = changes.iterator(); iter.hasNext();) {
-			Instance cInst = (Instance) iter.next();
+		for (Instance cInst : changes) {
+		    Change change = (Change) cInst;
 			
-			if (cInst.getDirectType().getName().equals(Model.CHANGETYPE_TRANS_CHANGE)) {
-				Collection transChanges = Model.getTransChanges(cInst);
+			if (cInst instanceof Composite_Change)  {
+				Collection transChanges = ((Composite_Change) change).getSubChanges();
 				boolean hasChangeRel = false;
 				
-				for (Iterator iterator = transChanges.iterator(); iterator
-						.hasNext();) {
-					Instance tcInst = (Instance) iterator.next();
+				for (Instance tcInst : transChange) {
 					String tApplyToStr = Model.getApplyTo(tcInst);
 					
 					for (Iterator it2 = names.iterator(); it2
@@ -144,13 +147,13 @@ public class ChangeAnnotateWindow {
 			}
 		}
 
-		Collections.sort(relChanges, new InstanceDateComparator(cKb));
+		Collections.sort(relChanges, new InstanceDateComparator(change_kb));
 		for (Iterator iter = relChanges.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
 			cTableModel.addChangeData(aInst);
 		}
 		
-		Collections.sort(assocAnnotations, new InstanceDateComparator(cKb));
+		Collections.sort(assocAnnotations, new InstanceDateComparator(change_kb));
 		for (Iterator iter = assocAnnotations.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
 			aTableModel.addAnnotationData(aInst);
