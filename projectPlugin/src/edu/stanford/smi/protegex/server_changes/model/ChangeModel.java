@@ -24,6 +24,8 @@ public class ChangeModel {
     public final static String CHANGE_TYPE_ROOT = "Root";
     
     public final static String CHANGE_LEVEL_INFO = "info";
+    public static final String CHANGE_LEVEL_TRANS_INFO = "transaction_info";
+    public static final String CHANGE_LEVEL_TRANS = "transaction";
     
     
     private KnowledgeBase changes_kb;
@@ -40,17 +42,26 @@ public class ChangeModel {
     public enum ChangeCls {
         Annotation,
         Change,
+        
         Class_Change,
-        Instance_Change,
-        KB_Change,
         Class_Created,
         Class_Deleted,
-        Property_Change,
-        Slot_Change,
-        CompositeChange,
-        Timestamp;
+        Subclass_Added,
+        Subclass_Removed,
+        Superclass_Added,
+        Superclass_Removed,
         
-
+        Instance_Change,
+        
+        Property_Change,
+        
+        Slot_Change,
+        
+        Composite_Change,
+        
+        Ontology_Component,
+        
+        Timestamp;
     }
     
     public enum ChangeSlot {
@@ -64,6 +75,10 @@ public class ChangeModel {
         date,
         sequence,
         timestamp
+    }
+    
+    public KnowledgeBase getChangeKb() {
+        return changes_kb;
     }
     
     public Cls getCls(ChangeCls c) {
@@ -95,22 +110,6 @@ public class ChangeModel {
     
     public Instance createInstance(ChangeCls cls) {
         return getCls(cls).createDirectInstance(null);
-    }
-    
-    public boolean isCreateChange(Instance change) {
-        return change instanceof Class_Created ||
-               change instanceof Property_Created ||
-               change instanceof Slot_Created;
-    }
-    
-    public boolean isDeleteChange(Instance change) {
-        return change instanceof Class_Deleted ||
-               change instanceof Property_Deleted ||
-               change instanceof Slot_Deleted;
-    }
-    
-    public boolean isNameChange(Instance change) {
-        return change instanceof Name_Changed;
     }
     
     /*

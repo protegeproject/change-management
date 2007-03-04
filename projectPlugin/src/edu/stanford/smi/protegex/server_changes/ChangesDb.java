@@ -4,8 +4,10 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -22,27 +24,31 @@ import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.URIUtilities;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.InstanceDateComparator;
+import edu.stanford.smi.protegex.server_changes.model.NameChangeManager;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Created_Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
+import edu.stanford.smi.protegex.server_changes.util.Util;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
 public class ChangesDb {
 
-    private KnowledgeBase changes;
+    private KnowledgeBase kb;
+    private KnowledgeBase changes_kb;
     private Project changesProject;
-    ChangeModel model;
-    private TransactionUtility transactionUtility;
+    private ChangeModel model;
+    private Map<RemoteSession, TransactionState> transactionMap = new HashMap<RemoteSession, TransactionState>();
+    private NameChangeManager nameChangeManager;
     
-    private Map<RemoteSession, Integer> transCount = new HashMap<RemoteSession, Integer>();
-    private Map<RemoteSession, Stack> transStack   = new HashMap<RemoteSession, Stack>();
-    
-    private Set<RemoteSession> inTransaction = new HashSet<RemoteSession>();
     private Set<RemoteSession> inCreateClass = new HashSet<RemoteSession>();
     private Set<RemoteSession> inCreateSlot  = new HashSet<RemoteSession>();
     
-    private Map<String, Instance> lastCreateByName = new HashMap<String, Instance>();
+    private Map<Ontology_Component, Created_Change> lastCreateByComponent = new HashMap<Ontology_Component, Created_Change>();
     
     private Map<FrameID, String> frameIdMap = new HashMap<FrameID, String>();
     
@@ -50,11 +56,12 @@ public class ChangesDb {
                     = new HashMap<String, Ontology_Component>();
     
     public ChangesDb(KnowledgeBase kb) {
+        this.kb = kb;
         getOrCreateChangesProject(kb);
-        model = new ChangeModel(changes);
-        transactionUtility = new TransactionUtility(kb, changes);
+        model = new ChangeModel(changes_kb);
+        nameChangeManager = new NameChangeManager(model);
+
         Timestamp.initialize(model);
-        addNameChangeListener(kb);
     }
     
     private void getOrCreateChangesProject(KnowledgeBase kb) {
@@ -69,7 +76,7 @@ public class ChangesDb {
                 " slot)");
             }
             changesProject = server.getProject(annotationName);
-            changes = changesProject.getKnowledgeBase();
+            changes_kb = changesProject.getKnowledgeBase();
             return;
         }
 
@@ -106,7 +113,7 @@ public class ChangesDb {
             ChangesProject.displayErrors(errors);
         }
 
-        changes = changesProject.getKnowledgeBase();
+        changes_kb = changesProject.getKnowledgeBase();
     }
     
     public static URI getAnnotationProjectURI(Project p) {
@@ -116,16 +123,7 @@ public class ChangesDb {
                                       p.getName() + ".pprj");
     }
     
-    private void addNameChangeListener(KnowledgeBase kb) {
-        synchronized (changes) {
-            for (Object o : model.getCls(ChangeCls.Change).getInstances()) {
-                Change change = (Change) o;
-                if (model.isCreateChange(change)) {
-                    
-                }
-            }
-        }
-    }
+    
 
     private RemoteSession getCurrentSession() {
         RemoteSession session = ServerFrameStore.getCurrentSession();
@@ -133,12 +131,54 @@ public class ChangesDb {
         else return StandaloneSession.getInstance();
     }
     
+    private void postProcessChange(Change aChange) {
+        checkForTransaction(aChange);
+        checkForCreateChange(aChange);
+    }
+    
+    private void checkForTransaction(Change aChange) {
+        if (isInTransaction()) {
+            pushTransStack(aChange);
+        }
+    }
+    
+    
+    // takes care of case when class is created & then renamed - Adding original name of class and change instance to HashMap
+    private void checkForCreateChange(Change aChange) {
+
+        if  (aChange instanceof Created_Change) {
+            lastCreateByComponent.put((Ontology_Component) aChange.getApplyTo(), (Created_Change) aChange);
+        }
+        if (aChange instanceof Name_Changed) {
+            possiblyCombineWithCreate((Name_Changed) aChange);
+        }
+    }
+    
+    private void possiblyCombineWithCreate(Name_Changed changeInst) {
+        String newName = changeInst.getNewName();
+        Ontology_Component created = (Ontology_Component) changeInst.getApplyTo();
+        Change createOp = lastCreateByComponent.get(created);
+        if (createOp != null) {
+            lastCreateByComponent.remove(created);
+            Composite_Change existingCreateTrans = (Composite_Change) changeInst.getPartOfCompositeChange();
+            if (existingCreateTrans != null) {
+                createOp = existingCreateTrans;
+            }
+            Set<Change> changes = new HashSet<Change>();
+            changes.add(changeInst);
+            changes.add(createOp);
+            Composite_Change transaction = (Composite_Change) createChange(ChangeCls.Composite_Change);
+            transaction.setSubChanges(changes);
+            finalizeChange(transaction, created, "Created " + newName, ChangeModel.CHANGE_LEVEL_TRANS);
+        }
+    }
+    
     /* -------------------------------------Interfaces ------------------------------*/
 
 
     
     public KnowledgeBase getChangesKb() {
-        return changes;
+        return changes_kb;
     }
     
     public Project getChangesProject() {
@@ -149,7 +189,28 @@ public class ChangesDb {
         return model;
     }
     
-    public TransactionUtility getTransactionUtility() {
+    public String getCurrentUser() {
+        return ChangesProject.getUserName(kb);
+    }
+    
+    public boolean isOwl() {
+        return Util.kbInOwl(kb);
+    }
+    
+    public Ontology_Component getOntologyComponent(String name, boolean create) {
+        return nameChangeManager.getOntologyComponent(name, create);
+    }
+    
+    public TransactionState getTransactionState() {
+        TransactionState state = transactionMap.get(getCurrentSession());
+        if (state == null) {
+            state = new TransactionState(this);
+            transactionMap.put(getCurrentSession(), state);
+        }
+        return state;
+    }
+    
+    public TransactionState getTransactionUtility() {
         return transactionUtility;
     }
     
@@ -238,18 +299,6 @@ public class ChangesDb {
         }
     }
     
-    public Instance getRecentCreate(String name) {
-        return lastCreateByName.get(name);
-    }
-    
-    public void removeRecentCreate(String name) {
-        lastCreateByName.remove(name);
-    }
-    
-    public void addRecentCreate(String name, Instance change) {
-        lastCreateByName.put(name, change);
-    }
-    
     public void updateMap(FrameID frameId, String name) {
         frameIdMap.put(frameId, name);
     }
@@ -270,5 +319,24 @@ public class ChangesDb {
         else {
             return frame.getBrowserText();
         }
+    }
+    
+    public Change createChange(ChangeCls type) {
+        Change change = (Change) model.createInstance(type);
+        change.setAction(type.toString());
+        return change;
+    }
+    
+    public void finalizeChange(Change change,
+                               Ontology_Component applyTo,
+                               String context,
+                               String type) {
+        change.setAuthor(getCurrentUser());
+        change.setContext(context);
+        change.setType(type);
+        change.setTimestamp(new Timestamp(model));
+        change.setApplyTo(applyTo);  // this is what passes the change to the change tab
+                                     // so it  must happen last.
+        postProcessChange(change);
     }
 }

@@ -1,5 +1,5 @@
 
-// Created on Sat Mar 03 08:54:42 PST 2007
+// Created on Sat Mar 03 09:41:37 PST 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -32,10 +32,10 @@ public abstract class Change extends AnnotatableThing {
 		return  ModelUtilities.getOwnSlotValues(this, "associatedAnnotations");
 	}
 
-	public void setAction(Collection action) {
-		ModelUtilities.setOwnSlotValues(this, "action", action);	}
-	public Collection getAction(){
-		return  ModelUtilities.getOwnSlotValues(this, "action");
+	public void setAction(String action) {
+		ModelUtilities.setOwnSlotValue(this, "action", action);	}
+	public String getAction() {
+		return ((String) ModelUtilities.getOwnSlotValue(this, "action"));
 	}
 
 	public void setApplyTo(Instance applyTo) {

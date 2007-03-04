@@ -26,7 +26,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
     public ChangesKBListener(KnowledgeBase kb) {
         this.kb = kb;
         changesKb = ChangesProject.getChangesKB(kb);
-        changesDb = ChangesProject.getChangesDb(kb);
+        changesDb = ChangesProject.getChangesDb(kb);   
     }
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
@@ -37,10 +37,8 @@ public class ChangesKBListener implements KnowledgeBaseListener {
         String context = "Created Class: " + clsName;
 
         // Create artifical transaction for create class
-        if (!ChangesProject.getIsInTransaction(kb)) {
-            ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_BEGIN);
-            ChangesProject.setInCreateClass(kb, true);
-        } 
+        changesDb.getTransactionState().beginTransaction(context);
+        changesDb.setInCreateClass(true);
 
         Instance changeInst = ServerChangesUtil.createChange(kb,
                                                              changesKb,
