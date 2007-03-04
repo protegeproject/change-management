@@ -17,19 +17,22 @@ import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Class_Deleted;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
+import edu.stanford.smi.protegex.server_changes.model.generated.Property_Deleted;
 
 
 public class ChangesOwlKBListener implements KnowledgeBaseListener {
     private static final Logger log = Log.getLogger(ChangesOwlKBListener.class);
     private OWLModel om;
     private KnowledgeBase changesKb;
-    private ChangeModel model;
+    private ChangesDb changes_db;
     
     public ChangesOwlKBListener(OWLModel om) {
         this.om = om;
-        ChangesDb db = ChangesProject.getChangesDb(om);
-        changesKb = db.getChangesKb();
-        model = db.getModel();
+        changes_db = ChangesProject.getChangesDb(om);
+        changesKb = changes_db.getChangesKb();
     }
 
 	/* (non-Javadoc)
@@ -46,16 +49,14 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
             log.fine("In deleted class listener");
         }
         updateDeletedFrameMap(event);
+        
         String deletedClsName = event.getOldName();
         String context = "Deleted Class: " + deletedClsName;
-        Instance changeInst = ServerChangesUtil.createChange(om,
-                                                             changesKb,
-                                                             ChangeCls.Class_Deleted,
-                                                             deletedClsName, 
-                                                             context, 
-                                                             ChangeModel.CHANGE_LEVEL_INFO);
-        changeInst.get
-        ChangesProject.postProcessChange(om, changesKb, changeInst);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(deletedClsName, true);
+        
+        Class_Deleted change = (Class_Deleted) changes_db.createChange(ChangeCls.Class_Deleted);
+        change.setDeletionName(deletedClsName);
+        changes_db.finalizeChange(change, applyTo, context, ChangeModel.CHANGE_LEVEL_INFO);
     }
 
 
@@ -130,14 +131,11 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
         String propName = event.getOldName();
         if (event.getSlot() instanceof RDFProperty) {
             String context = "Property Deleted: " + propName;
-
-            Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                 changesKb,
-                                                                 Model.CHANGETYPE_PROPERTY_DELETED,
-                                                                 propName, 
-                                                                 context, 
-                                                                 Model.CHANGE_LEVEL_INFO);
-            ChangesProject.postProcessChange(om,changesKb, changeInst);
+            Ontology_Component property = changes_db.getOntologyComponent(propName, true);
+            
+            Property_Deleted change = (Property_Deleted) changes_db.createChange(ChangeCls.Property_Deleted);
+            change.setDeletionName(propName);
+            changes_db.finalizeChange(change, property, context, ChangeModel.CHANGE_LEVEL_INFO);
         }
 	}
     

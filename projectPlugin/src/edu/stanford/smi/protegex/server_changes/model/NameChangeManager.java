@@ -9,12 +9,12 @@ import java.util.Map;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Created_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Deleted_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
-import edu.stanford.smi.protegex.server_changes.model.listeners.AbstractChangeListener;
 
 public class NameChangeManager {
     private ChangeModel model;
@@ -67,6 +67,8 @@ public class NameChangeManager {
         public void addChange(Change change) {
             handleNameChange(change);
         }
+        
+        public void addAnnotation(Annotation a) { }
         
     }
     

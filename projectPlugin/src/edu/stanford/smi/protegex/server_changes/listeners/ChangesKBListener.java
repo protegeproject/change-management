@@ -1,32 +1,34 @@
 package edu.stanford.smi.protegex.server_changes.listeners;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.event.KnowledgeBaseEvent;
 import edu.stanford.smi.protege.event.KnowledgeBaseListener;
 import edu.stanford.smi.protege.model.Cls;
-import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.TransactionState;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Class_Created;
+import edu.stanford.smi.protegex.server_changes.model.generated.Class_Deleted;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
 public class ChangesKBListener implements KnowledgeBaseListener {
     private final static Logger log = Log.getLogger(ChangesKBListener.class);
     private KnowledgeBase kb;
     private KnowledgeBase changesKb;
-    private ChangesDb changesDb;
+    private ChangesDb changes_db;
     
     public ChangesKBListener(KnowledgeBase kb) {
         this.kb = kb;
         changesKb = ChangesProject.getChangesKB(kb);
-        changesDb = ChangesProject.getChangesDb(kb);   
+        changes_db = ChangesProject.getChangesDb(kb);   
     }
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
@@ -37,17 +39,15 @@ public class ChangesKBListener implements KnowledgeBaseListener {
         String context = "Created Class: " + clsName;
 
         // Create artifical transaction for create class
-        changesDb.getTransactionState().beginTransaction(context);
-        changesDb.setInCreateClass(true);
-
-        Instance changeInst = ServerChangesUtil.createChange(kb,
-                                                             changesKb,
-                                                             Model.CHANGETYPE_CLASS_CREATED, 
-                                                             clsName, 
-                                                             context, 
-                                                             Model.CHANGE_LEVEL_INFO);
-
-        ChangesProject.postProcessChange(kb, changesKb, changeInst);
+        changes_db.getTransactionState().beginTransaction(context);
+        changes_db.setInCreateClass(true);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
+        applyTo.setCurrentName(clsName);
+        
+        Class_Created change = (Class_Created) changes_db.createChange(ChangeCls.Class_Created);
+        change.setCreationName(clsName);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
     }
 
 	/* (non-Javadoc)
@@ -67,13 +67,12 @@ public class ChangesKBListener implements KnowledgeBaseListener {
             }
 		
             String context = "Deleted Class: " + deletedClsName;
-            Instance changeInst = ServerChangesUtil.createChange(kb,
-                                                                 changesKb,
-                                                                 Model.CHANGETYPE_CLASS_DELETED,
-                                                                 deletedClsName, 
-                                                                 context, 
-                                                                 Model.CHANGE_LEVEL_INFO);
-            ChangesProject.postProcessChange(kb, changesKb, changeInst);
+            
+            Ontology_Component applyTo = changes_db.getOntologyComponent(deletedClsName, true);
+            
+            Class_Deleted change = (Class_Deleted) changes_db.createChange(ChangeCls.Class_Deleted);
+            change.setDeletionName(deletedClsName);
+            changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	/* (non-Javadoc)
@@ -120,18 +119,12 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	    context.append("' to '");
 	    context.append(newName);
 	    context.append("'");
-
-
-	    Instance changeInst = ServerChangesUtil.createNameChange(kb,
-	                                                             changesKb,
-	                                                             Model.CHANGETYPE_NAME_CHANGED,
-	                                                             newName, 
-	                                                             context.toString(), 
-	                                                             Model.CHANGE_LEVEL_INFO, 
-	                                                             oldName, 
-	                                                             newName);
-
-	    ChangesProject.postProcessChange(kb, changesKb, changeInst);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(oldName, true);
+        applyTo.setCurrentName(newName);
+        
+        Change change = changes_db.createChange(ChangeCls.Name_Changed);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	/* (non-Javadoc)
@@ -153,20 +146,19 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 		Slot createdSlot = event.getSlot();
 		String slotName = createdSlot.getName();
 
+        
+        String context = "Created Slot: " + slotName;
+        
 		// Create artifical transaction for create slot
-		if (!ChangesProject.getIsInTransaction(kb)) {
-			ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_BEGIN);
-			ChangesProject.setInCreateSlot(kb, true);
-		}
-		
-		String context = "Created Slot: " + slotName;
-		Instance changeInst = ServerChangesUtil.createChange(kb,
-												changesKb,
-												Model.CHANGETYPE_SLOT_CREATED,
-												slotName, 
-												context, 
-												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(kb, changesKb, changeInst);
+        TransactionState tstate = changes_db.getTransactionState();
+        tstate.beginTransaction(context);
+        changes_db.setInCreateSlot(true);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(slotName, true);
+        applyTo.setCurrentName(slotName);
+        
+        Change change = changes_db.createChange(ChangeCls.Slot_Created);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	/* (non-Javadoc)
@@ -183,13 +175,11 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 			deletedSlotName = oldName;
 		}
 		String context = "Deleted Slot: " + deletedSlotName;
-		Instance changeInst = ServerChangesUtil.createChange(kb,
-												changesKb,
-												Model.CHANGETYPE_SLOT_DELETED,
-												deletedSlotName, 
-												context, 
-												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(kb, changesKb, changeInst);
-	
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(deletedSlotName, true);
+        applyTo.setCurrentName(null);
+        
+        Change change = changes_db.createChange(ChangeCls.Slote_Deleted);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 }

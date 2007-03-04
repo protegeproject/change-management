@@ -1,10 +1,8 @@
 package edu.stanford.smi.protegex.server_changes.listeners.owl;
 
-import java.util.logging.Logger;
-
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.owl.model.RDFResource;
@@ -13,15 +11,21 @@ import edu.stanford.smi.protegex.owl.model.event.ClassAdapter;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Instance_Added;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
  
 public class OwlChangesClassListener extends ClassAdapter {
     private OWLModel om;
+    private ChangesDb changes_db;
     private KnowledgeBase changesKb;
     
     public OwlChangesClassListener(OWLModel om) {
         this.om = om;
-        changesKb = ChangesProject.getChangesKB(om);
+        changes_db = ChangesProject.getChangesDb(om);
+        changesKb = changes_db.getChangesKb();
     }
 
 	public void instanceAdded(RDFSClass arg0, RDFResource arg1) {
@@ -33,16 +37,11 @@ public class OwlChangesClassListener extends ClassAdapter {
 		context.append(" (instance of: " );
 		context.append(arg0.getBrowserText() );
 		context.append(")");
-		
-		// Update frames map
-        ChangesDb changesDb = ChangesProject.getChangesDb(om);
-		Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                     changesKb,
-                                                                     Model.CHANGETYPE_INSTANCE_ADDED,
-                                                                     instName, 
-                                                                     context.toString(), 
-                                                                     Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(om,changesKb, changeInst);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(instName, true);
+        
+        Instance_Added change = (Instance_Added) changes_db.createChange(ChangeCls.Instance_Added);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	public void instanceRemoved(RDFSClass arg0, RDFResource arg1) {
@@ -56,13 +55,10 @@ public class OwlChangesClassListener extends ClassAdapter {
             context.append(arg0.getBrowserText());
             context.append(")");
             
-            Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                 changesKb,
-                                                                 Model.CHANGETYPE_INSTANCE_REMOVED,
-                                                                 instName, 
-                                                                 context.toString(), 
-                                                                 Model.CHANGE_LEVEL_INFO);
-            ChangesProject.postProcessChange(om,changesKb, changeInst);
+            Ontology_Component applyTo = changes_db.getOntologyComponent(instName, true);
+            
+            Change change = changes_db.createChange(ChangeCls.Instance_Removed);
+            changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	public void addedToUnionDomainOf(RDFSClass arg0, RDFProperty arg1) {
@@ -73,7 +69,7 @@ public class OwlChangesClassListener extends ClassAdapter {
 
 	public void subclassAdded(RDFSClass arg0, RDFSClass arg1) {
 		String clsName = arg1.getName();
-                String clsText = arg1.getBrowserText();
+		String clsText = arg1.getBrowserText();
 		StringBuffer context = new StringBuffer();
 		context.append("Subclass Added: ");
 		context.append(clsName);
@@ -81,14 +77,10 @@ public class OwlChangesClassListener extends ClassAdapter {
 		context.append(arg0.getBrowserText());
 		context.append(")");
 		
-		// Update frames map
-		Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                     changesKb,
-                                                                     Model.CHANGETYPE_SUBCLASS_ADDED,
-                                                                     clsName, 
-                                                                     context.toString(), 
-                                                                     Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(om,changesKb, changeInst);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
+        
+        Change change = changes_db.createChange(ChangeCls.Subclass_Added);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	public void subclassRemoved(RDFSClass arg0, RDFSClass arg1) {
@@ -101,18 +93,15 @@ public class OwlChangesClassListener extends ClassAdapter {
             context.append(arg0.getBrowserText());
             context.append(")");
             
-            Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                 changesKb,
-                                                                 Model.CHANGETYPE_SUBCLASS_REMOVED,
-                                                                 clsName, 
-                                                                 context.toString(), 
-                                                                 Model.CHANGE_LEVEL_INFO);
-            ChangesProject.postProcessChange(om,changesKb, changeInst);
+            Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
+            
+            Change change = changes_db.createChange(ChangeCls.Subclass_Removed);
+            changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	public void superclassAdded(RDFSClass arg0, RDFSClass arg1) {
 		String clsName = arg1.getName();
-                String clsText = arg1.getBrowserText();
+		String clsText = arg1.getBrowserText();
 		StringBuffer context = new StringBuffer();
 		context.append("Superclass Added: ");
 		context.append(clsText);
@@ -120,34 +109,27 @@ public class OwlChangesClassListener extends ClassAdapter {
 		context.append(arg0.getBrowserText());
 		context.append(")");
 		
-		// Update frames map
-		Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                     changesKb,
-                                                                     Model.CHANGETYPE_SUPERCLASS_ADDED,
-                                                                     clsName, 
-                                                                     context.toString(),
-                                                                     Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(om,changesKb, changeInst);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
+        
+        Change change = changes_db.createChange(ChangeCls.Superclass_Added);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	public void superclassRemoved(RDFSClass arg0, RDFSClass arg1) {
 		String a = arg1.getName();
 		String b = arg1.getBrowserText();
-                ChangesDb changesDb = ChangesProject.getChangesDb(om);
-		String clsName = changesDb.getPossiblyDeletedFrameName(arg1);
+		String clsName = changes_db.getPossiblyDeletedFrameName(arg1);
 		StringBuffer context = new StringBuffer();
 		context.append("Superclass Removed: ");
 		context.append(clsName);
 		context.append(" (removed from: ");
 		context.append(arg0.getBrowserText());
 		context.append(")");
-		
-		Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                     changesKb,
-                                                                     Model.CHANGETYPE_SUPERCLASS_REMOVED,
-                                                                     clsName, 
-                                                                     context.toString(), 
-                                                                     Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(om,changesKb, changeInst);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
+        
+        Change change = changes_db.createChange(ChangeCls.Superclass_Removed);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 }

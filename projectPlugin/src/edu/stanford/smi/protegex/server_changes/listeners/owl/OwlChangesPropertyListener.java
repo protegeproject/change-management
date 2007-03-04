@@ -1,6 +1,5 @@
 package edu.stanford.smi.protegex.server_changes.listeners.owl;
 
-import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
@@ -8,18 +7,20 @@ import edu.stanford.smi.protegex.owl.model.RDFSClass;
 import edu.stanford.smi.protegex.owl.model.event.PropertyAdapter;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
 public class OwlChangesPropertyListener extends PropertyAdapter{
     private OWLModel om;
     private KnowledgeBase changesKb;
-    private ChangesDb changesDb;
+    private ChangesDb changes_db;
 
     public OwlChangesPropertyListener(OWLModel om) {
         this.om = om;
         changesKb = ChangesProject.getChangesKB(om);
-        changesDb = ChangesProject.getChangesDb(om);
+        changes_db = ChangesProject.getChangesDb(om);
     }
 
 
@@ -30,19 +31,16 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(" (added to: ");
 		context.append(arg1.getBrowserText());
 		context.append(")");
-		
-		Instance changeInst = ServerChangesUtil.createChange(om,
-		                                                     changesKb,
-		                                                     Model.CHANGETYPE_SUBPROPERTY_ADDED,
-		                                                     arg0.getName(), 
-		                                                     context.toString(), 
-		                                                     Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(om, changesKb, changeInst);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(arg0.getName(), true);
+        
+        Change change = changes_db.createChange(ChangeCls.Subproperty_Added);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	public void subpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
-            String browserText0 = changesDb.getPossiblyDeletedBrowserText(arg0);
-            String name0 = changesDb.getPossiblyDeletedFrameName(arg0);
+            String browserText0 = changes_db.getPossiblyDeletedBrowserText(arg0);
+            String name0 = changes_db.getPossiblyDeletedFrameName(arg0);
         
             StringBuffer context = new StringBuffer();
             context.append("Subproperty Removed: ");
@@ -50,14 +48,11 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
             context.append(" (removed from: ");
             context.append(arg1.getBrowserText());
             context.append(")");
-		
-            Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                 changesKb,
-                                                                 Model.CHANGETYPE_SUBPROPERTY_REMOVED,
-                                                                 name0, 
-                                                                 context.toString(), 
-                                                                 Model.CHANGE_LEVEL_INFO);
-            ChangesProject.postProcessChange(om,changesKb, changeInst);
+            
+            Ontology_Component applyTo = changes_db.getOntologyComponent(name0, true);
+            
+            Change change = changes_db.createChange(ChangeCls.Subproperty_Removed);
+            changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	public void superpropertyAdded(RDFProperty arg0, RDFProperty arg1) {
@@ -68,19 +63,17 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(arg1.getBrowserText());
 		context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                     changesKb,
-                                                                     Model.CHANGETYPE_SUPERPROPERTY_ADDED,
-                                                                     arg0.getName(), 
-                                                                     context.toString(), 
-                                                                     Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(om,changesKb, changeInst);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(arg0.getName(), true);
+        
+        Change change = changes_db.createChange(ChangeCls.Superproperty_Added);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	public void superpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
-        String browserText0 = changesDb.getPossiblyDeletedBrowserText(arg0);
-        String name0 = changesDb.getPossiblyDeletedFrameName(arg0);
-        String browserText1 = changesDb.getPossiblyDeletedBrowserText(arg1);
+        String browserText0 = changes_db.getPossiblyDeletedBrowserText(arg0);
+        String name0 = changes_db.getPossiblyDeletedFrameName(arg0);
+        String browserText1 = changes_db.getPossiblyDeletedBrowserText(arg1);
 		StringBuffer context = new StringBuffer();
 		context.append("Superproperty Removed: ");
 		context.append(browserText0);
@@ -88,13 +81,11 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(browserText1);
 		context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(om,
-		                                                     changesKb,
-		                                                     Model.CHANGETYPE_SUPERPROPERTY_REMOVED,
-		                                                     name0, 
-		                                                     context.toString(),
-		                                                     Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(om,changesKb, changeInst);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(name0, true);
+        
+        Change change = changes_db.createChange(ChangeCls.Superproperty_Removed);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+
 	}
 
 	public void unionDomainClassAdded(RDFProperty arg0, RDFSClass arg1) {
@@ -110,20 +101,18 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(clsText);
 		context.append(")");
 				
-		Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                     changesKb,
-                                                                     Model.CHANGETYPE_DOMAIN_PROP_ADDED,
-                                                                     clsName, 
-                                                                     context.toString(), 
-                                                                     Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(om,changesKb, changeInst);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(propName, true);
+        
+        Change change = changes_db.createChange(ChangeCls.DomainProperty_Added);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+
 	}
 
 	public void unionDomainClassRemoved(RDFProperty arg0, RDFSClass arg1) {
-		String propName = changesDb.getPossiblyDeletedFrameName(arg0);
-		String propText = changesDb.getPossiblyDeletedBrowserText(arg0);
-		String clsName = changesDb.getPossiblyDeletedFrameName(arg1);
-		String clsText = changesDb.getPossiblyDeletedBrowserText(arg1);
+		String propName = changes_db.getPossiblyDeletedFrameName(arg0);
+		String propText = changes_db.getPossiblyDeletedBrowserText(arg0);
+		String clsName = changes_db.getPossiblyDeletedFrameName(arg1);
+		String clsText = changes_db.getPossiblyDeletedBrowserText(arg1);
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Domain Property Removed: ");
@@ -132,13 +121,11 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(clsText);
 		context.append(")");
 		
-		Instance changeInst = ServerChangesUtil.createChange(om,
-                                                                     changesKb,
-                                                                     Model.CHANGETYPE_DOMAIN_PROP_REMOVED,
-                                                                     clsName, 
-                                                                     context.toString(), 
-                                                                     Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(om,changesKb, changeInst);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(propName, true);
+        
+        Change change = changes_db.createChange(ChangeCls.DomainProperty_Removed);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+
 	}
 
 }
