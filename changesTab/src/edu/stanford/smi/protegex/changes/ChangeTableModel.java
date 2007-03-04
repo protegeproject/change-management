@@ -100,13 +100,14 @@ public class ChangeTableModel extends AbstractTableModel {
 		// get the particular piece of info out of it.
 		Change aInst = workingData.get(row);
 
-		
-		Object ctxt = null;
 		if (col < 0 || col >= ChangeTableColumn.values().length) {
 		    return null;
         }
-        
-		switch(ChangeTableColumn.values()[col]) {
+        ChangeTableColumn column = ChangeTableColumn.values()[col];
+        if (ChangeModel.isRoot(aInst)) {
+            return column.getHeading();
+        }
+		switch(column) {
 		case CHANGE_COLNAME_AUTHOR:
 			return  aInst.getAuthor();
 		case CHANGE_COLNAME_CREATED: 

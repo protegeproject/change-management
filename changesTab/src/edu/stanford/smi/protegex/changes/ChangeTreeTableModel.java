@@ -79,10 +79,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 
 
 	public Object getValueAt(Object node, int col) {
-		
-	
-     return ((TreeTableNode) node).getValueAt(col);
-		   
+	    return ((TreeTableNode) node).getValueAt(col);
 	}
 	
 

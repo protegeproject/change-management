@@ -318,18 +318,7 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		// GETTING THE ROOT INSTANCE TO CREATE ROOT OF THE TREE
 		
-		Cls chgs = changes_kb.getCls("Instance_Added");
-		Collection<Instance> changeInst = changes_kb.getInstances(chgs);
-		Change ROOT = null;
-		for (Instance i : changeInst) {
-			Change aInst = (Change) i;
-			String apply = ChangeSlot.applyTo.toString();
-			if (changes_db.getModel().isRoot(aInst)){
-				 ROOT = aInst;
-		         break;
-			}
-			
-		}
+        Change ROOT = changes_db.getModel().findRoot();
 	
 		TreeTableNode root = new TreeTableNode(ROOT,changes_kb);
 		
