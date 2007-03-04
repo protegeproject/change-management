@@ -24,6 +24,7 @@ import edu.stanford.smi.protegex.changes.ChangeCreateUtil;
 import edu.stanford.smi.protegex.changes.ChangesTab;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 
 public class ChangeMenu extends JMenu {
 
@@ -38,6 +39,7 @@ public class ChangeMenu extends JMenu {
 	private KnowledgeBase change_kb;
 	private Project change_project;
     private ChangeModel change_model;
+    private ChangeCreateUtil create_util;
 	private Instance annotateInst;
 	
 	public ChangeMenu(ChangesDb change_db) {
@@ -47,6 +49,7 @@ public class ChangeMenu extends JMenu {
 		this.change_kb = change_db.getChangesKb();
 		this.change_project = change_kb.getProject();
         this.change_model = change_db.getModel();
+        this.create_util = new ChangeCreateUtil(change_model);
 		
 		JMenuItem annotate = new JMenuItem(MENU_ITEM_ANNOTATE_LAST);
 		JMenuItem changeInfo = new JMenuItem(MENU_ITEM_CHANGE_INFO);
@@ -77,13 +80,13 @@ public class ChangeMenu extends JMenu {
 		public void actionPerformed(ActionEvent arg0) {
 			Collection changeInsts = new ArrayList();
 			changeInsts.add(lastInst);
-			annotateInst = ChangeCreateUtil.createAnnotation(change_kb, "Comment", changeInsts);
+			annotateInst = create_util.createAnnotation("Comment", changeInsts);
 			
 			JFrame aEdit = change_project.show(annotateInst);
 			aEdit.addWindowListener(new WindowListener() {
 				
 				public void windowClosed(WindowEvent arg0) {
-					ChangesTab.createAnnotation(annotateInst);	
+					ChangesTab.createAnnotation((Annotation) annotateInst);	
 					setEnabledLastChange(false);
 				}
 				

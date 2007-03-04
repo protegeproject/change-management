@@ -12,29 +12,37 @@ import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeSlot;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 
 public class ChangeTableModel extends AbstractTableModel {
-
-	public static final int FILTER_TRANS = 0;
-	public static final int FILTER_TRANS_INFO = 1;
-	public static final int SHOW_ALL = 2;
+    public enum FilterMethod {
+        FILTER_TRANS, FILTER_TRANS_INFO, SHOW_ALL
+    }
 	
     public enum Column {
-      CHANGE_COLNAME_ACTION("Action"),
-        CHANGE_COLNAME_DESCRIPTION("Description"),
-        CHANGE_COLNAME_AUTHOR("Author"),
-        CHANGE_COLNAME_CREATED("Created");
+      CHANGE_COLNAME_ACTION("Action", ChangeSlot.action),
+        CHANGE_COLNAME_DESCRIPTION("Description", ChangeSlot.body),
+        CHANGE_COLNAME_AUTHOR("Author", ChangeSlot.author),
+        CHANGE_COLNAME_CREATED("Created", ChangeSlot.timestamp);
 
         private String name;
-        private Column(String name) {
+        private ChangeSlot search_slot;
+        private Column(String name, ChangeSlot search_slot) {
           this.name = name;
+          this.search_slot = search_slot;
         }
 
         public String getName() {
           return name;
+        }
+        
+        public ChangeSlot getSearchSlot() {
+            return search_slot;
         }
     }
 	//static protected Class[]  cTypes = {String.class, String.class, String.class, Icon.class, String.class};
@@ -46,16 +54,19 @@ public class ChangeTableModel extends AbstractTableModel {
 	private ArrayList colorList;
 	private Integer currColor = new Integer(-1);
 	
-	private int filterMethod = FILTER_TRANS;
+	private FilterMethod filterMethod = FilterMethod.FILTER_TRANS;
 	private KnowledgeBase changeKB;
+    ChangeModel model;
 	
-	public ChangeTableModel(KnowledgeBase changeKB) {
-		this.changeKB = changeKB;
+	public ChangeTableModel(ChangeModel model) {
+        this.model = model;
+		this.changeKB = model.getChangeKb();
 		init();
 	}
 	
-	public ChangeTableModel(KnowledgeBase changeKB, int filter) {
-		this.changeKB = changeKB;
+	public ChangeTableModel(ChangeModel model, FilterMethod filter) {
+        this.model = model;
+		this.changeKB = model.getChangeKb();
 		filterMethod = filter;
 		init();
 	}
@@ -140,7 +151,7 @@ public class ChangeTableModel extends AbstractTableModel {
 	 * @param annotate
 	 * Add the given annotation to the internal data structure
 	 */
-	public void addChangeData(Instance changeInst) {
+	public void addChangeData(Change changeInst) {
 		
 		addChangeData(changeInst, true);
 		fireTableRowsInserted(workingData.size()-1, workingData.size()-1);
@@ -150,43 +161,37 @@ public class ChangeTableModel extends AbstractTableModel {
 		fireTableDataChanged();
 	}
 	
-	private void addChangeData(Instance changeInst, boolean completeUpdate) {
+	@SuppressWarnings("unchecked")
+    private void addChangeData(Change changeInst, boolean completeUpdate) {
 		boolean isTrans = false;
 		boolean added = false;
-		String actionType = Model.getType(changeInst);
 			
-		if (!Model.CHANGE_LEVEL_ROOT.equals(actionType)) {
-			if (filterMethod == FILTER_TRANS) {
-				if (actionType.equals(Model.CHANGE_LEVEL_INFO) || 
-						actionType.equals(Model.CHANGE_LEVEL_TRANS) || 
-						actionType.equals(Model.CHANGE_LEVEL_DISP_TRANS)) {
-					workingData.add(changeInst);
-					colorList.add(currColor);
-					added = true;
-				}
-				
-			} else if (filterMethod == FILTER_TRANS_INFO) {
-				if (actionType.equals(Model.CHANGE_LEVEL_INFO) || 
-						actionType.equals(Model.CHANGE_LEVEL_TRANS) || 
-						actionType.equals(Model.CHANGE_LEVEL_TRANS_INFO)) {
-					workingData.add(changeInst);
-					colorList.add(currColor);
-					added = true;
-				}
-				
-			} else if (filterMethod == SHOW_ALL) {
-				workingData.add(changeInst);
-				colorList.add(currColor);
-				added = true;
-			}
+		if (!ChangeModel.isRoot(changeInst)) {
+            switch (filterMethod) {
+            case FILTER_TRANS:
+                if (!(changeInst instanceof Composite_Change)) {
+                    workingData.add(changeInst);
+                    colorList.add(currColor);
+                    added = true;
+                }
+                break;
+            case FILTER_TRANS_INFO:
+                if (changeInst.getPartOfCompositeChange() == null) {
+                    workingData.add(changeInst);
+                    colorList.add(currColor);
+                    added = true;
+                }
+                break;
+            case SHOW_ALL:
+                workingData.add(changeInst);
+                colorList.add(currColor);
+                added = true;
+                break;
+            default:
+                throw new UnsupportedOperationException("Developer missed a case");
+            }
 
-			// If we have a transaction change, add the list of changes
-			Cls changeInstType = changeInst.getDirectType();
-			if (changeInstType.getName().equals(Model.CHANGETYPE_TRANS_CHANGE)) {
-				isTrans = true;
-				Collection relChanges = Model.getChanges(changeInst);
-				addChangeData(relChanges);
-			} 
+            isTrans = changeInst instanceof Composite_Change;
 			
 			if (!isTrans && added) {
 				updateCurrColor();
@@ -196,37 +201,7 @@ public class ChangeTableModel extends AbstractTableModel {
 				completeData.add(changeInst);
 			}
 		}
-	}
-	
-	private void addChangeData(Collection changeInsts) {
-		
-		for (Iterator iter = changeInsts.iterator(); iter.hasNext();) {
-			Instance aInst = (Instance) iter.next();
-			String actionType = Model.getType(aInst);
-			
-			if (filterMethod == FILTER_TRANS) {
-				if (actionType.equals(Model.CHANGE_LEVEL_INFO) || 
-						actionType.equals(Model.CHANGE_LEVEL_TRANS)) {
-					workingData.add(aInst);
-					colorList.add(currColor);
-				}
-				
-			} else if (filterMethod == FILTER_TRANS_INFO) {
-				if (actionType.equals(Model.CHANGE_LEVEL_INFO) || 
-						actionType.equals(Model.CHANGE_LEVEL_TRANS) || 
-						actionType.equals(Model.CHANGE_LEVEL_TRANS_INFO)) {
-					workingData.add(aInst);
-					colorList.add(currColor);
-				}
-				
-			} else if (filterMethod == SHOW_ALL) {
-				workingData.add(aInst);
-				colorList.add(currColor);
-			}
-		}
-		updateCurrColor();
-	}
-	
+    }
 	
 	
 	
@@ -234,19 +209,17 @@ public class ChangeTableModel extends AbstractTableModel {
 	 * @param changeInsts
 	 * Set the given data structure to the given collectin of instances
 	 */
-	public void setChanges(Collection changeInsts) {
+	public void setChanges(Collection<Instance> changeInsts) {
 		workingData.clear();
+        completeData.clear();
 		colorList.clear();
-		for (Iterator iter = changeInsts.iterator(); iter.hasNext();) {
-			Instance cInst = (Instance) iter.next();
+		for (Instance i : changeInsts) {
+			Change cInst = (Change) i;
 			workingData.add(cInst);
+            completeData.add(cInst);
 			colorList.add(currColor);
 			updateCurrColor();
 		}
-		
-		completeData.clear();
-		completeData.addAll(changeInsts);
-		
 		fireTableDataChanged();
 	}
 	
@@ -271,17 +244,17 @@ public class ChangeTableModel extends AbstractTableModel {
 	}
 	
 	public void filterTrans() {
-		filterMethod = FILTER_TRANS;
+		filterMethod = FilterMethod.FILTER_TRANS;
 		setNewFilter();
 	}
 	
 	public void filterTransInfo() {
-		filterMethod = FILTER_TRANS_INFO;
+		filterMethod = FilterMethod.FILTER_TRANS_INFO;
 		setNewFilter();
 	}
 
 	public void filterAll() {
-		filterMethod = SHOW_ALL;
+		filterMethod = FilterMethod.SHOW_ALL;
 		setNewFilter();
 	}
 	
@@ -304,22 +277,13 @@ public class ChangeTableModel extends AbstractTableModel {
             }
         }
 		
-		Slot sltToSearch = null;
-		if (field.equals(CHANGE_COLNAME_AUTHOR)) {
-			sltToSearch = author;
-		} else if (field.equals(CHANGE_COLNAME_CREATED)) {
-			sltToSearch = created;
-		} else if (field.equals(CHANGE_COLNAME_ACTION)) {
-			sltToSearch = action;
-		} else if (field.equals(CHANGE_COLNAME_DESCRIPTION)) {
-			sltToSearch = desc;
-		}
+		Slot sltToSearch = model.getSlot(search_column.getSearchSlot());
 		Collection results = changeKB.getMatchingFrames(sltToSearch, null, false, text, 1000);
 		
 		for (Iterator iter = results.iterator(); iter.hasNext();) {
 			Object element = (Object) iter.next();
-			if (element instanceof Instance) {
-				Instance someInst = (Instance) element;
+			if (element instanceof Change) {
+				Change someInst = (Change) element;
 				addChangeData(someInst, false);
 			}
 		}
@@ -332,8 +296,7 @@ public class ChangeTableModel extends AbstractTableModel {
 		colorList.clear();
 		
 		//initCurrColor();
-		for (Iterator iter = completeData.iterator(); iter.hasNext();) {
-			Instance aInst = (Instance) iter.next();
+		for (Change aInst : completeData) {
 			addChangeData(aInst, false);
 		}
 		

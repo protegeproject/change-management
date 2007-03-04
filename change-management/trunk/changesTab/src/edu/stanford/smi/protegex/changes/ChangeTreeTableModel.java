@@ -9,10 +9,11 @@ import java.util.Map;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protegex.changes.ui.AbstractTreeTableModel;
 import edu.stanford.smi.protegex.changes.ui.TreeTableModel;
-import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 
 public class ChangeTreeTableModel extends AbstractTreeTableModel implements TreeTableModel{
 
@@ -121,7 +122,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
         TreeTableNode newNode = null;
 		String actionType = Model.getType(changeInst);   
 		if (actionType != null){
-			if (!actionType.equals(Model.CHANGE_LEVEL_ROOT)){
+                    if (!isRoot(changeInst)) {
 			    newNode = insertIntoModel(root, changeInst);
 			    if (completeUpdate) {
 			        completeData.add(changeInst);
@@ -144,10 +145,10 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 		}
 	
 	
-	private void addChangeData(Collection changeInsts) {
+	private void addChangeData(Collection<Instance> changeInsts) {
 		
-		for (Iterator iter = changeInsts.iterator(); iter.hasNext();) {
-			Instance aInst = (Instance) iter.next();
+		for (Instance i : changeInsts) {
+			Change aInst = (Change) i;
 			addChangeData(aInst,false);
 		}
 	}
