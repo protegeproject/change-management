@@ -48,7 +48,7 @@ public class ChangeCreateUtil {
  * I don't think that this method will work right - see the AbstractChangeListener & ChangeDb.createAnnotation
  */
 	public Annotation updateAnnotation(Annotation annotateInst) {
-        Timestamp now = new Timestamp(model);
+        Timestamp now = Timestamp.getTimestamp(model);
         annotateInst.setCreated(now);
         annotateInst.setModified(now);
         annotateInst.setAuthor(cKb.getUserName());

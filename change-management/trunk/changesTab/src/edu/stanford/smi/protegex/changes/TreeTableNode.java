@@ -5,7 +5,7 @@ import java.util.List;
 
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protege.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
@@ -23,11 +23,19 @@ public class TreeTableNode {
 
     
     public String toString() { 
-		return ChangeCreateUtil.getActionDisplay(changeInst);
+        if (ChangeModel.isRoot(changeInst)) {
+            return ChangeTableColumn.CHANGE_COLNAME_ACTION.getHeading();
+        }
+        else {
+            return ChangeCreateUtil.getActionDisplay(changeInst);
+        }
     }
 
     public Object getValueAt(int i) {
         ChangeTableColumn col = ChangeTableColumn.values()[i];
+        if (ChangeModel.isRoot(changeInst)) {
+            return col.getHeading();
+        }
     	switch (col) {
 		case CHANGE_COLNAME_AUTHOR:
 		    return changeInst.getAuthor();
