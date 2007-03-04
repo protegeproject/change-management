@@ -55,20 +55,32 @@
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Class_Created"
+	 rdfs:comment="Created_Change"
 	 rdfs:label="Class_Created">
-	<rdfs:subClassOf rdf:resource="&kb;KB_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Created_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Class_Deleted"
+	 rdfs:comment="Deleted_Change"
 	 rdfs:label="Class_Deleted">
-	<rdfs:subClassOf rdf:resource="&kb;KB_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Deleted_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Comment"
 	 rdfs:comment="A class of Annotations representing general comments"
 	 rdfs:label="Comment">
 	<rdfs:subClassOf rdf:resource="&kb;Annotation"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;CompositeChange"
-	 rdfs:label="CompositeChange">
+<rdfs:Class rdf:about="&kb;Composite_Change"
+	 rdfs:label="Composite_Change">
+	<rdfs:subClassOf rdf:resource="&kb;Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Created_Change"
+	 rdfs:label="Created_Change">
+	<rdfs:subClassOf rdf:resource="&kb;Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Deleted_Change"
+	 rdfs:label="Deleted_Change">
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;DirectType_Added"
@@ -130,11 +142,6 @@
 	 rdfs:label="Instance_Removed">
 	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;KB_Change"
-	 a:role="abstract"
-	 rdfs:label="KB_Change">
-	<rdfs:subClassOf rdf:resource="&kb;Change"/>
-</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Maximum_Cardinality"
 	 rdfs:label="Maximum_Cardinality">
 	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
@@ -153,7 +160,7 @@
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Name_Changed"
 	 rdfs:label="Name_Changed">
-	<rdfs:subClassOf rdf:resource="&kb;KB_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Ontology_Component"
 	 rdfs:label="Ontology_Component">
@@ -164,11 +171,15 @@
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Property_Created"
+	 rdfs:comment="Created_Change"
 	 rdfs:label="Property_Created">
+	<rdfs:subClassOf rdf:resource="&kb;Created_Change"/>
 	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Property_Deleted"
+	 rdfs:comment="Deleted_Change"
 	 rdfs:label="Property_Deleted">
+	<rdfs:subClassOf rdf:resource="&kb;Deleted_Change"/>
 	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Proposal"
@@ -196,11 +207,15 @@
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Slot_Created"
+	 rdfs:comment="Created_Change"
 	 rdfs:label="Slot_Created">
+	<rdfs:subClassOf rdf:resource="&kb;Created_Change"/>
 	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Slot_Deleted"
+	 rdfs:comment="Deleted_Change"
 	 rdfs:label="Slot_Deleted">
+	<rdfs:subClassOf rdf:resource="&kb;Deleted_Change"/>
 	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Slot_Value"
@@ -278,6 +293,7 @@
 	<rdfs:subClassOf rdf:resource="&kb;Proposal"/>
 </rdfs:Class>
 <rdf:Property rdf:about="&kb;action"
+	 a:maxCardinality="1"
 	 rdfs:label="action">
 	<rdfs:domain rdf:resource="&kb;Change"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
@@ -338,6 +354,12 @@
 	<rdfs:domain rdf:resource="&kb;Annotation"/>
 	<rdfs:range rdf:resource="&kb;Timestamp"/>
 </rdf:Property>
+<rdf:Property rdf:about="&kb;creationName"
+	 a:maxCardinality="1"
+	 rdfs:label="creationName">
+	<rdfs:domain rdf:resource="&kb;Created_Change"/>
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</rdf:Property>
 <rdf:Property rdf:about="&kb;currentName"
 	 a:maxCardinality="1"
 	 rdfs:label="currentName">
@@ -348,6 +370,12 @@
 	 a:maxCardinality="1"
 	 rdfs:label="date">
 	<rdfs:domain rdf:resource="&kb;Timestamp"/>
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;deletionName"
+	 a:maxCardinality="1"
+	 rdfs:label="deletionName">
+	<rdfs:domain rdf:resource="&kb;Deleted_Change"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;inverse_of_annotates"
@@ -381,7 +409,7 @@
 	 a:maxCardinality="1"
 	 rdfs:label="partOfCompositeChange">
 	<rdfs:domain rdf:resource="&kb;Change"/>
-	<rdfs:range rdf:resource="&kb;CompositeChange"/>
+	<rdfs:range rdf:resource="&kb;Composite_Change"/>
 	<a:inverseProperty rdf:resource="&kb;subChanges"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;related"
@@ -400,7 +428,7 @@
 <rdf:Property rdf:about="&kb;subChanges"
 	 rdfs:label="subChanges">
 	<rdfs:range rdf:resource="&kb;Change"/>
-	<rdfs:domain rdf:resource="&kb;CompositeChange"/>
+	<rdfs:domain rdf:resource="&kb;Composite_Change"/>
 	<a:inverseProperty rdf:resource="&kb;partOfCompositeChange"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;subject"
