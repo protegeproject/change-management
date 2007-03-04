@@ -5,17 +5,21 @@ import edu.stanford.smi.protege.event.ClsListener;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Model;
+import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.TransactionState;
 
 public class ChangesClsListener implements ClsListener{
     private KnowledgeBase kb;
+    private ChangesDb changesDb;
     private KnowledgeBase changesKb;
     
     public ChangesClsListener(KnowledgeBase kb) {
         this.kb = kb;
-        changesKb = ChangesProject.getChangesKB(kb);
+        changesDb = ChangesProject.getChangesDb(kb);
+        changesKb = changesDb.getChangesKb();
     }
 
 	/* (non-Javadoc)
@@ -43,8 +47,8 @@ public class ChangesClsListener implements ClsListener{
 		ChangesProject.postProcessChange(kb, changesKb, changeInst);
 		// Create artificial transaction for create slot
 		if (ChangesProject.getInCreateSlot(kb) && ChangesProject.getIsInTransaction(kb)) {
-			ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_END);
-			ChangesProject.setInCreateSlot(kb, false);
+            changesDb.getTransactionState().commitTransaction();
+            changesDb.setInCreateClass(false);
 		}
 		
 	}
@@ -95,8 +99,11 @@ public class ChangesClsListener implements ClsListener{
 												Model.CHANGE_LEVEL_INFO);
 		ChangesProject.postProcessChange(kb, changesKb, changeInst);
 		
+        TransactionState tstate = changesDb.getTransactionState();
 		// Create artificial transaction for create class
-		if (ChangesProject.getIsInTransaction(kb) && ChangesProject.getInCreateClass(kb)) {
+		if (tstate.inTransaction() && changesDb.getInCreateClass()) {
+            tstate.commitTransaction();
+            changesDb.setInCreateClass(false);
 			ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_END);
 			ChangesProject.setInCreateClass(kb, false);
 		}

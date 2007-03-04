@@ -144,81 +144,6 @@ public class ChangesProject extends ProjectPluginAdapter {
 		currentKB.addTransactionListener(new ChangesTransListener(currentKB));
 		currentKB.addFrameListener(new ChangesFrameListener(currentKB));
 	}
-    
-
-
-	public static void postProcessChange(KnowledgeBase currentKB, 
-	                                     KnowledgeBase changesKb, 
-	                                     Instance aChange){
-        ChangesDb changesDb = getChangesDb(currentKB);
-		if (changesDb.isInTransaction()) {
-			changesDb.pushTransStack(aChange);
-		}
-        checkForCreateChange(currentKB, changesKb, changesDb, aChange);
-	}
-	
-	
-	// takes care of case when class is created & then renamed - Adding original name of class and change instance to HashMap
-	private static void checkForCreateChange(KnowledgeBase currentKB, 
-                                             KnowledgeBase changesKb, 
-                                             ChangesDb changesDb, 
-                                             Instance aChange) {
-        Model model = changesDb.getModel();
-        Collection direct_types = aChange.getDirectTypes();
-		if  (direct_types.contains(model.getClassCreatedClass()) ||
-                direct_types.contains(model.getSlotCreatedClass()) ||
-		        direct_types.contains(model.getPropertyCreatedClass())) {
-			changesDb.addRecentCreate(Model.getApplyTo(aChange), aChange);
-		}
-        if (direct_types.contains(model.getNameChangedClass())) {
-            String oldName = Model.getNameChangedOldName(aChange);
-            String newName = Model.getNameChangedNewName(aChange);
-            possiblyCombineWithCreate(currentKB, changesKb, changesDb, 
-                                      aChange, oldName, newName);
-        }
-    }
-    
-    private static void possiblyCombineWithCreate(KnowledgeBase kb, KnowledgeBase changesKb, ChangesDb changesDb,
-                                                  Instance changeInst, String oldName, String newName) {
-        Model model = changesDb.getModel();
-        Instance createOp = changesDb.getRecentCreate(oldName);
-        if (createOp != null) {
-            Instance createTrans = (Instance) createOp.getOwnSlotValue(model.getPartOfTransactionSlot());
-            if (createTrans != null) {
-                createOp = createTrans;
-            }
-            changesDb.removeRecentCreate(oldName);
-            Set<Instance> changes = new HashSet<Instance>();
-            changes.add(changeInst);
-            changes.add(createOp);
-            Instance transaction = ServerChangesUtil.createTransChange(changesKb, changes, createOp, 
-                                                                      newName, "Created " + newName);
-            ChangesProject.postProcessChange(kb, changesKb,  transaction);
-        }
-    }
-        
-	public static void createTransactionChange(KnowledgeBase currentKB, String typ) {
-        ChangesDb changesDb = changesDbMap.get(currentKB);
-        TransactionUtility tu = changesDb.getTransactionUtility();
-
-		if (typ.equals(TRANS_SIGNAL_TRANS_BEGIN)) {
-            changesDb.setInTransaction(true);
-            changesDb.incrementTransactionCount();
-            changesDb.pushTransStack(TRANS_SIGNAL_START);
-
-		} else if (typ.equals(TRANS_SIGNAL_TRANS_END)) {
-            changesDb.decrementTransactionCount();
-			changesDb.setTransStack(tu.convertTransactions(changesDb.getTransStack()));
-
-			// Indicates we are done (balanced start and ends)
-			if (changesDb.getTransactionCount() ==0) {
-                changesDb.setInTransaction(false);
-				Instance changeInst = tu.findAggAction(changesDb.getTransStack(), Util.kbInOwl(currentKB));
-				//checkForCreateChange(changeInst);	
-				changesDb.clearTransStack();
-			} 
-		} 
-	}
 
 	private static void createChangeProject(KnowledgeBase currentKB) {
         ChangesDb changesDb = changesDbMap.get(currentKB);
@@ -231,31 +156,6 @@ public class ChangesProject extends ProjectPluginAdapter {
 	
 	public static String getUserName(KnowledgeBase currentKB) {
 		return currentKB.getUserName();
-	}
-
-	public static boolean getIsInTransaction(KnowledgeBase kb) {
-        ChangesDb changesDb = getChangesDb(kb);
-		return changesDb.isInTransaction();
-	}
-
-	public static boolean getInCreateClass(KnowledgeBase kb) {
-        ChangesDb changesDb = getChangesDb(kb);
-		return changesDb.isInCreateClass();
-	}
-
-	public static void setInCreateClass(KnowledgeBase kb, boolean val) {
-        ChangesDb changesDb = getChangesDb(kb);
-        changesDb.setInCreateClass(val);
-	}
-
-	public static boolean getInCreateSlot(KnowledgeBase kb) {
-        ChangesDb changesDb = getChangesDb(kb);
-		return changesDb.isInCreateSlot();
-	}
-
-	public static void setInCreateSlot(KnowledgeBase kb, boolean val) {
-        ChangesDb changesDb = getChangesDb(kb);
-        changesDb.setInCreateSlot(val);
 	}
     
     public static ChangesDb getChangesDb(KnowledgeBase kb) {

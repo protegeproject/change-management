@@ -28,8 +28,7 @@ public class Util {
 	private Util() {}
 	
 	public static boolean kbInOwl(KnowledgeBase kb) {
-		int index = (kb.getClass().getName().indexOf(OWL_KB_INDICATOR));
-		return (index > 0);
+	    return kb instanceof OWLModel;
 	}
 	
 	public static void registerOwlListeners(OWLModel om) {

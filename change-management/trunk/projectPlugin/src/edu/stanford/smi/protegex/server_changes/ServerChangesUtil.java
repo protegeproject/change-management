@@ -4,7 +4,6 @@ package edu.stanford.smi.protegex.server_changes;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,236 +13,40 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
-import edu.stanford.smi.protegex.server_changes.model.Model;
-import edu.stanford.smi.protegex.server_changes.model.Timestamp;
+import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
 public class ServerChangesUtil {
     private static final Logger log = Log.getLogger(ServerChangesUtil.class);
+    
+    private ChangeModel model;
 	
-	private ServerChangesUtil() {}
-	
-	public static String getActionDisplay(KnowledgeBase cKb, Instance aInst) {
-		String actionStr = (String) aInst.getOwnSlotValue(cKb.getSlot(Model.SLOT_NAME_ACTION));
-		return actionStr.replace('_', ' ');
-	}
-	
-	public static Instance createClassCreatedChange(KnowledgeBase cKb, String apply) {
-		Cls createCls = cKb.getCls(Model.CHANGETYPE_CLASS_CREATED);
-		
-		Instance changeInst = cKb.createInstance(null, new ArrayList());
-		Slot action = cKb.getSlot(Model.SLOT_NAME_ACTION);
-		Slot applyTo = cKb.getSlot(Model.SLOT_NAME_APPLYTO);
-		Slot author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
-		Slot context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
-		Slot created = cKb.getSlot(Model.SLOT_NAME_CREATED);
-		Slot type = cKb.getSlot(Model.SLOT_NAME_TYPE);
-		
-		String desc = "Created Class: " + apply;
-		
-		changeInst.setOwnSlotValue(action, createCls.getName());
-		changeInst.setOwnSlotValue(applyTo, apply);
-		changeInst.setOwnSlotValue(author, "");
-		changeInst.setOwnSlotValue(context, desc);
-		changeInst.setOwnSlotValue(created, "");
-		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
-		ChangeModel.logAnnotatableThing("Creating new change instance for new class", log, Level.FINE, changeInst, createCls);
-		cKb.setDirectType(changeInst, createCls);
-		
-		return changeInst;
-		
-	}
-	
-	public static Instance createTemplateSlotAddedChange(KnowledgeBase cKb, String apply, String slot) {
-		Cls tempSlotAddCls = cKb.getCls(Model.CHANGETYPE_TEMPLATESLOT_ADDED);
-		
-		Instance changeInst = cKb.createInstance(null, new ArrayList());
-		Slot action = cKb.getSlot(Model.SLOT_NAME_ACTION);
-		Slot applyTo = cKb.getSlot(Model.SLOT_NAME_APPLYTO);
-		Slot author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
-		Slot context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
-		Slot created = cKb.getSlot(Model.SLOT_NAME_CREATED);
-		Slot type = cKb.getSlot(Model.SLOT_NAME_TYPE);
-		
-		String desc = "Added template slot: "+slot+" to: "+apply;
-		
-		changeInst.setOwnSlotValue(action, tempSlotAddCls.getName());
-		changeInst.setOwnSlotValue(applyTo, apply);
-		changeInst.setOwnSlotValue(author, "");
-		changeInst.setOwnSlotValue(context, desc);
-        Timestamp.getTimestamp().setTimestamp(changeInst);
-		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
-        ChangeModel.logAnnotatableThing("Creating change instance for added template slot", log, Level.FINE, changeInst, tempSlotAddCls);
-		cKb.setDirectType(changeInst, tempSlotAddCls);
-		return changeInst;
-		
-	}
-	
-	
-	public static Instance createRestrictionAddedChange(KnowledgeBase cKb, String apply, String slot) {
-		Cls restrAddCls = cKb.getCls(Model.CHANGETYPE_TRANS_CHANGE);
-		
-		Instance changeInst = cKb.createInstance(null, new ArrayList());
-		Slot action = cKb.getSlot(Model.SLOT_NAME_ACTION);
-		Slot applyTo = cKb.getSlot(Model.SLOT_NAME_APPLYTO);
-		Slot author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
-		Slot context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
-		Slot created = cKb.getSlot(Model.SLOT_NAME_CREATED);
-		Slot type = cKb.getSlot(Model.SLOT_NAME_TYPE);
-		
-		String desc = "Restriction Created: "+slot;
-		
-		changeInst.setOwnSlotValue(action, "Restriction Created");
-		changeInst.setOwnSlotValue(applyTo, apply);
-		changeInst.setOwnSlotValue(author, "");
-		changeInst.setOwnSlotValue(context, desc);
-        Timestamp.getTimestamp().setTimestamp(changeInst);
-		changeInst.setOwnSlotValue(type, "transaction");
-        ChangeModel.logAnnotatableThing("Creating new change for added restriction", log, Level.FINE, changeInst, restrAddCls);
-		cKb.setDirectType(changeInst, restrAddCls);
-		return changeInst;
-		
-	}
-	
-	
-	
-	public static Instance createRestrictionRemovedChange(KnowledgeBase cKb, String apply, String slot) {
-		Cls restrRemCls = cKb.getCls(Model.CHANGETYPE_TRANS_CHANGE);
-		
-		Instance changeInst = cKb.createInstance(null, new ArrayList());
-		Slot action = cKb.getSlot(Model.SLOT_NAME_ACTION);
-		Slot applyTo = cKb.getSlot(Model.SLOT_NAME_APPLYTO);
-		Slot author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
-		Slot context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
-		Slot created = cKb.getSlot(Model.SLOT_NAME_CREATED);
-		Slot type = cKb.getSlot(Model.SLOT_NAME_TYPE);
-		
-		String desc = "Restriction Removed: "+slot;
-		
-		changeInst.setOwnSlotValue(action, "Restriction Removed");
-		changeInst.setOwnSlotValue(applyTo, apply);
-		changeInst.setOwnSlotValue(author, "");
-		changeInst.setOwnSlotValue(context, desc);
-        Timestamp.getTimestamp().setTimestamp(changeInst);
-		changeInst.setOwnSlotValue(type, "transaction");
-		ChangeModel.logAnnotatableThing("Creating new change for removed restriction", log, Level.FINE, changeInst, restrRemCls);
-		cKb.setDirectType(changeInst, restrRemCls);
+	private ServerChangesUtil(ChangeModel model) {
+	    this.model = model;
+    }
+    
 
-		return changeInst;
-		
+	
+	public Annotation createAnnotation(String annotType,Collection annotatables) {
+        Annotation a = (Annotation) model.createInstance(ChangeCls.Annotation);
+        a.setAnnotates(annotatables);
+        a.setCreated(new Timestamp(model));
+        ChangeModel.logAnnotatableThing("Creating change for annotation", log, Level.FINE, a);
+            // we need to determine what will trigger the listener
+		return a;
 	}
 	
-	
-	public static Instance createTemplateSlotRemovedChange(KnowledgeBase cKb, String apply, String slot) {
-		Cls tempSlotRemCls = cKb.getCls(Model.CHANGETYPE_TEMPLATESLOT_REMOVED);
-		
-		Instance changeInst = cKb.createInstance(null, new ArrayList());
-		Slot action = cKb.getSlot(Model.SLOT_NAME_ACTION);
-		Slot applyTo = cKb.getSlot(Model.SLOT_NAME_APPLYTO);
-		Slot author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
-		Slot context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
-		Slot created = cKb.getSlot(Model.SLOT_NAME_CREATED);
-		Slot type = cKb.getSlot(Model.SLOT_NAME_TYPE);
-		
-		String desc = "Removed template slot: "+slot+" from: "+apply;
-		
-		changeInst.setOwnSlotValue(action, tempSlotRemCls.getName());
-		changeInst.setOwnSlotValue(applyTo, apply);
-		changeInst.setOwnSlotValue(author, "");
-		changeInst.setOwnSlotValue(context, desc);
-        Timestamp.getTimestamp().setTimestamp(changeInst);
-		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
-		ChangeModel.logAnnotatableThing("Creating change for removed template slot", log, Level.FINE, changeInst, tempSlotRemCls);
-		cKb.setDirectType(changeInst, tempSlotRemCls);
-		
-		return changeInst;
-		
-	}
-	
-	public static Instance createClassDeletedChange(KnowledgeBase cKb, String apply) {
-		Cls deleteCls = cKb.getCls(Model.CHANGETYPE_CLASS_DELETED);
-	
-		Instance changeInst = cKb.createInstance(null, new ArrayList());
-		Slot action = cKb.getSlot(Model.SLOT_NAME_ACTION);
-		Slot applyTo = cKb.getSlot(Model.SLOT_NAME_APPLYTO);
-		Slot author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
-		Slot context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
-		Slot created = cKb.getSlot(Model.SLOT_NAME_CREATED);
-		Slot type = cKb.getSlot(Model.SLOT_NAME_TYPE);
-
-		String desc = "Deleted Class: " + apply;
-		
-		changeInst.setOwnSlotValue(action, deleteCls.getName());
-		changeInst.setOwnSlotValue(applyTo, apply);
-		changeInst.setOwnSlotValue(author, "");
-		changeInst.setOwnSlotValue(context, desc);
-        Timestamp.getTimestamp().setTimestamp(changeInst);
-		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
-		ChangeModel.logAnnotatableThing("Creating new change for deleted class", log, Level.FINE, changeInst, deleteCls);
-		cKb.setDirectType(changeInst, deleteCls);
-
-		return changeInst;
-		
-	}
-	
-	public static Instance createClsRenameChange(KnowledgeBase cKb, String oldName, String newName) {
-		Cls nameChangeCls = cKb.getCls(Model.CHANGETYPE_NAME_CHANGED);
-		
-		Instance changeInst = cKb.createInstance(null, new ArrayList());
-		Slot action = cKb.getSlot(Model.SLOT_NAME_ACTION);
-		Slot applyTo = cKb.getSlot(Model.SLOT_NAME_APPLYTO);
-		Slot author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
-		Slot context = cKb.getSlot(Model.SLOT_NAME_CONTEXT);
-		Slot created = cKb.getSlot(Model.SLOT_NAME_CREATED);
-		Slot type = cKb.getSlot(Model.SLOT_NAME_TYPE);
-
-		String desc = "Name change from '" + oldName +"' to '" + newName + "'";
-		
-		changeInst.setOwnSlotValue(action, nameChangeCls.getName());
-		changeInst.setOwnSlotValue(applyTo, newName);
-		changeInst.setOwnSlotValue(author, "");
-		changeInst.setOwnSlotValue(context, desc);
-        Timestamp.getTimestamp().setTimestamp(changeInst);
-		changeInst.setOwnSlotValue(type, Model.CHANGE_LEVEL_INFO);
-		ChangeModel.logAnnotatableThing("Creating new change for renamed class", log, Level.FINE, changeInst, nameChangeCls);
-		cKb.setDirectType(changeInst, nameChangeCls);
-
-		return changeInst;
-	}
-	
-	public static Instance createAnnotation(KnowledgeBase cKb, String annotType,Collection changeInsts) {
-		Cls annotate = cKb.getCls(annotType);
-		Slot annotates = cKb.getSlot(Model.SLOT_NAME_ANNOTATES);
-		//Slot title = cKb.getSlot(Model.SLOT_NAME_TITLE);
-		
-		Instance annotateInst = cKb.createInstance(null, new ArrayList());
-		annotateInst.setOwnSlotValues(annotates, changeInsts);
-		//annotateInst.setOwnSlotValue(title, annotateInst.getName());
-        ChangeModel.logAnnotatableThing("Creating change for annotation", log, Level.FINE, annotateInst, annotate);
-		cKb.setDirectType(annotateInst, annotate);
-
-		return annotateInst;
-	}
-	
-	public static Instance updateAnnotation(KnowledgeBase kb,
-                                            KnowledgeBase cKb, Instance annotateInst) {
-
-		Slot author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
-		Slot modified = cKb.getSlot(Model.SLOT_NAME_MODIFIED);
-		Slot body = cKb.getSlot(Model.SLOT_NAME_BODY);
-        
-        Timestamp now = Timestamp.getTimestamp();
-        now.setTimestamp(annotateInst);
-        now.setTimestamp(annotateInst, modified);
-
-		annotateInst.setOwnSlotValue(author, ChangesProject.getUserName(kb));
-		
-		// If no comments are added, add empty string as comment
-		Object bdy = annotateInst.getOwnSlotValue(body);
-		if (bdy == null) {
-			annotateInst.setOwnSlotValue(body, "");
-		}
-		ChangeModel.logAnnotatableThing("Updated Annotation", log, Level.FINE, annotateInst);
-		return annotateInst;	
+	public Annotation updateAnnotation(KnowledgeBase kb, Annotation a) {
+	    a.setModified(new Timestamp(model));
+        a.setAuthor(ChangesProject.getUserName(kb));
+        if (a.getBody() == null) {
+            a.setBody("");
+        }
+		ChangeModel.logAnnotatableThing("Updated Annotation", log, Level.FINE, a);
+		return a;	
 	}
     
     public static Instance createTransChange(KnowledgeBase cKb, Collection transChanges, Instance repInst) {
