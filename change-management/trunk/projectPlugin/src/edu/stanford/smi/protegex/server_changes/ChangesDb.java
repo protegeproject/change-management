@@ -4,18 +4,14 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.logging.Level;
 
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.FrameID;
-import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.server.RemoteSession;
@@ -24,7 +20,6 @@ import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.URIUtilities;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
-import edu.stanford.smi.protegex.server_changes.model.InstanceDateComparator;
 import edu.stanford.smi.protegex.server_changes.model.NameChangeManager;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
@@ -51,9 +46,6 @@ public class ChangesDb {
     private Map<Ontology_Component, Created_Change> lastCreateByComponent = new HashMap<Ontology_Component, Created_Change>();
     
     private Map<FrameID, String> frameIdMap = new HashMap<FrameID, String>();
-    
-    private Map<String, Ontology_Component> nameToOntologyComponentMap
-                    = new HashMap<String, Ontology_Component>();
     
     public ChangesDb(KnowledgeBase kb) {
         this.kb = kb;
@@ -137,8 +129,9 @@ public class ChangesDb {
     }
     
     private void checkForTransaction(Change aChange) {
-        if (isInTransaction()) {
-            pushTransStack(aChange);
+        TransactionState tstate = getTransactionState();
+        if (tstate.inTransaction()) {
+            tstate.addToTransaction(aChange);
         }
     }
     
@@ -209,68 +202,7 @@ public class ChangesDb {
         }
         return state;
     }
-    
-    public TransactionState getTransactionUtility() {
-        return transactionUtility;
-    }
-    
-    public boolean isInTransaction() {
-        return inTransaction.contains(getCurrentSession());
-    }
-    
-    public void setInTransaction(boolean val) {
-        RemoteSession session = getCurrentSession();
-        if (val) {
-            inTransaction.add(session);
-        }
-        else {
-            inTransaction.remove(session);
-        }
-    }
-    
-    public int getTransactionCount() {
-        RemoteSession session = getCurrentSession();
-        Integer count = transCount.get(session);
-        if (count == null) return 0;
-        return count;
-    }
-    
-    public void incrementTransactionCount() {
-        RemoteSession session = getCurrentSession();
-        Integer count = getTransactionCount();
-        transCount.put(session, count+1);
-    }
-    
-    public void decrementTransactionCount() {
-        RemoteSession session = getCurrentSession();
-        Integer count = getTransactionCount();
-        transCount.put(session, count-1);
-    }
-    
-    @SuppressWarnings("unchecked")
-    public void pushTransStack(Object change) {
-        Stack currentStack = getTransStack();
-        currentStack.push(change);
-    }
-    
-    public void setTransStack(Stack s) {
-        transStack.put(getCurrentSession(), s);
-    }
-    
-    public Stack getTransStack() {
-        RemoteSession session = getCurrentSession();
-        Stack currentStack = transStack.get(session);
-        if (currentStack == null) {
-            currentStack = new Stack();
-            transStack.put(session, currentStack);
-        }
-        return currentStack;
-    }
-    
-    public void clearTransStack() {
-        transStack.remove(getCurrentSession());
-    }
-  
+
     public boolean isInCreateClass() {
         return inCreateClass.contains(getCurrentSession());
     }
@@ -336,7 +268,7 @@ public class ChangesDb {
         change.setType(type);
         change.setTimestamp(new Timestamp(model));
         change.setApplyTo(applyTo);  // this is what passes the change to the change tab
-                                     // so it  must happen last.
+                                     // so it  must happen last.  see AbstractChangeListener
         postProcessChange(change);
     }
 }

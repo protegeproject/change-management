@@ -8,13 +8,13 @@ import java.util.Map;
 
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protegex.server_changes.listeners.AbstractChangeListener;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Created_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Deleted_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
+import edu.stanford.smi.protegex.server_changes.model.listeners.AbstractChangeListener;
 
 public class NameChangeManager {
     private ChangeModel model;
@@ -29,8 +29,8 @@ public class NameChangeManager {
   
     private void addNameChangeListener() {
         synchronized (changes_kb) {
-            List<Instance> changes = new ArrayList<Instance>(model.getCls(ChangeCls.Change).getInstances());
-            Collections.sort(changes, new InstanceDateComparator(changes_kb));
+            List<Instance> changes = new ArrayList<Instance>(model.getInstances(ChangeCls.Change));
+            Collections.sort(changes, new ChangeDateComparator(changes_kb));
             for (Object o : changes) {
                 Change change = (Change) o;
                 handleNameChange(change);

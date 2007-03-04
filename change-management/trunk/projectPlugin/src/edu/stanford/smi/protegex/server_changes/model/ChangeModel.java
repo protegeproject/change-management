@@ -100,6 +100,10 @@ public class ChangeModel {
         return slot;
     }
     
+    public Collection<Instance> getInstances(ChangeCls cls) {
+        return getCls(cls).getInstances();
+    }
+    
     public Object getDirectValue(Instance i, ChangeSlot s) {
         return i.getDirectOwnSlotValue(getSlot(s));
     }
@@ -131,7 +135,7 @@ public class ChangeModel {
             log.log(level, "\tApplyTo = " + change.getApplyTo());
             log.log(level, "\tAuthor = " + change.getAuthor());
             log.log(level, "\tContext = " + change.getContext());
-            log.log(level, "\tCreated = " + change.getTimestamp().get);
+            log.log(level, "\tCreated = " + ((Timestamp) change.getTimestamp()).getDate());
             log.log(level, "\tType = " + change.getType());
         }
         log.log(level, "\tDirect type = " + cls);
