@@ -278,10 +278,10 @@ public class ChangesTab extends AbstractTabWidget {
 	private JPanel initSearchPanel() {
 		JPanel searchPanel = ComponentFactory.createPanel();
 		JLabel searchLabel = new JLabel(SEARCH_PANEL_TITLE);
-		String[] searchFields = {	ChangeTableModel.Column.CHANGE_COLNAME_AUTHOR.toString(),
-				                    ChangeTableModel.Column.CHANGE_COLNAME_ACTION.toString(), 
-				                    ChangeTableModel.Column.CHANGE_COLNAME_DESCRIPTION.toString(),
-									ChangeTableModel.Column.CHANGE_COLNAME_CREATED.toString()
+		String[] searchFields = {	ChangeTableColumn.CHANGE_COLNAME_AUTHOR.toString(),
+				                    ChangeTableColumn.CHANGE_COLNAME_ACTION.toString(), 
+				                    ChangeTableColumn.CHANGE_COLNAME_DESCRIPTION.toString(),
+									ChangeTableColumn.CHANGE_COLNAME_CREATED.toString()
 									};
 		
 		JComboBox cbox = new JComboBox(searchFields);
@@ -320,7 +320,7 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		Cls chgs = changes_kb.getCls("Instance_Added");
 		Collection<Instance> changeInst = changes_kb.getInstances(chgs);
-		Instance ROOT = null;
+		Change ROOT = null;
 		for (Instance i : changeInst) {
 			Change aInst = (Change) i;
 			String apply = ChangeSlot.applyTo.toString();
@@ -338,7 +338,7 @@ public class ChangesTab extends AbstractTabWidget {
 		acTableModel = new ChangeTableModel(changes_db.getModel());
 
 		aTableModel = new AnnotationTableModel(changes_kb);
-		cTreeTableModel = new ChangeTreeTableModel(root, changes_kb);
+		cTreeTableModel = new ChangeTreeTableModel(root, changes_db.getModel());
 		
 		cTable = new JTable(cTableModel);
 		acTable = new JTable(acTableModel);
@@ -473,10 +473,10 @@ public class ChangesTab extends AbstractTabWidget {
 		List<Instance> changeList = new ArrayList<Instance>(changeInsts);
 		Collections.sort(changeList, new ChangeDateComparator(changes_kb));
 		
-		for (Iterator iter = changeList.iterator(); iter.hasNext();) {
-			Instance aInst = (Instance) iter.next();
+		for (Instance i : changeList) {
+			Change aInst = (Change) i;
 			
-			cTableModel.addChangeData((Change) aInst);
+			cTableModel.addChangeData(aInst);
 			cTreeTableModel.addChangeData(aInst);
 		}
 	}

@@ -5,54 +5,41 @@ import java.util.List;
 
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protegex.server_changes.listeners.ChangesKBListener;
-import edu.stanford.smi.protegex.server_changes.model.Model;
-import edu.stanford.smi.protegex.server_changes.model.Timestamp;
+import edu.stanford.smi.protege.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 
 public class TreeTableNode {
-    private Instance changeInst;
+    private Change changeInst;
     private List<TreeTableNode> children;
     private TreeTableNode parent;
-
-    private KnowledgeBase changeKB;
     
 
-    public TreeTableNode(Instance changeInst, KnowledgeBase changeKB) {
+    public TreeTableNode(Change changeInst, KnowledgeBase changeKB) {
 		this.changeInst = changeInst;
 		children = new ArrayList<TreeTableNode>();
-		this.changeKB = changeKB;
     }
 
     
     public String toString() { 
-		return ChangeCreateUtil.getActionDisplay(changeKB, changeInst);
+		return ChangeCreateUtil.getActionDisplay(changeInst);
     }
 
     public Object getValueAt(int i) {
-    	
-		Object ctxt = null;
-    	switch (i) {
-
-		case 2:
-			ctxt = Model.getAuthor(changeInst);
-			
-			break;
-		case 3: 
-			ctxt = Timestamp.getTimestamp(changeInst).getDateString();
-	         
-			break;
-		case 0: 
-			ctxt = ChangeCreateUtil.getActionDisplay(changeKB, changeInst);
-		   
-			break;
-		case 1: 
-			ctxt = Model.getContext(changeInst);
-		
-			break;
+        ChangeTableColumn col = ChangeTableColumn.values()[i];
+    	switch (col) {
+		case CHANGE_COLNAME_AUTHOR:
+		    return changeInst.getAuthor();
+		case CHANGE_COLNAME_CREATED: 
+			return ((Timestamp) changeInst.getTimestamp()).getDate();
+		case CHANGE_COLNAME_ACTION: 
+		    return ChangeCreateUtil.getActionDisplay(changeInst);
+		case CHANGE_COLNAME_DESCRIPTION: 
+		    return changeInst.getContext();
+		default:
+            throw new UnsupportedOperationException("Developer missed a case");
 		}
-   
-		return ctxt;
     }
 
     public void setValueAt(Object aValue, int i) {

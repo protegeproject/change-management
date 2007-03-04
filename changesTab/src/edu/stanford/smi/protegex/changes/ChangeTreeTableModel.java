@@ -6,48 +6,42 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protegex.changes.ui.AbstractTreeTableModel;
 import edu.stanford.smi.protegex.changes.ui.TreeTableModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 
 public class ChangeTreeTableModel extends AbstractTreeTableModel implements TreeTableModel{
-
-
-	
-	public static final String CHANGE_COLNAME_AUTHOR ="Author";
-	public static final String CHANGE_COLNAME_CREATED ="Created";
-	public static final String CHANGE_COLNAME_ACTION ="Action";
-	public static final String CHANGE_COLNAME_DESCRIPTION ="Description";
-	//static protected Class[]  cTypes = {TreeTableModel.class, String.class, String.class, String.class};
 	
 	private String[] colNames;
 	private ArrayList<Instance> completeData;
+    
 	private KnowledgeBase changeKB;
+    private ChangeModel model;
     
     private TreeTableNode root;
     private Map<Instance, TreeTableNode> treeMap = new HashMap<Instance, TreeTableNode>();
 	
 	
-	public ChangeTreeTableModel(TreeTableNode rootOfTree, KnowledgeBase changeKb) {
+	public ChangeTreeTableModel(TreeTableNode rootOfTree, ChangeModel model) {
 		super(rootOfTree);
-		this.changeKB = changeKb;
+        this.model = model;
+		this.changeKB = model.getChangeKb();
 		init();
 	}
 
 	// init the column names, data structures
 	private void init() {
-		colNames = new String[4];
-	
-		colNames[2] = CHANGE_COLNAME_AUTHOR;
-		colNames[3] = CHANGE_COLNAME_CREATED;
-		colNames[0] = CHANGE_COLNAME_ACTION;
-		colNames[1] = CHANGE_COLNAME_DESCRIPTION;
-		completeData = new ArrayList();
+        ChangeTableColumn[] cols = ChangeTableColumn.values();
+		colNames = new String[cols.length];
+        for (int i = 0; i < cols.length; i++) {
+            colNames[i] = cols[i].toString();
+        }
+		completeData = new ArrayList<Instance>();
 		root = (TreeTableNode)getRoot();
 	}
 	
@@ -67,32 +61,22 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	 * @see javax.swing.table.TableModel#getColumnName(int)
 	 */
 	public String getColumnName(int column) {
-		switch (column) {
-		case 0:
-			return colNames[0];
-		case 1:
-			return colNames[1];
-		case 2:
-			return colNames[2];
-		case 3:
-			return colNames[3];
-	
-		
-		}
-		
-		return "";
+        if (column < 0 || column >= colNames.length) {
+            return "";
+        }
+        return colNames[column];
 	}
 	
-	
-	        
-	        public int getChildCount(Object node) {
-	    		return ((TreeTableNode) node).getChildCount();
-	        }
 
-	        public Object getChild(Object node, int i) {
-	    		return ((TreeTableNode) node).getChildAt(i);
-	        }
-	        
+
+	public int getChildCount(Object node) {
+	    return ((TreeTableNode) node).getChildCount();
+	}
+
+	public Object getChild(Object node, int i) {
+	    return ((TreeTableNode) node).getChildAt(i);
+	}
+
 
 	public Object getValueAt(Object node, int col) {
 		
@@ -107,35 +91,28 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
    }
 
 	
-   public void addChangeData(Instance changeInst) {
-		
+   public void addChangeData(Change changeInst) {
 		addChangeData(changeInst, true);
-		
-		
-	
 	}
 
 	
 
 	
-	private void addChangeData(Instance changeInst,  boolean completeUpdate) {
+	private void addChangeData(Change changeInst,  boolean completeUpdate) {
         TreeTableNode newNode = null;
-		String actionType = Model.getType(changeInst);   
-		if (actionType != null){
-                    if (!isRoot(changeInst)) {
-			    newNode = insertIntoModel(root, changeInst);
-			    if (completeUpdate) {
-			        completeData.add(changeInst);
-			    }
-			}
-		}
-		// If we have a transaction change, add the list of changes
-		Cls changeInstType = changeInst.getDirectType();
-		if (changeInstType.getName().equals(Model.CHANGETYPE_TRANS_CHANGE)) {
 
-		    Collection relChanges = Model.getChanges(changeInst);
+        if (!ChangeModel.isRoot(changeInst)) {
+            newNode = insertIntoModel(root, changeInst);
+            if (completeUpdate) {
+                completeData.add(changeInst);
+            }
+        }
+		// If we have a transaction change, add the list of changes
+		if (changeInst instanceof Composite_Change) {
+
+		    Collection relChanges = ((Composite_Change) changeInst).getSubChanges();
             for (Object o : relChanges) {
-                Instance aInst = (Instance) o;
+                Change aInst = (Change) o;
                 insertIntoModel(newNode, aInst);
             }
 		} 
@@ -143,15 +120,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 			
 		
 		}
-	
-	
-	private void addChangeData(Collection<Instance> changeInsts) {
-		
-		for (Instance i : changeInsts) {
-			Change aInst = (Change) i;
-			addChangeData(aInst,false);
-		}
-	}
+
 
 	
 	public void cancelQuery() {
@@ -167,27 +136,23 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	private void setNewSearch(String field, String text) {
 		
 	    clearModel();
-		Slot author = changeKB.getSlot(Model.SLOT_NAME_AUTHOR);
-		Slot created = changeKB.getSlot(Model.SLOT_NAME_CREATED);
-		Slot action = changeKB.getSlot(Model.SLOT_NAME_ACTION);
-		Slot desc = changeKB.getSlot(Model.SLOT_NAME_CONTEXT);
 		
-		Slot sltToSearch = null;
-		if (field.equals(CHANGE_COLNAME_AUTHOR)) {
-			sltToSearch = author;
-		} else if (field.equals(CHANGE_COLNAME_CREATED)) {
-			sltToSearch = created;
-		} else if (field.equals(CHANGE_COLNAME_ACTION)) {
-			sltToSearch = action;
-		} else if (field.equals(CHANGE_COLNAME_DESCRIPTION)) {
-			sltToSearch = desc;
-		}
+        ChangeTableColumn searchColumn = null;
+        for (ChangeTableColumn col : ChangeTableColumn.values()) {
+            if (col.toString().equals(field)) {
+                searchColumn = col;
+                break;
+            }
+        }
+        
+		Slot sltToSearch = model.getSlot(searchColumn.getSearchSlot());
+
 		Collection results = changeKB.getMatchingFrames(sltToSearch, null, false, text, 1000);
 		
 		for (Iterator iter = results.iterator(); iter.hasNext();) {
 			Object element = (Object) iter.next();
-			if (element instanceof Instance) {
-				Instance someInst = (Instance) element;
+			if (element instanceof Change) {
+				Change someInst = (Change) element;
 				addChangeData(someInst, false);
 		
 				
@@ -205,8 +170,8 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	
 	private void setNewFilter() {
         clearModel();
-		for (Iterator iter = completeData.iterator(); iter.hasNext();) {
-			Instance aInst = (Instance) iter.next();
+		for (Instance i : completeData) {
+			Change aInst = (Change) i;
 			addChangeData(aInst, false);
 		}
 	
@@ -226,7 +191,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
         }
     }
     
-    private TreeTableNode insertIntoModel(TreeTableNode parent, Instance changeInst) {
+    private TreeTableNode insertIntoModel(TreeTableNode parent, Change changeInst) {
         TreeTableNode newNode = treeMap.get(changeInst);
         if (newNode == null) {
             newNode = new TreeTableNode(changeInst,changeKB);
