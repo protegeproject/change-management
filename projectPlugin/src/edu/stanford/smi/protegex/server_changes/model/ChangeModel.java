@@ -111,8 +111,26 @@ public class ChangeModel {
         return changes_kb;
     }
     
+    /*
+     * Hopefully the definition of root will change or - better - go away.
+     * These two methods need to be synchronized with ChangesDb.createRootChange
+     * while we are figuring this out.
+     */
+    
     public static boolean isRoot(Change change) {
         return CHANGE_TYPE_ROOT.equals(change.getType());
+    }
+    
+    public Change findRoot() {
+        Cls chgs = getCls(ChangeCls.Composite_Change);
+        Collection<Instance> changeInst = changes_kb.getInstances(chgs);
+        for (Instance i : changeInst) {
+            Change aInst = (Change) i;
+            if (ChangeModel.isRoot(aInst)){
+                return aInst;
+            }
+        }
+        return null;
     }
     
     public List<Instance> getSortedChanges() {

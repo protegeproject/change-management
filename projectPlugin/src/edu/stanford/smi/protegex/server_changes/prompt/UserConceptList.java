@@ -14,7 +14,6 @@ import java.util.Set;
 
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
 import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.LabeledComponent;
@@ -23,7 +22,6 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Compone
 
 public class UserConceptList extends JPanel {
 	private Collection<String> _userList = new ArrayList<String>(); 
-	private JTextArea textArea = new JTextArea ();
 	private JList _noConflictList, _conflictList;
 	private Set<Ontology_Component> _noConflictConcepts = new HashSet<Ontology_Component> ();
 	private Set<Ontology_Component> _conflictConcepts = new HashSet<Ontology_Component> ();

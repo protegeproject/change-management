@@ -263,7 +263,7 @@ public class ChangesDb {
      * @return
      */
     public Change createRootChange() {
-        Change root = createChange(ChangeCls.Instance_Change);
+        Change root = createChange(ChangeCls.Composite_Change);
         finalizeChange(root, null, ChangeModel.CHANGE_TYPE_ROOT, ChangeModel.CHANGE_TYPE_ROOT);
         return root;
     }
@@ -290,7 +290,7 @@ public class ChangesDb {
         change.setAuthor(getCurrentUser());
         change.setContext(context);
         change.setType(type);
-        change.setTimestamp(new Timestamp(model));
+        change.setTimestamp(Timestamp.getTimestamp(model));
         change.setApplyTo(applyTo);  // this is what passes the change to the change tab
                                      // so it  must happen last.  see AbstractChangeListener
         postProcessChange(change);
@@ -303,7 +303,7 @@ public class ChangesDb {
     public void finalizeAnnotation(Annotation annotation,
                                    Collection<AnnotatableThing> annotated,
                                    String body) {
-        Timestamp timestamp = new Timestamp(model);
+        Timestamp timestamp = Timestamp.getTimestamp(model);
         annotation.setBody(body);
         annotation.setAuthor(getCurrentUser());
         if (annotation.getCreated() == null) {
