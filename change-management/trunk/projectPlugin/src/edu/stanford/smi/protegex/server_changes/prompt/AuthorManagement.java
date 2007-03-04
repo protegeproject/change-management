@@ -6,29 +6,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.Model;
-import edu.stanford.smi.protegex.server_changes.time.ChangingFrame;
-import edu.stanford.smi.protegex.server_changes.time.ChangingFrameManager;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
 public class AuthorManagement {
-    private ChangingFrameManager frameManager;
     private KnowledgeBase kb;
-    private KnowledgeBase changeskb;
+    private ChangesDb changes_db;
+    private ChangeModel model;
     
     private Map<String, Set<String>> userConflictsMap = new HashMap<String, Set<String>>();
-    private Map<String, Set<ChangingFrame>> conflictingFrames = new HashMap<String, Set<ChangingFrame>>();
-    private Map<String, Set<ChangingFrame>> unconflictedFrames = new HashMap<String, Set<ChangingFrame>>();
+    private Map<String, Set<Ontology_Component>> conflictingFrames = new HashMap<String, Set<Ontology_Component>>();
+    private Map<String, Set<Ontology_Component>> unconflictedFrames = new HashMap<String, Set<Ontology_Component>>();
+    
+    private Set<String> active_users  = new HashSet<String>();
     
     private AuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
         this.kb = kb2;
-        ChangesDb changesdb = ChangesProject.getChangesDb(kb);
-        changeskb = changesdb.getChangesKb();
-        frameManager = changesdb.getFrameManager();
+        changes_db = ChangesProject.getChangesDb(kb);
+        model = changes_db.getModel();
         evaluateConflicts();
     }
     
@@ -41,30 +40,28 @@ public class AuthorManagement {
         }
     }
     
-    public ChangingFrameManager getFrameManager() {
-        return frameManager;
-    }
-    
     private void evaluateConflicts() {
         
-        Map<ChangingFrame, Set<String>> whoChangedMeMap = new HashMap<ChangingFrame, Set<String>>();
-        for (Object o : ServerChangesUtil.removeRoots(Model.getChangeInsts(changeskb))) {
-            Instance change = (Instance) o;
-            ChangingFrame frame = frameManager.getChangingFrame(change);
+        Map<Ontology_Component, Set<String>> whoChangedMeMap = new HashMap<Ontology_Component, Set<String>>();
+        
+        for (Object o : model.getSortedChanges()) {
+            Change change = (Change) o;
+            Ontology_Component frame = (Ontology_Component) change.getApplyTo();
             Set<String> users = whoChangedMeMap.get(frame);
             if (users == null) {
                 users = new HashSet<String>();
                 whoChangedMeMap.put(frame, users);
             }
-            String user = Model.getAuthor(change);
+            String user = change.getAuthor();
             users.add(user);
+            active_users.add(user);
         }
-        for (Entry<ChangingFrame, Set<String>> entry : whoChangedMeMap.entrySet()) {
-            ChangingFrame frame = entry.getKey();
+        for (Entry<Ontology_Component, Set<String>> entry : whoChangedMeMap.entrySet()) {
+            Ontology_Component frame = entry.getKey();
             Set<String> users = entry.getValue();
             if (users.size() > 1) {
                 for (String user : users) {
-                    Set<ChangingFrame> frames = getConflictedFrames(user);
+                    Set<Ontology_Component> frames = getConflictedFrames(user);
                     frames.add(frame);
                     
                     Set<String> conflictingUsers = getUsersInConflictWith(user);
@@ -73,7 +70,7 @@ public class AuthorManagement {
             }
             else {
                 for (String user : users) {
-                    Set<ChangingFrame> frames = getUnConlictedFrames(user);
+                    Set<Ontology_Component> frames = getUnConlictedFrames(user);
                     frames.add(frame);
                 }
             }
@@ -94,22 +91,26 @@ public class AuthorManagement {
         return conflictingUsers;
     }
     
-    public Set<ChangingFrame> getConflictedFrames(String user) {
-        Set<ChangingFrame> myConflictingFrames = conflictingFrames.get(user);
+    public Set<Ontology_Component> getConflictedFrames(String user) {
+        Set<Ontology_Component> myConflictingFrames = conflictingFrames.get(user);
         if (myConflictingFrames == null) {
-            myConflictingFrames = new HashSet<ChangingFrame>();
+            myConflictingFrames = new HashSet<Ontology_Component>();
             conflictingFrames.put(user, myConflictingFrames);
         }
         return myConflictingFrames;
     }
     
-    public Set<ChangingFrame> getUnConlictedFrames(String user) {
-        Set<ChangingFrame> myUnconflictedFrames = unconflictedFrames.get(user);
+    public Set<Ontology_Component> getUnConlictedFrames(String user) {
+        Set<Ontology_Component> myUnconflictedFrames = unconflictedFrames.get(user);
         if (myUnconflictedFrames == null) {
-            myUnconflictedFrames = new HashSet<ChangingFrame>();
+            myUnconflictedFrames = new HashSet<Ontology_Component>();
             unconflictedFrames.put(user, myUnconflictedFrames);
         }
         return myUnconflictedFrames;
+    }
+    
+    public Set<String> getUsers() {
+        return active_users;
     }
     
 }

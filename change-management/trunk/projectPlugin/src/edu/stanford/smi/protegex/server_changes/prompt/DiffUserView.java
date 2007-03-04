@@ -21,8 +21,6 @@ import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.DefaultRenderer;
 import edu.stanford.smi.protege.util.LabeledComponent;
 import edu.stanford.smi.protege.util.SelectionListener;
-import edu.stanford.smi.protegex.server_changes.time.ChangingFrame;
-import edu.stanford.smi.protegex.server_changes.time.ChangingFrameManager;
 
 public class DiffUserView extends JPanel {
   private static final long serialVersionUID = 3771686927172752103L;
@@ -31,7 +29,6 @@ public class DiffUserView extends JPanel {
   private JSplitPane _contentPane = null;
   private UserConceptList _concepts = new UserConceptList();
   private AuthorManagement authorManagement;
-  private ChangingFrameManager frameManager;
   
   public DiffUserView () {
 
@@ -39,7 +36,6 @@ public class DiffUserView extends JPanel {
    
    public void setAuthorManagement(AuthorManagement authorManagement) {
        this.authorManagement = authorManagement;
-       this.frameManager = authorManagement.getFrameManager();
        _concepts.setAuthorManagement(authorManagement);
        initialize();
    }
@@ -65,23 +61,27 @@ public class DiffUserView extends JPanel {
    }
 
    private TableModel createTableModel () {
-       DefaultTableModel model = new DefaultTableModel() {
+       DefaultTableModel table_model = new DefaultTableModel() {
            public boolean isCellEditable(int row, int col) {
                return false;
            }
        };
        for (int c = 0; c < COLUMN_NAMES.length; c++) {
-           model.addColumn (COLUMN_NAMES[c]);
+           table_model.addColumn (COLUMN_NAMES[c]);
        }
 
-       for (String user : frameManager.getUsers()) {
-           Collection<ChangingFrame> frames = frameManager.getFramesTouchedByUser(user);
-           int conceptsChanged = frames.size();
+       for (String user : authorManagement.getUsers()) {
+           int conceptsNotInConflict = authorManagement.getUnConlictedFrames(user).size();
            int conceptsInConflict = authorManagement.getConflictedFrames(user).size();
            String conflictsWith = authorManagement.getUsersInConflictWith(user).toString();
-           model.addRow(new Object []{user, new Integer (conceptsChanged), new Integer (conceptsInConflict), conflictsWith});
+           table_model.addRow(new Object []{
+                   user, 
+                   new Integer (conceptsNotInConflict + conceptsInConflict), 
+                   new Integer (conceptsInConflict), 
+                   conflictsWith
+                   });
        }
-       return model;
+       return table_model;
    }
    
    public Collection<String> getSelection () {

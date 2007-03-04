@@ -129,7 +129,7 @@ public class ChangesDb {
     
     private void postProcessChange(Change aChange) {
         checkForTransaction(aChange);
-        checkForCreateChange(aChange);
+        checkForCreateAndNameChange(aChange);
     }
     
     private void checkForTransaction(Change aChange) {
@@ -141,7 +141,7 @@ public class ChangesDb {
     
     
     // takes care of case when class is created & then renamed - Adding original name of class and change instance to HashMap
-    private void checkForCreateChange(Change aChange) {
+    private void checkForCreateAndNameChange(Change aChange) {
 
         if  (aChange instanceof Created_Change) {
             lastCreateByComponent.put((Ontology_Component) aChange.getApplyTo(), (Created_Change) aChange);
@@ -266,6 +266,15 @@ public class ChangesDb {
         Change root = createChange(ChangeCls.Instance_Change);
         finalizeChange(root, null, ChangeModel.CHANGE_TYPE_ROOT, ChangeModel.CHANGE_TYPE_ROOT);
         return root;
+    }
+    
+    public Change createChangeStd(ChangeCls type, 
+                                  String applyTo,
+                                  String context) {
+        Ontology_Component frame = getOntologyComponent(applyTo, true);
+        Change change = createChange(type);
+        finalizeChange(change, frame, context, ChangeModel.CHANGE_LEVEL_INFO);
+        return change;
     }
     
     public Change createChange(ChangeCls type) {
