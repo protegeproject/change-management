@@ -10,6 +10,7 @@ import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Class_Created;
 import edu.stanford.smi.protegex.server_changes.model.generated.Class_Deleted;
@@ -44,18 +45,50 @@ public class ChangeModel {
         Change,
         
         Class_Change,
+        Annotation_Added,
+        Annotation_Modified,
+        Annotation_Removed,
         Class_Created,
         Class_Deleted,
+        Disjoint_Class_Added,
+        Documentation_Added,
+        Documentation_Removed,
+        DomainProperty_Added,
+        DomainProperty_Removed,
         Subclass_Added,
         Subclass_Removed,
         Superclass_Added,
         Superclass_Removed,
         
         Instance_Change,
+        DirectType_Added,
+        DirectType_Removed,
+        Instance_Added,
+        Instance_Removed,
+        Slot_Value,
         
         Property_Change,
+        Property_Created,
+        Property_Deleted,
+        Subproperty_Added,
+        Subproperty_Removed,
+        Superproperty_Added,
+        Superproperty_Removed,
         
         Slot_Change,
+        Maximum_Cardinality,
+        Maximum_Value,
+        Minimum_Cardinality,
+        Minimum_Value,
+        Slot_Created,
+        Slote_Deleted,
+        Subslot_Added,
+        Subslot_Removed,
+        Superslot_Added,
+        Superslot_Removed,
+        
+        
+        Name_Changed,
         
         Composite_Change,
         
@@ -79,6 +112,10 @@ public class ChangeModel {
     
     public KnowledgeBase getChangeKb() {
         return changes_kb;
+    }
+    
+    public static boolean isRoot(Change change) {
+        return CHANGE_TYPE_ROOT.equals(change.getType());
     }
     
     public Cls getCls(ChangeCls c) {

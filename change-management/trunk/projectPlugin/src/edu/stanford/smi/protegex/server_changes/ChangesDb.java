@@ -4,12 +4,14 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.FrameID;
 import edu.stanford.smi.protege.model.KnowledgeBase;
@@ -22,6 +24,8 @@ import edu.stanford.smi.protege.util.URIUtilities;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.NameChangeManager;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.AnnotatableThing;
+import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Created_Change;
@@ -253,6 +257,17 @@ public class ChangesDb {
         }
     }
     
+    /**
+     * This implementation must be sychronized with ChangeModel.isRoot();
+     * 
+     * @return
+     */
+    public Change createRootChange() {
+        Change root = createChange(ChangeCls.Instance_Change);
+        finalizeChange(root, null, ChangeModel.CHANGE_TYPE_ROOT, ChangeModel.CHANGE_TYPE_ROOT);
+        return root;
+    }
+    
     public Change createChange(ChangeCls type) {
         Change change = (Change) model.createInstance(type);
         change.setAction(type.toString());
@@ -270,5 +285,23 @@ public class ChangesDb {
         change.setApplyTo(applyTo);  // this is what passes the change to the change tab
                                      // so it  must happen last.  see AbstractChangeListener
         postProcessChange(change);
+    }
+    
+    public Annotation createAnnotation(Cls direct_type) {
+        return (Annotation) direct_type.createDirectInstance(null);
+    }
+    
+    public void finalizeAnnotation(Annotation annotation,
+                                   Collection<AnnotatableThing> annotated,
+                                   String body) {
+        Timestamp timestamp = new Timestamp(model);
+        annotation.setBody(body);
+        annotation.setAuthor(getCurrentUser());
+        if (annotation.getCreated() == null) {
+            annotation.setCreated(timestamp);
+        }
+        annotation.setModified(timestamp);
+        annotation.setAnnotates(annotated);  // this is what passes the change to the annotation listeners.
+                                             // so it must happen last.  See AbstractChangeListener.
     }
 }

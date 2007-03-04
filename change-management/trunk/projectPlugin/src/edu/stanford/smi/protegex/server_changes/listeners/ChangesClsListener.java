@@ -10,16 +10,20 @@ import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.TransactionState;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
 public class ChangesClsListener implements ClsListener{
     private KnowledgeBase kb;
-    private ChangesDb changesDb;
+    private ChangesDb changes_db;
     private KnowledgeBase changesKb;
     
     public ChangesClsListener(KnowledgeBase kb) {
         this.kb = kb;
-        changesDb = ChangesProject.getChangesDb(kb);
-        changesKb = changesDb.getChangesKb();
+        changes_db = ChangesProject.getChangesDb(kb);
+        changesKb = changes_db.getChangesKb();
     }
 
 	/* (non-Javadoc)
@@ -35,20 +39,17 @@ public class ChangesClsListener implements ClsListener{
 		context.append(" (instance of ");
 		context.append(clsOfInst.getBrowserText());
 		context.append(")");
-		
-		Instance changeInst = ServerChangesUtil.createChange(kb,
-												changesKb,
-												Model.CHANGETYPE_INSTANCE_ADDED, 
-												clsOfInst.getName(), 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
-		
-	
-		ChangesProject.postProcessChange(kb, changesKb, changeInst);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(addedInst.getName(), true);
+        
+        Change change = changes_db.createChange(ChangeCls.Instance_Added);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+
 		// Create artificial transaction for create slot
-		if (ChangesProject.getInCreateSlot(kb) && ChangesProject.getIsInTransaction(kb)) {
-            changesDb.getTransactionState().commitTransaction();
-            changesDb.setInCreateClass(false);
+        TransactionState tstate = changes_db.getTransactionState();
+		if (changes_db.isInCreateClass() && tstate.inTransaction()) {
+            tstate.commitTransaction();
+            changes_db.setInCreateClass(false);
 		}
 		
 	}
@@ -59,6 +60,7 @@ public class ChangesClsListener implements ClsListener{
 	public void directInstanceRemoved(ClsEvent event) {
 		Instance removedInst = event.getInstance();
 		Cls clsOfInst = event.getCls();
+		String name = changes_db.getPossiblyDeletedFrameName(removedInst);
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Removed Instance: ");
@@ -66,15 +68,11 @@ public class ChangesClsListener implements ClsListener{
 		context.append(" (instance of ");
 		context.append(clsOfInst.getBrowserText());
 		context.append(")");
-		
-		Instance changeInst = ServerChangesUtil.createChange(kb,
-												changesKb,
-												Model.CHANGETYPE_INSTANCE_REMOVED, 
-												clsOfInst.getName(), 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
-	
-		ChangesProject.postProcessChange(kb, changesKb, changeInst);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
+        
+        Change change = changes_db.createChange(ChangeCls.Instance_Removed);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	/* (non-Javadoc)
@@ -90,22 +88,17 @@ public class ChangesClsListener implements ClsListener{
 		context.append(" (subclass of ");
 		context.append(superClass.getBrowserText());
 		context.append(")");
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(subClass.getName(), true);
+        
+        Change change = changes_db.createChange(ChangeCls.Subclass_Added);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 		
-		Instance changeInst = ServerChangesUtil.createChange(kb,
-												changesKb,
-												Model.CHANGETYPE_SUBCLASS_ADDED, 
-												subClass.getName(), 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(kb, changesKb, changeInst);
-		
-        TransactionState tstate = changesDb.getTransactionState();
+        TransactionState tstate = changes_db.getTransactionState();
 		// Create artificial transaction for create class
-		if (tstate.inTransaction() && changesDb.getInCreateClass()) {
+		if (tstate.inTransaction() && changes_db.isInCreateClass()) {
             tstate.commitTransaction();
-            changesDb.setInCreateClass(false);
-			ChangesProject.createTransactionChange(kb, ChangesProject.TRANS_SIGNAL_TRANS_END);
-			ChangesProject.setInCreateClass(kb, false);
+            changes_db.setInCreateClass(false);
 		}
 	}
 
@@ -122,6 +115,7 @@ public class ChangesClsListener implements ClsListener{
 	public void directSubclassRemoved(ClsEvent event) {
 		Cls subClass = event.getSubclass();
 		Cls superClass = event.getCls();
+        String name = changes_db.getPossiblyDeletedFrameName(subClass);
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Removed subclass: ");
@@ -129,15 +123,11 @@ public class ChangesClsListener implements ClsListener{
 		context.append(" (subclass of ");
 		context.append(superClass.getBrowserText());
 		context.append(")");
-		
-		Instance changeInst = ServerChangesUtil.createChange(kb,
-												changesKb,
-												Model.CHANGETYPE_SUBCLASS_REMOVED, 
-												subClass.getName(), 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(kb, changesKb, changeInst);
-		
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
+        
+        Change change = changes_db.createChange(ChangeCls.Subclass_Removed);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	/* (non-Javadoc)
@@ -154,14 +144,10 @@ public class ChangesClsListener implements ClsListener{
 		context.append( superClass.getBrowserText());
 		context.append(")");
 		
-		Instance changeInst =ServerChangesUtil.createChange(kb,
-												changesKb,
-												Model.CHANGETYPE_SUPERCLASS_ADDED,
-												subClass.getName(), 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
-		ChangesProject.postProcessChange(kb, changesKb, changeInst);
-	
+        Ontology_Component applyTo = changes_db.getOntologyComponent(subClass.getName(), true);
+        
+        Change change = changes_db.createChange(ChangeCls.Superclass_Added);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	/* (non-Javadoc)
@@ -170,6 +156,7 @@ public class ChangesClsListener implements ClsListener{
 	public void directSuperclassRemoved(ClsEvent event) {
 		Cls subClass = event.getSubclass();
 		Cls superClass = event.getCls();
+        String name = changes_db.getPossiblyDeletedFrameName(subClass);
 	
 		StringBuffer context = new StringBuffer();
 		context.append("Removed superclass: ");
@@ -177,15 +164,11 @@ public class ChangesClsListener implements ClsListener{
 		context.append(" (subclass of ");
 		context.append(superClass.getBrowserText());
 		context.append(")");
-		
-		Instance changeInst = ServerChangesUtil.createChange(kb,
-												changesKb,
-												Model.CHANGETYPE_SUPERCLASS_REMOVED, 
-												subClass.getName(), 
-												context.toString(), 
-												Model.CHANGE_LEVEL_INFO);
-		
-		ChangesProject.postProcessChange(kb, changesKb, changeInst);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
+        
+        Change change = changes_db.createChange(ChangeCls.Superclass_Removed);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
 	}
 
 	/* (non-Javadoc)

@@ -3,23 +3,26 @@ package edu.stanford.smi.protegex.server_changes.listeners;
 import edu.stanford.smi.protege.event.TransactionEvent;
 import edu.stanford.smi.protege.event.TransactionListener;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.TransactionState;
 
 public class ChangesTransListener implements TransactionListener {
-    private KnowledgeBase currentKB;
-
+    private ChangesDb changes_db;
+    
     public ChangesTransListener(KnowledgeBase currentKB) {
-        this.currentKB = currentKB;
+        changes_db = ChangesProject.getChangesDb(currentKB);
     }
 	
 	public void transactionBegin(TransactionEvent arg0) {
-
-		ChangesProject.createTransactionChange(currentKB, ChangesProject.TRANS_SIGNAL_TRANS_BEGIN);
+	    TransactionState tstate = changes_db.getTransactionState();
+        tstate.beginTransaction(arg0.getBeginString());
 	}
 
+    /* TODO TR - fix this to distinguish a rollback and a commit - requires changing event generation */
 	public void transactionEnded(TransactionEvent arg0) {
-
-		ChangesProject.createTransactionChange(currentKB, ChangesProject.TRANS_SIGNAL_TRANS_END);
+	    TransactionState tstate = changes_db.getTransactionState();
+	    tstate.commitTransaction();
 	}
 
 }

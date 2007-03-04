@@ -1,7 +1,5 @@
 package edu.stanford.smi.protegex.server_changes.listeners.owl;
 
-import edu.stanford.smi.protege.model.FrameID;
-import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
@@ -10,31 +8,36 @@ import edu.stanford.smi.protegex.owl.model.RDFSClass;
 import edu.stanford.smi.protegex.owl.model.event.ModelAdapter;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
-import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.Model;
-import edu.stanford.smi.protegex.server_changes.util.Util;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Class_Created;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
+import edu.stanford.smi.protegex.server_changes.model.generated.Property_Created;
 
 public class OwlChangesModelListener extends ModelAdapter{
     private OWLModel om;
+    private ChangesDb changes_db;
     private KnowledgeBase changesKb;
 
 
     public OwlChangesModelListener(OWLModel om) {
         this.om = om;
-        changesKb = ChangesProject.getChangesKB(om);
+        changes_db = ChangesProject.getChangesDb(om);
+        changesKb = changes_db.getChangesKb();
     }
 
     public void classCreated(RDFSClass arg0) {
         String clsName = arg0.getName();
         String clsText = arg0.getBrowserText();
         String context = "Created Class: " + clsText;
-        Instance changeInst = ServerChangesUtil.createChange(om,
-                                                             changesKb,
-                                                             Model.CHANGETYPE_CLASS_CREATED,
-                                                             clsName, 
-                                                             context, 
-                                                             Model.CHANGE_LEVEL_INFO);
-        ChangesProject.postProcessChange(om,changesKb, changeInst);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
+        applyTo.setCurrentName(clsName);
+        
+        Class_Created change = (Class_Created) changes_db.createChange(ChangeCls.Class_Created);
+        change.setCreationName(clsName);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
     }
 
 
@@ -54,14 +57,12 @@ public class OwlChangesModelListener extends ModelAdapter{
         String propName = arg0.getName();
         String propText = arg0.getBrowserText();
         String context = "Property Created: " + propText;
-
-        Instance changeInst = ServerChangesUtil.createChange(om,
-                                                             changesKb,
-                                                             Model.CHANGETYPE_PROPERTY_CREATED,
-                                                             propName, 
-                                                             context, 
-                                                             Model.CHANGE_LEVEL_INFO);
-        ChangesProject.postProcessChange(om,changesKb, changeInst);
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(propName, true);
+        
+        Property_Created change = (Property_Created) changes_db.createChange(ChangeCls.Property_Created);
+        change.setCreationName(propName);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
     }
 
     public void propertyDeleted(RDFProperty arg0) {
@@ -78,18 +79,11 @@ public class OwlChangesModelListener extends ModelAdapter{
         context.append("' to '");
         context.append(newName);
         context.append("'");
-
-        ChangesDb changesDb = ChangesProject.getChangesDb(om);
-
-        Instance changeInst = ServerChangesUtil.createNameChange(om,
-                                                                 changesKb,
-                                                                 Model.CHANGETYPE_NAME_CHANGED,
-                                                                 newName, 
-                                                                 context.toString(), 
-                                                                 Model.CHANGE_LEVEL_INFO, 
-                                                                 oldName, 
-                                                                 newName);
-        ChangesProject.postProcessChange(om, changesKb, changeInst);
-
+        
+        Ontology_Component applyTo = changes_db.getOntologyComponent(oldName, true);
+        applyTo.setCurrentName(null);
+        
+        Change change = changes_db.createChange(ChangeCls.Name_Changed);
+        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
     }
 }

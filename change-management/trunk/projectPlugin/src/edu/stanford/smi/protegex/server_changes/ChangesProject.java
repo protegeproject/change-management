@@ -3,17 +3,13 @@ package edu.stanford.smi.protegex.server_changes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
 import edu.stanford.smi.protege.Application;
-import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
-import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.model.WidgetDescriptor;
 import edu.stanford.smi.protege.plugin.ProjectPluginAdapter;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
@@ -27,7 +23,6 @@ import edu.stanford.smi.protegex.server_changes.listeners.ChangesInstanceListene
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesKBListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesSlotListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesTransListener;
-import edu.stanford.smi.protegex.server_changes.model.Model;
 import edu.stanford.smi.protegex.server_changes.util.Util;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
@@ -116,9 +111,8 @@ public class ChangesProject extends ProjectPluginAdapter {
 		// AT THIS POINT, WE HAVE THE CHANGES PROJECT 'changes' and the KB 'changesKb'. 
 		// Creating the Root of the tree for the UI
 
-		ServerChangesUtil.createChange(currentKB, changesKb, Model.CHANGETYPE_INSTANCE_ADDED,	
-                                       Model.CHANGE_LEVEL_ROOT, Model.CHANGE_LEVEL_ROOT,	Model.CHANGE_LEVEL_ROOT);
 
+		changesDb.createRootChange();
 
 		//Check to see if the project is an OWL one
 		boolean isOwlProject = Util.kbInOwl(currentKB);
