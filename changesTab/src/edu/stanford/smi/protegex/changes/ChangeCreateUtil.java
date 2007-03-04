@@ -7,47 +7,55 @@ import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeSlot;
+import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 public class ChangeCreateUtil {
+    private ChangeModel model;
+    private KnowledgeBase cKb;
 
-	private ChangeCreateUtil() {}
+	public ChangeCreateUtil(ChangeModel model) {
+	    this.model = model;
+        cKb = model.getChangeKb();
+    }
     
     public static String getActionDisplay(Change aInst) {
         String actionStr = aInst.getAction();
         return actionStr.replace('_', ' ');
     }
     
-
-	
-	
-	public static Instance createAnnotation(KnowledgeBase cKb, String annotType,Collection changeInsts) {
+@Deprecated 
+/**
+ * I don't think that this method will work right - see the AbstractChangeListener & ChangeDb.createAnnotation
+ */
+	public Annotation createAnnotation(String annotType,Collection changeInsts) {
 		Cls annotate = cKb.getCls(annotType);
-		Slot annotates = cKb.getSlot(Model.SLOT_NAME_ANNOTATES);
-		//Slot title = cKb.getSlot(Model.SLOT_NAME_TITLE);
+		Slot annotates = model.getSlot(ChangeSlot.annotates);
 		
-		Instance annotateInst = cKb.createInstance(null, annotate);
+		Annotation annotateInst = (Annotation) cKb.createInstance(null, annotate);
 		annotateInst.setOwnSlotValues(annotates, changeInsts);
 		//annotateInst.setOwnSlotValue(title, annotateInst.getName());
 		
 		return annotateInst;
 	}
 	
-	public static Instance updateAnnotation(KnowledgeBase cKb, Instance annotateInst) {
-		
-		Slot created = cKb.getSlot(Model.SLOT_NAME_CREATED);
-		Slot author = cKb.getSlot(Model.SLOT_NAME_AUTHOR);
-		Slot modified = cKb.getSlot(Model.SLOT_NAME_MODIFIED);
-		Slot body = cKb.getSlot(Model.SLOT_NAME_BODY);
-		
-		annotateInst.setOwnSlotValue(created, ChangesTab.getTimeStamp());
-		annotateInst.setOwnSlotValue(modified, ChangesTab.getTimeStamp());
-		annotateInst.setOwnSlotValue(author, cKb.getUserName());
+@Deprecated 
+/**
+ * I don't think that this method will work right - see the AbstractChangeListener & ChangeDb.createAnnotation
+ */
+	public Annotation updateAnnotation(Annotation annotateInst) {
+        Timestamp now = new Timestamp(model);
+        annotateInst.setCreated(now);
+        annotateInst.setModified(now);
+        annotateInst.setAuthor(cKb.getUserName());
 		
 		// If no comments are added, add empty string as comment
-		Object bdy = annotateInst.getOwnSlotValue(body);
-		if (bdy == null) {
-			annotateInst.setOwnSlotValue(body, "");
+		if (annotateInst.getBody() == null) {
+            annotateInst.setBody("");
 		}
 		
 		return annotateInst;	
