@@ -4,23 +4,40 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protege.model.Cls;
-import edu.stanford.smi.protegex.server_changes.model.Model;
-import edu.stanford.smi.protegex.server_changes.model.Timestamp;
+import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 /**
  * The tabel model for the annotation specific table
  *
  */
 public class AnnotationTableModel extends AbstractTableModel{
+    
+    public enum Column {
+        ANNOTATE_COLNAME_TYPE("Type"),
+        ANNOTATE_COLNAME_COMMENTS("Description"),
+        ANNOTATE_COLNAME_AUTHOR("Author"),
+        ANNOTATE_COLNAME_CREATED("Created");
+        
+        private String name;
+        
+        private Column(String name) {
+            this.name = name;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public int getColumn() {
+            return ordinal();
+        }
+    }
 
-	public static final String ANNOTATE_COLNAME_AUTHOR ="Author";
-	public static final String ANNOTATE_COLNAME_CREATED ="Created";
-	//public static final String ANNOTATE_COLNAME_TITLE ="Title";
-	public static final String ANNOTATE_COLNAME_TYPE ="Type";
-	public static final String ANNOTATE_COLNAME_COMMENTS ="Description";
     public static final String TYPE_EXPLANATION = "Explanation";
     public static final String TYPE_QUESTION = "Question";
     public static final String TYPE_SEEALSO = "SeeAlso";
@@ -29,21 +46,21 @@ public class AnnotationTableModel extends AbstractTableModel{
     public static final String TYPE_COMMENT = "Comment";
 
 	private String[] colNames;
-	private ArrayList data;
+	private ArrayList<Annotation> data;
 	private KnowledgeBase changeKB;
 	
 	public AnnotationTableModel(KnowledgeBase changeKB) {
 		this.changeKB = changeKB;
 		
 		// Setup the table column size/names
-		colNames = new String[4];
-		colNames[2] = ANNOTATE_COLNAME_AUTHOR;
-		colNames[3] = ANNOTATE_COLNAME_CREATED;
-		colNames[0]= ANNOTATE_COLNAME_TYPE;
-		//colNames[3] = ANNOTATE_COLNAME_TITLE;
-		colNames[1] = ANNOTATE_COLNAME_COMMENTS;
+
+        Column[] cols = Column.values();
+        colNames = new String[cols.length];
+        for (int i = 0; i < cols.length; i++) {
+            colNames[i] = cols[i].getName();
+        }
 		
-		data = new ArrayList();
+		data = new ArrayList<Annotation>();
 	}
 	
 	public void update() {
@@ -70,19 +87,10 @@ public class AnnotationTableModel extends AbstractTableModel{
 	 * @see javax.swing.table.TableModel#getColumnName(int)
 	 */
 	public String getColumnName(int column) {
-		switch (column) {
-		case 0:
-			return colNames[0];
-		case 1:
-			return colNames[1];
-		case 2:
-			return colNames[2];
-		case 3:
-			return colNames[3];
-		
-		}
-		
-		return "";
+        if (column >= 0 && column <= colNames.length) {
+            return colNames[column];
+        }
+        return "";
 	}
 	
 	/* (non-Javadoc)
@@ -102,21 +110,22 @@ public class AnnotationTableModel extends AbstractTableModel{
 		
 		// This is the instance object,
 		// get the particular piece of info out of it.
-		Instance aInst = (Instance)data.get(row);
+		Annotation aInst = data.get(row);
 		Cls annotType = aInst.getDirectType();
 		
-		switch(col) {
-		
-		case 2:
-			return Model.getAuthor(aInst);
-		case 3: 
-			return Timestamp.getTimestamp(aInst).getDateString();
-		case 0:
-			return annotType.getName(); 
-		/*case 3:
-			return ChangeCreateUtil.getTitle(changeKB, aInst);*/
-		case 1: 
-			return Model.getBody(aInst);
+        if (col < 0 || col >= Column.values().length) {
+            return "";
+        }
+		switch(Column.values()[col]) {
+        case ANNOTATE_COLNAME_TYPE:
+            return annotType.getName(); 
+        case ANNOTATE_COLNAME_COMMENTS: 
+            return aInst.getBody();
+		case ANNOTATE_COLNAME_AUTHOR:
+			return aInst.getAuthor();
+		case ANNOTATE_COLNAME_CREATED: 
+			return ((Timestamp) aInst.getCreated()).getDate();
+
 		}
 		
 		return "";
@@ -144,10 +153,9 @@ public class AnnotationTableModel extends AbstractTableModel{
 	 * @param annotate
 	 * Add the given annotation to the internal data structure of instances
 	 */
-	public void addAnnotationData(Instance annotate) {
+	public void addAnnotationData(Annotation annotate) {
 		data.add(annotate);
 		fireTableRowsInserted(data.size()-1, data.size()-1);
-		
 	}
 	
 	/**
@@ -178,7 +186,7 @@ public class AnnotationTableModel extends AbstractTableModel{
 	 */
 	public void editAnnotationData(Instance annotate, int index) {
 		data.remove(index);
-		data.add(index, annotate);
+		data.add(index, (Annotation) annotate);
 		fireTableDataChanged();
 	}
 }
