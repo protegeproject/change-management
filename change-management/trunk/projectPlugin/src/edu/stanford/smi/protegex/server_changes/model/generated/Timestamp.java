@@ -47,7 +47,7 @@ public class Timestamp extends DefaultSimpleInstance {
 	    ;
 	}
 
-	public Timestamp(ChangeModel model) {
+	public static Timestamp getTimestamp(ChangeModel model) {
 	    int counter;
 	    Date date;
 	    synchronized (Timestamp.class) {
@@ -57,6 +57,7 @@ public class Timestamp extends DefaultSimpleInstance {
 	    Timestamp i = (Timestamp) model.createInstance(ChangeCls.Timestamp);
 	    i.setDate(DATE_FORMAT.format(date));
 	    i.setSequence(counter);
+        return i;
 	}
 
 

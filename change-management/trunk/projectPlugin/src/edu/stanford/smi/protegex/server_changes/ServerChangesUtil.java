@@ -33,14 +33,14 @@ public class ServerChangesUtil {
 	public Annotation createAnnotation(String annotType,Collection annotatables) {
         Annotation a = (Annotation) model.createInstance(ChangeCls.Annotation);
         a.setAnnotates(annotatables);
-        a.setCreated(new Timestamp(model));
+        a.setCreated(Timestamp.getTimestamp(model));
         ChangeModel.logAnnotatableThing("Creating change for annotation", log, Level.FINE, a);
             // we need to determine what will trigger the listener
 		return a;
 	}
 	
 	public Annotation updateAnnotation(KnowledgeBase kb, Annotation a) {
-	    a.setModified(new Timestamp(model));
+	    a.setModified(Timestamp.getTimestamp(model));
         a.setAuthor(ChangesProject.getUserName(kb));
         if (a.getBody() == null) {
             a.setBody("");
