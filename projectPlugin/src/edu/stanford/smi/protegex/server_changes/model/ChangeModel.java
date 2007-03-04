@@ -1,7 +1,10 @@
 package edu.stanford.smi.protegex.server_changes.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,15 +13,7 @@ import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
-import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Class_Created;
-import edu.stanford.smi.protegex.server_changes.model.generated.Class_Deleted;
-import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
-import edu.stanford.smi.protegex.server_changes.model.generated.Property_Created;
-import edu.stanford.smi.protegex.server_changes.model.generated.Property_Deleted;
-import edu.stanford.smi.protegex.server_changes.model.generated.Slot_Created;
-import edu.stanford.smi.protegex.server_changes.model.generated.Slot_Deleted;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 public class ChangeModel {
@@ -59,6 +54,8 @@ public class ChangeModel {
         Subclass_Removed,
         Superclass_Added,
         Superclass_Removed,
+        TemplateSlot_Added,
+        TemplateSlot_Removed,
         
         Instance_Change,
         DirectType_Added,
@@ -116,6 +113,12 @@ public class ChangeModel {
     
     public static boolean isRoot(Change change) {
         return CHANGE_TYPE_ROOT.equals(change.getType());
+    }
+    
+    public List<Instance> getSortedChanges() {
+        List<Instance> changes = new ArrayList<Instance>(getInstances(ChangeCls.Change));
+        Collections.sort(changes, new ChangeDateComparator(changes_kb));
+        return changes;
     }
     
     public Cls getCls(ChangeCls c) {

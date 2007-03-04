@@ -30,15 +30,6 @@ public class Util {
 	public static boolean kbInOwl(KnowledgeBase kb) {
 	    return kb instanceof OWLModel;
 	}
-	
-	public static void registerOwlListeners(OWLModel om) {
-		om.addClassListener(new OwlChangesClassListener(om));
-		om.addModelListener(new OwlChangesModelListener(om));
-		om.addPropertyListener(new OwlChangesPropertyListener(om));
-		((KnowledgeBase) om).addFrameListener(new OwlChangesFrameListener(om));
-		om.addTransactionListener(new ChangesTransListener(om));
-		((KnowledgeBase) om).addKnowledgeBaseListener(new ChangesOwlKBListener(om)); // Handles Class Deletes
-	}
 
 	// Undo framestore possible use
 	private static void ufsReg(KnowledgeBase currKB) {

@@ -4,18 +4,16 @@
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.Collection;
-import edu.stanford.smi.protege.model.DefaultSimpleInstance;
+import java.util.Collections;
+import java.util.List;
+
 import edu.stanford.smi.protege.model.FrameID;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.ModelUtilities;
-import edu.stanford.smi.protege.util.Log;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.ChangeDateComparator;
 
 
 /** 
@@ -38,4 +36,36 @@ public class Ontology_Component extends AnnotatableThing {
 		return ((String) ModelUtilities.getOwnSlotValue(this, "currentName"));
 	}
 // __Code above is automatically generated. Do not change
+    
+    public enum Status {
+        CREATED, DELETED, CREATED_AND_DELETED, UNCHANGED, CHANGED
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Status getStatus() {
+        List<Instance> changes = new ArrayList<Instance>(getChanges());
+        Collections.sort(changes, new ChangeDateComparator(getKnowledgeBase()));
+        if (changes == null) {
+            return Status.UNCHANGED;
+        }
+        else {
+            Change first_change = (Change) changes.get(0);
+            Change last_change = (Change) changes.get(changes.size() - 1);
+            if (first_change instanceof Created_Change && last_change instanceof Deleted_Change) {
+                return Status.CREATED_AND_DELETED;
+            }
+            else if (first_change instanceof Created_Change) {
+                return Status.CREATED;
+            }
+            else if (last_change instanceof Deleted_Change) {
+                return Status.DELETED;
+            }
+            else {
+                return Status.CHANGED;
+            }
+        }
+        
+    }
+    
+    
 }

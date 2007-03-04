@@ -7,12 +7,13 @@ import java.awt.Graphics;
 import java.awt.Point;
 
 import edu.stanford.smi.protege.util.DefaultRenderer;
-import edu.stanford.smi.protegex.server_changes.time.ChangingFrame;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
+
 
 public class ChangeTabRenderer extends DefaultRenderer {
     private static final long serialVersionUID = -6563461006874742252L;
     
-    private ChangingFrame frame;
+    private Ontology_Component frame;
 
     private boolean _underline = false;
     private boolean _strikeOut = false;
@@ -67,8 +68,8 @@ public class ChangeTabRenderer extends DefaultRenderer {
 
 
     public void load(Object value) {
-        if(value instanceof ChangingFrame) {
-            frame = (ChangingFrame) value;          
+        if(value instanceof Ontology_Component) {
+            frame = (Ontology_Component) value;          
         } else {
             frame = null;
         }
