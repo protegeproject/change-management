@@ -7,9 +7,9 @@ import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.changes.ChangesTab;
-import edu.stanford.smi.protegex.server_changes.listeners.AbstractChangeListener;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.listeners.AbstractChangeListener;
 
 
 public class ChangesListener extends AbstractChangeListener {

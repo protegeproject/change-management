@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -37,6 +38,7 @@ import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.DefaultKnowledgeBase;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.model.framestore.FrameStoreManager;
@@ -58,8 +60,11 @@ import edu.stanford.smi.protegex.changes.ui.JTreeTable;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.GetAnnotationProjectName;
-import edu.stanford.smi.protegex.server_changes.model.InstanceDateComparator;
-import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.AnnotationCreationComparator;
+import edu.stanford.smi.protegex.server_changes.model.ChangeDateComparator;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
  
 /**
  * Change Management Tab widget
@@ -448,8 +453,9 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	
 	private static void loadExistingData() {
-		Collection annotateInsts = Model.getAnnotationInsts(changes_kb);
-		Collection changeInsts = Model.getChangeInsts(changes_kb);
+        ChangeModel model = changes_db.getModel();
+		Collection<Instance> annotateInsts = model.getInstances(ChangeCls.Annotation);
+		Collection<Instance> changeInsts = model.getInstances(ChangeCls.Change);
 		
 		loadChanges(changeInsts);
 		loadAnnotations(annotateInsts);
@@ -457,9 +463,9 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	}
 	
-	private static void loadChanges(Collection changeInsts) {
-		ArrayList changeList = new ArrayList(changeInsts);
-		Collections.sort(changeList, new InstanceDateComparator(changes_kb));
+	private static void loadChanges(Collection<Instance> changeInsts) {
+		List<Instance> changeList = new ArrayList<Instance>(changeInsts);
+		Collections.sort(changeList, new ChangeDateComparator(changes_kb));
 		
 		for (Iterator iter = changeList.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
@@ -570,10 +576,10 @@ public class ChangesTab extends AbstractTabWidget {
 		}
 	}*/
 	
-	private static void loadAnnotations(Collection annotateInsts) {
+	private static void loadAnnotations(Collection<Instance> annotateInsts) {
 		
-		ArrayList annotationList = new ArrayList(annotateInsts);
-		Collections.sort(annotationList, new InstanceDateComparator(changes_kb));
+		List<Instance> annotationList = new ArrayList<Instance>(annotateInsts);
+		Collections.sort(annotationList, new AnnotationCreationComparator());
 		
 		for (Iterator iter = annotationList.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
@@ -590,14 +596,13 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 	
 	public static void createAnnotation(Instance annotateInst) {
-		Slot body = changes_kb.getSlot(Model.SLOT_NAME_BODY);
-		Object bdy = annotateInst.getOwnSlotValue(body);
-		if (bdy == null) {
+        String body = ((Annotation) annotateInst).getBody();
+		if (body == null) {
 			changes_kb.deleteInstance(annotateInst);
 		}
 		else{
-		annotateInst = ChangeCreateUtil.updateAnnotation(changes_kb, annotateInst);
-		aTableModel.addAnnotationData(annotateInst);
+		    annotateInst = ChangeCreateUtil.updateAnnotation(changes_kb, annotateInst);
+		    aTableModel.addAnnotationData((Annotation) annotateInst);
 		}
 	}
 	

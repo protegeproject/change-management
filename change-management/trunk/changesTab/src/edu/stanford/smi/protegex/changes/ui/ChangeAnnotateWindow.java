@@ -28,7 +28,7 @@ import edu.stanford.smi.protegex.changes.ChangeTableModel;
 import edu.stanford.smi.protegex.changes.ChangesTab;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
-import edu.stanford.smi.protegex.server_changes.model.InstanceDateComparator;
+import edu.stanford.smi.protegex.server_changes.model.ChangeDateComparator;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
@@ -64,100 +64,14 @@ public class ChangeAnnotateWindow {
 	
 	private void generateCMWindow(String clsName) {
 		
-		cmFrame = ComponentFactory.createFrame();
-		ComponentUtilities.center(cmFrame);
-		cmFrame.setSize(500,300);
-		cmFrame.setTitle(CHANGE_ANNOTATE_TITLE + clsName);
-		cmFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
-		JPanel cmPanel = new JPanel();
-	
-		cTableModel = new ChangeTableModel(change_kb);
-		aTableModel = new AnnotationTableModel(change_kb);
-		
-		List<Instance> changes = new ArrayList<Instance>(change_model.getCls(ChangeCls.Change).getInstances());
-        Collections.sort(changes, new InstanceDateComparator(change_kb));
-		List<Instance> relChanges = new ArrayList<Instance>();
-		List<Instance> assocAnnotations = new ArrayList<Instance>();
-		HashMap uniqueSet = new HashMap();
-
-		// Construct name changed list
-		names.clear();
-		if (nameChangeOn) {
-			getAllNames(ChangesTab.getNameChanges(), clsName);	
-		} else {
-			getAllNames(new HashMap<String, String>(), clsName);	
-		}
-		names.add(clsName);
-		
-		for (Instance cInst : changes) {
-		    Change change = (Change) cInst;
-			
-			if (cInst instanceof Composite_Change)  {
-				Collection transChanges = ((Composite_Change) change).getSubChanges();
-				boolean hasChangeRel = false;
-				
-				for (Instance tcInst : transChange) {
-					String tApplyToStr = Model.getApplyTo(tcInst);
-					
-					for (Iterator it2 = names.iterator(); it2
-							.hasNext();) {
-						String nameChange = (String) it2.next();
-						if (tApplyToStr.equals(nameChange)) {
-							hasChangeRel = true;
-						}
-					}
-				}
-				
-				if (hasChangeRel) {
-					relChanges.add(cInst);
-					Collection assocList = Model.getAssocAnnotations(cInst);
-					for (Iterator iterator = assocList.iterator(); iterator
-							.hasNext();) {
-						Instance elem = (Instance) iterator.next();
-						if (!uniqueSet.containsKey(elem.getName())){
-							assocAnnotations.add(elem);
-							uniqueSet.put(elem.getName(), null);
-						}
-					}
-				}
-			
-			} else {
-				String info = Model.getType(cInst);
-				
-				if (!info.equals(Model.CHANGE_LEVEL_TRANS_INFO)){
-					String applyToStr = Model.getApplyTo(cInst);
-					for (Iterator iterator = names.iterator(); iterator
-							.hasNext();) {
-						String nameChange = (String) iterator.next();
-						if (nameChange.equals(applyToStr)) {
-							relChanges.add(cInst);
-							Collection assocList = Model.getAssocAnnotations(cInst);
-							for (Iterator it2 = assocList.iterator(); it2
-									.hasNext();) {
-								Instance elem = (Instance) it2.next();
-								if (!uniqueSet.containsKey(elem.getName())){
-									assocAnnotations.add(elem);
-									uniqueSet.put(elem.getName(), null);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		Collections.sort(relChanges, new InstanceDateComparator(change_kb));
-		for (Iterator iter = relChanges.iterator(); iter.hasNext();) {
-			Instance aInst = (Instance) iter.next();
-			cTableModel.addChangeData(aInst);
-		}
-		
-		Collections.sort(assocAnnotations, new InstanceDateComparator(change_kb));
-		for (Iterator iter = assocAnnotations.iterator(); iter.hasNext();) {
-			Instance aInst = (Instance) iter.next();
-			aTableModel.addAnnotationData(aInst);
-		}
+	    if (true) {
+	        throw new UnsupportedOperationException("Not implemented yet");
+        }
+        JPanel cmPanel = new JPanel();
+        Collection changes;
+        List<Instance> relChanges = new ArrayList<Instance>();
+        List<Instance> assocAnnotations = new ArrayList<Instance>();
+        HashMap uniqueSet = new HashMap();
 		
 		cTable = new JTable(cTableModel);
 		aTable = new JTable(aTableModel);

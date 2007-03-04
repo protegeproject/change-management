@@ -10,10 +10,11 @@ import javax.swing.table.AbstractTableModel;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protege.model.Slot;
-import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.Model;
-import edu.stanford.smi.protegex.server_changes.model.Timestamp;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
+
 
 public class ChangeTableModel extends AbstractTableModel {
 
@@ -21,14 +22,25 @@ public class ChangeTableModel extends AbstractTableModel {
 	public static final int FILTER_TRANS_INFO = 1;
 	public static final int SHOW_ALL = 2;
 	
-	public static final String CHANGE_COLNAME_AUTHOR ="Author";
-	public static final String CHANGE_COLNAME_CREATED ="Created";
-	public static final String CHANGE_COLNAME_ACTION ="Action";
-	public static final String CHANGE_COLNAME_DESCRIPTION ="Description";
+    public enum Column {
+      CHANGE_COLNAME_ACTION("Action"),
+        CHANGE_COLNAME_DESCRIPTION("Description"),
+        CHANGE_COLNAME_AUTHOR("Author"),
+        CHANGE_COLNAME_CREATED("Created");
+
+        private String name;
+        private Column(String name) {
+          this.name = name;
+        }
+
+        public String getName() {
+          return name;
+        }
+    }
 	//static protected Class[]  cTypes = {String.class, String.class, String.class, Icon.class, String.class};
 	private String[] colNames;
-	private List<Instance> completeData;
-	private List<Instance> workingData;
+	private List<Change> completeData;
+	private List<Change> workingData;
 	
 	// Used for coloring the table
 	private ArrayList colorList;
@@ -50,16 +62,14 @@ public class ChangeTableModel extends AbstractTableModel {
 	
 	// init the column names, data structures
 	private void init() {
-		colNames = new String[4];
-	
-		colNames[2] = CHANGE_COLNAME_AUTHOR;
-		colNames[3] = CHANGE_COLNAME_CREATED;
-		colNames[0] = CHANGE_COLNAME_ACTION;
-		//colNames[3] = "    ";
-		colNames[1] = CHANGE_COLNAME_DESCRIPTION;
+        Column[] cols = Column.values();
+		colNames = new String[cols.length];
+        for (int i = 0; i < cols.length; i++) {
+            colNames[i] = cols[i].getName();
+        }
 		
-		workingData = new ArrayList<Instance>();
-		completeData = new ArrayList<Instance>();
+		workingData = new ArrayList<Change>();
+		completeData = new ArrayList<Change>();
 		colorList = new ArrayList();
 	}
 	
@@ -81,22 +91,10 @@ public class ChangeTableModel extends AbstractTableModel {
 	 * @see javax.swing.table.TableModel#getColumnName(int)
 	 */
 	public String getColumnName(int column) {
-		switch (column) {
-		case 0:
-			return colNames[0];
-		case 1:
-			return colNames[1];
-		case 2:
-			return colNames[2];
-		case 3:
-			return colNames[3];
-		//case 4:
-			//return colNames[4];
-	
-		
-		}
-		
-		return "";
+        if (column < 0 || column > colNames.length) {
+            return "";
+        }
+        return colNames[column];
 	}
 	
 	/*public Class getColumnClass(int c) {
@@ -111,40 +109,26 @@ public class ChangeTableModel extends AbstractTableModel {
 		
 		// This is the instance object,
 		// get the particular piece of info out of it.
-		Instance aInst = workingData.get(row);
+		Change aInst = workingData.get(row);
 
 		
 		Object ctxt = null;
-		
-		switch(col) {
-		case 2:
-			ctxt = Model.getAuthor(aInst);
-		    break;
-		case 3: 
-			ctxt = Timestamp.getTimestamp(aInst).getDateString();
-			break;
-		case 0: 
-			ctxt = ChangeCreateUtil.getActionDisplay(changeKB, aInst);
-			break;
-		/*case 3:  
-			//Cls changeInstType = aInst.getDirectType();
-			//if (changeInstType.getName().equals(Model.CHANGETYPE_TRANS_CHANGE))
-			  String actionType = ChangeCreateUtil.getType(changeKB, aInst);	
-			  if(actionType.equals(Model.CHANGE_LEVEL_DISP_TRANS))
-			   ctxt = Icons.getViewClsIcon();
-			break; */ 	
-		case 1: 
-			ctxt = Model.getContext(aInst);
-			break;
+		if (col < 0 || col >= Column.values().length) {
+		    return null;
+        }
+        
+		switch(Column.values()[col]) {
+		case CHANGE_COLNAME_AUTHOR:
+			return  aInst.getAuthor();
+		case CHANGE_COLNAME_CREATED: 
+            return ((Timestamp) aInst.getTimestamp()).getDate();
+		case CHANGE_COLNAME_ACTION:
+			return ChangeCreateUtil.getActionDisplay(aInst);
+		case CHANGE_COLNAME_DESCRIPTION: 
+		    return aInst.getContext();
+		default:
+		    throw new UnsupportedOperationException("Developer missed a case");
 		}
-		
-		//Integer colorInt = (Integer) colorList.get(row);
-		//Object[] wrapper = new Object[2];
-		//wrapper[0] = colorInt;
-		//wrapper[1] = ctxt;
-		
-		//return wrapper;
-		return ctxt;
 	}
 	
 	public Object getObjInRow(int row) {
@@ -313,10 +297,12 @@ public class ChangeTableModel extends AbstractTableModel {
 		workingData.clear();
 		colorList.clear();
 		
-		Slot author = changeKB.getSlot(Model.SLOT_NAME_AUTHOR);
-		Slot created = changeKB.getSlot(Model.SLOT_NAME_CREATED);
-		Slot action = changeKB.getSlot(Model.SLOT_NAME_ACTION);
-		Slot desc = changeKB.getSlot(Model.SLOT_NAME_CONTEXT);
+        Column search_column = null;
+        for (Column col : Column.values()) {
+            if (field.equals(col.getName())) {
+                search_column = col;
+            }
+        }
 		
 		Slot sltToSearch = null;
 		if (field.equals(CHANGE_COLNAME_AUTHOR)) {

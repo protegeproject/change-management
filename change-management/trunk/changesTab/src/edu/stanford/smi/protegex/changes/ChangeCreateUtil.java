@@ -5,15 +5,16 @@ import java.util.Collection;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protege.model.Slot;
-import edu.stanford.smi.protegex.server_changes.model.Model;
+import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 
 public class ChangeCreateUtil {
 
 	private ChangeCreateUtil() {}
     
-    public static String getActionDisplay(KnowledgeBase cKb, Instance aInst) {
-        String actionStr = (String) aInst.getOwnSlotValue(cKb.getSlot(Model.SLOT_NAME_ACTION));
+    public static String getActionDisplay(Change aInst) {
+        String actionStr = aInst.getAction();
         return actionStr.replace('_', ' ');
     }
     
