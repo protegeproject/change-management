@@ -13,7 +13,6 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeSlot;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
@@ -24,28 +23,7 @@ public class ChangeTableModel extends AbstractTableModel {
         FILTER_TRANS, FILTER_TRANS_INFO, SHOW_ALL
     }
 	
-    public enum Column {
-      CHANGE_COLNAME_ACTION("Action", ChangeSlot.action),
-        CHANGE_COLNAME_DESCRIPTION("Description", ChangeSlot.body),
-        CHANGE_COLNAME_AUTHOR("Author", ChangeSlot.author),
-        CHANGE_COLNAME_CREATED("Created", ChangeSlot.timestamp);
-
-        private String name;
-        private ChangeSlot search_slot;
-        private Column(String name, ChangeSlot search_slot) {
-          this.name = name;
-          this.search_slot = search_slot;
-        }
-
-        public String getName() {
-          return name;
-        }
-        
-        public ChangeSlot getSearchSlot() {
-            return search_slot;
-        }
-    }
-	//static protected Class[]  cTypes = {String.class, String.class, String.class, Icon.class, String.class};
+    //static protected Class[]  cTypes = {String.class, String.class, String.class, Icon.class, String.class};
 	private String[] colNames;
 	private List<Change> completeData;
 	private List<Change> workingData;
@@ -73,7 +51,7 @@ public class ChangeTableModel extends AbstractTableModel {
 	
 	// init the column names, data structures
 	private void init() {
-        Column[] cols = Column.values();
+        ChangeTableColumn[] cols = ChangeTableColumn.values();
 		colNames = new String[cols.length];
         for (int i = 0; i < cols.length; i++) {
             colNames[i] = cols[i].getName();
@@ -124,11 +102,11 @@ public class ChangeTableModel extends AbstractTableModel {
 
 		
 		Object ctxt = null;
-		if (col < 0 || col >= Column.values().length) {
+		if (col < 0 || col >= ChangeTableColumn.values().length) {
 		    return null;
         }
         
-		switch(Column.values()[col]) {
+		switch(ChangeTableColumn.values()[col]) {
 		case CHANGE_COLNAME_AUTHOR:
 			return  aInst.getAuthor();
 		case CHANGE_COLNAME_CREATED: 
@@ -270,8 +248,8 @@ public class ChangeTableModel extends AbstractTableModel {
 		workingData.clear();
 		colorList.clear();
 		
-        Column search_column = null;
-        for (Column col : Column.values()) {
+        ChangeTableColumn search_column = null;
+        for (ChangeTableColumn col : ChangeTableColumn.values()) {
             if (field.equals(col.getName())) {
                 search_column = col;
             }
