@@ -56,6 +56,9 @@ public class ServerChangesUtil {
         case Property_Created:
             context = "Property";
             break;
+        case Instance_Created:
+            context = "Instance";
+            break;
         default:
             throw new IllegalArgumentException("Change type " + type + " is not a create frame type");
         }
@@ -89,6 +92,9 @@ public class ServerChangesUtil {
             break;
         case Property_Deleted:
             context = "Property";
+            break;
+        case Instance_Deleted:
+            context = "Instance";
             break;
         default:
             throw new IllegalArgumentException("Change type " + type + " is not a create frame type");
