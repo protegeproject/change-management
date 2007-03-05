@@ -42,13 +42,13 @@ public class ChangeMenu extends JMenu {
     private ChangeCreateUtil create_util;
 	private Instance annotateInst;
 	
-	public ChangeMenu(ChangesDb change_db) {
+	public ChangeMenu(KnowledgeBase changeKb) {
 		super(MENU_TITLE);
 		setMnemonic(KeyEvent.VK_C);
 		
-		this.change_kb = change_db.getChangesKb();
+		this.change_kb = changeKb;
 		this.change_project = change_kb.getProject();
-        this.change_model = change_db.getModel();
+        this.change_model = new ChangeModel(changeKb);
         this.create_util = new ChangeCreateUtil(change_model);
 		
 		JMenuItem annotate = new JMenuItem(MENU_ITEM_ANNOTATE_LAST);
