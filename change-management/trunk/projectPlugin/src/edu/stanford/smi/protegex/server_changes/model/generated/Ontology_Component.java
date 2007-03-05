@@ -49,9 +49,8 @@ public class Ontology_Component extends AnnotatableThing {
     
     @SuppressWarnings("unchecked")
     public Status getStatus() {
-        List<Instance> changes = new ArrayList<Instance>(getChanges());
-        Collections.sort(changes, new ChangeDateComparator(getKnowledgeBase()));
-        if (changes == null) {
+        List<Instance> changes = getSortedChanges();
+        if (changes == null || changes.isEmpty()) {
             return Status.UNCHANGED;
         }
         else {
@@ -71,6 +70,53 @@ public class Ontology_Component extends AnnotatableThing {
             }
         }
         
+    }
+    
+    public String toString() {
+        switch (getStatus()) {
+        case CHANGED:
+            return "Modified Object: " + getCurrentName();
+        case CREATED:
+            return "New Object: " + getCurrentName();
+        case DELETED:
+            return "Deleted Object: " + getInitialName();
+        case CREATED_AND_DELETED:
+            return "Created and Deleted Object";
+        case UNCHANGED:
+            return "Unchanged Object: " + getCurrentName();
+        default:
+            throw new RuntimeException("Developer missed a case");
+        }
+    }
+    
+    public String getInitialName() {
+        List<Instance> changes = getSortedChanges();
+        if (changes.get(0) instanceof Created_Change) {
+            return null;
+        }
+        Collections.reverse(changes);
+        String name = getCurrentName();
+        for (Instance i : changes) {
+            if (i instanceof Deleted_Change) {
+                Deleted_Change change = (Deleted_Change) i;
+                name = change.getDeletionName();
+            }
+            else if (i instanceof Name_Changed) {
+                Name_Changed change = (Name_Changed) i;
+                name = change.getOldName();
+            }
+            else if (i instanceof Created_Change) {
+                Created_Change change = (Created_Change) i;
+                return null;
+            }
+        }
+        return name;
+    }
+    
+    public List<Instance> getSortedChanges() {
+        List<Instance> changes = new ArrayList<Instance>(getChanges());
+        Collections.sort(changes, new ChangeDateComparator(getKnowledgeBase()));
+        return changes;
     }
     
     
