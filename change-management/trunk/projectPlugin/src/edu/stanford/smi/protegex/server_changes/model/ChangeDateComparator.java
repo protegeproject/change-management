@@ -16,6 +16,6 @@ public class ChangeDateComparator implements Comparator<Instance> {
     public int compare(Instance o1, Instance o2) {
         Change c1 = (Change) o1;
         Change c2 = (Change) o2;
-        return ((Timestamp) c1.getTimestamp()).compareTo(c2.getTimestamp());
+        return ((Timestamp) c1.getTimestamp()).compareTimestamp((Timestamp) c2.getTimestamp());
     }
 }
