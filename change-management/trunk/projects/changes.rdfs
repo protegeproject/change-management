@@ -448,12 +448,6 @@
 	 rdfs:label="title">
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
-<rdf:Property rdf:about="&kb;type"
-	 a:maxCardinality="1"
-	 rdfs:label="type">
-	<rdfs:domain rdf:resource="&kb;Change"/>
-	<rdfs:range rdf:resource="&rdfs;Literal"/>
-</rdf:Property>
 <rdf:Property rdf:about="&kb;voteValue"
 	 a:maxCardinality="1"
 	 a:range="symbol"
