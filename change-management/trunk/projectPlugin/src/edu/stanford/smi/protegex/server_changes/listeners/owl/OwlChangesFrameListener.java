@@ -104,7 +104,7 @@ public class OwlChangesFrameListener implements FrameListener {
                         Ontology_Component applyTo = changes_db.getOntologyComponent(cName, true);
 
                         Change change = changes_db.createChange(ChangeCls.Annotation_Removed);
-                        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);                
+                        changes_db.finalizeChange(change, applyTo, context.toString());
                     }//Annotation deleted
                     else if (oldSlotValues == null || oldSlotValues.isEmpty()) {
 
@@ -122,7 +122,7 @@ public class OwlChangesFrameListener implements FrameListener {
                         Ontology_Component applyTo = changes_db.getOntologyComponent(cName, true);
 
                         Change change = changes_db.createChange(ChangeCls.Annotation_Added);
-                        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+                        changes_db.finalizeChange(change, applyTo, context.toString());
                     }
                     else {
                         context.append("Annotation Modified: ");
@@ -134,7 +134,7 @@ public class OwlChangesFrameListener implements FrameListener {
                         Ontology_Component applyTo = changes_db.getOntologyComponent(cName, true);
                         
                         Change change = changes_db.createChange(ChangeCls.Annotation_Modified);
-                        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+                        changes_db.finalizeChange(change, applyTo, context.toString());
 
                     }
                 }// handles annotations
@@ -164,7 +164,7 @@ public class OwlChangesFrameListener implements FrameListener {
                 Ontology_Component applyTo = changes_db.getOntologyComponent(cName, true);
                 
                 Change change = changes_db.createChange(ChangeCls.Disjoint_Class_Added);
-                changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+                changes_db.finalizeChange(change, applyTo, context.toString());
             } // Handles disjoints
 
         }
@@ -191,7 +191,7 @@ public class OwlChangesFrameListener implements FrameListener {
                 Ontology_Component applyTo = changes_db.getOntologyComponent(ownSName, true);
                 
                 Change change = changes_db.createChange(ChangeCls.Slot_Value);
-                changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+                changes_db.finalizeChange(change, applyTo, context.toString());
             } 
         }
 

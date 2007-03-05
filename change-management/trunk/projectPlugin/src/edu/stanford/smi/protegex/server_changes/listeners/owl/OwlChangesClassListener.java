@@ -41,7 +41,7 @@ public class OwlChangesClassListener extends ClassAdapter {
         Ontology_Component applyTo = changes_db.getOntologyComponent(instName, true);
         
         Instance_Added change = (Instance_Added) changes_db.createChange(ChangeCls.Instance_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	public void instanceRemoved(RDFSClass arg0, RDFResource arg1) {
@@ -58,7 +58,7 @@ public class OwlChangesClassListener extends ClassAdapter {
             Ontology_Component applyTo = changes_db.getOntologyComponent(instName, true);
             
             Change change = changes_db.createChange(ChangeCls.Instance_Removed);
-            changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+            changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	public void addedToUnionDomainOf(RDFSClass arg0, RDFProperty arg1) {
@@ -80,7 +80,7 @@ public class OwlChangesClassListener extends ClassAdapter {
         Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
         
         Change change = changes_db.createChange(ChangeCls.Subclass_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	public void subclassRemoved(RDFSClass arg0, RDFSClass arg1) {
@@ -96,7 +96,7 @@ public class OwlChangesClassListener extends ClassAdapter {
             Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
             
             Change change = changes_db.createChange(ChangeCls.Subclass_Removed);
-            changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+            changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	public void superclassAdded(RDFSClass arg0, RDFSClass arg1) {
@@ -113,7 +113,7 @@ public class OwlChangesClassListener extends ClassAdapter {
         Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
         
         Change change = changes_db.createChange(ChangeCls.Superclass_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	public void superclassRemoved(RDFSClass arg0, RDFSClass arg1) {
@@ -130,6 +130,6 @@ public class OwlChangesClassListener extends ClassAdapter {
         Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
         
         Change change = changes_db.createChange(ChangeCls.Superclass_Removed);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 }
