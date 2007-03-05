@@ -68,11 +68,10 @@ public class TransactionState {
             if (r.getContext() != null) context = r.getContext();
             if (r.getApplyTo() != null) applyTo = r.getApplyTo();
         }
-        transactionLevel(changes);
         Composite_Change transaction = (Composite_Change) changesDb.createChange(ChangeCls.Composite_Change);
         transaction.setSubChanges(changes);
         transaction.setAction(action);
-        changesDb.finalizeChange(transaction, applyTo, context, ChangeModel.CHANGE_LEVEL_TRANS);
+        changesDb.finalizeChange(transaction, applyTo, context);
         
     }
 
@@ -99,7 +98,7 @@ public class TransactionState {
 	    Change firstInst = null;
 
 	    for (Change change : transActions) {
-	        if (change.getType().equals(ChangeModel.CHANGE_LEVEL_INFO) && !firstInfoInst) {
+	        if (!(change instanceof Composite_Change) && !firstInfoInst) {
 	            firstInst = change;
 	            firstInfoInst = true;
 	        }
@@ -233,12 +232,6 @@ public class TransactionState {
 		return isAnon;
 	}
 	
-	// make sure we convert the level to transaction_level
-	private void transactionLevel(Collection<Change> trans) {
-		for (Change change : trans) {
-            change.setType(ChangeModel.CHANGE_LEVEL_TRANS_INFO);
-		}
-	}
 	
     /*
      * This class provides values that the user wants to see.  If we use a poor heuristic for finding these
