@@ -54,6 +54,8 @@ public class ChangeModel {
         TemplateSlot_Removed,
         
         Instance_Change,
+        Instance_Created,
+        Instance_Deleted,
         DirectType_Added,
         DirectType_Removed,
         Instance_Added,
