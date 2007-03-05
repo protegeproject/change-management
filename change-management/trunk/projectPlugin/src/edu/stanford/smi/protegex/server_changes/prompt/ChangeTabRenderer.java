@@ -6,20 +6,26 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 
+import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.DefaultRenderer;
+import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
 
 public class ChangeTabRenderer extends DefaultRenderer {
     private static final long serialVersionUID = -6563461006874742252L;
     
+    private KnowledgeBase old_kb, new_kb;
+    
     private Ontology_Component frame;
 
     private boolean _underline = false;
     private boolean _strikeOut = false;
     
-    public ChangeTabRenderer(){
+    public ChangeTabRenderer(KnowledgeBase old_kb, KnowledgeBase new_kb){
         super();
+        this.old_kb = old_kb;
+        this.new_kb = new_kb;
     }
 
     public Color getTextColor() {
@@ -69,13 +75,57 @@ public class ChangeTabRenderer extends DefaultRenderer {
 
     public void load(Object value) {
         if(value instanceof Ontology_Component) {
-            frame = (Ontology_Component) value;          
+            frame = (Ontology_Component) value;
+            value = calculateValueString(frame);
         } else {
             frame = null;
         }
         super.load(value);
     }
 
+    private String calculateValueString(Ontology_Component frame) {
+        String name = null;
+        switch (frame.getStatus()) {
+        case CHANGED:
+        case UNCHANGED:
+        case CREATED:
+            name = frame.getCurrentName();
+            if (new_kb != null) {
+                try {
+                    name = new_kb.getFrame(name).getBrowserText();
+                }
+                catch (Throwable t) {
+                    Log.getLogger().warning("Could not get browser text for new frame " + name + ", " + t);
+                }
+            }
+            break;
+        case DELETED:
+            name = frame.getInitialName();
+            if (old_kb != null) {
+                try {
+                    name = old_kb.getFrame(name).getBrowserText();
+                }
+                catch(Throwable t) {
+                    Log.getLogger().warning("Could not get browser text for old frame " + name + ", " + t);
+                }
+            }
+            break;
+        }
+        switch (frame.getStatus()) {
+        case UNCHANGED:
+            return "Unchanged Object: " + name;
+        case CHANGED:
+            return "Modified Object: " + name;
+        case CREATED:
+            return "New Object: " + name;
+        case DELETED:
+            return "Deleted Object: " + name;
+        case CREATED_AND_DELETED:
+            return "Created and Deleted Object";
+        default:
+            throw new RuntimeException("Developer missed a case");
+        }
+    }
 
     protected void paintString(Graphics graphics, String text, Point position, Color color, Dimension size) {
      if (color != null) {

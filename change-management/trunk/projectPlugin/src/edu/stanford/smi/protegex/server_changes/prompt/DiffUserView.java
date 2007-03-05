@@ -16,6 +16,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.DefaultRenderer;
@@ -24,14 +25,17 @@ import edu.stanford.smi.protege.util.SelectionListener;
 
 public class DiffUserView extends JPanel {
   private static final long serialVersionUID = 3771686927172752103L;
+  KnowledgeBase old_kb, new_kb;
   private DiffUserView _this;
   private JTable _userTable = ComponentFactory.createTable (null);
   private JSplitPane _contentPane = null;
-  private UserConceptList _concepts = new UserConceptList();
+  private UserConceptList _concepts;
   private AuthorManagement authorManagement;
   
-  public DiffUserView () {
-
+  public DiffUserView (KnowledgeBase old_kb, KnowledgeBase new_kb) {
+      this.old_kb = old_kb;
+      this.new_kb = new_kb;
+      _concepts = new UserConceptList(old_kb, new_kb);
    }
    
    public void setAuthorManagement(AuthorManagement authorManagement) {
