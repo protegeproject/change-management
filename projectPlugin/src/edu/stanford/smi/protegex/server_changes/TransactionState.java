@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-import com.ibm.icu.util.StringTokenizer;
-
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
@@ -41,69 +39,83 @@ public class TransactionState {
     }
     
     public void beginTransaction(String name) {
-        changeStack.push(new Stack<Change>());
+        changeStack.push(new ArrayList<Change>());
         transactionNameStack.push(name);
     }
     
     public void commitTransaction() {
         List<Change> changes = changeStack.pop();
         String name = transactionNameStack.pop();
-        Collections.reverse(changes);
-        findAggAction(changes, name);
+        createTransactionChange(changes, name);
     }
     
     public void rollbackTransaction() {
-        changeStack.pop();
+        changeStack.pop();  // this isn't right! but I am not calling it yet...
+        transactionNameStack.pop();
     }
-	
+    
+    
+	public void createTransactionChange(List<Change> changes, String name) {
+        if (changes.size() == 0) return;
+        
+        String action = ChangeCls.Composite_Change.toString();
+        String context = name;
+        Ontology_Component applyTo = (Ontology_Component) changes.get(0).getApplyTo();
+        
+        Representative r = guessRepresentative(changes);
+        if (r != null) {
+            if (r.getAction() != null) action = r.getAction();
+            if (r.getContext() != null) context = r.getContext();
+            if (r.getApplyTo() != null) applyTo = r.getApplyTo();
+        }
+        transactionLevel(changes);
+        Composite_Change transaction = (Composite_Change) changesDb.createChange(ChangeCls.Composite_Change);
+        transaction.setSubChanges(changes);
+        transaction.setAction(action);
+        changesDb.finalizeChange(transaction, applyTo, context, ChangeModel.CHANGE_LEVEL_TRANS);
+        
+    }
 
 	
-	private void findAggAction(List<Change> actions, String name) {
+	private Representative guessRepresentative(List<Change> actions) {
         boolean isOwl = changesDb.isOwl();
 		if (isOwl) {
 			// Check if we have a restriction
 			if (isRestriction(actions)) {
-				findRestrictionInstance(actions, name);
+				return findRestrictionInstance(actions);
 			} else {
-				generateTransInstance(actions, name);
+				return generateTransInstance(actions);
 			}
 		
 		// Not an OWL project
 		} else {
-			generateTransInstance(actions, name);
+			return generateTransInstance(actions);
 		}
 	}
 	
-	private void generateTransInstance(Collection<Change> transActions, String name) {
-		if (!transActions.isEmpty()) {
-			// find first info action
-			boolean firstInfoInst = false;
-			boolean firstDeleted = false;
-			Change firstInst = null;
-			
-			for (Change change : transActions) {
-				if (change.getType().equals(ChangeModel.CHANGE_LEVEL_INFO) && !firstInfoInst) {
-					firstInst = change;
-					firstInfoInst = true;
-				}
-				
-				if (change.getDirectType().getName().equals(ChangeCls.Class_Deleted.toString()) && !firstDeleted) {
-					firstInst = change;
-					firstDeleted = true;
-				}
-            }
-            transactionLevel(transActions);
-            Composite_Change transaction = (Composite_Change) changesDb.createChange(ChangeCls.Composite_Change);
-            transaction.setSubChanges(transActions);
-            transaction.setAction(firstInst.getAction());
-            changesDb.finalizeChange(transaction, (Ontology_Component) firstInst.getApplyTo(), 
-                                     name, ChangeModel.CHANGE_LEVEL_TRANS);
-		}
+	private Representative generateTransInstance(Collection<Change> transActions) {
+	    boolean firstInfoInst = false;
+	    boolean firstDeleted = false;
+	    Change firstInst = null;
+
+	    for (Change change : transActions) {
+	        if (change.getType().equals(ChangeModel.CHANGE_LEVEL_INFO) && !firstInfoInst) {
+	            firstInst = change;
+	            firstInfoInst = true;
+	        }
+
+	        if (change.getDirectType().getName().equals(ChangeCls.Class_Deleted.toString()) && !firstDeleted) {
+	            firstInst = change;
+	            firstDeleted = true;
+	        }
+	    }
+        return new Representative(firstInst.getAction(), 
+                                  firstInst.getContext(), 
+                                  (Ontology_Component) firstInst.getApplyTo());
 	}
 	
-	private Composite_Change findRestrictionInstance(List<Change> actions, String name) {
-		
-		String contextVal = null;
+	private Representative findRestrictionInstance(List<Change> actions) {
+        String contextVal;
 		String ctxt = null;
 		Ontology_Component applyToVal = null;
 		
@@ -178,16 +190,7 @@ public class TransactionState {
 		}
 		contextVal = act + ": " + ctxt;
         
-        transactionLevel(actions);
-        Composite_Change transaction = (Composite_Change) changesDb.createChange(ChangeCls.Composite_Change);
-        transaction.setAction(act);
-        transaction.setSubChanges(actions);
-
-        changesDb.finalizeChange(transaction, 
-                                 applyToVal, 
-                                 name, 
-                                 ChangeModel.CHANGE_LEVEL_TRANS);
-		return transaction;
+        return new Representative(act, ctxt, applyToVal);
     }
 	
 	// Decompose context into its constituent parts for "Action: name (added to: actUpon)"
@@ -237,20 +240,31 @@ public class TransactionState {
 		}
 	}
 	
-	private ArrayList filterActions(Stack actions) {
-		ArrayList results = new ArrayList();
-		
-		for (Iterator iter = actions.iterator(); iter.hasNext();) {
-			Object element = (Object) iter.next();
-			
-			if(element instanceof Instance) {
-				Instance aInst = (Instance) element;
-				results.add(aInst);
-			} else if (element instanceof Stack) {
-				results.addAll(filterActions((Stack)element));
-			}
-		}
-		
-		return results;
-	}
+    /*
+     * This class provides values that the user wants to see.  If we use a poor heuristic for finding these
+     * values then it is hard for the user to understand what the change tab is showing.
+     */
+    public class Representative {
+        private String action;
+        private String context;
+        private Ontology_Component applyTo;
+        
+        public String getAction() {
+            return action;
+        }
+        
+        public String getContext() {
+            return context;
+        }
+        
+        public Ontology_Component getApplyTo() {
+            return applyTo;
+        }
+        
+        public Representative(String action, String context, Ontology_Component applyTo) {
+            this.action = action;
+            this.context = context;
+            this.applyTo = applyTo;
+        }
+    }
 }
