@@ -15,12 +15,15 @@ import java.util.Set;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.LabeledComponent;
 import edu.stanford.smi.protege.util.SimpleListModel;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
 public class UserConceptList extends JPanel {
+    private KnowledgeBase old_kb, new_kb;
+    
 	private Collection<String> _userList = new ArrayList<String>(); 
 	private JList _noConflictList, _conflictList;
 	private Set<Ontology_Component> _noConflictConcepts = new HashSet<Ontology_Component> ();
@@ -29,8 +32,10 @@ public class UserConceptList extends JPanel {
     private AuthorManagement authorManagement;
 
     
-    public UserConceptList () {
+    public UserConceptList (KnowledgeBase old_kb, KnowledgeBase new_kb) {
         super ();
+        this.old_kb = old_kb;
+        this.new_kb = new_kb;
         setLayout (new BorderLayout ());
         add (createConceptLists (), BorderLayout.CENTER);
     } 
@@ -71,7 +76,7 @@ public class UserConceptList extends JPanel {
 		JList list = ComponentFactory.createList(null);
 
 		list = ComponentFactory.createList(null);
-		list.setCellRenderer(new ChangeTabRenderer());
+		list.setCellRenderer(new ChangeTabRenderer(old_kb, new_kb));
 		((SimpleListModel)list.getModel()).setValues(concepts);
 		
 		return list;
