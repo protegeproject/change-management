@@ -1,7 +1,6 @@
 package edu.stanford.smi.protegex.server_changes.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -11,13 +10,6 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.framestore.undo.MacroCommand;
 import edu.stanford.smi.protege.model.framestore.undo.UndoFrameStore;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
-import edu.stanford.smi.protegex.owl.model.impl.AbstractOWLModel;
-import edu.stanford.smi.protegex.server_changes.listeners.ChangesTransListener;
-import edu.stanford.smi.protegex.server_changes.listeners.owl.ChangesOwlKBListener;
-import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesClassListener;
-import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesFrameListener;
-import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesModelListener;
-import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesPropertyListener;
 
 public class Util {
 
