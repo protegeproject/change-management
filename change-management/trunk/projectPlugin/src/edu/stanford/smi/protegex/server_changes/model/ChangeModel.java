@@ -17,11 +17,7 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 public class ChangeModel {
-    public final static String CHANGE_TYPE_ROOT = "Root";
-    
-    public final static String CHANGE_LEVEL_INFO = "info";
-    public static final String CHANGE_LEVEL_TRANS_INFO = "transaction_info";
-    public static final String CHANGE_LEVEL_TRANS = "transaction";
+
     
     
     private KnowledgeBase changes_kb;
@@ -78,7 +74,7 @@ public class ChangeModel {
         Minimum_Cardinality,
         Minimum_Value,
         Slot_Created,
-        Slote_Deleted,
+        Slot_Deleted,
         Subslot_Added,
         Subslot_Removed,
         Superslot_Added,
@@ -119,7 +115,7 @@ public class ChangeModel {
      */
     
     public static boolean isRoot(Change change) {
-        return CHANGE_TYPE_ROOT.equals(change.getType());
+        return change.getApplyTo() == null;
     }
     
     public Change findRoot() {
@@ -195,7 +191,6 @@ public class ChangeModel {
             log.log(level, "\tAuthor = " + change.getAuthor());
             log.log(level, "\tContext = " + change.getContext());
             log.log(level, "\tCreated = " + ((Timestamp) change.getTimestamp()).getDate());
-            log.log(level, "\tType = " + change.getType());
         }
         log.log(level, "\tDirect type = " + cls);
         log.log(level, "\tFrame ID = " + aInst.getFrameID().getLocalPart());
