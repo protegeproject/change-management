@@ -138,6 +138,18 @@
 	 rdfs:label="Instance_Change">
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
+<rdfs:Class rdf:about="&kb;Instance_Created"
+	 rdfs:comment="Created_Change"
+	 rdfs:label="Instance_Created">
+	<rdfs:subClassOf rdf:resource="&kb;Created_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Instance_Deleted"
+	 rdfs:comment="Deleted_Change"
+	 rdfs:label="Instance_Deleted">
+	<rdfs:subClassOf rdf:resource="&kb;Deleted_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Instance_Removed"
 	 rdfs:label="Instance_Removed">
 	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
