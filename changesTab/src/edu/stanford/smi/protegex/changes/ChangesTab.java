@@ -103,7 +103,7 @@ public class ChangesTab extends AbstractTabWidget {
 
 	private static Project currProj;
 	private static Project changes_project;
-    private static ChangesDb changes_db;
+    private static ChangeModel model;
 	private static KnowledgeBase changes_kb;
 	private static KnowledgeBase currKB;
     private static ChangeCreateUtil createUtil;
@@ -183,7 +183,7 @@ public class ChangesTab extends AbstractTabWidget {
 	    initTables();
 	    loadExistingData();
 
-	    changes_kb.addFrameListener(new ChangesListener(changes_db.getModel()));		
+	    changes_kb.addFrameListener(new ChangesListener(model));		
 
 
 	    // Initialize the tab text
@@ -197,7 +197,7 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	private void initUI() {
 		// Create menu item
-		cMenu = new ChangeMenu(changes_db);
+		cMenu = new ChangeMenu(changes_kb);
 		JMenuBar menuBar = getMainWindowMenuBar();
 	    menuBar.add (cMenu);
 
@@ -318,16 +318,16 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		// GETTING THE ROOT INSTANCE TO CREATE ROOT OF THE TREE
 		
-        Change ROOT = changes_db.getModel().findRoot();
+        Change ROOT = model.findRoot();
 	
 		TreeTableNode root = new TreeTableNode(ROOT,changes_kb);
 		
 		
-		cTableModel = new ChangeTableModel(changes_db.getModel());
-		acTableModel = new ChangeTableModel(changes_db.getModel());
+		cTableModel = new ChangeTableModel(model);
+		acTableModel = new ChangeTableModel(model);
 
 		aTableModel = new AnnotationTableModel(changes_kb);
-		cTreeTableModel = new ChangeTreeTableModel(root, changes_db.getModel());
+		cTreeTableModel = new ChangeTreeTableModel(root, model);
 		
 		cTable = new JTable(cTableModel);
 		acTable = new JTable(acTableModel);
@@ -414,8 +414,10 @@ public class ChangesTab extends AbstractTabWidget {
             }
             changes_project = ChangesProject.getChangesProj(currKB);
             changes_kb = changes_project.getKnowledgeBase();
-            changes_db = ChangesProject.getChangesDb(currKB);
-            createUtil = new ChangeCreateUtil(changes_db.getModel());
+            ChangesDb changes_db = ChangesProject.getChangesDb(currKB);
+            model = changes_db.getModel();
+            
+            createUtil = new ChangeCreateUtil(model);
         }
     }
     
@@ -431,6 +433,8 @@ public class ChangesTab extends AbstractTabWidget {
         RemoteClientFrameStore rcfs = (RemoteClientFrameStore) fsmanager.getFrameStoreFromClass(RemoteClientFrameStore.class);
         changes_project = manager.connectToProject(rcfs.getRemoteServer(), rcfs.getSession(), annotationName);
         changes_kb = changes_project.getKnowledgeBase();
+        
+        model = new ChangeModel(changes_kb);
     }
     
 	private static void displayErrors(Collection errors) {
@@ -447,8 +451,7 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 	
 	
-	private static void loadExistingData() {
-        ChangeModel model = changes_db.getModel();
+	private static void loadExistingData() {      
 		Collection<Instance> annotateInsts = model.getInstances(ChangeCls.Annotation);
 		Collection<Instance> changeInsts = model.getInstances(ChangeCls.Change);
 		
