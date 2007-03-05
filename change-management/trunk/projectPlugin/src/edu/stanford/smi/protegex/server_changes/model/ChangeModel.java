@@ -130,8 +130,20 @@ public class ChangeModel {
         return null;
     }
     
+    public static Collection<Instance> removeRoots(Collection<Instance> changes) {
+        Collection<Instance> roots = new ArrayList<Instance>();
+        for (Instance change : changes) {
+          if (isRoot((Change) change)) {
+                roots.add(change);
+            }
+        }
+        changes.removeAll(roots);
+        return changes;
+    }
+    
     public List<Instance> getSortedChanges() {
         List<Instance> changes = new ArrayList<Instance>(getInstances(ChangeCls.Change));
+        removeRoots(changes);
         Collections.sort(changes, new ChangeDateComparator(changes_kb));
         return changes;
     }
@@ -171,6 +183,8 @@ public class ChangeModel {
         return getCls(cls).createDirectInstance(null);
     }
     
+
+
     /*
      * utility for debug sessions...
      */
