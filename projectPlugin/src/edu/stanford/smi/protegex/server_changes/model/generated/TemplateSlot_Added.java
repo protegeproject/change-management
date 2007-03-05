@@ -1,5 +1,5 @@
 
-// Created on Sun Mar 04 20:08:38 PST 2007
+// Created on Mon Mar 05 11:21:39 PST 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -26,8 +26,13 @@ import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
  */
 public class TemplateSlot_Added extends Class_Change {
 
+	public TemplateSlot_Added() {
+	}
+
+
 	public TemplateSlot_Added(KnowledgeBase kb, FrameID id ) {
 		super(kb, id);
 	}
+
 // __Code above is automatically generated. Do not change
 }
