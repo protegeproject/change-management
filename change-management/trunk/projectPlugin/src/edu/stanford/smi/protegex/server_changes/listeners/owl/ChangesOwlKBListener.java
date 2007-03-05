@@ -39,6 +39,8 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void clsCreated(KnowledgeBaseEvent event) {
+        String clsName = event.getFrame().getName();
+        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Class_Created, clsName, true);
 	}
     
     /* (non-Javadoc)
@@ -88,6 +90,10 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#frameNameChanged(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void frameNameChanged(KnowledgeBaseEvent event) {
+        String oldName = event.getOldName();
+        String newName = event.getFrame().getName();
+
+        ServerChangesUtil.createNameChange(changes_db, oldName, newName);
 
 	}
 
@@ -95,6 +101,12 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#instanceCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void instanceCreated(KnowledgeBaseEvent event) {
+        if (log.isLoggable(Level.FINE)) {
+            log.fine("In created instance listener");
+        }
+        Frame frame = event.getFrame();
+        String name = frame.getName();
+        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Instance_Created, name, false);
 	}
 
 	/* (non-Javadoc)
@@ -104,14 +116,22 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
         if (log.isLoggable(Level.FINE)) {
             log.fine("In deleted instance listener");
         }
+        String name = event.getOldName();
 	    updateDeletedFrameMap(event);
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Instance_Deleted, name);
 	}
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#slotCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void slotCreated(KnowledgeBaseEvent event) {
-
+        Frame prop = event.getFrame();
+        String propName = prop.getName();
+        ChangeCls change = ChangeCls.Slot_Created;
+        if (prop instanceof RDFProperty) {
+            change = ChangeCls.Property_Created;
+        }
+        ServerChangesUtil.createCreatedChange(changes_db, change, propName, true);
 	}
 
 	/* (non-Javadoc)
