@@ -83,7 +83,10 @@ public class Timestamp extends DefaultSimpleInstance {
 	}
 
 
-	public int compareTo(Timestamp other) {
+    /*
+     * Frames are comparable so it is better not to replicate/overwrite that interface.
+     */
+	public int compareTimestamp(Timestamp other) {
 	    Date myDate = getDateParsed();
 	    Date otherDate = other.getDateParsed();
 
