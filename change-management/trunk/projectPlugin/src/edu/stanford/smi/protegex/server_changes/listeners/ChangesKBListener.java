@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import edu.stanford.smi.protege.event.KnowledgeBaseEvent;
 import edu.stanford.smi.protege.event.KnowledgeBaseListener;
 import edu.stanford.smi.protege.model.Cls;
+import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
@@ -96,12 +97,25 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#instanceCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void instanceCreated(KnowledgeBaseEvent event) {
+	    if (log.isLoggable(Level.FINE)) {
+	        log.fine("In created instance listener");
+	    }
+	    Frame frame = event.getFrame();
+	    String name = frame.getName();
+	    ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Instance_Created, name, false);
 	}
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#instanceDeleted(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void instanceDeleted(KnowledgeBaseEvent event) {
+        if (log.isLoggable(Level.FINE)) {
+            log.fine("In deleted instance listener");
+        }
+        Frame frame = event.getFrame();
+        String name = event.getOldName();
+        changes_db.updateMap(frame.getFrameID(), name);
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Instance_Deleted, name);
 	}
 
 	/* (non-Javadoc)
