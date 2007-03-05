@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -157,13 +158,13 @@ public class ChangesDb {
         Change createOp = lastCreateByComponent.get(created);
         if (createOp != null) {
             lastCreateByComponent.remove(created);
-            Composite_Change existingCreateTrans = (Composite_Change) changeInst.getPartOfCompositeChange();
+            Composite_Change existingCreateTrans = (Composite_Change) createOp.getPartOfCompositeChange();
             if (existingCreateTrans != null) {
                 createOp = existingCreateTrans;
             }
-            Set<Change> changes = new HashSet<Change>();
-            changes.add(changeInst);
+            List<Change> changes = new ArrayList<Change>();
             changes.add(createOp);
+            changes.add(changeInst);
             Composite_Change transaction = (Composite_Change) createChange(ChangeCls.Composite_Change);
             transaction.setSubChanges(changes);
             finalizeChange(transaction, created, "Created " + newName, ChangeModel.CHANGE_LEVEL_TRANS);
