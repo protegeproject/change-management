@@ -35,7 +35,7 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
         Ontology_Component applyTo = changes_db.getOntologyComponent(arg0.getName(), true);
         
         Change change = changes_db.createChange(ChangeCls.Subproperty_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	public void subpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
@@ -52,7 +52,7 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
             Ontology_Component applyTo = changes_db.getOntologyComponent(name0, true);
             
             Change change = changes_db.createChange(ChangeCls.Subproperty_Removed);
-            changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+            changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	public void superpropertyAdded(RDFProperty arg0, RDFProperty arg1) {
@@ -67,7 +67,7 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
         Ontology_Component applyTo = changes_db.getOntologyComponent(arg0.getName(), true);
         
         Change change = changes_db.createChange(ChangeCls.Superproperty_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	public void superpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
@@ -84,7 +84,7 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
         Ontology_Component applyTo = changes_db.getOntologyComponent(name0, true);
         
         Change change = changes_db.createChange(ChangeCls.Superproperty_Removed);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 
 	}
 
@@ -104,7 +104,7 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
         Ontology_Component applyTo = changes_db.getOntologyComponent(propName, true);
         
         Change change = changes_db.createChange(ChangeCls.DomainProperty_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 
 	}
 
@@ -124,7 +124,7 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
         Ontology_Component applyTo = changes_db.getOntologyComponent(propName, true);
         
         Change change = changes_db.createChange(ChangeCls.DomainProperty_Removed);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 
 	}
 

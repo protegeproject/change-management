@@ -49,14 +49,8 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
             log.fine("In deleted class listener");
         }
         updateDeletedFrameMap(event);
-        
         String deletedClsName = event.getOldName();
-        String context = "Deleted Class: " + deletedClsName;
-        Ontology_Component applyTo = changes_db.getOntologyComponent(deletedClsName, true);
-        
-        Class_Deleted change = (Class_Deleted) changes_db.createChange(ChangeCls.Class_Deleted);
-        change.setDeletionName(deletedClsName);
-        changes_db.finalizeChange(change, applyTo, context, ChangeModel.CHANGE_LEVEL_INFO);
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, deletedClsName);
     }
 
 
@@ -130,12 +124,9 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 	    updateDeletedFrameMap(event);
         String propName = event.getOldName();
         if (event.getSlot() instanceof RDFProperty) {
-            String context = "Property Deleted: " + propName;
-            Ontology_Component property = changes_db.getOntologyComponent(propName, true);
-            
-            Property_Deleted change = (Property_Deleted) changes_db.createChange(ChangeCls.Property_Deleted);
-            change.setDeletionName(propName);
-            changes_db.finalizeChange(change, property, context, ChangeModel.CHANGE_LEVEL_INFO);
+            ServerChangesUtil.createDeletedChange(changes_db,
+                                                  ChangeCls.Property_Deleted,
+                                                  propName);
         }
 	}
     
