@@ -1,5 +1,5 @@
 
-// Created on Sun Mar 04 20:08:38 PST 2007
+// Created on Mon Mar 05 11:21:39 PST 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -26,9 +26,14 @@ import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
  */
 public class Timestamp extends DefaultSimpleInstance {
 
+	public Timestamp() {
+	}
+
+
 	public Timestamp(KnowledgeBase kb, FrameID id ) {
 		super(kb, id);
 	}
+
 
 	public void setDate(String date) {
 		ModelUtilities.setOwnSlotValue(this, "date", date);	}
