@@ -73,7 +73,7 @@ public class ServerChangesUtil {
         Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
         applyTo.setCurrentName(name);
         
-        Class_Created change = (Class_Created) changes_db.createChange(ChangeCls.Class_Created);
+        Class_Created change = (Class_Created) changes_db.createChange(type);
         change.setCreationName(name);
         changes_db.finalizeChange(change, applyTo, context);
         return change;
@@ -104,7 +104,7 @@ public class ServerChangesUtil {
         Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
         applyTo.setCurrentName(null);
     
-        Class_Deleted change = (Class_Deleted) changes_db.createChange(ChangeCls.Class_Deleted);
+        Class_Deleted change = (Class_Deleted) changes_db.createChange(type);
         change.setDeletionName(name);
         changes_db.finalizeChange(change, applyTo, context);
         return change;
