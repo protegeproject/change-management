@@ -167,7 +167,7 @@ public class ChangesDb {
             changes.add(changeInst);
             Composite_Change transaction = (Composite_Change) createChange(ChangeCls.Composite_Change);
             transaction.setSubChanges(changes);
-            finalizeChange(transaction, created, "Created " + newName, ChangeModel.CHANGE_LEVEL_TRANS);
+            finalizeChange(transaction, created, "Created " + newName);
         }
     }
     
@@ -265,17 +265,8 @@ public class ChangesDb {
      */
     public Change createRootChange() {
         Change root = createChange(ChangeCls.Composite_Change);
-        finalizeChange(root, null, ChangeModel.CHANGE_TYPE_ROOT, ChangeModel.CHANGE_TYPE_ROOT);
+        finalizeChange(root, null, "Root");
         return root;
-    }
-    
-    public Change createChangeStd(ChangeCls type, 
-                                  String applyTo,
-                                  String context) {
-        Ontology_Component frame = getOntologyComponent(applyTo, true);
-        Change change = createChange(type);
-        finalizeChange(change, frame, context, ChangeModel.CHANGE_LEVEL_INFO);
-        return change;
     }
     
     public Change createChange(ChangeCls type) {
@@ -286,11 +277,9 @@ public class ChangesDb {
     
     public void finalizeChange(Change change,
                                Ontology_Component applyTo,
-                               String context,
-                               String type) {
+                               String context) {
         change.setAuthor(getCurrentUser());
         change.setContext(context);
-        change.setType(type);
         change.setTimestamp(Timestamp.getTimestamp(model));
         change.setApplyTo(applyTo);  // this is what passes the change to the change tab
                                      // so it  must happen last.  see AbstractChangeListener
