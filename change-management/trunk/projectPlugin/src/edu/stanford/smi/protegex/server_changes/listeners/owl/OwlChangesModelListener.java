@@ -12,6 +12,7 @@ import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Class_Created;
+import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 import edu.stanford.smi.protegex.server_changes.model.generated.Property_Created;
 
@@ -81,9 +82,11 @@ public class OwlChangesModelListener extends ModelAdapter{
         context.append("'");
         
         Ontology_Component applyTo = changes_db.getOntologyComponent(oldName, true);
-        applyTo.setCurrentName(null);
+        applyTo.setCurrentName(newName);
         
-        Change change = changes_db.createChange(ChangeCls.Name_Changed);
+        Name_Changed change = (Name_Changed) changes_db.createChange(ChangeCls.Name_Changed);
+        change.setOldName(oldName);
+        change.setNewName(newName);
         changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
     }
 }
