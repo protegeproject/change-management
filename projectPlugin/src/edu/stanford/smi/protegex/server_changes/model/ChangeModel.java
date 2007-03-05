@@ -102,6 +102,7 @@ public class ChangeModel {
         author,
         body,
         changes,
+        context,
         date,
         sequence,
         timestamp
