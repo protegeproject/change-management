@@ -278,10 +278,10 @@ public class ChangesTab extends AbstractTabWidget {
 	private JPanel initSearchPanel() {
 		JPanel searchPanel = ComponentFactory.createPanel();
 		JLabel searchLabel = new JLabel(SEARCH_PANEL_TITLE);
-		String[] searchFields = {	ChangeTableColumn.CHANGE_COLNAME_AUTHOR.toString(),
-				                    ChangeTableColumn.CHANGE_COLNAME_ACTION.toString(), 
-				                    ChangeTableColumn.CHANGE_COLNAME_DESCRIPTION.toString(),
-									ChangeTableColumn.CHANGE_COLNAME_CREATED.toString()
+		String[] searchFields = {	ChangeTableColumn.CHANGE_COLNAME_AUTHOR.getName(),
+				                    ChangeTableColumn.CHANGE_COLNAME_ACTION.getName(), 
+				                    ChangeTableColumn.CHANGE_COLNAME_DESCRIPTION.getName(),
+									ChangeTableColumn.CHANGE_COLNAME_CREATED.getName()
 									};
 		
 		JComboBox cbox = new JComboBox(searchFields);
