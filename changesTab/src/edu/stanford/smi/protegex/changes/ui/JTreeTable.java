@@ -43,7 +43,6 @@ import javax.swing.tree.TreePath;
 
 import edu.stanford.smi.protege.resource.Icons;
 import edu.stanford.smi.protegex.changes.TreeTableNode;
-import edu.stanford.smi.protegex.changes.ChangesTab;
 
 
 /**
@@ -77,9 +76,11 @@ public class JTreeTable extends JTable {
 
 			if (value instanceof TreeTableNode) {
 				TreeTableNode node = (TreeTableNode) value;
-				//if(node.getChildCount()>0)
-			      //setIcon(Icons.getHierarchyCollapsedIcon());
-				//else
+                /*
+				if(node.getChildCount()>0)
+			      setIcon(Icons.getHierarchyCollapsedIcon());
+				else
+                */
 			      setIcon(Icons.getBlankIcon());
 			}
 
@@ -430,7 +431,9 @@ public class JTreeTable extends JTable {
 				}
 				((TreeTableTextField) getComponent()).offset = offset;
 			}
-			catch (Exception e) {}
+			catch (Exception e) {
+			    e.printStackTrace();
+            }
 			return component;
 		}
 
