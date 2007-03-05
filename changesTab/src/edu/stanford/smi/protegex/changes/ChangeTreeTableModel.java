@@ -39,7 +39,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
         ChangeTableColumn[] cols = ChangeTableColumn.values();
 		colNames = new String[cols.length];
         for (int i = 0; i < cols.length; i++) {
-            colNames[i] = cols[i].toString();
+            colNames[i] = cols[i].getName();
         }
 		completeData = new ArrayList<Instance>();
 		root = (TreeTableNode)getRoot();
@@ -136,7 +136,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 		
         ChangeTableColumn searchColumn = null;
         for (ChangeTableColumn col : ChangeTableColumn.values()) {
-            if (col.toString().equals(field)) {
+            if (col.getName().equals(field)) {
                 searchColumn = col;
                 break;
             }
@@ -144,7 +144,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
         
 		Slot sltToSearch = model.getSlot(searchColumn.getSearchSlot());
 
-		Collection results = changeKB.getMatchingFrames(sltToSearch, null, false, text, 1000);
+		Collection results = changeKB.getMatchingFrames(sltToSearch, null, false, "*" + text + "*", 1000);
 		
 		for (Iterator iter = results.iterator(); iter.hasNext();) {
 			Object element = (Object) iter.next();
