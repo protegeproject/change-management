@@ -23,15 +23,15 @@ import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 
 
 /** 
- *  A class of Annotations representing explanations of content
+ *  Created_Change
  */
-public class Explanation extends Annotation {
+public class Instance_Created extends Created_Change {
 
-	public Explanation() {
+	public Instance_Created() {
 	}
 
 
-	public Explanation(KnowledgeBase kb, FrameID id ) {
+	public Instance_Created(KnowledgeBase kb, FrameID id ) {
 		super(kb, id);
 	}
 
