@@ -2,12 +2,10 @@ package edu.stanford.smi.protegex.server_changes;
 
 
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
@@ -147,16 +145,4 @@ public class ServerChangesUtil {
 		ChangeModel.logAnnotatableThing("Updated Annotation", log, Level.FINE, a);
 		return a;	
 	}
-    
-    
-    public static Collection<Instance> removeRoots(Collection<Instance> changes) {
-        Collection<Instance> roots = new ArrayList<Instance>();
-        for (Instance change : changes) {
-          if (ChangeModel.isRoot((Change) change)) {
-                roots.add(change);
-            }
-        }
-        changes.removeAll(roots);
-        return changes;
-    }
  }
