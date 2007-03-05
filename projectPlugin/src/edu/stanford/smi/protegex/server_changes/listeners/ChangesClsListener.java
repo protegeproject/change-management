@@ -43,7 +43,7 @@ public class ChangesClsListener implements ClsListener{
         Ontology_Component applyTo = changes_db.getOntologyComponent(addedInst.getName(), true);
         
         Change change = changes_db.createChange(ChangeCls.Instance_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 
 		// Create artificial transaction for create slot
         TransactionState tstate = changes_db.getTransactionState();
@@ -72,7 +72,7 @@ public class ChangesClsListener implements ClsListener{
         Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
         
         Change change = changes_db.createChange(ChangeCls.Instance_Removed);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	/* (non-Javadoc)
@@ -92,7 +92,7 @@ public class ChangesClsListener implements ClsListener{
         Ontology_Component applyTo = changes_db.getOntologyComponent(subClass.getName(), true);
         
         Change change = changes_db.createChange(ChangeCls.Subclass_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 		
         TransactionState tstate = changes_db.getTransactionState();
 		// Create artificial transaction for create class
@@ -127,7 +127,7 @@ public class ChangesClsListener implements ClsListener{
         Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
         
         Change change = changes_db.createChange(ChangeCls.Subclass_Removed);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	/* (non-Javadoc)
@@ -147,7 +147,7 @@ public class ChangesClsListener implements ClsListener{
         Ontology_Component applyTo = changes_db.getOntologyComponent(subClass.getName(), true);
         
         Change change = changes_db.createChange(ChangeCls.Superclass_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	/* (non-Javadoc)
@@ -168,7 +168,7 @@ public class ChangesClsListener implements ClsListener{
         Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
         
         Change change = changes_db.createChange(ChangeCls.Superclass_Removed);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
 	/* (non-Javadoc)

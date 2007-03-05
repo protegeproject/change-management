@@ -87,7 +87,7 @@ public class ChangesFrameListener implements FrameListener {
                 Ontology_Component applyTo = changes_db.getOntologyComponent(sName, true);
 
                 Change change = changes_db.createChange(ChangeCls.Maximum_Value);
-                changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+                changes_db.finalizeChange(change, applyTo, context.toString());
             }
             if(ownSName.equals(":SLOT-NUMERIC-MINIMUM")){
                 context.append("Minimum value for: ");
@@ -98,7 +98,7 @@ public class ChangesFrameListener implements FrameListener {
                 Ontology_Component applyTo = changes_db.getOntologyComponent(sName, true);
                 
                 Change change = changes_db.createChange(ChangeCls.Minimum_Value);
-                changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+                changes_db.finalizeChange(change, applyTo, context.toString());
 
             }
 
@@ -114,7 +114,7 @@ public class ChangesFrameListener implements FrameListener {
                     Ontology_Component applyTo = changes_db.getOntologyComponent(sName, true);
                     
                     Change change = changes_db.createChange(ChangeCls.Minimum_Cardinality);
-                    changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+                    changes_db.finalizeChange(change, applyTo, context.toString());
 
                 }
 
@@ -129,7 +129,7 @@ public class ChangesFrameListener implements FrameListener {
                     Ontology_Component applyTo = changes_db.getOntologyComponent(sName, true);
                     
                     Change change = changes_db.createChange(ChangeCls.Maximum_Cardinality);
-                    changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+                    changes_db.finalizeChange(change, applyTo, context.toString());
                 }
                 else{
                     //maximum values set to -
@@ -141,7 +141,7 @@ public class ChangesFrameListener implements FrameListener {
                     Ontology_Component applyTo = changes_db.getOntologyComponent(sName, true);
                     
                     Change change = changes_db.createChange(ChangeCls.Maximum_Cardinality);
-                    changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+                    changes_db.finalizeChange(change, applyTo, context.toString());
                 }
 
             }
@@ -167,7 +167,7 @@ public class ChangesFrameListener implements FrameListener {
                     Ontology_Component applyTo = changes_db.getOntologyComponent(cName, true);
                     
                     Change change = changes_db.createChange(ChangeCls.Documentation_Removed);
-                    changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+                    changes_db.finalizeChange(change, applyTo, context.toString());
                 }
                 else {
                     // ADDED DOCUMENTATION
@@ -202,7 +202,7 @@ public class ChangesFrameListener implements FrameListener {
             Ontology_Component applyTo = changes_db.getOntologyComponent(iName, true);
             
             Change change = changes_db.createChange(ChangeCls.Slot_Value);
-            changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+            changes_db.finalizeChange(change, applyTo, context.toString());
 
         }
 
