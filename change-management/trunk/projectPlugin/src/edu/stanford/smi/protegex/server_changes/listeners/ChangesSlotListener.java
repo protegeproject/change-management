@@ -7,6 +7,7 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.TransactionState;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 
@@ -34,7 +35,7 @@ public class ChangesSlotListener implements SlotListener{
 			context.append(" to: ");
 			context.append(theCls.getBrowserText());
             
-            changes_db.createChangeStd(ChangeCls.TemplateSlot_Added, theCls.getName(), context.toString());
+            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.TemplateSlot_Added, theCls.getName(), context.toString());
 			// Create artificial transaction for create slot
             TransactionState tstate = changes_db.getTransactionState();
 			if (changes_db.isInCreateSlot() && tstate.inTransaction()) {
@@ -58,7 +59,7 @@ public class ChangesSlotListener implements SlotListener{
 			context.append(" from: ");
 			context.append(theCls.getBrowserText());
 			
-            changes_db.createChangeStd(ChangeCls.TemplateSlot_Removed, name, context.toString());
+            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.TemplateSlot_Removed, name, context.toString());
 		}
 	}
 
@@ -70,7 +71,7 @@ public class ChangesSlotListener implements SlotListener{
 			Slot eventSlot = (Slot) event.getArgument();
 			String context = "Direct Subslot Added: " + eventSlot.getBrowserText();
             
-            changes_db.createChangeStd(ChangeCls.Subslot_Added, eventSlot.getName(), context);
+            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Subslot_Added, eventSlot.getName(), context);
 		}
 	}
 
@@ -83,7 +84,7 @@ public class ChangesSlotListener implements SlotListener{
             String name = changes_db.getPossiblyDeletedFrameName(eventSlot);
 			String context = "Direct Subslot Removed: " + eventSlot.getBrowserText();
             
-            changes_db.createChangeStd(ChangeCls.Subslot_Removed, name, context);
+            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Subslot_Removed, name, context);
 		}
 	}
 
@@ -101,7 +102,7 @@ public class ChangesSlotListener implements SlotListener{
 			Slot eventSlot = (Slot) event.getArgument();
 			String context = "Direct Superslot Added: " + eventSlot.getBrowserText();
             
-            changes_db.createChangeStd(ChangeCls.Superslot_Added, eventSlot.getName(), context);
+            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Superslot_Added, eventSlot.getName(), context);
 		}
 	}
 
@@ -114,7 +115,7 @@ public class ChangesSlotListener implements SlotListener{
             String name = changes_db.getPossiblyDeletedBrowserText(eventSlot);
 			String context = "Direct Superslot Removed: " + eventSlot.getBrowserText();
             
-            changes_db.createChangeStd(ChangeCls.Superslot_Removed, name, context);
+            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Superslot_Removed, name, context);
 		}
 	}
 }

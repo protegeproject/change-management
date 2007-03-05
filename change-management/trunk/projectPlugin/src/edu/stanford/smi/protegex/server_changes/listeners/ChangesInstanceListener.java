@@ -42,7 +42,7 @@ public class ChangesInstanceListener implements InstanceListener{
         Ontology_Component applyTo = changes_db.getOntologyComponent(instName, true);
 
         Change change = changes_db.createChange(ChangeCls.DirectType_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
     }
 
     /* (non-Javadoc)
@@ -64,6 +64,6 @@ public class ChangesInstanceListener implements InstanceListener{
         Ontology_Component applyTo = changes_db.getOntologyComponent(instName, true);
 
         Change change = changes_db.createChange(ChangeCls.DirectType_Removed);
-        changes_db.finalizeChange(change, applyTo, context.toString(), ChangeModel.CHANGE_LEVEL_INFO);
+        changes_db.finalizeChange(change, applyTo, context.toString());
     }
 }
