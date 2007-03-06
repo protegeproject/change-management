@@ -131,6 +131,7 @@ public class ChangesDb {
     private void postProcessChange(Change aChange) {
         checkForTransaction(aChange);
         checkForCreateAndNameChange(aChange);
+        checkForNameChanges(aChange);
     }
     
     private void checkForTransaction(Change aChange) {
@@ -169,6 +170,10 @@ public class ChangesDb {
             transaction.setSubChanges(changes);
             finalizeChange(transaction, created, "Created " + newName);
         }
+    }
+    
+    public void checkForNameChanges(Change aChange) {
+        nameChangeManager.handleNameChange(aChange);
     }
     
     /* -------------------------------------Interfaces ------------------------------*/
