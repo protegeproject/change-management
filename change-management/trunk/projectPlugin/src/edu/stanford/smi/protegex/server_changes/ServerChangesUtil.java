@@ -63,12 +63,6 @@ public class ServerChangesUtil {
             throw new IllegalArgumentException("Change type " + type + " is not a create frame type");
         }
         context = context + " Created: " + name;
-
-        if (createTransaction) {
-            // Create artifical transaction for create class
-            changes_db.getTransactionState().beginTransaction(context);
-            changes_db.setInCreateClass(true);
-        }
         
         Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
         applyTo.setCurrentName(name);
@@ -76,6 +70,10 @@ public class ServerChangesUtil {
         Class_Created change = (Class_Created) changes_db.createChange(type);
         change.setCreationName(name);
         changes_db.finalizeChange(change, applyTo, context);
+        if (createTransaction) {
+            // Create artifical transaction for create class
+            changes_db.startChangeTransaction(change);
+        }
         return change;
     }
     
