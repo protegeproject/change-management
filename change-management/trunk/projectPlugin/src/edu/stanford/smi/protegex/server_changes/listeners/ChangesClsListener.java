@@ -47,11 +47,6 @@ public class ChangesClsListener implements ClsListener{
 
 		// Create artificial transaction for create slot
         TransactionState tstate = changes_db.getTransactionState();
-		if (changes_db.isInCreateClass() && tstate.inTransaction()) {
-            tstate.commitTransaction();
-            changes_db.setInCreateClass(false);
-		}
-		
 	}
 
 	/* (non-Javadoc)
@@ -93,13 +88,6 @@ public class ChangesClsListener implements ClsListener{
         
         Change change = changes_db.createChange(ChangeCls.Subclass_Added);
         changes_db.finalizeChange(change, applyTo, context.toString());
-		
-        TransactionState tstate = changes_db.getTransactionState();
-		// Create artificial transaction for create class
-		if (tstate.inTransaction() && changes_db.isInCreateClass()) {
-            tstate.commitTransaction();
-            changes_db.setInCreateClass(false);
-		}
 	}
 
 	/* (non-Javadoc)

@@ -36,12 +36,6 @@ public class ChangesSlotListener implements SlotListener{
 			context.append(theCls.getBrowserText());
             
             ServerChangesUtil.createChangeStd(changes_db, ChangeCls.TemplateSlot_Added, theCls.getName(), context.toString());
-			// Create artificial transaction for create slot
-            TransactionState tstate = changes_db.getTransactionState();
-			if (changes_db.isInCreateSlot() && tstate.inTransaction()) {
-                tstate.commitTransaction();
-                changes_db.setInCreateSlot(false);
-			}
 		}
 	}
 
