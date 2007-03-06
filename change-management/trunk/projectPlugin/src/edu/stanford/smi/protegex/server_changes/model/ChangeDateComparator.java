@@ -14,8 +14,24 @@ public class ChangeDateComparator implements Comparator<Instance> {
     }
 
     public int compare(Instance o1, Instance o2) {
+    	if (o1 == null) {
+    		return -1;
+    	}
+    	
+    	if (o2 == null) {
+    		return 1;
+    	}
+    	
         Change c1 = (Change) o1;
         Change c2 = (Change) o2;
-        return ((Timestamp) c1.getTimestamp()).compareTimestamp((Timestamp) c2.getTimestamp());
+        
+        Timestamp t1 = (Timestamp) c1.getTimestamp();
+        Timestamp t2 = (Timestamp) c2.getTimestamp();
+        
+        if (t1 == null) {
+        	return -1;
+        }
+        
+        return t1.compareTimestamp(t2);
     }
 }
