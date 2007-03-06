@@ -157,7 +157,7 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
             log.fine("Deleting frame with frame id " + f.getFrameID() + " and name = " + name);
         }
         ChangesDb changesDb = ChangesProject.getChangesDb(om);
-        changesDb.updateMap(f.getFrameID(), name);
+        changesDb.updateDeletedFrameIdToNameMap(f.getFrameID(), name);
     }
 
 }
