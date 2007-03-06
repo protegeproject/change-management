@@ -49,7 +49,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
                 log.fine("In class deleted listener");
             }
             String oldName = event.getOldName();
-            changes_db.updateMap(event.getFrame().getFrameID(), oldName);
+            changes_db.updateDeletedFrameIdToNameMap(event.getFrame().getFrameID(), oldName);
             ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, oldName);
 	}
 
@@ -114,7 +114,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
         }
         Frame frame = event.getFrame();
         String name = event.getOldName();
-        changes_db.updateMap(frame.getFrameID(), name);
+        changes_db.updateDeletedFrameIdToNameMap(frame.getFrameID(), name);
         ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Instance_Deleted, name);
 	}
 
@@ -132,7 +132,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 */
 	public void slotDeleted(KnowledgeBaseEvent event) {
         String oldName = event.getOldName();
-        changes_db.updateMap(event.getFrame().getFrameID(), oldName);
+        changes_db.updateDeletedFrameIdToNameMap(event.getFrame().getFrameID(), oldName);
         ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, oldName);
 	}
 }
