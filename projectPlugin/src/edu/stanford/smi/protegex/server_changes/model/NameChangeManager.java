@@ -24,22 +24,15 @@ public class NameChangeManager {
     public NameChangeManager(ChangeModel model) {
         this.model = model;
         changes_kb = model.getChangeKb();
-        addNameChangeListener();
-    }
-  
-    private void addNameChangeListener() {
-        synchronized (changes_kb) {
-            List<Instance> changes = new ArrayList<Instance>(model.getInstances(ChangeCls.Change));
-            Collections.sort(changes, new ChangeDateComparator(changes_kb));
-            for (Object o : changes) {
-                Change change = (Change) o;
-                handleNameChange(change);
-            }
-            changes_kb.addFrameListener(new NameChangeListener());
+        List<Instance> changes = new ArrayList<Instance>(model.getInstances(ChangeCls.Change));
+        Collections.sort(changes, new ChangeDateComparator(changes_kb));
+        for (Object o : changes) {
+            Change change = (Change) o;
+            handleNameChange(change);
         }
     }
     
-    private void handleNameChange(Change change) {
+    public void handleNameChange(Change change) {
         synchronized (changes_kb) {
             if (change instanceof Created_Change) {
                 Ontology_Component frame = (Ontology_Component) change.getApplyTo();
@@ -57,19 +50,6 @@ public class NameChangeManager {
                 name_map.put(newName, name_map.remove(oldName));
             }
         }
-    }
-    
-    public class NameChangeListener extends AbstractChangeListener {
-        public NameChangeListener() {
-            super(model);
-        }
-
-        public void addChange(Change change) {
-            handleNameChange(change);
-        }
-        
-        public void addAnnotation(Annotation a) { }
-        
     }
     
     public Ontology_Component getOntologyComponent(String name, boolean create) {
