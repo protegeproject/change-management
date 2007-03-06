@@ -92,6 +92,11 @@ public class Timestamp extends DefaultSimpleInstance {
      * Frames are comparable so it is better not to replicate/overwrite that interface.
      */
 	public int compareTimestamp(Timestamp other) {
+		
+		if (other == null) {
+			return 1;
+		}
+		
 	    Date myDate = getDateParsed();
 	    Date otherDate = other.getDateParsed();
 
