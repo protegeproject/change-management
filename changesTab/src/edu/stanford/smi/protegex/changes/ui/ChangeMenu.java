@@ -6,6 +6,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
@@ -16,6 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import edu.stanford.smi.protege.exception.ProtegeException;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
@@ -24,10 +26,11 @@ import edu.stanford.smi.protege.ui.ProjectManager;
 import edu.stanford.smi.protege.ui.ProjectView;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.MessageError;
+import edu.stanford.smi.protege.util.ProtegeJob;
 import edu.stanford.smi.protege.widget.TabWidget;
 import edu.stanford.smi.protegex.changes.ChangeCreateUtil;
 import edu.stanford.smi.protegex.changes.ChangesTab;
-import edu.stanford.smi.protegex.server_changes.ChangesDb;
+import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 
@@ -43,16 +46,18 @@ public class ChangeMenu extends JMenu {
 	protected Action saveChangesPrjAction;
 	protected Instance lastInst;
 	
+    private KnowledgeBase kb;
 	private KnowledgeBase change_kb;
 	private Project change_project;
     private ChangeModel change_model;
     private ChangeCreateUtil create_util;
 	private Instance annotateInst;
 	
-	public ChangeMenu(KnowledgeBase changeKb) {
+	public ChangeMenu(KnowledgeBase kb, KnowledgeBase changeKb) {
 		super(MENU_TITLE);
 		setMnemonic(KeyEvent.VK_C);
 		
+        this.kb = kb;
 		this.change_kb = changeKb;
 		this.change_project = change_kb.getProject();
         this.change_model = new ChangeModel(changeKb);
@@ -189,8 +194,31 @@ public class ChangeMenu extends JMenu {
 	}
 
 	protected void saveChangeProject() {
-		// TODO Auto-generated method stub
-		//To be implemented
-		
+	    List errors = (List) new SaveChangeProjectJob(kb).execute();
+        if (!errors.isEmpty()) {
+            Log.getLogger().warning("Problems saving change project");
+            for (Object o : errors) {
+                if (o instanceof Exception) {
+                    Log.getLogger().log(Level.WARNING, "exception caught", (Exception) o);
+                }
+                else {
+                    Log.getLogger().warning(o.toString());
+                }
+            }
+        }
 	}
+    
+    public static class SaveChangeProjectJob extends ProtegeJob {
+        public SaveChangeProjectJob(KnowledgeBase kb) {
+            super(kb);
+        }
+        
+        public Object run() throws ProtegeException {
+            KnowledgeBase kb = getKnowledgeBase();
+            Project changes_project = ChangesProject.getChangesProj(kb);
+            List errors = new ArrayList();
+            changes_project.save(errors);
+            return errors;
+        }
+    }
 }
