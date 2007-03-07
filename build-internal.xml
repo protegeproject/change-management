@@ -3,9 +3,16 @@
 
 	<property name = "project.name" value = "change-management"/>
 	<property name = "build.dir" value = "./build"/>
+
+	<!-- unlike most other projects, we need to pull source code from three separate directories -->
 	<property name = "build.src.tab" value = "${build.dir}/changesTab/src"/>
 	<property name = "build.src.pplugin" value = "${build.dir}/projectPlugin/src"/>
+	<property name = "build.src.model" value = "${build.dir}/model/src"/>
+
+	<!-- need two output directories because this build file will create two separate jar files for the change management tab -->
 	<property name = "build.dest" value = "${build.dir}/classes"/>
+	<property name = "build.dest.model" value = "${build.dir}/classes-model"/>
+
 	<property name = "lib.dir" value = "./lib"/>
 	<property name = "docs.dir" value = "./docs"/>
 	<property name = "deprecation" value = "on"/>    
@@ -28,6 +35,7 @@
 		<mkdir dir = "${build.src.tab}"/>
 		<mkdir dir = "${build.src.pplugin}"/>
 		<mkdir dir = "${build.dest}"/>
+		<mkdir dir = "${build.dest.model}"/>
 		<mkdir dir = "${dist.dir}"/>
 
 		<!-- get source code from subversion repository -->
@@ -39,6 +47,9 @@
 		</exec>
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/projectPlugin/src ../${project.name}/${build.src.pplugin}"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/model/src ../${project.name}/${build.src.model}"/>
 		</exec>
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/docs ../${project.name}/docs"/>
@@ -59,16 +70,34 @@
 		</exec>
 	</target>
 
+	<!-- ============================================================================================== -->
+	<!-- COMPILE-MODEL -->
+	<!-- Compile the model source directory (doing this separately because we need to make a separate jar file for this portion of the tree). -->
+	<!-- ============================================================================================== -->
+	<target name = "compile-model" depends = "prepare-src">
+		<javac srcdir = "${build.src.model}" destdir = "${build.dest.model}" deprecation = "${deprecation}" debug = "${debug}" optimize = "${optimize}" includeAntRuntime = "${includeAntRuntime}">
+			<classpath>
+				<pathelement path = "${protege.jar}"/>
+				<pathelement path = "${protege-owl.jar}"/>
+				<pathelement path = "${rdf-backend.jar}"/>
+				<fileset dir = "${lib.dir}">
+					<include name = "**/*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
 	<!-- =================================================================== -->
 	<!-- COMPILE -->
 	<!-- Compile the source directory. -->
 	<!-- =================================================================== -->
-	<target name = "compile" depends = "prepare-src">
+	<target name = "compile" depends = "compile-model">
 		<javac srcdir = "${build.src.tab}:${build.src.pplugin}" destdir = "${build.dest}" deprecation = "${deprecation}" debug = "${debug}" optimize = "${optimize}" includeAntRuntime = "${includeAntRuntime}">
 			<classpath>
 				<pathelement path = "${protege.jar}"/>
 				<pathelement path = "${protege-owl.jar}"/>
 				<pathelement path = "${rdf-backend.jar}"/>
+				<pathelement path = "${build.dest.model}"/>
 				<fileset dir = "${lib.dir}">
 					<include name = "**/*.jar"/>
 				</fileset>
@@ -82,6 +111,7 @@
 	<!-- =================================================================== -->
 	<target name = "jar" depends = "compile">
 		<jar jarfile = "${dist.dir}/${project.name}.jar" basedir = "${build.dest}" manifest = "${build.src.tab}/META-INF/MANIFEST.MF"/>
+		<jar jarfile = "${dist.dir}/change-model.jar" basedir = "${build.dest.model}"/>
 	</target>
 
 	<!-- =================================================================== -->
