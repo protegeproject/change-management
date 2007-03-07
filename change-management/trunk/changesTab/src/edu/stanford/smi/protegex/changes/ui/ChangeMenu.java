@@ -169,9 +169,9 @@ public class ChangeMenu extends JMenu {
 					return;
 				}
 				
-				ArrayList errors = new ArrayList();
+				Collection errors = new ArrayList();
 				try {
-					saveChangeProject();
+					errors = saveChangeProject();
 				} catch (Exception e) {
 					Log.getLogger().log(Level.WARNING, "Errors saving changes project", e);
 					errors.add(new MessageError(e));
@@ -193,19 +193,8 @@ public class ChangeMenu extends JMenu {
 		};
 	}
 
-	protected void saveChangeProject() {
-	    List errors = (List) new SaveChangeProjectJob(kb).execute();
-        if (!errors.isEmpty()) {
-            Log.getLogger().warning("Problems saving change project");
-            for (Object o : errors) {
-                if (o instanceof Exception) {
-                    Log.getLogger().log(Level.WARNING, "exception caught", (Exception) o);
-                }
-                else {
-                    Log.getLogger().warning(o.toString());
-                }
-            }
-        }
+	protected Collection saveChangeProject() {
+	    return (Collection) new SaveChangeProjectJob(kb).execute();        
 	}
     
     public static class SaveChangeProjectJob extends ProtegeJob {
