@@ -6,11 +6,14 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import edu.stanford.smi.protege.model.Cls;
@@ -19,6 +22,8 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.ui.ProjectManager;
 import edu.stanford.smi.protege.ui.ProjectView;
+import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protege.util.MessageError;
 import edu.stanford.smi.protege.widget.TabWidget;
 import edu.stanford.smi.protegex.changes.ChangeCreateUtil;
 import edu.stanford.smi.protegex.changes.ChangesTab;
@@ -31,9 +36,11 @@ public class ChangeMenu extends JMenu {
 	public static final String MENU_TITLE = "Change";
 	public static final String MENU_ITEM_ANNOTATE_LAST = "Annotate Last Change";
 	public static final String MENU_ITEM_CHANGE_INFO = "Selected Change Info";
+	public static final String MENU_ITEM_SAVE_CHANGE_PRJ = "Save Changes ontology";
 	
 	protected AnnotateLastChange lastChange = new AnnotateLastChange();
 	protected SelectedChangeInfo selChangeInfo = new SelectedChangeInfo();
+	protected Action saveChangesPrjAction;
 	protected Instance lastInst;
 	
 	private KnowledgeBase change_kb;
@@ -53,7 +60,8 @@ public class ChangeMenu extends JMenu {
 		
 		JMenuItem annotate = new JMenuItem(MENU_ITEM_ANNOTATE_LAST);
 		JMenuItem changeInfo = new JMenuItem(MENU_ITEM_CHANGE_INFO);
-		
+		JMenuItem saveChangesPrj = new JMenuItem(MENU_ITEM_SAVE_CHANGE_PRJ);
+				
 		annotate.setAction(lastChange);
 		annotate.setMnemonic(KeyEvent.VK_A);
 		annotate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,ActionEvent.CTRL_MASK));
@@ -61,12 +69,17 @@ public class ChangeMenu extends JMenu {
 		changeInfo.setAction(selChangeInfo);
 		changeInfo.setMnemonic(KeyEvent.VK_K);
 		changeInfo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K,ActionEvent.CTRL_MASK));
+
+		saveChangesPrj.setAction(getSaveChangesPrjAction());
 		
 		add(annotate);
 		add(changeInfo);
-		
+		addSeparator();
+		add(saveChangesPrj);
+				
 		lastChange.setEnabled(false);
-		selChangeInfo.setEnabled(true);	
+		selChangeInfo.setEnabled(true);
+		//saveChangesPrj.setEnabled(true);
 	}
 	
 	public class AnnotateLastChange extends AbstractAction {
@@ -140,5 +153,44 @@ public class ChangeMenu extends JMenu {
 	
 	public void setChange(Instance lastInst) {
 		this.lastInst = lastInst;
+	}
+	
+	public Action getSaveChangesPrjAction() {
+		return new AbstractAction(MENU_ITEM_SAVE_CHANGE_PRJ) {
+
+			public void actionPerformed(ActionEvent arg0) {
+				if (change_project == null) {
+					Log.getLogger().warning("Cannot save Changes project. Changes project is null.");
+					return;
+				}
+				
+				ArrayList errors = new ArrayList();
+				try {
+					saveChangeProject();
+				} catch (Exception e) {
+					Log.getLogger().log(Level.WARNING, "Errors saving changes project", e);
+					errors.add(new MessageError(e));
+				}
+				
+				if (errors.size() == 0) {
+					Log.getLogger().info("Changes project saved successfully.");
+					return;
+				}
+				
+				for (Object error : errors) {
+					//Errors are either Strings or MessageErrors. We can treat these cases differently, if we need more error information.
+					Log.getLogger().warning(error.toString());
+				}
+				
+				JOptionPane.showMessageDialog(ChangeMenu.this, "There were errors at saving the changes project.\n" +
+						"See console for more details");				
+			}		
+		};
+	}
+
+	protected void saveChangeProject() {
+		// TODO Auto-generated method stub
+		//To be implemented
+		
 	}
 }
