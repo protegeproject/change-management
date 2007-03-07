@@ -6,14 +6,21 @@
 package edu.stanford.smi.protegex.server_changes.prompt;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -41,7 +48,7 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Compone
 public class UserConceptList extends JPanel {
     private KnowledgeBase old_kb, new_kb;
     private JTable changesTable;
-    
+        
 	private Collection<String> _userList = new ArrayList<String>(); 
 	private JList _noConflictList, _conflictList;
 	private Set<Ontology_Component> _noConflictConcepts = new HashSet<Ontology_Component> ();
@@ -49,6 +56,7 @@ public class UserConceptList extends JPanel {
     
     private AuthorManagement authorManagement;
 
+    private boolean showAllChangesInTable = false;
     
     public UserConceptList (KnowledgeBase old_kb, KnowledgeBase new_kb) {
         super ();
@@ -100,7 +108,7 @@ public class UserConceptList extends JPanel {
 		}
 		
 		LabeledComponent labeledComponent = new LabeledComponent("Changes of selected ontology component", new JScrollPane(changesTable));
-		
+						
 		labeledComponent.addHeaderButton(new ViewAction((Selectable)changesTable) {
 			@Override
 			public void onView() {
@@ -117,6 +125,8 @@ public class UserConceptList extends JPanel {
 			}			
 			
 		});
+		
+		labeledComponent.setHeaderComponent(getHeaderCenterComponent());
 		
 		return labeledComponent;
 	}
@@ -160,6 +170,35 @@ public class UserConceptList extends JPanel {
 		((SimpleListModel)list.getModel()).setValues(concepts);
 		
 		return list;
+	}
+	
+	private JComponent getHeaderCenterComponent() {	
+		final JCheckBox showAllChanges = ComponentFactory.createCheckBox("Show all changes");
+		showAllChanges.setSelected(showAllChangesInTable);
+		
+		Font font = showAllChanges.getFont();
+        showAllChanges.setFont(font.deriveFont(Font.BOLD, font.getSize()));
+        showAllChanges.setForeground(new Color(140, 140, 140));						
+		showAllChanges.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+		
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(showAllChanges, BorderLayout.EAST);
+		
+		showAllChanges.addItemListener(new ItemListener(){
+
+			public void itemStateChanged(ItemEvent e) {
+				onShowAllChanges(showAllChanges.isSelected());				
+			}
+			
+		});
+		
+		return panel;
+	}
+
+	protected void onShowAllChanges(boolean selected) {
+		showAllChangesInTable = selected;
+		
+		((ChangesTableModel)changesTable.getModel()).setShowAllChanges(showAllChangesInTable);		
 	}
 	
 }
