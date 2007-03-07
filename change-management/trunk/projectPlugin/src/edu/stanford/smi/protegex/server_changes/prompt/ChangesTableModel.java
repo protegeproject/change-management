@@ -19,11 +19,14 @@ public class ChangesTableModel extends DefaultTableModel {
 	
 	private List<Instance> changesList;
 	
+	private boolean showAllChanges = false;
+	
 		
 	public ChangesTableModel(Ontology_Component ontologyComp) {
 		super();
 		this.ontologyComp = ontologyComp;
-		this.changesList = (ontologyComp == null ? new ArrayList<Instance>() : (ontologyComp).getSortedTopLevelChanges());
+		//this.changesList = (ontologyComp == null ? new ArrayList<Instance>() : (ontologyComp).getSortedTopLevelChanges());
+		refillTableValues();
 		
 		for (int i = 0; i < COLUMN_NAMES.length; i++) {
 			addColumn(COLUMN_NAMES[i]);
@@ -63,7 +66,9 @@ public class ChangesTableModel extends DefaultTableModel {
 	
 	public void setOntologyComponent(Ontology_Component ontComp) {
 		this.ontologyComp = ontComp;
+		
 		refillTableValues();
+		fireTableDataChanged();
 	}
 
 	@Override
@@ -84,9 +89,8 @@ public class ChangesTableModel extends DefaultTableModel {
 	
 	
 	private void refillTableValues() {
-		changesList = (ontologyComp == null ? new ArrayList<Instance>() : (ontologyComp).getSortedTopLevelChanges());
-		
-		fireTableDataChanged();		
+		changesList = (ontologyComp == null ? new ArrayList<Instance>() : 
+			(showAllChanges ? (ontologyComp).getSortedChanges() :(ontologyComp).getSortedTopLevelChanges()));		
 	}
 	
 	public Change getChange(int row) {
@@ -95,6 +99,13 @@ public class ChangesTableModel extends DefaultTableModel {
 		}
 		
 		return null;		
+	}
+	
+	public void setShowAllChanges(boolean showAllChanges) {
+		this.showAllChanges = showAllChanges;
+		
+		refillTableValues();
+		fireTableDataChanged();		
 	}
 	
 }
