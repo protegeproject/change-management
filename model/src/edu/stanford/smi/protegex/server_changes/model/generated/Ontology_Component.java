@@ -52,6 +52,8 @@ public class Ontology_Component extends AnnotatableThing {
         CREATED, DELETED, CREATED_AND_DELETED, UNCHANGED, CHANGED
     }
     
+    private final static String ANONYMOUS_NAME_PREFIX = "@";
+    
     @SuppressWarnings("unchecked")
     public Status getStatus() {
         List<Instance> changes = getSortedChanges();
@@ -139,5 +141,22 @@ public class Ontology_Component extends AnnotatableThing {
 		}
     	
     	return topLevelChanges;
+    }
+    
+    
+    public boolean isAnonymous() {    	
+    	String currentName = getCurrentName();
+    	
+    	if (currentName == null) {
+    		String initialName = getInitialName();
+    		
+    		if (initialName == null) {
+    			Log.getLogger().warning("Current or initial name not defined for " + this);
+    		}
+    		
+    		return initialName.startsWith(ANONYMOUS_NAME_PREFIX);
+    	}
+    	
+    	return currentName.startsWith(ANONYMOUS_NAME_PREFIX);
     }
 }
