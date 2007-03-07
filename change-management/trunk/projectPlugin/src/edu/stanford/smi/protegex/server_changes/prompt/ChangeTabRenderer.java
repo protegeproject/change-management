@@ -113,13 +113,13 @@ public class ChangeTabRenderer extends DefaultRenderer {
         }
         switch (frame.getStatus()) {
         case UNCHANGED:
-            return "Unchanged Object: " + name;
+            return "Unchanged: " + name;
         case CHANGED:
-            return "Modified Object: " + name;
+            return "Modified: " + name;
         case CREATED:
-            return "New Object: " + name;
+            return "New: " + name;
         case DELETED:
-            return "Deleted Object: " + name;
+            return "Deleted: " + name;
         case CREATED_AND_DELETED:
             return "Created and Deleted Object";
         default:
