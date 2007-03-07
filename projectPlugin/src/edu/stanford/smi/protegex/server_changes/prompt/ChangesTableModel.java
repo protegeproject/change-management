@@ -82,11 +82,6 @@ public class ChangesTableModel extends DefaultTableModel {
 		}				
 	}
 	
-	@Override
-	public void setValueAt(Object aValue, int row, int column) {
-		System.out.println("set value at");
-		super.setValueAt(aValue, row, column);
-	}
 	
 	private void refillTableValues() {
 		changesList = (ontologyComp == null ? new ArrayList<Instance>() : (ontologyComp).getSortedTopLevelChanges());
