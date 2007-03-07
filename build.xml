@@ -5,8 +5,11 @@
 
    <property name = "tab.src"         value = "./changesTab/src"/>  
    <property name = "pplugin.src"     value = "./projectPlugin/src"/>
+   <property name = "model.src"       value = "./model/src"/>
+
    <property name = "build"           value = "./build"/>
-   <property name = "classes"         value = "${build}/classes"/>  
+   <property name = "classes"         value = "${build}/classes"/>
+   <property name = "model.classes"   value = "${build}/model.classes"/>  
    <property name = "plugins"         value = "${build}/plugins"/>
    <property name = "lib"             value = "./lib"/>
    <property name = "junit"           value = "./junit"/>
@@ -57,6 +60,7 @@
         <pathelement location = "${owl.lib}"/>
         <pathelement location = "${rdf.lib}"/> 
         <pathelement location = "${lib}/icu4j.jar"/>
+        <pathelement location = "${model.classes}"/>
       </path>
 
     </target>
@@ -80,6 +84,7 @@
    <target name = "init">
      <mkdir dir = "${build}"/>
      <mkdir dir = "${classes}"/>
+     <mkdir dir = "${model.classes}"/>
      <mkdir dir = "${plugins}"/>
      <mkdir dir = "${plugins}/${plugin_dist}"/>
    </target>  
@@ -97,17 +102,23 @@
      </java>
    </target> 
 
-   <target name = "compile" depends = "init, checkProtegeLibsAndReport">    
+   <target name = "compile" depends = "init, checkProtegeLibsAndReport">
+     <javac srcdir = "${model.src}"
+            destdir = "${model.classes}" debug="on">
+       <classpath refid = "project.classpath"/>  
+     </javac>
      <javac srcdir = "${pplugin.src}:${tab.src}" 
             destdir = "${classes}" debug="on">
-       <classpath refid = "project.classpath"/>    
-     </javac>
+       <classpath refid = "project.classpath"/>  
+     </javac>  
    </target>
 
    <target name = "jar" depends = "compile">
+     <jar jarfile = "${plugins}/${plugin_dist}/model.jar" 
+          basedir = "${model.classes}" />
      <jar jarfile = "${plugins}/${plugin_dist}/${pluginName}.jar" 
           basedir = "${classes}" 
-          manifest = "${tab.src}/META-INF/MANIFEST.MF"/>  
+          manifest = "${tab.src}/META-INF/MANIFEST.MF"/>
      <copy file = "${lib}/icu4j.jar"
            todir = "${plugins}/${plugin_dist}"/>
      <copy file = "plugin.properties"
