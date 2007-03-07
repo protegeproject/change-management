@@ -124,5 +124,20 @@ public class Ontology_Component extends AnnotatableThing {
         return changes;
     }
     
-    
+    public List<Instance> getSortedTopLevelChanges(){
+    	List<Instance> topLevelChanges = new ArrayList<Instance>();
+    	List<Instance> changes = new ArrayList<Instance>(getSortedChanges());
+    	
+    	for (Instance i : changes) {
+			Change change = (Change) i;
+			
+			Instance compositeChange = change.getPartOfCompositeChange();
+			
+			if (compositeChange == null) {
+				topLevelChanges.add(change);
+			}
+		}
+    	
+    	return topLevelChanges;
+    }
 }
