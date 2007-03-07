@@ -197,7 +197,7 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	private void initUI() {
 		// Create menu item
-		cMenu = new ChangeMenu(changes_kb);
+		cMenu = new ChangeMenu(getKnowledgeBase(), changes_kb);
 		JMenuBar menuBar = getMainWindowMenuBar();
 	    menuBar.add (cMenu);
 
