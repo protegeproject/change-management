@@ -136,8 +136,8 @@ public class UserConceptList extends JPanel {
 
 		_noConflictList = createConceptList (_noConflictConcepts);
 		_conflictList = createConceptList (_conflictConcepts);		
-		result.add( new LabeledComponent ("Changes with NO conflict ", ComponentFactory.createScrollPane (_noConflictList)));
-		result.add(new LabeledComponent ("Changes WITH conflicts", ComponentFactory.createScrollPane (_conflictList)));
+		result.add( new LabeledComponent ("Ontology components with single editor", ComponentFactory.createScrollPane (_noConflictList)));
+		result.add(new LabeledComponent ("Ontology components with multiple editor", ComponentFactory.createScrollPane (_conflictList)));
 		
 		return result;
 	}
