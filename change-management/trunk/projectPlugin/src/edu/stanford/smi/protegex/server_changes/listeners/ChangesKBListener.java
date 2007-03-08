@@ -7,6 +7,7 @@ import edu.stanford.smi.protege.event.KnowledgeBaseEvent;
 import edu.stanford.smi.protege.event.KnowledgeBaseListener;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Frame;
+import edu.stanford.smi.protege.model.FrameID;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
@@ -49,8 +50,8 @@ public class ChangesKBListener implements KnowledgeBaseListener {
                 log.fine("In class deleted listener");
             }
             String oldName = event.getOldName();
-            changes_db.updateDeletedFrameIdToNameMap(event.getFrame().getFrameID(), oldName);
-            ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, oldName);
+            FrameID frameId = event.getCls().getFrameID();
+            ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, frameId, oldName);
 	}
 
 	/* (non-Javadoc)
@@ -114,8 +115,8 @@ public class ChangesKBListener implements KnowledgeBaseListener {
         }
         Frame frame = event.getFrame();
         String name = event.getOldName();
-        changes_db.updateDeletedFrameIdToNameMap(frame.getFrameID(), name);
-        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Instance_Deleted, name);
+        FrameID frameId = frame.getFrameID();
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Instance_Deleted, frameId, name);
 	}
 
 	/* (non-Javadoc)
@@ -132,7 +133,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 */
 	public void slotDeleted(KnowledgeBaseEvent event) {
         String oldName = event.getOldName();
-        changes_db.updateDeletedFrameIdToNameMap(event.getFrame().getFrameID(), oldName);
-        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, oldName);
+        FrameID frameId = event.getSlot().getFrameID();
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, frameId, oldName);
 	}
 }

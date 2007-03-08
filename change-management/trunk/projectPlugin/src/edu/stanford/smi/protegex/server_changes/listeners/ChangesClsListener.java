@@ -55,7 +55,6 @@ public class ChangesClsListener implements ClsListener{
 	public void directInstanceRemoved(ClsEvent event) {
 		Instance removedInst = event.getInstance();
 		Cls clsOfInst = event.getCls();
-		String name = changes_db.getPossiblyDeletedFrameName(removedInst);
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Removed Instance: ");
@@ -64,7 +63,7 @@ public class ChangesClsListener implements ClsListener{
 		context.append(clsOfInst.getBrowserText());
 		context.append(")");
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(removedInst, true);
         
         Change change = changes_db.createChange(ChangeCls.Instance_Removed);
         changes_db.finalizeChange(change, applyTo, context.toString());
@@ -103,7 +102,6 @@ public class ChangesClsListener implements ClsListener{
 	public void directSubclassRemoved(ClsEvent event) {
 		Cls subClass = event.getSubclass();
 		Cls superClass = event.getCls();
-        String name = changes_db.getPossiblyDeletedFrameName(subClass);
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Removed subclass: ");
@@ -112,7 +110,7 @@ public class ChangesClsListener implements ClsListener{
 		context.append(superClass.getBrowserText());
 		context.append(")");
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(subClass, true);
         
         Change change = changes_db.createChange(ChangeCls.Subclass_Removed);
         changes_db.finalizeChange(change, applyTo, context.toString());
@@ -144,7 +142,6 @@ public class ChangesClsListener implements ClsListener{
 	public void directSuperclassRemoved(ClsEvent event) {
 		Cls subClass = event.getSubclass();
 		Cls superClass = event.getCls();
-        String name = changes_db.getPossiblyDeletedFrameName(subClass);
 	
 		StringBuffer context = new StringBuffer();
 		context.append("Removed superclass: ");
@@ -153,7 +150,7 @@ public class ChangesClsListener implements ClsListener{
 		context.append(superClass.getBrowserText());
 		context.append(")");
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(subClass, true);
         
         Change change = changes_db.createChange(ChangeCls.Superclass_Removed);
         changes_db.finalizeChange(change, applyTo, context.toString());

@@ -45,15 +45,15 @@ public class ChangesSlotListener implements SlotListener{
 	public void templateSlotClsRemoved(SlotEvent event) {
 		if (event.getArgument() instanceof Cls) {
 			Cls theCls = event.getCls();
-            String name = changes_db.getPossiblyDeletedFrameName(theCls);
+            String name = changes_db.getPossiblyDeletedBrowserText(theCls);
 			
 			StringBuffer context = new StringBuffer();
 			context.append("Removed template slot: ");
 			context.append(event.getSlot().getName());
 			context.append(" from: ");
-			context.append(theCls.getBrowserText());
+			context.append(name);
 			
-            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.TemplateSlot_Removed, name, context.toString());
+            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.TemplateSlot_Removed, theCls, context.toString());
 		}
 	}
 
@@ -75,10 +75,10 @@ public class ChangesSlotListener implements SlotListener{
 	public void directSubslotRemoved(SlotEvent event) {
 		if (event.getArgument() instanceof Slot) {
 			Slot eventSlot = (Slot) event.getArgument();
-            String name = changes_db.getPossiblyDeletedFrameName(eventSlot);
-			String context = "Direct Subslot Removed: " + eventSlot.getBrowserText();
+            String name = changes_db.getPossiblyDeletedBrowserText(eventSlot);
+			String context = "Direct Subslot Removed: " + name;
             
-            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Subslot_Removed, name, context);
+            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Subslot_Removed, eventSlot, context);
 		}
 	}
 
