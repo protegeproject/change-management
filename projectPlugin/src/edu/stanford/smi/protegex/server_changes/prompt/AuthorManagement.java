@@ -2,6 +2,7 @@ package edu.stanford.smi.protegex.server_changes.prompt;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -23,6 +24,8 @@ public class AuthorManagement {
     private Map<String, Set<Ontology_Component>> unconflictedFrames = new HashMap<String, Set<Ontology_Component>>();
     
     private Set<String> active_users  = new HashSet<String>();
+    
+    private boolean showAnonymousOntologyComponents = false;
     
     private AuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
         this.kb = kb2;
@@ -97,20 +100,66 @@ public class AuthorManagement {
             myConflictingFrames = new HashSet<Ontology_Component>();
             conflictingFrames.put(user, myConflictingFrames);
         }
+        
         return myConflictingFrames;
     }
-    
-    public Set<Ontology_Component> getUnConlictedFrames(String user) {
+   
+
+	public Set<Ontology_Component> getUnConlictedFrames(String user) {
         Set<Ontology_Component> myUnconflictedFrames = unconflictedFrames.get(user);
         if (myUnconflictedFrames == null) {
             myUnconflictedFrames = new HashSet<Ontology_Component>();
             unconflictedFrames.put(user, myUnconflictedFrames);
         }
+        
         return myUnconflictedFrames;
     }
-    
+
+	
+	public Set<Ontology_Component> getFilteredConflictedFrames(String user) {
+		  Set<Ontology_Component> myConflictingFrames = new HashSet<Ontology_Component>(getConflictedFrames(user));
+		  
+		  if (!showAnonymousOntologyComponents) {
+	        	filterAnonymousOntologyComponent(myConflictingFrames);
+	      } 
+		  
+		  return myConflictingFrames;
+	  }
+
+	
+	public Set<Ontology_Component> getFilteredUnConflictedFrames(String user) {
+		  Set<Ontology_Component> myUnConflictingFrames = new HashSet<Ontology_Component>(getUnConlictedFrames(user));
+		  
+		  if (!showAnonymousOntologyComponents) {
+	        	filterAnonymousOntologyComponent(myUnConflictingFrames);
+	      } 
+		  
+		  return myUnConflictingFrames;
+	  }
+
+	
+	
+    private void filterAnonymousOntologyComponent(Set<Ontology_Component> myConflictingFrames) {
+    	for (Iterator iter = myConflictingFrames.iterator(); iter.hasNext();) {
+			Ontology_Component ontoComp = (Ontology_Component) iter.next();
+			if (ontoComp.isAnonymous()) {
+				iter.remove();
+			}
+		}		
+	}
+
+	
     public Set<String> getUsers() {
         return active_users;
     }
+
+	public boolean isShowAnonymousOntologyComponents() {
+		return showAnonymousOntologyComponents;
+	}
+
+	public void setShowAnonymousOntologyComponents(
+			boolean showAnonymousOntologyComponents) {
+		this.showAnonymousOntologyComponents = showAnonymousOntologyComponents;
+	}
     
 }
