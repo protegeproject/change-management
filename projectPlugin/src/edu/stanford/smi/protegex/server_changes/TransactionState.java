@@ -58,7 +58,12 @@ public class TransactionState {
         String context = name;
         Ontology_Component applyTo = (Ontology_Component) changes.get(0).getApplyTo();
         
-        Representative r = guessRepresentative(changes);
+        Representative r;
+        try {
+            r = guessRepresentative(changes);
+        } catch (Exception e) {
+            r = null;
+        }
         if (r != null) {
             if (r.getAction() != null) action = r.getAction();
             if (r.getContext() != null) context = r.getContext();
