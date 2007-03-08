@@ -78,16 +78,13 @@ public class ChangesFrameListener implements FrameListener {
             String newSlotValue = CollectionUtilities.toString(s.getOwnSlotValues(event.getSlot()));
 
             StringBuffer context = new StringBuffer();
-            if(ownSName.equals(":SLOT-NUMERIC-MAXIMUM")){
+            if(ownSName.equals(":SLOT-NUMERIC-MAXIMUM")) {
                 context.append("Maximum value for: ");
                 context.append(sName);
                 context.append(" set to: ");
                 context.append(newSlotValue);
-
-                Ontology_Component applyTo = changes_db.getOntologyComponent(sName, true);
-
-                Change change = changes_db.createChange(ChangeCls.Maximum_Value);
-                changes_db.finalizeChange(change, applyTo, context.toString());
+                
+                ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Maximum_Value, s, context.toString());
             }
             if(ownSName.equals(":SLOT-NUMERIC-MINIMUM")){
                 context.append("Minimum value for: ");
@@ -95,10 +92,7 @@ public class ChangesFrameListener implements FrameListener {
                 context.append(" set to: ");
                 context.append(newSlotValue);
                 
-                Ontology_Component applyTo = changes_db.getOntologyComponent(sName, true);
-                
-                Change change = changes_db.createChange(ChangeCls.Minimum_Value);
-                changes_db.finalizeChange(change, applyTo, context.toString());
+                ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Minimum_Value, s, context.toString());
 
             }
 
@@ -111,11 +105,7 @@ public class ChangesFrameListener implements FrameListener {
                     context.append(" set to: ");
                     context.append(newSlotValue);
                     
-                    Ontology_Component applyTo = changes_db.getOntologyComponent(sName, true);
-                    
-                    Change change = changes_db.createChange(ChangeCls.Minimum_Cardinality);
-                    changes_db.finalizeChange(change, applyTo, context.toString());
-
+                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Minimum_Cardinality, s, context.toString());
                 }
 
             }
@@ -126,10 +116,7 @@ public class ChangesFrameListener implements FrameListener {
                     context.append(sName);
                     context.append(" can take multiple values");
                     
-                    Ontology_Component applyTo = changes_db.getOntologyComponent(sName, true);
-                    
-                    Change change = changes_db.createChange(ChangeCls.Maximum_Cardinality);
-                    changes_db.finalizeChange(change, applyTo, context.toString());
+                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Maximum_Cardinality, s, context.toString());
                 }
                 else{
                     //maximum values set to -
@@ -138,10 +125,7 @@ public class ChangesFrameListener implements FrameListener {
                     context.append(" set to: ");
                     context.append(newSlotValue);
                     
-                    Ontology_Component applyTo = changes_db.getOntologyComponent(sName, true);
-                    
-                    Change change = changes_db.createChange(ChangeCls.Maximum_Cardinality);
-                    changes_db.finalizeChange(change, applyTo, context.toString());
+                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Maximum_Cardinality, s, context.toString());
                 }
 
             }
@@ -164,10 +148,7 @@ public class ChangesFrameListener implements FrameListener {
                     context.append("Removed documentation from ");
                     context.append(cName);
                     
-                    Ontology_Component applyTo = changes_db.getOntologyComponent(cName, true);
-                    
-                    Change change = changes_db.createChange(ChangeCls.Documentation_Removed);
-                    changes_db.finalizeChange(change, applyTo, context.toString());
+                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Removed, c, context.toString());
                 }
                 else {
                     // ADDED DOCUMENTATION
@@ -176,9 +157,7 @@ public class ChangesFrameListener implements FrameListener {
                     context.append(" to: ");
                     context.append(cName);
                     
-                    Ontology_Component applyTo = changes_db.getOntologyComponent(cName, true);
-                    
-                    Change change = changes_db.createChange(ChangeCls.Documentation_Added);
+                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Added, c, context.toString());
                 }
             } // Handles documentation slot
         }
@@ -199,10 +178,7 @@ public class ChangesFrameListener implements FrameListener {
             context.append(" set to: ");
             context.append(newSlotValue);
             
-            Ontology_Component applyTo = changes_db.getOntologyComponent(iName, true);
-            
-            Change change = changes_db.createChange(ChangeCls.Slot_Value);
-            changes_db.finalizeChange(change, applyTo, context.toString());
+            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Slot_Value, i, context.toString());
 
         }
 

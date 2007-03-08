@@ -40,13 +40,8 @@ public class ChangesClsListener implements ClsListener{
 		context.append(clsOfInst.getBrowserText());
 		context.append(")");
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(addedInst.getName(), true);
-        
-        Change change = changes_db.createChange(ChangeCls.Instance_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Instance_Added, addedInst, context.toString());
 
-		// Create artificial transaction for create slot
-        TransactionState tstate = changes_db.getTransactionState();
 	}
 
 	/* (non-Javadoc)
@@ -83,10 +78,7 @@ public class ChangesClsListener implements ClsListener{
 		context.append(superClass.getBrowserText());
 		context.append(")");
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(subClass.getName(), true);
-        
-        Change change = changes_db.createChange(ChangeCls.Subclass_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Subclass_Added, subClass, context.toString());
 	}
 
 	/* (non-Javadoc)
@@ -129,11 +121,8 @@ public class ChangesClsListener implements ClsListener{
 		context.append(" (subclass of ");
 		context.append( superClass.getBrowserText());
 		context.append(")");
-		
-        Ontology_Component applyTo = changes_db.getOntologyComponent(subClass.getName(), true);
         
-        Change change = changes_db.createChange(ChangeCls.Superclass_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Superclass_Added, subClass, context.toString());
 	}
 
 	/* (non-Javadoc)
@@ -150,10 +139,7 @@ public class ChangesClsListener implements ClsListener{
 		context.append(superClass.getBrowserText());
 		context.append(")");
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(subClass, true);
-        
-        Change change = changes_db.createChange(ChangeCls.Superclass_Removed);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Superclass_Removed, subClass, context.toString());
 	}
 
 	/* (non-Javadoc)
