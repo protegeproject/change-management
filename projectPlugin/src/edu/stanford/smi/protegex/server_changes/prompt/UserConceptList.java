@@ -109,7 +109,7 @@ public class UserConceptList extends JPanel {
 		
 		LabeledComponent labeledComponent = new LabeledComponent("Changes of selected ontology component", new JScrollPane(changesTable));
 						
-		labeledComponent.addHeaderButton(new ViewAction((Selectable)changesTable) {
+		labeledComponent.addHeaderButton(new ViewAction("View change", (Selectable)changesTable) {
 			@Override
 			public void onView() {
 				for (int i = 0; i < changesTable.getSelectedRows().length; i++) {
@@ -122,11 +122,15 @@ public class UserConceptList extends JPanel {
 				if (change != null) {
 					ChangesProject.getChangesProj(new_kb).show(change);
 				}				
-			}			
+			}
 			
 		});
 		
-		labeledComponent.setHeaderComponent(getHeaderCenterComponent());
+		labeledComponent.setHeaderComponent(getHeaderCenterComponent("Show also subchanges", showAllChangesInTable, new ItemListener(){
+			public void itemStateChanged(ItemEvent e) {
+				onShowAllChanges(e.getSource());				
+			}			
+		}));
 		
 		return labeledComponent;
 	}
@@ -140,14 +144,34 @@ public class UserConceptList extends JPanel {
         this.authorManagement = authorManagement;
     }
 	
-	private JPanel createConceptLists() {
+	private JComponent createConceptLists() {		
 		JPanel result = new JPanel ();
 		result.setLayout (new GridLayout (0, 2, 10, 0));
 
 		_noConflictList = createConceptList (_noConflictConcepts);
 		_conflictList = createConceptList (_conflictConcepts);		
-		result.add( new LabeledComponent ("Ontology components changed by one user", ComponentFactory.createScrollPane (_noConflictList)));
-		result.add(new LabeledComponent ("Ontology components changed by multiple users", ComponentFactory.createScrollPane (_conflictList)));
+		
+		LabeledComponent labeledComponent1 = new LabeledComponent ("Ontology components changed by one user", ComponentFactory.createScrollPane (_noConflictList)); 
+		LabeledComponent labeledComponent2 = new LabeledComponent ("Ontology components changed by multiple users", ComponentFactory.createScrollPane (_conflictList));
+		
+		labeledComponent1.addHeaderButton(new ViewAction("View changed ontology component", (Selectable) _noConflictList) {
+			@Override
+			public void onView(Object o) {			
+				Ontology_Component ontoComp = (Ontology_Component) o;
+				ChangesProject.getChangesProj(new_kb).show(ontoComp);
+			}
+		});
+		
+		labeledComponent2.addHeaderButton(new ViewAction("View changed ontology component", (Selectable) _conflictList) {
+			@Override
+			public void onView(Object o) {			
+				Ontology_Component ontoComp = (Ontology_Component) o;
+				ChangesProject.getChangesProj(new_kb).show(ontoComp);
+			}
+		});
+		
+		result.add(labeledComponent1);
+		result.add(labeledComponent2);
 		
 		return result;
 	}
@@ -156,8 +180,8 @@ public class UserConceptList extends JPanel {
 	    _noConflictConcepts.clear();
 	    _conflictConcepts.clear();
 	    for (String user : _userList) {
-	        _noConflictConcepts.addAll(authorManagement.getUnConlictedFrames(user));
-	        _conflictConcepts.addAll(authorManagement.getConflictedFrames(user));
+	        _noConflictConcepts.addAll(authorManagement.getFilteredUnConflictedFrames(user));
+	        _conflictConcepts.addAll(authorManagement.getFilteredConflictedFrames(user));
 	    }
 	    ((SimpleListModel)_noConflictList.getModel()).setValues(_noConflictConcepts);
 	    ((SimpleListModel)_conflictList.getModel()).setValues (_conflictConcepts);
@@ -172,9 +196,9 @@ public class UserConceptList extends JPanel {
 		return list;
 	}
 	
-	private JComponent getHeaderCenterComponent() {	
-		final JCheckBox showAllChanges = ComponentFactory.createCheckBox("Show all changes");
-		showAllChanges.setSelected(showAllChangesInTable);
+	private JComponent getHeaderCenterComponent(String text, boolean selected, ItemListener itemListener) {	
+		final JCheckBox showAllChanges = ComponentFactory.createCheckBox(text);
+		showAllChanges.setSelected(selected);
 		
 		Font font = showAllChanges.getFont();
         showAllChanges.setFont(font.deriveFont(Font.BOLD, font.getSize()));
@@ -184,21 +208,19 @@ public class UserConceptList extends JPanel {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(showAllChanges, BorderLayout.EAST);
 		
-		showAllChanges.addItemListener(new ItemListener(){
-
-			public void itemStateChanged(ItemEvent e) {
-				onShowAllChanges(showAllChanges.isSelected());				
-			}
-			
-		});
+		if (itemListener != null) {
+			showAllChanges.addItemListener(itemListener);
+		}
 		
 		return panel;
 	}
-
-	protected void onShowAllChanges(boolean selected) {
-		showAllChangesInTable = selected;
 		
+
+	protected void onShowAllChanges(Object source) {
+		JCheckBox cb = (JCheckBox) source;
+		
+		showAllChangesInTable = cb.isSelected();		
 		((ChangesTableModel)changesTable.getModel()).setShowAllChanges(showAllChangesInTable);		
 	}
-	
+		
 }
