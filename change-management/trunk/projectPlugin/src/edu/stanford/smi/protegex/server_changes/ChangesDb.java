@@ -26,6 +26,8 @@ import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.AnnotatableThing;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
+import edu.stanford.smi.protegex.server_changes.model.generated.Annotation_Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Annotation_Removed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Created_Change;
@@ -152,12 +154,19 @@ public class ChangesDb {
         else return StandaloneSession.getInstance();
     }
     
+    /* -------------------------------- PostProcessing -------------------------------- */
+    /* ToDo - put these in separate classes - there are getting to be too many of them */
+    
     private void postProcessChange(Change aChange) {
         checkForTransaction(aChange);
         checkForCreateAndNameChange(aChange);
         checkForNameChanges(aChange);
+        possiblyCombineAnnotations(aChange);
     }
     
+    /*
+     * If I am in a transaction, add the change to the transaction.
+     */
     private void checkForTransaction(Change aChange) {
         TransactionState tstate = getTransactionState();
         if (tstate.inTransaction()) {
@@ -237,6 +246,10 @@ public class ChangesDb {
         }
     }
     
+    
+    /*
+     * Update the name map.
+     */
     public void checkForNameChanges(Change change) {
         synchronized (changes_kb) {
             if (change instanceof Created_Change) {
@@ -255,6 +268,70 @@ public class ChangesDb {
                 name_map.put(newName, name_map.remove(oldName));
             }
         }
+    }
+    
+    private Map<RemoteSession, List<Annotation_Change>> lastAnnotationsBySession
+                = new HashMap<RemoteSession, List<Annotation_Change>>();
+    /*
+     * Combine Annotations.
+     */
+    private void possiblyCombineAnnotations(Change aChange) {
+        List<Annotation_Change> previous_annotations = lastAnnotationsBySession.get(getCurrentSession());
+        
+        if (aChange instanceof Annotation_Change) {
+            Annotation_Change annotation = (Annotation_Change) aChange;
+
+            if (previous_annotations == null) {
+                previous_annotations = new ArrayList<Annotation_Change>();
+                previous_annotations.add(annotation);
+                lastAnnotationsBySession.put(getCurrentSession(), previous_annotations);
+                return;
+            }
+            
+            Ontology_Component applyTo = (Ontology_Component) annotation.getApplyTo();
+            Ontology_Component property = (Ontology_Component) annotation.getOntologyAnnotation();
+            
+            Annotation_Change earlier_annotation = previous_annotations.get(0);
+            if (!applyTo.equals(earlier_annotation.getApplyTo()) || 
+                    !property.equals(earlier_annotation.getOntologyAnnotation())) {
+                combineAnnotations(previous_annotations);
+                List<Annotation_Change> new_annotations = new ArrayList<Annotation_Change>();
+                new_annotations.add(annotation);
+                lastAnnotationsBySession.put(getCurrentSession(), new_annotations);
+                return;
+            }
+            else {
+                previous_annotations.add(annotation);
+                return;
+            }
+        }
+        else if (previous_annotations != null) {
+            combineAnnotations(previous_annotations);
+        }
+        
+    }
+    
+    private void combineAnnotations(List<Annotation_Change> annotations) {
+        lastAnnotationsBySession.remove(getCurrentSession());
+        if (annotations.size() <= 1) return;
+        Ontology_Component applyTo = (Ontology_Component) annotations.get(0).getApplyTo();
+        Composite_Change transaction = (Composite_Change) createChange(ChangeCls.Composite_Change);
+        
+        transaction.setSubChanges(annotations);
+        
+        finalizeChange(transaction, applyTo, getContextForAnnotations(annotations));
+
+    }
+    
+    private String getContextForAnnotations(Collection<Annotation_Change> annotations) {
+        String context = null;
+        for (Annotation_Change annotation : annotations) {
+            context = annotation.getContext();
+            if (!(annotation instanceof Annotation_Removed)) {
+                break;
+            }
+        }
+        return context;
     }
     
     /* -------------------------------------Interfaces ------------------------------*/
