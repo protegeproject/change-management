@@ -6,14 +6,14 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import edu.stanford.smi.protege.model.Frame;
+import edu.stanford.smi.protege.model.FrameID;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Class_Created;
-import edu.stanford.smi.protegex.server_changes.model.generated.Class_Deleted;
 import edu.stanford.smi.protegex.server_changes.model.generated.Created_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Deleted_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
@@ -32,6 +32,16 @@ public class ServerChangesUtil {
     public static Change createChangeStd(ChangesDb changes_db,
                                          ChangeCls type, 
                                          String applyTo,
+                                         String context) {
+        Ontology_Component frame = changes_db.getOntologyComponent(applyTo, true);
+        Change change = changes_db.createChange(type);
+        changes_db.finalizeChange(change, frame, context);
+        return change;
+    }
+    
+    public static Change createChangeStd(ChangesDb changes_db,
+                                         ChangeCls type, 
+                                         Frame applyTo,
                                          String context) {
         Ontology_Component frame = changes_db.getOntologyComponent(applyTo, true);
         Change change = changes_db.createChange(type);
@@ -79,6 +89,7 @@ public class ServerChangesUtil {
     
     public static Deleted_Change createDeletedChange(ChangesDb changes_db,
                                                      ChangeCls type,
+                                                     FrameID frameId,
                                                      String name) {
         String context;
         switch (type) {
@@ -105,6 +116,9 @@ public class ServerChangesUtil {
         Deleted_Change change = (Deleted_Change) changes_db.createChange(type);
         change.setDeletionName(name);
         changes_db.finalizeChange(change, applyTo, context);
+        if (frameId != null) {
+            changes_db.updateDeletedFrameIdToNameMap(frameId, change);
+        }
         return change;
     }
     
