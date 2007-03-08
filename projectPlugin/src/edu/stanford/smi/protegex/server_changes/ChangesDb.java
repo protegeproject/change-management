@@ -6,15 +6,14 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.FrameID;
+import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.server.RemoteSession;
@@ -52,11 +51,11 @@ public class ChangesDb {
      */
     private Map<RemoteSession, TransactionState> transactionMap = new HashMap<RemoteSession, TransactionState>();
     
+    
     /*
-     * This map maps names to the corresponding ontology component.  This map is critical to the 
-     * correct operation of the changes tab.
+     * This map maps frame ids to ontology components.
      */
-    private Map<String, Ontology_Component> name_map = new HashMap<String, Ontology_Component>();
+    private Map<FrameID, Ontology_Component> frameIdMap = new HashMap<FrameID, Ontology_Component>();
     
     /*
      * This map tracks the relationship between frame id's and information about the frame.
@@ -79,12 +78,21 @@ public class ChangesDb {
         this.kb = kb;
         getOrCreateChangesProject(kb);
         model = new ChangeModel(changes_kb);
-        for (Object o : model.getSortedChanges()) {
-            Change change = (Change) o;
-            checkForNameChanges(change);
-        }
-
+        initializeFrameMap();
         Timestamp.initialize(model);
+    }
+    
+    public void initializeFrameMap() {
+        for (Instance i : model.getInstances(ChangeCls.Ontology_Component)) {
+            Ontology_Component oc = (Ontology_Component) i;
+            String name = oc.getCurrentName();
+            if (name != null) {
+                Frame frame = kb.getFrame(name);
+                if (frame != null) {
+                    frameIdMap.put(frame.getFrameID(), oc);
+                }
+            }
+        }
     }
     
     private void getOrCreateChangesProject(KnowledgeBase kb) {
@@ -160,7 +168,6 @@ public class ChangesDb {
     private void postProcessChange(Change aChange) {
         checkForTransaction(aChange);
         checkForCreateAndNameChange(aChange);
-        checkForNameChanges(aChange);
         possiblyCombineAnnotations(aChange);
     }
     
@@ -246,29 +253,6 @@ public class ChangesDb {
         }
     }
     
-    
-    /*
-     * Update the name map.
-     */
-    public void checkForNameChanges(Change change) {
-        synchronized (changes_kb) {
-            if (change instanceof Created_Change) {
-                Ontology_Component frame = (Ontology_Component) change.getApplyTo();
-                String name = ((Created_Change) change).getCreationName();
-                name_map.put(name, frame);
-            }
-            else if (change instanceof Deleted_Change) {
-                String name = ((Deleted_Change) change).getDeletionName();
-                name_map.remove(name);
-            }
-            else if (change instanceof Name_Changed) {
-                Name_Changed name_change = (Name_Changed) change;
-                String oldName = name_change.getOldName();
-                String newName = name_change.getNewName();
-                name_map.put(newName, name_map.remove(oldName));
-            }
-        }
-    }
     
     private Map<RemoteSession, List<Annotation_Change>> lastAnnotationsBySession
                 = new HashMap<RemoteSession, List<Annotation_Change>>();
@@ -358,27 +342,17 @@ public class ChangesDb {
         return Util.kbInOwl(kb);
     }
     
-    public Ontology_Component getOntologyComponent(String name, boolean create) {
-        synchronized (changes_kb) {
-            Ontology_Component frame = name_map.get(name);
-            if (frame == null && create) {
-                frame = (Ontology_Component) model.createInstance(ChangeCls.Ontology_Component);
-                frame.setCurrentName(name);
-                name_map.put(name, frame);
-            }
-            return frame;
-        }
-    }
-    
     public Ontology_Component getOntologyComponent(Frame frame, boolean create) {
-        if (frame.isDeleted()) {
-            Deleted_Change deletion = deletedFrameMap.get(frame.getFrameID());
-            return (Ontology_Component) deletion.getApplyTo();
+        FrameID frameId = frame.getFrameID();
+        Ontology_Component oc = frameIdMap.get(frameId);
+        if (oc == null && create) {
+            oc = (Ontology_Component) model.createInstance(ChangeCls.Ontology_Component);
+            if (!frame.isDeleted()) {
+                oc.setCurrentName(frame.getName());
+            }
+            frameIdMap.put(frameId, oc);
         }
-        else {
-            String name = frame.getName();
-            return getOntologyComponent(name, create);
-        }
+        return oc;
     }
     
     public TransactionState getTransactionState() {
