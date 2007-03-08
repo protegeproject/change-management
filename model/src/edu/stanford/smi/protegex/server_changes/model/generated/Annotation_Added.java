@@ -1,5 +1,5 @@
 
-// Created on Mon Mar 05 12:16:44 PST 2007
+// Created on Wed Mar 07 13:03:39 PST 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -24,7 +24,7 @@ import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 
 /** 
  */
-public class Annotation_Added extends Class_Change {
+public class Annotation_Added extends Annotation_Change {
 
 	public Annotation_Added() {
 	}
