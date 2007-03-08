@@ -40,7 +40,6 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 
 	public void subpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
             String browserText0 = changes_db.getPossiblyDeletedBrowserText(arg0);
-            String name0 = changes_db.getPossiblyDeletedFrameName(arg0);
         
             StringBuffer context = new StringBuffer();
             context.append("Subproperty Removed: ");
@@ -49,7 +48,7 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
             context.append(arg1.getBrowserText());
             context.append(")");
             
-            Ontology_Component applyTo = changes_db.getOntologyComponent(name0, true);
+            Ontology_Component applyTo = changes_db.getOntologyComponent(arg0, true);
             
             Change change = changes_db.createChange(ChangeCls.Subproperty_Removed);
             changes_db.finalizeChange(change, applyTo, context.toString());
@@ -72,7 +71,6 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 
 	public void superpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
         String browserText0 = changes_db.getPossiblyDeletedBrowserText(arg0);
-        String name0 = changes_db.getPossiblyDeletedFrameName(arg0);
         String browserText1 = changes_db.getPossiblyDeletedBrowserText(arg1);
 		StringBuffer context = new StringBuffer();
 		context.append("Superproperty Removed: ");
@@ -81,7 +79,7 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(browserText1);
 		context.append(")");
 		
-        Ontology_Component applyTo = changes_db.getOntologyComponent(name0, true);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(arg0, true);
         
         Change change = changes_db.createChange(ChangeCls.Superproperty_Removed);
         changes_db.finalizeChange(change, applyTo, context.toString());
@@ -109,19 +107,17 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 	}
 
 	public void unionDomainClassRemoved(RDFProperty arg0, RDFSClass arg1) {
-		String propName = changes_db.getPossiblyDeletedFrameName(arg0);
 		String propText = changes_db.getPossiblyDeletedBrowserText(arg0);
-		String clsName = changes_db.getPossiblyDeletedFrameName(arg1);
 		String clsText = changes_db.getPossiblyDeletedBrowserText(arg1);
 		
 		StringBuffer context = new StringBuffer();
 		context.append("Domain Property Removed: ");
-		context.append(propName);
+		context.append(propText);
 		context.append("(removed from: ");
 		context.append(clsText);
 		context.append(")");
 		
-        Ontology_Component applyTo = changes_db.getOntologyComponent(propName, true);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(arg0, true);
         
         Change change = changes_db.createChange(ChangeCls.DomainProperty_Removed);
         changes_db.finalizeChange(change, applyTo, context.toString());

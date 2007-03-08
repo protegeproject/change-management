@@ -184,7 +184,7 @@ public class OwlChangesFrameListener implements FrameListener {
         
         Ontology_Component applyTo = changes_db.getOntologyComponent(cName, true);
         
-        Change change = changes_db.createChange(ChangeCls.Disjoint_Class_Added);
+        Change change = changes_db.createChange(ChangeCls.DisjointClass_Added);
         changes_db.finalizeChange(change, applyTo, context.toString());
     }
     

@@ -46,7 +46,6 @@ public class OwlChangesClassListener extends ClassAdapter {
 
 	public void instanceRemoved(RDFSClass arg0, RDFResource arg1) {
             ChangesDb changesDb = ChangesProject.getChangesDb(om);
-            String instName = changesDb.getPossiblyDeletedFrameName(arg1);
             String instText = changesDb.getPossiblyDeletedBrowserText(arg1);
             StringBuffer context = new StringBuffer();
             context.append("Instance Removed: ");
@@ -55,7 +54,7 @@ public class OwlChangesClassListener extends ClassAdapter {
             context.append(arg0.getBrowserText());
             context.append(")");
             
-            Ontology_Component applyTo = changes_db.getOntologyComponent(instName, true);
+            Ontology_Component applyTo = changes_db.getOntologyComponent(arg1, true);
             
             Change change = changes_db.createChange(ChangeCls.Instance_Removed);
             changes_db.finalizeChange(change, applyTo, context.toString());
@@ -84,8 +83,7 @@ public class OwlChangesClassListener extends ClassAdapter {
 	}
 
 	public void subclassRemoved(RDFSClass arg0, RDFSClass arg1) {
-            ChangesDb changesDb = ChangesProject.getChangesDb(om);
-            String clsName = changesDb.getPossiblyDeletedFrameName(arg1);
+            String clsName = changes_db.getPossiblyDeletedBrowserText(arg1);
             StringBuffer context = new StringBuffer();
             context.append("Subclass Removed: ");
             context.append(clsName);
@@ -93,7 +91,7 @@ public class OwlChangesClassListener extends ClassAdapter {
             context.append(arg0.getBrowserText());
             context.append(")");
             
-            Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
+            Ontology_Component applyTo = changes_db.getOntologyComponent(arg1, true);
             
             Change change = changes_db.createChange(ChangeCls.Subclass_Removed);
             changes_db.finalizeChange(change, applyTo, context.toString());
@@ -119,7 +117,7 @@ public class OwlChangesClassListener extends ClassAdapter {
 	public void superclassRemoved(RDFSClass arg0, RDFSClass arg1) {
 		String a = arg1.getName();
 		String b = arg1.getBrowserText();
-		String clsName = changes_db.getPossiblyDeletedFrameName(arg1);
+		String clsName = changes_db.getPossiblyDeletedBrowserText(arg1);
 		StringBuffer context = new StringBuffer();
 		context.append("Superclass Removed: ");
 		context.append(clsName);
@@ -127,7 +125,7 @@ public class OwlChangesClassListener extends ClassAdapter {
 		context.append(arg0.getBrowserText());
 		context.append(")");
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(clsName, true);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(arg1, true);
         
         Change change = changes_db.createChange(ChangeCls.Superclass_Removed);
         changes_db.finalizeChange(change, applyTo, context.toString());
