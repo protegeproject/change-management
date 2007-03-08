@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import edu.stanford.smi.protege.event.KnowledgeBaseEvent;
 import edu.stanford.smi.protege.event.KnowledgeBaseListener;
 import edu.stanford.smi.protege.model.Frame;
+import edu.stanford.smi.protege.model.FrameID;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Model;
@@ -50,9 +51,9 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
         if (log.isLoggable(Level.FINE)) {
             log.fine("In deleted class listener");
         }
-        updateDeletedFrameMap(event);
         String deletedClsName = event.getOldName();
-        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, deletedClsName);
+        FrameID frameId = event.getCls().getFrameID();
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, frameId, deletedClsName);
     }
 
 
@@ -117,8 +118,8 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
             log.fine("In deleted instance listener");
         }
         String name = event.getOldName();
-	    updateDeletedFrameMap(event);
-        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Instance_Deleted, name);
+        FrameID frameId = event.getFrame().getFrameID();
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Instance_Deleted, frameId, name);
 	}
 
 	/* (non-Javadoc)
@@ -141,23 +142,15 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
         if (log.isLoggable(Level.FINE)) {
             log.fine("In deleted slot listener");
         }
-	    updateDeletedFrameMap(event);
         String propName = event.getOldName();
+        FrameID frameId = event.getSlot().getFrameID();
         if (event.getSlot() instanceof RDFProperty) {
             ServerChangesUtil.createDeletedChange(changes_db,
                                                   ChangeCls.Property_Deleted,
+                                                  frameId, 
                                                   propName);
         }
 	}
     
-    private void updateDeletedFrameMap(KnowledgeBaseEvent event) {
-        Frame f = event.getFrame();
-        String name = event.getOldName();
-        if (log.isLoggable(Level.FINE)) {
-            log.fine("Deleting frame with frame id " + f.getFrameID() + " and name = " + name);
-        }
-        ChangesDb changesDb = ChangesProject.getChangesDb(om);
-        changesDb.updateDeletedFrameIdToNameMap(f.getFrameID(), name);
-    }
 
 }
