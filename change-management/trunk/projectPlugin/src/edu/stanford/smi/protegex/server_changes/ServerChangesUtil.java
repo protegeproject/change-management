@@ -28,16 +28,7 @@ public class ServerChangesUtil {
 	private ServerChangesUtil(ChangeModel model) {
 	    this.model = model;
     }
-    
-    public static Change createChangeStd(ChangesDb changes_db,
-                                         ChangeCls type, 
-                                         String applyTo,
-                                         String context) {
-        Ontology_Component frame = changes_db.getOntologyComponent(applyTo, true);
-        Change change = changes_db.createChange(type);
-        changes_db.finalizeChange(change, frame, context);
-        return change;
-    }
+
     
     public static Change createChangeStd(ChangesDb changes_db,
                                          ChangeCls type, 
@@ -52,9 +43,9 @@ public class ServerChangesUtil {
 
     public static Created_Change createCreatedChange(ChangesDb changes_db,
                                                      ChangeCls type,
+                                                     Frame applyTo,
                                                      String name,
                                                      boolean createTransaction) {
-        
         String context;
         switch (type) {
         case Class_Created:
@@ -74,12 +65,12 @@ public class ServerChangesUtil {
         }
         context = context + " Created: " + name;
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
-        applyTo.setCurrentName(name);
+        Ontology_Component oc = changes_db.getOntologyComponent(applyTo, true);
+        oc.setCurrentName(name);
         
         Created_Change change = (Created_Change) changes_db.createChange(type);
         change.setCreationName(name);
-        changes_db.finalizeChange(change, applyTo, context);
+        changes_db.finalizeChange(change, oc, context);
         if (createTransaction) {
             // Create artifical transaction for create class
             changes_db.startChangeTransaction(change);
@@ -89,7 +80,7 @@ public class ServerChangesUtil {
     
     public static Deleted_Change createDeletedChange(ChangesDb changes_db,
                                                      ChangeCls type,
-                                                     FrameID frameId,
+                                                     Frame frame,
                                                      String name) {
         String context;
         switch (type) {
@@ -110,21 +101,20 @@ public class ServerChangesUtil {
         }
         context = context + " Deleted: " + name;
 
-        Ontology_Component applyTo = changes_db.getOntologyComponent(name, true);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(frame, true);
         applyTo.setCurrentName(null);
     
         Deleted_Change change = (Deleted_Change) changes_db.createChange(type);
         change.setDeletionName(name);
         changes_db.finalizeChange(change, applyTo, context);
-        if (frameId != null) {
-            changes_db.updateDeletedFrameIdToNameMap(frameId, change);
-        }
+        changes_db.updateDeletedFrameIdToNameMap(frame.getFrameID(), change);
         return change;
     }
     
     public static Name_Changed createNameChange(ChangesDb changes_db,
-                                         String oldName,
-                                         String newName) {
+                                                Frame applyTo,
+                                                String oldName,
+                                                String newName) {
 
         StringBuffer context = new StringBuffer();
         context.append("Name change from '");
@@ -133,13 +123,13 @@ public class ServerChangesUtil {
         context.append(newName);
         context.append("'");
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(oldName, true);
-        applyTo.setCurrentName(newName);
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        applyToOc.setCurrentName(newName);
         
         Name_Changed change = (Name_Changed) changes_db.createChange(ChangeCls.Name_Changed);
         change.setOldName(oldName);
         change.setNewName(newName);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        changes_db.finalizeChange(change, applyToOc, context.toString());
         return change;
     }
                                                   
