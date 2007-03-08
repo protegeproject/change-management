@@ -30,7 +30,8 @@ public class ChangesInstanceListener implements InstanceListener{
 
         String directType = event.getInstance().getDirectType().getBrowserText();
         String directTypeName = event.getInstance().getDirectType().getName();
-        String instName = event.getInstance().getBrowserText();
+        Instance inst = event.getInstance();
+        String instName = inst.getBrowserText();
 
         StringBuffer context = new StringBuffer();
         context.append("Direct Type Added: ");
@@ -38,11 +39,8 @@ public class ChangesInstanceListener implements InstanceListener{
         context.append(" (added to: ");
         context.append(instName);
         context.append(")");
-
-        Ontology_Component applyTo = changes_db.getOntologyComponent(instName, true);
-
-        Change change = changes_db.createChange(ChangeCls.DirectType_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.DirectType_Added, inst, context.toString());
     }
 
     /* (non-Javadoc)
@@ -60,10 +58,7 @@ public class ChangesInstanceListener implements InstanceListener{
         context.append(" (removed from: ");
         context.append(instText);
         context.append(")");
-
-        Ontology_Component applyTo = changes_db.getOntologyComponent(instName, true);
-
-        Change change = changes_db.createChange(ChangeCls.DirectType_Removed);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.DirectType_Removed, event.getInstance(), context.toString());
     }
 }

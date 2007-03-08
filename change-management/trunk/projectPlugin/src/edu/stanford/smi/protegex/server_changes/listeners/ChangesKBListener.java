@@ -38,8 +38,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 */
     public void clsCreated(KnowledgeBaseEvent event) {
         Cls createdCls = event.getCls();
-        String clsName = createdCls.getName();
-        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Class_Created, clsName, true);
+        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Class_Created, createdCls, createdCls.getName(), true);
     }
 
 	/* (non-Javadoc)
@@ -50,8 +49,8 @@ public class ChangesKBListener implements KnowledgeBaseListener {
                 log.fine("In class deleted listener");
             }
             String oldName = event.getOldName();
-            FrameID frameId = event.getCls().getFrameID();
-            ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, frameId, oldName);
+            Frame frame = event.getCls();
+            ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, frame, oldName);
 	}
 
 	/* (non-Javadoc)
@@ -89,9 +88,10 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 */
 	public void frameNameChanged(KnowledgeBaseEvent event) {
 	    String oldName = event.getOldName();
-	    String newName = event.getFrame().getName();
+        Frame frame = event.getFrame();
+	    String newName = frame.getName();
 
-        ServerChangesUtil.createNameChange(changes_db, oldName, newName);
+        ServerChangesUtil.createNameChange(changes_db, frame, oldName, newName);
 	}
 
 	/* (non-Javadoc)
@@ -102,8 +102,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	        log.fine("In created instance listener");
 	    }
 	    Frame frame = event.getFrame();
-	    String name = frame.getName();
-	    ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Instance_Created, name, false);
+	    ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Instance_Created, frame, frame.getName(), false);
 	}
 
 	/* (non-Javadoc)
@@ -115,8 +114,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
         }
         Frame frame = event.getFrame();
         String name = event.getOldName();
-        FrameID frameId = frame.getFrameID();
-        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Instance_Deleted, frameId, name);
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Instance_Deleted, frame, name);
 	}
 
 	/* (non-Javadoc)
@@ -124,8 +122,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 */
 	public void slotCreated(KnowledgeBaseEvent event) {
 		Slot createdSlot = event.getSlot();
-		String slotName = createdSlot.getName();
-		ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Slot_Created, slotName, true);
+		ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Slot_Created, createdSlot, createdSlot.getName(), true);
 	}
 
 	/* (non-Javadoc)
@@ -133,7 +130,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 */
 	public void slotDeleted(KnowledgeBaseEvent event) {
         String oldName = event.getOldName();
-        FrameID frameId = event.getSlot().getFrameID();
-        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, frameId, oldName);
+        Frame frame = event.getSlot();
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, frame, oldName);
 	}
 }
