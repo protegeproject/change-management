@@ -1,13 +1,20 @@
- /*
-  * Contributor(s): Natasha Noy noy@smi.stanford.edu
+/*
+ * Contributor(s): Natasha Noy noy@smi.stanford.edu
  */
 
 package edu.stanford.smi.protegex.server_changes.prompt;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -24,100 +31,150 @@ import edu.stanford.smi.protege.util.LabeledComponent;
 import edu.stanford.smi.protege.util.SelectionListener;
 
 public class DiffUserView extends JPanel {
-  private static final long serialVersionUID = 3771686927172752103L;
-  KnowledgeBase old_kb, new_kb;
-  private DiffUserView _this;
-  private JTable _userTable = ComponentFactory.createTable (null);
-  private JSplitPane _contentPane = null;
-  private UserConceptList _concepts;
-  private AuthorManagement authorManagement;
-  
-  public DiffUserView (KnowledgeBase old_kb, KnowledgeBase new_kb) {
-      this.old_kb = old_kb;
-      this.new_kb = new_kb;
-      _concepts = new UserConceptList(old_kb, new_kb);
-   }
-   
-   public void setAuthorManagement(AuthorManagement authorManagement) {
-       this.authorManagement = authorManagement;
-       _concepts.setAuthorManagement(authorManagement);
-       initialize();
-   }
-   
-   private void initialize () {
-       _this = this;
-       initializeUserTable ();
-       _contentPane = createContentPane();
+	private static final long serialVersionUID = 3771686927172752103L;
 
-       setLayout (new BorderLayout ());
-       add (_contentPane, BorderLayout.CENTER);
-   }
-   
-   private static final String [] COLUMN_NAMES = 
-   	{"User", "Changed", "Conflicts", "Conflicts with"};
-   
-   private void initializeUserTable () {
-   	_userTable.setModel(createTableModel ());
-   	DefaultRenderer renderer = new DefaultRenderer ();
-   	for (int i = 0; i < COLUMN_NAMES.length; i++)
-   		ComponentUtilities.addColumn(_userTable, renderer);
+	private JTable _userTable = ComponentFactory.createTable (null);
 
-   }
+	private UserConceptList _concepts;
+	private AuthorManagement authorManagement;
 
-   private TableModel createTableModel () {
-       DefaultTableModel table_model = new DefaultTableModel() {
-           public boolean isCellEditable(int row, int col) {
-               return false;
-           }
-       };
-       for (int c = 0; c < COLUMN_NAMES.length; c++) {
-           table_model.addColumn (COLUMN_NAMES[c]);
-       }
+	private static final String[] COLUMN_NAMES =	{"User", "Changed", "Conflicts", "Conflicts with"};
 
-       for (String user : authorManagement.getUsers()) {
-           int conceptsNotInConflict = authorManagement.getUnConlictedFrames(user).size();
-           int conceptsInConflict = authorManagement.getConflictedFrames(user).size();
-           String conflictsWith = authorManagement.getUsersInConflictWith(user).toString();
-           table_model.addRow(new Object []{
-                   user, 
-                   new Integer (conceptsNotInConflict + conceptsInConflict), 
-                   new Integer (conceptsInConflict), 
-                   conflictsWith
-                   });
-       }
-       return table_model;
-   }
-   
-   public Collection<String> getSelection () {
-   	int[] indices = _userTable.getSelectedRows();
-   	Collection<String> selection = new ArrayList<String>();
-   	if (indices == null) return selection;
-   	TableModel model = _userTable.getModel();
-   	for (int i = 0; i < indices.length; i++) {
-   		selection.add((String) model.getValueAt(indices[i], 0));
-   	}
-   	return selection;
-   }
-   
-   private JSplitPane createContentPane () {
-   	JSplitPane result = ComponentFactory.createLeftRightSplitPane();
-   	result.setLeftComponent (new LabeledComponent ("Users with changes (select multiple rows to see changes from several users on the rigt)",
-   	                                               ComponentFactory.createScrollPane(_userTable), true));
-   	result.setRightComponent (_concepts);
-   	addSelectionListener (null);
-   	return result;
-   }
-   
+
+	public DiffUserView (KnowledgeBase old_kb, KnowledgeBase new_kb) {
+		_concepts = new UserConceptList(old_kb, new_kb);
+	}
+
+	public void setAuthorManagement(AuthorManagement authorManagement) {
+		this.authorManagement = authorManagement;
+		_concepts.setAuthorManagement(authorManagement);
+		initialize();
+	}
+
+
+	private void initialize () {       
+		setLayout(new BorderLayout());
+
+		initializeUserTable(); 
+
+		add(buildGUI(), BorderLayout.CENTER);
+	}
+
+
+	private void initializeUserTable () {
+		_userTable.setModel(createTableModel ());
+		DefaultRenderer renderer = new DefaultRenderer ();
+		for (int i = 0; i < COLUMN_NAMES.length; i++)
+			ComponentUtilities.addColumn(_userTable, renderer);
+
+	}
+
+	private TableModel createTableModel () {
+		DefaultTableModel table_model = new DefaultTableModel() {
+			public boolean isCellEditable(int row, int col) {
+				return false;
+			}
+		};
+		for (int c = 0; c < COLUMN_NAMES.length; c++) {
+			table_model.addColumn (COLUMN_NAMES[c]);
+		}
+
+		for (String user : authorManagement.getUsers()) {
+			int conceptsNotInConflict = authorManagement.getFilteredUnConflictedFrames(user).size();
+			int conceptsInConflict = authorManagement.getFilteredConflictedFrames(user).size();
+			String conflictsWith = authorManagement.getUsersInConflictWith(user).toString();
+			table_model.addRow(new Object []{
+					user, 
+					new Integer (conceptsNotInConflict + conceptsInConflict), 
+					new Integer (conceptsInConflict), 
+					conflictsWith
+			});
+		}
+		return table_model;
+	}
+
+	public Collection<String> getSelection () {
+		
+		Collection<String> selection = new ArrayList<String>();
+		
+		int[] indices = _userTable.getSelectedRows();
+		if (indices == null) {
+			return selection;
+		}
+		
+		TableModel model = _userTable.getModel();
+		for (int i = 0; i < indices.length; i++) {
+			selection.add((String) model.getValueAt(indices[i], 0));
+		}
+		
+		return selection;
+	}
+
+
+	private LabeledComponent buildGUI() {
+		JSplitPane result = ComponentFactory.createLeftRightSplitPane();
+		result.setLeftComponent (new LabeledComponent ("Users with changes (select multiple rows to see changes from several users on the rigt)",
+				ComponentFactory.createScrollPane(_userTable), true));
+		result.setRightComponent (_concepts);
+
+		addSelectionListener(null);
+		LabeledComponent listsLabeledComponent = new LabeledComponent("Changed ontology components", result, true);
+
+		listsLabeledComponent.setHeaderComponent(getHeaderCenterComponent("Show anonymous ontology components",
+				((authorManagement == null ? false : authorManagement.isShowAnonymousOntologyComponents())),
+				new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				onShowAnonymousResources(e.getSource());				
+			}
+		}));	   
+
+		return listsLabeledComponent;
+	}
+
+
 	public void addSelectionListener (SelectionListener listener) {
 		_userTable.getSelectionModel().addListSelectionListener(new ListSelectionListener () {
 			public void valueChanged(ListSelectionEvent e) {
-				_concepts.setUserList(_this.getSelection());
-  	        }
-	});
-}
-  public String toString () {
-   	return "DiffUserView";
-  }
+				_concepts.setUserList(getSelection());
+			}
+		});
+	}
+
+
+	private void onShowAnonymousResources(Object source) {
+		JCheckBox cb = (JCheckBox) source;
+
+		int[] selectedIndexes = _userTable.getSelectedRows();
+
+		authorManagement.setShowAnonymousOntologyComponents(cb.isSelected());
+
+		//reinitialize the users table
+		_userTable.setModel(createTableModel());
+		
+		for (int i = 0; i < selectedIndexes.length; i++) {
+			_userTable.addRowSelectionInterval(selectedIndexes[i], selectedIndexes[i]);
+		}
+	}	
+
+
+	private JComponent getHeaderCenterComponent(String text, boolean selected, ItemListener itemListener) {	
+		final JCheckBox showAllChanges = ComponentFactory.createCheckBox(text);
+		showAllChanges.setSelected(selected);
+
+		Font font = showAllChanges.getFont();
+		showAllChanges.setFont(font.deriveFont(Font.BOLD, font.getSize()));
+		showAllChanges.setForeground(new Color(140, 140, 140));						
+		showAllChanges.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(showAllChanges, BorderLayout.EAST);
+
+		if (itemListener != null) {
+			showAllChanges.addItemListener(itemListener);
+		}
+
+		return panel;
+	}
 
 
 }
