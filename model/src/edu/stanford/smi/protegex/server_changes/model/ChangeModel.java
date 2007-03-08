@@ -102,6 +102,7 @@ public class ChangeModel {
         changes,
         context,
         date,
+        ontology_annotation,
         sequence,
         timestamp
     }
