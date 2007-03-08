@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='ISO-8859-1'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE rdf:RDF [
 	 <!ENTITY rdf 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
 	 <!ENTITY a 'http://protege.stanford.edu/system#'>
@@ -34,15 +34,19 @@
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Annotation_Added"
 	 rdfs:label="Annotation_Added">
+	<rdfs:subClassOf rdf:resource="&kb;Annotation_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Annotation_Change"
+	 rdfs:label="Annotation_Change">
 	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Annotation_Modified"
 	 rdfs:label="Annotation_Modified">
-	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Annotation_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Annotation_Removed"
 	 rdfs:label="Annotation_Removed">
-	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Annotation_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Change"
 	 a:role="abstract"
@@ -416,6 +420,12 @@
 	 rdfs:label="oldName">
 	<rdfs:domain rdf:resource="&kb;Name_Changed"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;ontologyAnnotation"
+	 a:maxCardinality="1"
+	 rdfs:label="ontologyAnnotation">
+	<rdfs:domain rdf:resource="&kb;Annotation_Change"/>
+	<rdfs:range rdf:resource="&kb;Ontology_Component"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;partOfCompositeChange"
 	 a:maxCardinality="1"

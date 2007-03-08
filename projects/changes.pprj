@@ -1,4 +1,4 @@
-; Mon Mar 05 16:47:55 PST 2007
+; Wed Mar 07 13:03:33 PST 2007
 ; 
 ;+ (version "3.2")
 ;+ (build "Build 318")
@@ -6,21 +6,21 @@
 ([BROWSER_SLOT_NAMES] of  Property_List
 
 	(properties
-		[changes_ProjectKB_Instance_51425]
-		[changes_ProjectKB_Instance_51426]
-		[changes_ProjectKB_Instance_51427]
-		[changes_ProjectKB_Instance_51428]
-		[changes_ProjectKB_Instance_51429]
-		[changes_ProjectKB_Instance_51430]
-		[changes_ProjectKB_Instance_51431]
-		[changes_ProjectKB_Instance_51432]
-		[changes_ProjectKB_Instance_51433]))
+		[changes_ProjectKB_Instance_20014]
+		[changes_ProjectKB_Instance_20015]
+		[changes_ProjectKB_Instance_20016]
+		[changes_ProjectKB_Instance_20017]
+		[changes_ProjectKB_Instance_20018]
+		[changes_ProjectKB_Instance_20019]
+		[changes_ProjectKB_Instance_20020]
+		[changes_ProjectKB_Instance_20021]
+		[changes_ProjectKB_Instance_20022]))
 
 ([changes_ProjectKB_Instance_0] of  Widget
 
 	(is_hidden TRUE)
 	(property_list [changes_ProjectKB_Instance_1])
-	(widget_class_name "edu.stanford.smi.protege.widget.ProtegePropertiesTab"))
+	(widget_class_name "edu.stanford.smi.protege.collab.gui.collabClassesTab.CollaborativeClsesTab"))
 
 ([changes_ProjectKB_Instance_1] of  Property_List
 )
@@ -32,6 +32,30 @@
 
 ([changes_ProjectKB_Instance_100] of  Property_List
 )
+
+([changes_ProjectKB_Instance_10002] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Instance_10003])
+	(widget_class_name "edu.stanford.smi.protege.widget.ProtegePropertiesTab"))
+
+([changes_ProjectKB_Instance_10003] of  Property_List
+)
+
+([changes_ProjectKB_Instance_10004] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Instance_10005])
+	(widget_class_name "edu.stanford.smi.protegex.server_changes.prompt.DiffUserTab"))
+
+([changes_ProjectKB_Instance_10005] of  Property_List
+)
+
+([changes_ProjectKB_Instance_10006] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Instance_20007])
+	(widget_class_name "se.liu.ida.JessTab.JessTab"))
 
 ([changes_ProjectKB_Instance_10007] of  String
 
@@ -159,7 +183,7 @@
 
 ([changes_ProjectKB_Instance_10131] of  Map
 
-	(entries [changes_ProjectKB_Instance_51434]))
+	(entries [changes_ProjectKB_Instance_20023]))
 
 ([changes_ProjectKB_Instance_102] of  Property_List
 )
@@ -211,6 +235,88 @@
 	(boolean_value FALSE)
 	(name "ButtonDisplayed-View References to Value  "))
 
+([changes_ProjectKB_Instance_20007] of  Property_List
+)
+
+([changes_ProjectKB_Instance_20008] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Instance_20009])
+	(widget_class_name "edu.stanford.smi.protege.transaction.TransactionControlTab"))
+
+([changes_ProjectKB_Instance_20009] of  Property_List
+)
+
+([changes_ProjectKB_Instance_20010] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Instance_20011])
+	(widget_class_name "edu.stanford.smi.protege.server.plugin.ServerStatsPlugin"))
+
+([changes_ProjectKB_Instance_20011] of  Property_List
+)
+
+([changes_ProjectKB_Instance_20012] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Instance_20013])
+	(widget_class_name "edu.stanford.smi.protege.collab.gui.changesKBViewTab.ChangesKBViewTab"))
+
+([changes_ProjectKB_Instance_20013] of  Property_List
+)
+
+([changes_ProjectKB_Instance_20014] of  String
+
+	(name "Annotation")
+	(string_value "body"))
+
+([changes_ProjectKB_Instance_20015] of  String
+
+	(name "Timestamp")
+	(string_value "date"))
+
+([changes_ProjectKB_Instance_20016] of  String
+
+	(name "Change")
+	(string_value "context"))
+
+([changes_ProjectKB_Instance_20017] of  String
+
+	(name "Vote")
+	(string_value "voteValue"))
+
+([changes_ProjectKB_Instance_20018] of  String
+
+	(name ":INSTANCE-ANNOTATION")
+	(string_value "%3AANNOTATION-TEXT"))
+
+([changes_ProjectKB_Instance_20019] of  String
+
+	(name ":PAL-CONSTRAINT")
+	(string_value "%3APAL-NAME"))
+
+([changes_ProjectKB_Instance_20020] of  String
+
+	(name "Ontology_Component")
+	(string_value "currentName"))
+
+([changes_ProjectKB_Instance_20021] of  String
+
+	(name ":META-CLASS")
+	(string_value "%3ANAME"))
+
+([changes_ProjectKB_Instance_20022] of  String
+
+	(name "Proposal")
+	(string_value "subject"))
+
+([changes_ProjectKB_Instance_20023] of  Map_Entry
+
+	(key "annotation_proj_exists")
+	(key_class "java.lang.String")
+	(value "yes")
+	(value_class "java.lang.String"))
+
 ([changes_ProjectKB_Instance_20070] of  Property_List
 )
 
@@ -253,16 +359,6 @@
 
 ([changes_ProjectKB_Instance_20083] of  Property_List
 )
-
-([changes_ProjectKB_Instance_20336] of  Boolean
-
-	(boolean_value FALSE)
-	(name "ButtonDisplayed-View References to Value"))
-
-([changes_ProjectKB_Instance_20337] of  Boolean
-
-	(boolean_value FALSE)
-	(name "ButtonDisplayed-Delete Instance"))
 
 ([changes_ProjectKB_Instance_30018] of  Widget
 
@@ -381,20 +477,6 @@
 		[changes_ProjectKB_Instance_50714]
 		[changes_ProjectKB_Instance_50718]
 		[changes_ProjectKB_Instance_50720]))
-
-([changes_ProjectKB_Instance_40059] of  Widget
-
-	(height 60)
-	(is_hidden FALSE)
-	(name "type")
-	(property_list [changes_ProjectKB_Instance_40060])
-	(widget_class_name "edu.stanford.smi.protege.widget.TextFieldWidget")
-	(width 200)
-	(x 210)
-	(y 220))
-
-([changes_ProjectKB_Instance_40060] of  Property_List
-)
 
 ([changes_ProjectKB_Instance_43] of  Widget
 
@@ -2214,58 +2296,6 @@
 	(name "vertical_stretcher")
 	(string_value "<<all>>"))
 
-([changes_ProjectKB_Instance_51425] of  String
-
-	(name "Proposal")
-	(string_value "subject"))
-
-([changes_ProjectKB_Instance_51426] of  String
-
-	(name "Timestamp")
-	(string_value "date"))
-
-([changes_ProjectKB_Instance_51427] of  String
-
-	(name "Annotation")
-	(string_value "body"))
-
-([changes_ProjectKB_Instance_51428] of  String
-
-	(name "Vote")
-	(string_value "voteValue"))
-
-([changes_ProjectKB_Instance_51429] of  String
-
-	(name ":INSTANCE-ANNOTATION")
-	(string_value "%3AANNOTATION-TEXT"))
-
-([changes_ProjectKB_Instance_51430] of  String
-
-	(name ":PAL-CONSTRAINT")
-	(string_value "%3APAL-NAME"))
-
-([changes_ProjectKB_Instance_51431] of  String
-
-	(name "Ontology_Component")
-	(string_value "currentName"))
-
-([changes_ProjectKB_Instance_51432] of  String
-
-	(name "Change")
-	(string_value "context"))
-
-([changes_ProjectKB_Instance_51433] of  String
-
-	(name ":META-CLASS")
-	(string_value "%3ANAME"))
-
-([changes_ProjectKB_Instance_51434] of  Map_Entry
-
-	(key "annotation_proj_exists")
-	(key_class "java.lang.String")
-	(value "yes")
-	(value_class "java.lang.String"))
-
 ([changes_ProjectKB_Instance_52] of  Property_List
 )
 
@@ -2429,307 +2459,6 @@
 	(property_list [changes_ProjectKB_Instance_50575])
 	(widget_class_name "edu.stanford.smi.protege.widget.FormWidget"))
 
-([changes_ProjectKB_Instance_80903] of  Widget
-
-	(height 60)
-	(is_hidden FALSE)
-	(name "created")
-	(property_list [changes_ProjectKB_Instance_80904])
-	(widget_class_name "edu.stanford.smi.protege.widget.TextFieldWidget")
-	(width 200)
-	(x 0)
-	(y 320))
-
-([changes_ProjectKB_Instance_80904] of  Property_List
-)
-
-([changes_ProjectKB_Instance_80909] of  Widget
-
-	(height 60)
-	(is_hidden FALSE)
-	(name "modified")
-	(property_list [changes_ProjectKB_Instance_80910])
-	(widget_class_name "edu.stanford.smi.protege.widget.TextFieldWidget")
-	(width 200)
-	(x 200)
-	(y 320))
-
-([changes_ProjectKB_Instance_80910] of  Property_List
-)
-
-([changes_ProjectKB_Instance_80918] of  Widget
-
-	(height 120)
-	(is_hidden FALSE)
-	(label "Associated Annotations")
-	(name "assoc_annotations")
-	(property_list [changes_ProjectKB_Instance_80919])
-	(widget_class_name "edu.stanford.smi.protegex.widget.instancetable.InstanceTableWidget")
-	(width 380)
-	(x 0)
-	(y 370))
-
-([changes_ProjectKB_Instance_80919] of  Property_List
-
-	(properties
-		[changes_ProjectKB_Instance_80920]
-		[changes_ProjectKB_Instance_80921]
-		[changes_ProjectKB_Instance_80922]
-		[changes_ProjectKB_Instance_80923]
-		[changes_ProjectKB_Instance_80924]
-		[changes_ProjectKB_Instance_80925]
-		[changes_ProjectKB_Instance_80926]
-		[changes_ProjectKB_Instance_80927]
-		[changes_ProjectKB_Instance_80928]
-		[changes_ProjectKB_Instance_80929]
-		[changes_ProjectKB_Instance_80930]
-		[changes_ProjectKB_Instance_80931]
-		[changes_ProjectKB_Instance_80932]
-		[changes_ProjectKB_Instance_80933]
-		[changes_ProjectKB_Instance_80934]
-		[changes_ProjectKB_Instance_80935]
-		[changes_ProjectKB_Instance_80936]
-		[changes_ProjectKB_Instance_80937]
-		[changes_ProjectKB_Instance_80938]
-		[changes_ProjectKB_Instance_80939]
-		[changes_ProjectKB_Instance_80940]
-		[changes_ProjectKB_Instance_80941]
-		[changes_ProjectKB_Instance_80942]
-		[changes_ProjectKB_Instance_80943]
-		[changes_ProjectKB_Instance_80944]
-		[changes_ProjectKB_Instance_80945]
-		[changes_ProjectKB_Instance_80946]
-		[changes_ProjectKB_Instance_80947]
-		[changes_ProjectKB_Instance_80948]
-		[changes_ProjectKB_Instance_80949]
-		[changes_ProjectKB_Instance_80950]
-		[changes_ProjectKB_Instance_80951]
-		[changes_ProjectKB_Instance_80952]
-		[changes_ProjectKB_Instance_80953]
-		[changes_ProjectKB_Instance_80954]
-		[changes_ProjectKB_Instance_80955]
-		[changes_ProjectKB_Instance_80956]
-		[changes_ProjectKB_Instance_80960]
-		[changes_ProjectKB_Instance_80961]
-		[changes_ProjectKB_Instance_80962]))
-
-([changes_ProjectKB_Instance_80920] of  String
-
-	(name "tooltip_text"))
-
-([changes_ProjectKB_Instance_80921] of  String
-
-	(name ":COLUMN:NAME:DESCRIPTORcreated")
-	(string_value "created"))
-
-([changes_ProjectKB_Instance_80922] of  Integer
-
-	(integer_value -16777216)
-	(name ":COLOR:RGB:DESCRIPTORcreated"))
-
-([changes_ProjectKB_Instance_80923] of  Integer
-
-	(integer_value 20)
-	(name ":PREFERRED:SIZE:DESCRIPTORcreated"))
-
-([changes_ProjectKB_Instance_80924] of  String
-
-	(name ":COLUMN:NAME:DESCRIPTORauthor")
-	(string_value "author"))
-
-([changes_ProjectKB_Instance_80925] of  Integer
-
-	(integer_value -16777216)
-	(name ":COLOR:RGB:DESCRIPTORauthor"))
-
-([changes_ProjectKB_Instance_80926] of  Integer
-
-	(integer_value 20)
-	(name ":PREFERRED:SIZE:DESCRIPTORauthor"))
-
-([changes_ProjectKB_Instance_80927] of  String
-
-	(name ":COLUMN:NAME:DESCRIPTORcontext")
-	(string_value "context"))
-
-([changes_ProjectKB_Instance_80928] of  Integer
-
-	(integer_value -16777216)
-	(name ":COLOR:RGB:DESCRIPTORcontext"))
-
-([changes_ProjectKB_Instance_80929] of  Integer
-
-	(integer_value 20)
-	(name ":PREFERRED:SIZE:DESCRIPTORcontext"))
-
-([changes_ProjectKB_Instance_80930] of  Integer
-
-	(integer_value 3)
-	(name ":Number:Of:Visible:Slots"))
-
-([changes_ProjectKB_Instance_80931] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Automatically:Select:Insertions"))
-
-([changes_ProjectKB_Instance_80932] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Create:Form:For:New:Instances"))
-
-([changes_ProjectKB_Instance_80933] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":HighLight:Selected:Row"))
-
-([changes_ProjectKB_Instance_80934] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Edit:In:Place"))
-
-([changes_ProjectKB_Instance_80935] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Use:Dialog:To:Select:Instances"))
-
-([changes_ProjectKB_Instance_80936] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Use:Dialog:To:Select:Classes"))
-
-([changes_ProjectKB_Instance_80937] of  String
-
-	(name ":Dialog:Title:For:Selecting:Instances")
-	(string_value "Select an instance"))
-
-([changes_ProjectKB_Instance_80938] of  String
-
-	(name ":Dialog:Title:For:Selecting:Classes")
-	(string_value "Select a class"))
-
-([changes_ProjectKB_Instance_80939] of  Integer
-
-	(integer_value 1)
-	(name ":Prototype:Depth"))
-
-([changes_ProjectKB_Instance_80940] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:Create:Instance:Button"))
-
-([changes_ProjectKB_Instance_80941] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:Add:Instance:Button"))
-
-([changes_ProjectKB_Instance_80942] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:View:Instance:Button"))
-
-([changes_ProjectKB_Instance_80943] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:Remove:Instance:Button"))
-
-([changes_ProjectKB_Instance_80944] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Display:Delete:Instance:Button"))
-
-([changes_ProjectKB_Instance_80945] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Display:Prototype:Button"))
-
-([changes_ProjectKB_Instance_80946] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Display:Move:Instance:Buttons"))
-
-([changes_ProjectKB_Instance_80947] of  String
-
-	(name ":Create:Instance:Button:Tooltip")
-	(string_value "Create a new instance"))
-
-([changes_ProjectKB_Instance_80948] of  String
-
-	(name ":Add:Instance:Button:Tooltip")
-	(string_value "Select an already existing instance"))
-
-([changes_ProjectKB_Instance_80949] of  String
-
-	(name ":View:Instance:Button:Tooltip")
-	(string_value "View the selected instance"))
-
-([changes_ProjectKB_Instance_80950] of  String
-
-	(name ":Remove:Instance:Button:Tooltip")
-	(string_value "Remove the selected instance(s)"))
-
-([changes_ProjectKB_Instance_80951] of  String
-
-	(name ":Delete:Instance:Button:Tooltip")
-	(string_value "Delete the selected instance(s) from the knowledge base"))
-
-([changes_ProjectKB_Instance_80952] of  String
-
-	(name ":Prototype:Button:Tooltip")
-	(string_value "Create a new instance which is a duplicate of the selected instance"))
-
-([changes_ProjectKB_Instance_80953] of  String
-
-	(name ":Move:Instance:Buttons:Tooltip")
-	(string_value "Move the selected instance"))
-
-([changes_ProjectKB_Instance_80954] of  String
-
-	(name ":Create:Instance:Dialog:Title")
-	(string_value "Create a new instance"))
-
-([changes_ProjectKB_Instance_80955] of  String
-
-	(name ":Add:Instance:Dialog:Title")
-	(string_value "Select an already existing instance"))
-
-([changes_ProjectKB_Instance_80956] of  Property_List
-
-	(name ":Visible:Slot:List")
-	(properties
-		[changes_ProjectKB_Instance_80957]
-		[changes_ProjectKB_Instance_80958]
-		[changes_ProjectKB_Instance_80959]))
-
-([changes_ProjectKB_Instance_80957] of  String
-
-	(name "created")
-	(string_value "created"))
-
-([changes_ProjectKB_Instance_80958] of  String
-
-	(name "author")
-	(string_value "author"))
-
-([changes_ProjectKB_Instance_80959] of  String
-
-	(name "context")
-	(string_value "context"))
-
-([changes_ProjectKB_Instance_80960] of  String
-
-	(name ":Visible:Slot:Index0")
-	(string_value "author"))
-
-([changes_ProjectKB_Instance_80961] of  String
-
-	(name ":Visible:Slot:Index1")
-	(string_value "created"))
-
-([changes_ProjectKB_Instance_80962] of  String
-
-	(name ":Visible:Slot:Index2")
-	(string_value "context"))
-
 ([changes_ProjectKB_Instance_81] of  Widget
 
 	(is_hidden TRUE)
@@ -2751,52 +2480,6 @@
 		[changes_ProjectKB_Instance_51408]
 		[changes_ProjectKB_Instance_51412]))
 
-([changes_ProjectKB_Instance_81828] of  Widget
-
-	(height 60)
-	(is_hidden FALSE)
-	(name "created")
-	(property_list [changes_ProjectKB_Instance_81829])
-	(widget_class_name "edu.stanford.smi.protege.widget.TextFieldWidget")
-	(width 200)
-	(x 200)
-	(y 200))
-
-([changes_ProjectKB_Instance_81829] of  Property_List
-)
-
-([changes_ProjectKB_Instance_81834] of  Widget
-
-	(height 60)
-	(is_hidden FALSE)
-	(name "modified")
-	(property_list [changes_ProjectKB_Instance_81835])
-	(widget_class_name "edu.stanford.smi.protege.widget.TextFieldWidget")
-	(width 200)
-	(x 0)
-	(y 590))
-
-([changes_ProjectKB_Instance_81835] of  Property_List
-)
-
-([changes_ProjectKB_Instance_81843] of  Widget
-
-	(height 120)
-	(is_hidden FALSE)
-	(label "Associated Annotations")
-	(name "assoc_annotations")
-	(property_list [changes_ProjectKB_Instance_81844])
-	(widget_class_name "edu.stanford.smi.protege.widget.DirectInstancesWidget")
-	(width 400)
-	(x 0)
-	(y 290))
-
-([changes_ProjectKB_Instance_81844] of  Property_List
-
-	(properties
-		[changes_ProjectKB_Instance_20336]
-		[changes_ProjectKB_Instance_20337]))
-
 ([changes_ProjectKB_Instance_82] of  Property_List
 )
 
@@ -2807,640 +2490,11 @@
 	(property_list [changes_ProjectKB_Instance_50827])
 	(widget_class_name "edu.stanford.smi.protege.widget.FormWidget"))
 
-([changes_ProjectKB_Instance_82931] of  Widget
-
-	(height 60)
-	(is_hidden FALSE)
-	(name "type")
-	(property_list [changes_ProjectKB_Instance_82932])
-	(widget_class_name "edu.stanford.smi.protege.widget.TextFieldWidget")
-	(width 200)
-	(x 210)
-	(y 220))
-
-([changes_ProjectKB_Instance_82932] of  Property_List
-)
-
-([changes_ProjectKB_Instance_82933] of  Widget
-
-	(height 120)
-	(is_hidden FALSE)
-	(name "action")
-	(property_list [changes_ProjectKB_Instance_82934])
-	(widget_class_name "edu.stanford.smi.protege.widget.StringListWidget")
-	(width 200)
-	(x 210)
-	(y 360))
-
-([changes_ProjectKB_Instance_82934] of  Property_List
-)
-
-([changes_ProjectKB_Instance_82939] of  Widget
-
-	(height 60)
-	(is_hidden FALSE)
-	(name "created")
-	(property_list [changes_ProjectKB_Instance_82940])
-	(widget_class_name "edu.stanford.smi.protege.widget.TextFieldWidget")
-	(width 200)
-	(x 210)
-	(y 290))
-
-([changes_ProjectKB_Instance_82940] of  Property_List
-)
-
-([changes_ProjectKB_Instance_82941] of  Widget
-
-	(height 120)
-	(is_hidden FALSE)
-	(label "Associated Annotations")
-	(name "assoc_annotations")
-	(property_list [changes_ProjectKB_Instance_82942])
-	(widget_class_name "edu.stanford.smi.protegex.widget.instancetable.InstanceTableWidget")
-	(width 410)
-	(x 0)
-	(y 90))
-
-([changes_ProjectKB_Instance_82942] of  Property_List
-
-	(properties
-		[changes_ProjectKB_Instance_82943]
-		[changes_ProjectKB_Instance_82944]
-		[changes_ProjectKB_Instance_82945]
-		[changes_ProjectKB_Instance_82946]
-		[changes_ProjectKB_Instance_82947]
-		[changes_ProjectKB_Instance_82948]
-		[changes_ProjectKB_Instance_82949]
-		[changes_ProjectKB_Instance_82950]
-		[changes_ProjectKB_Instance_82951]
-		[changes_ProjectKB_Instance_82952]
-		[changes_ProjectKB_Instance_82953]
-		[changes_ProjectKB_Instance_82954]
-		[changes_ProjectKB_Instance_82955]
-		[changes_ProjectKB_Instance_82956]
-		[changes_ProjectKB_Instance_82957]
-		[changes_ProjectKB_Instance_82958]
-		[changes_ProjectKB_Instance_82959]
-		[changes_ProjectKB_Instance_82960]
-		[changes_ProjectKB_Instance_82961]
-		[changes_ProjectKB_Instance_82962]
-		[changes_ProjectKB_Instance_82963]
-		[changes_ProjectKB_Instance_82964]
-		[changes_ProjectKB_Instance_82965]
-		[changes_ProjectKB_Instance_82966]
-		[changes_ProjectKB_Instance_82967]
-		[changes_ProjectKB_Instance_82968]
-		[changes_ProjectKB_Instance_82969]
-		[changes_ProjectKB_Instance_82970]
-		[changes_ProjectKB_Instance_82971]
-		[changes_ProjectKB_Instance_82972]
-		[changes_ProjectKB_Instance_82973]
-		[changes_ProjectKB_Instance_82974]
-		[changes_ProjectKB_Instance_82975]
-		[changes_ProjectKB_Instance_82976]
-		[changes_ProjectKB_Instance_82977]
-		[changes_ProjectKB_Instance_82978]
-		[changes_ProjectKB_Instance_82979]
-		[changes_ProjectKB_Instance_82983]
-		[changes_ProjectKB_Instance_82984]
-		[changes_ProjectKB_Instance_82985]))
-
-([changes_ProjectKB_Instance_82943] of  String
-
-	(name "tooltip_text"))
-
-([changes_ProjectKB_Instance_82944] of  String
-
-	(name ":COLUMN:NAME:DESCRIPTORcreated")
-	(string_value "created"))
-
-([changes_ProjectKB_Instance_82945] of  Integer
-
-	(integer_value -16777216)
-	(name ":COLOR:RGB:DESCRIPTORcreated"))
-
-([changes_ProjectKB_Instance_82946] of  Integer
-
-	(integer_value 20)
-	(name ":PREFERRED:SIZE:DESCRIPTORcreated"))
-
-([changes_ProjectKB_Instance_82947] of  String
-
-	(name ":COLUMN:NAME:DESCRIPTORauthor")
-	(string_value "author"))
-
-([changes_ProjectKB_Instance_82948] of  Integer
-
-	(integer_value -16777216)
-	(name ":COLOR:RGB:DESCRIPTORauthor"))
-
-([changes_ProjectKB_Instance_82949] of  Integer
-
-	(integer_value 20)
-	(name ":PREFERRED:SIZE:DESCRIPTORauthor"))
-
-([changes_ProjectKB_Instance_82950] of  String
-
-	(name ":COLUMN:NAME:DESCRIPTORcontext")
-	(string_value "context"))
-
-([changes_ProjectKB_Instance_82951] of  Integer
-
-	(integer_value -16777216)
-	(name ":COLOR:RGB:DESCRIPTORcontext"))
-
-([changes_ProjectKB_Instance_82952] of  Integer
-
-	(integer_value 20)
-	(name ":PREFERRED:SIZE:DESCRIPTORcontext"))
-
-([changes_ProjectKB_Instance_82953] of  Integer
-
-	(integer_value 3)
-	(name ":Number:Of:Visible:Slots"))
-
-([changes_ProjectKB_Instance_82954] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Automatically:Select:Insertions"))
-
-([changes_ProjectKB_Instance_82955] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Create:Form:For:New:Instances"))
-
-([changes_ProjectKB_Instance_82956] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":HighLight:Selected:Row"))
-
-([changes_ProjectKB_Instance_82957] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Edit:In:Place"))
-
-([changes_ProjectKB_Instance_82958] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Use:Dialog:To:Select:Instances"))
-
-([changes_ProjectKB_Instance_82959] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Use:Dialog:To:Select:Classes"))
-
-([changes_ProjectKB_Instance_82960] of  String
-
-	(name ":Dialog:Title:For:Selecting:Instances")
-	(string_value "Select an instance"))
-
-([changes_ProjectKB_Instance_82961] of  String
-
-	(name ":Dialog:Title:For:Selecting:Classes")
-	(string_value "Select a class"))
-
-([changes_ProjectKB_Instance_82962] of  Integer
-
-	(integer_value 1)
-	(name ":Prototype:Depth"))
-
-([changes_ProjectKB_Instance_82963] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:Create:Instance:Button"))
-
-([changes_ProjectKB_Instance_82964] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:Add:Instance:Button"))
-
-([changes_ProjectKB_Instance_82965] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:View:Instance:Button"))
-
-([changes_ProjectKB_Instance_82966] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:Remove:Instance:Button"))
-
-([changes_ProjectKB_Instance_82967] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Display:Delete:Instance:Button"))
-
-([changes_ProjectKB_Instance_82968] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Display:Prototype:Button"))
-
-([changes_ProjectKB_Instance_82969] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Display:Move:Instance:Buttons"))
-
-([changes_ProjectKB_Instance_82970] of  String
-
-	(name ":Create:Instance:Button:Tooltip")
-	(string_value "Create a new instance"))
-
-([changes_ProjectKB_Instance_82971] of  String
-
-	(name ":Add:Instance:Button:Tooltip")
-	(string_value "Select an already existing instance"))
-
-([changes_ProjectKB_Instance_82972] of  String
-
-	(name ":View:Instance:Button:Tooltip")
-	(string_value "View the selected instance"))
-
-([changes_ProjectKB_Instance_82973] of  String
-
-	(name ":Remove:Instance:Button:Tooltip")
-	(string_value "Remove the selected instance(s)"))
-
-([changes_ProjectKB_Instance_82974] of  String
-
-	(name ":Delete:Instance:Button:Tooltip")
-	(string_value "Delete the selected instance(s) from the knowledge base"))
-
-([changes_ProjectKB_Instance_82975] of  String
-
-	(name ":Prototype:Button:Tooltip")
-	(string_value "Create a new instance which is a duplicate of the selected instance"))
-
-([changes_ProjectKB_Instance_82976] of  String
-
-	(name ":Move:Instance:Buttons:Tooltip")
-	(string_value "Move the selected instance"))
-
-([changes_ProjectKB_Instance_82977] of  String
-
-	(name ":Create:Instance:Dialog:Title")
-	(string_value "Create a new instance"))
-
-([changes_ProjectKB_Instance_82978] of  String
-
-	(name ":Add:Instance:Dialog:Title")
-	(string_value "Select an already existing instance"))
-
-([changes_ProjectKB_Instance_82979] of  Property_List
-
-	(name ":Visible:Slot:List")
-	(properties
-		[changes_ProjectKB_Instance_82980]
-		[changes_ProjectKB_Instance_82981]
-		[changes_ProjectKB_Instance_82982]))
-
-([changes_ProjectKB_Instance_82980] of  String
-
-	(name "created")
-	(string_value "created"))
-
-([changes_ProjectKB_Instance_82981] of  String
-
-	(name "author")
-	(string_value "author"))
-
-([changes_ProjectKB_Instance_82982] of  String
-
-	(name "context")
-	(string_value "context"))
-
-([changes_ProjectKB_Instance_82983] of  String
-
-	(name ":Visible:Slot:Index0")
-	(string_value "author"))
-
-([changes_ProjectKB_Instance_82984] of  String
-
-	(name ":Visible:Slot:Index1")
-	(string_value "created"))
-
-([changes_ProjectKB_Instance_82985] of  String
-
-	(name ":Visible:Slot:Index2")
-	(string_value "context"))
-
-([changes_ProjectKB_Instance_82986] of  Widget
-
-	(height 60)
-	(is_hidden FALSE)
-	(name "applyTo")
-	(property_list [changes_ProjectKB_Instance_82987])
-	(widget_class_name "edu.stanford.smi.protege.widget.TextFieldWidget")
-	(width 200)
-	(x 0)
-	(y 220))
-
-([changes_ProjectKB_Instance_82987] of  Property_List
-)
-
-([changes_ProjectKB_Instance_82988] of  Widget
-
-	(height 120)
-	(is_hidden FALSE)
-	(name "part_of_Transaction")
-	(property_list [changes_ProjectKB_Instance_82989])
-	(widget_class_name "edu.stanford.smi.protege.widget.InstanceListWidget")
-	(width 200)
-	(x 0)
-	(y 360))
-
-([changes_ProjectKB_Instance_82989] of  Property_List
-
-	(properties
-		[changes_ProjectKB_Instance_82990]
-		[changes_ProjectKB_Instance_82991]))
-
-([changes_ProjectKB_Instance_82990] of  Boolean
-
-	(boolean_value FALSE)
-	(name "ButtonDisplayed-View References to Value"))
-
-([changes_ProjectKB_Instance_82991] of  Boolean
-
-	(boolean_value FALSE)
-	(name "ButtonDisplayed-Delete Instance"))
-
-([changes_ProjectKB_Instance_82992] of  Widget
-
-	(height 120)
-	(is_hidden FALSE)
-	(label "Changes")
-	(name "Changes")
-	(property_list [changes_ProjectKB_Instance_82993])
-	(widget_class_name "edu.stanford.smi.protegex.widget.instancetable.InstanceTableWidget")
-	(width 410)
-	(x 0)
-	(y 480))
-
-([changes_ProjectKB_Instance_82993] of  Property_List
-
-	(properties
-		[changes_ProjectKB_Instance_82996]
-		[changes_ProjectKB_Instance_82998]
-		[changes_ProjectKB_Instance_82999]
-		[changes_ProjectKB_Instance_83000]
-		[changes_ProjectKB_Instance_83002]
-		[changes_ProjectKB_Instance_83003]
-		[changes_ProjectKB_Instance_83004]
-		[changes_ProjectKB_Instance_83006]
-		[changes_ProjectKB_Instance_83007]
-		[changes_ProjectKB_Instance_83008]
-		[changes_ProjectKB_Instance_83010]
-		[changes_ProjectKB_Instance_83014]
-		[changes_ProjectKB_Instance_83015]
-		[changes_ProjectKB_Instance_83016]
-		[changes_ProjectKB_Instance_83017]
-		[changes_ProjectKB_Instance_83018]
-		[changes_ProjectKB_Instance_83019]
-		[changes_ProjectKB_Instance_83020]
-		[changes_ProjectKB_Instance_83021]
-		[changes_ProjectKB_Instance_83022]
-		[changes_ProjectKB_Instance_83023]
-		[changes_ProjectKB_Instance_83024]
-		[changes_ProjectKB_Instance_83025]
-		[changes_ProjectKB_Instance_83026]
-		[changes_ProjectKB_Instance_83027]
-		[changes_ProjectKB_Instance_83028]
-		[changes_ProjectKB_Instance_83029]
-		[changes_ProjectKB_Instance_83030]
-		[changes_ProjectKB_Instance_83031]
-		[changes_ProjectKB_Instance_83032]
-		[changes_ProjectKB_Instance_83033]
-		[changes_ProjectKB_Instance_83034]
-		[changes_ProjectKB_Instance_83035]
-		[changes_ProjectKB_Instance_83036]
-		[changes_ProjectKB_Instance_83037]
-		[changes_ProjectKB_Instance_83038]
-		[changes_ProjectKB_Instance_83053]
-		[changes_ProjectKB_Instance_83057]
-		[changes_ProjectKB_Instance_83058]
-		[changes_ProjectKB_Instance_83059]))
-
-([changes_ProjectKB_Instance_82996] of  String
-
-	(name "tooltip_text"))
-
-([changes_ProjectKB_Instance_82998] of  String
-
-	(name ":COLUMN:NAME:DESCRIPTORcreated")
-	(string_value "created"))
-
-([changes_ProjectKB_Instance_82999] of  Integer
-
-	(integer_value -16777216)
-	(name ":COLOR:RGB:DESCRIPTORcreated"))
-
 ([changes_ProjectKB_Instance_83] of  Widget
 
 	(is_hidden TRUE)
 	(property_list [changes_ProjectKB_Instance_84])
 	(widget_class_name "edu.stanford.smi.protege.widget.instance_tree.KnowledgeTreeTab"))
-
-([changes_ProjectKB_Instance_83000] of  Integer
-
-	(integer_value 20)
-	(name ":PREFERRED:SIZE:DESCRIPTORcreated"))
-
-([changes_ProjectKB_Instance_83002] of  String
-
-	(name ":COLUMN:NAME:DESCRIPTORauthor")
-	(string_value "author"))
-
-([changes_ProjectKB_Instance_83003] of  Integer
-
-	(integer_value -16777216)
-	(name ":COLOR:RGB:DESCRIPTORauthor"))
-
-([changes_ProjectKB_Instance_83004] of  Integer
-
-	(integer_value 20)
-	(name ":PREFERRED:SIZE:DESCRIPTORauthor"))
-
-([changes_ProjectKB_Instance_83006] of  String
-
-	(name ":COLUMN:NAME:DESCRIPTORcontext")
-	(string_value "context"))
-
-([changes_ProjectKB_Instance_83007] of  Integer
-
-	(integer_value -16777216)
-	(name ":COLOR:RGB:DESCRIPTORcontext"))
-
-([changes_ProjectKB_Instance_83008] of  Integer
-
-	(integer_value 20)
-	(name ":PREFERRED:SIZE:DESCRIPTORcontext"))
-
-([changes_ProjectKB_Instance_83010] of  Integer
-
-	(integer_value 3)
-	(name ":Number:Of:Visible:Slots"))
-
-([changes_ProjectKB_Instance_83014] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Automatically:Select:Insertions"))
-
-([changes_ProjectKB_Instance_83015] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Create:Form:For:New:Instances"))
-
-([changes_ProjectKB_Instance_83016] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":HighLight:Selected:Row"))
-
-([changes_ProjectKB_Instance_83017] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Edit:In:Place"))
-
-([changes_ProjectKB_Instance_83018] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Use:Dialog:To:Select:Instances"))
-
-([changes_ProjectKB_Instance_83019] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Use:Dialog:To:Select:Classes"))
-
-([changes_ProjectKB_Instance_83020] of  String
-
-	(name ":Dialog:Title:For:Selecting:Instances")
-	(string_value "Select an instance"))
-
-([changes_ProjectKB_Instance_83021] of  String
-
-	(name ":Dialog:Title:For:Selecting:Classes")
-	(string_value "Select a class"))
-
-([changes_ProjectKB_Instance_83022] of  Integer
-
-	(integer_value 1)
-	(name ":Prototype:Depth"))
-
-([changes_ProjectKB_Instance_83023] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:Create:Instance:Button"))
-
-([changes_ProjectKB_Instance_83024] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:Add:Instance:Button"))
-
-([changes_ProjectKB_Instance_83025] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:View:Instance:Button"))
-
-([changes_ProjectKB_Instance_83026] of  Boolean
-
-	(boolean_value TRUE)
-	(name ":Display:Remove:Instance:Button"))
-
-([changes_ProjectKB_Instance_83027] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Display:Delete:Instance:Button"))
-
-([changes_ProjectKB_Instance_83028] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Display:Prototype:Button"))
-
-([changes_ProjectKB_Instance_83029] of  Boolean
-
-	(boolean_value FALSE)
-	(name ":Display:Move:Instance:Buttons"))
-
-([changes_ProjectKB_Instance_83030] of  String
-
-	(name ":Create:Instance:Button:Tooltip")
-	(string_value "Create a new instance"))
-
-([changes_ProjectKB_Instance_83031] of  String
-
-	(name ":Add:Instance:Button:Tooltip")
-	(string_value "Select an already existing instance"))
-
-([changes_ProjectKB_Instance_83032] of  String
-
-	(name ":View:Instance:Button:Tooltip")
-	(string_value "View the selected instance"))
-
-([changes_ProjectKB_Instance_83033] of  String
-
-	(name ":Remove:Instance:Button:Tooltip")
-	(string_value "Remove the selected instance(s)"))
-
-([changes_ProjectKB_Instance_83034] of  String
-
-	(name ":Delete:Instance:Button:Tooltip")
-	(string_value "Delete the selected instance(s) from the knowledge base"))
-
-([changes_ProjectKB_Instance_83035] of  String
-
-	(name ":Prototype:Button:Tooltip")
-	(string_value "Create a new instance which is a duplicate of the selected instance"))
-
-([changes_ProjectKB_Instance_83036] of  String
-
-	(name ":Move:Instance:Buttons:Tooltip")
-	(string_value "Move the selected instance"))
-
-([changes_ProjectKB_Instance_83037] of  String
-
-	(name ":Create:Instance:Dialog:Title")
-	(string_value "Create a new instance"))
-
-([changes_ProjectKB_Instance_83038] of  String
-
-	(name ":Add:Instance:Dialog:Title")
-	(string_value "Select an already existing instance"))
-
-([changes_ProjectKB_Instance_83053] of  Property_List
-
-	(name ":Visible:Slot:List")
-	(properties
-		[changes_ProjectKB_Instance_83054]
-		[changes_ProjectKB_Instance_83055]
-		[changes_ProjectKB_Instance_83056]))
-
-([changes_ProjectKB_Instance_83054] of  String
-
-	(name "created")
-	(string_value "created"))
-
-([changes_ProjectKB_Instance_83055] of  String
-
-	(name "author")
-	(string_value "author"))
-
-([changes_ProjectKB_Instance_83056] of  String
-
-	(name "context")
-	(string_value "context"))
-
-([changes_ProjectKB_Instance_83057] of  String
-
-	(name ":Visible:Slot:Index0")
-	(string_value "author"))
-
-([changes_ProjectKB_Instance_83058] of  String
-
-	(name ":Visible:Slot:Index1")
-	(string_value "created"))
-
-([changes_ProjectKB_Instance_83059] of  String
-
-	(name ":Visible:Slot:Index2")
-	(string_value "context"))
 
 ([changes_ProjectKB_Instance_84] of  Property_List
 )
@@ -3977,22 +3031,22 @@
 
 	(browser_slot_names [BROWSER_SLOT_NAMES])
 	(customized_instance_widgets
-		[changes_ProjectKB_Instance_82926]
 		[STANDARD_SLOT_FORM_WIDGET]
-		[changes_ProjectKB_Instance_81267]
-		[changes_ProjectKB_Instance_40056]
-		[STANDARD_CLASS_FORM_WIDGET]
-		[changes_ProjectKB_Instance_51393]
-		[changes_ProjectKB_Instance_80822]
-		[changes_ProjectKB_Instance_51020]
-		[changes_ProjectKB_Instance_16]
-		[changes_ProjectKB_Instance_50648]
-		[PAL_FORM_WIDGET]
-		[changes_ProjectKB_Instance_50854]
-		[changes_ProjectKB_Instance_80535]
 		[changes_ProjectKB_Instance_51308]
+		[changes_ProjectKB_Instance_51393]
+		[changes_ProjectKB_Instance_40056]
+		[changes_ProjectKB_Instance_51020]
+		[PAL_FORM_WIDGET]
+		[changes_ProjectKB_Instance_81267]
+		[changes_ProjectKB_Instance_80535]
+		[changes_ProjectKB_Instance_16]
+		[STANDARD_CLASS_FORM_WIDGET]
 		[STANDARD_FACET_FORM_WIDGET]
-		[INSTANCE_ANNOTATION_FORM_WIDGET])
+		[changes_ProjectKB_Instance_50648]
+		[changes_ProjectKB_Instance_80822]
+		[changes_ProjectKB_Instance_82926]
+		[INSTANCE_ANNOTATION_FORM_WIDGET]
+		[changes_ProjectKB_Instance_50854])
 	(default_cls_metaclass ":STANDARD-CLASS")
 	(default_facet_metaclass ":STANDARD-FACET")
 	(default_instance_widget_class_name "edu.stanford.smi.protege.widget.FormWidget")
