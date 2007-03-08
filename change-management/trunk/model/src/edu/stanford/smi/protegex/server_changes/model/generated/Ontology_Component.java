@@ -1,5 +1,5 @@
 
-// Created on Mon Mar 05 12:16:44 PST 2007
+// Created on Wed Mar 07 13:03:39 PST 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -61,15 +61,26 @@ public class Ontology_Component extends AnnotatableThing {
             return Status.UNCHANGED;
         }
         else {
-            Change first_change = (Change) changes.get(0);
-            Change last_change = (Change) changes.get(changes.size() - 1);
-            if (first_change instanceof Created_Change && last_change instanceof Deleted_Change) {
+            boolean created = false;
+            boolean deleted = false;
+            // Can't assume that the deleted change is last 
+            //     - there might be a composite change following
+            for (Instance change : changes) {
+                if (change instanceof Created_Change) {
+                    created = true;
+                }
+                if (change instanceof Deleted_Change) {
+                    deleted = true;
+                    break;
+                }
+            }
+            if (created && deleted) {
                 return Status.CREATED_AND_DELETED;
             }
-            else if (first_change instanceof Created_Change) {
+            else if (created) {
                 return Status.CREATED;
             }
-            else if (last_change instanceof Deleted_Change) {
+            else if (deleted) {
                 return Status.DELETED;
             }
             else {
