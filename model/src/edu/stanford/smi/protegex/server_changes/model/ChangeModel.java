@@ -41,7 +41,7 @@ public class ChangeModel {
         Annotation_Removed,
         Class_Created,
         Class_Deleted,
-        Disjoint_Class_Added,
+        DisjointClass_Added,
         Documentation_Added,
         Documentation_Removed,
         DomainProperty_Added,
