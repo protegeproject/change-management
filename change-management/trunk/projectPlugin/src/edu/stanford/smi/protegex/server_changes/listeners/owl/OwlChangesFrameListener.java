@@ -17,6 +17,7 @@ import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.owl.model.impl.DefaultOWLDatatypeProperty;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation_Change;
@@ -112,8 +113,8 @@ public class OwlChangesFrameListener implements FrameListener {
             return;
         }
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(cName, true);
-        Ontology_Component ontologyAnnotation = changes_db.getOntologyComponent(sName, true);
+        Ontology_Component applyTo = changes_db.getOntologyComponent(c, true);
+        Ontology_Component ontologyAnnotation = changes_db.getOntologyComponent(s, true);
         
         if (newSlotValues == null || newSlotValues.isEmpty()){
             context.append("Annotation Removed: ");
@@ -182,10 +183,7 @@ public class OwlChangesFrameListener implements FrameListener {
         context.append(" to: ");
         context.append(cName);
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(cName, true);
-        
-        Change change = changes_db.createChange(ChangeCls.DisjointClass_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.DisjointClass_Added, c, context.toString());
     }
     
     private void handleInstanceSlotValueChange(Instance i, Slot ownS, FrameEvent event) {
@@ -203,10 +201,7 @@ public class OwlChangesFrameListener implements FrameListener {
         context.append(" set to: ");
         context.append(newSlotValue);
 
-        Ontology_Component applyTo = changes_db.getOntologyComponent(iName, true);
-
-        Change change = changes_db.createChange(ChangeCls.Slot_Value);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Slot_Value, i, context.toString());
     }
 
 

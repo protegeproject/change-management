@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.event.KnowledgeBaseEvent;
 import edu.stanford.smi.protege.event.KnowledgeBaseListener;
+import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.FrameID;
 import edu.stanford.smi.protege.model.Instance;
@@ -40,8 +41,8 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void clsCreated(KnowledgeBaseEvent event) {
-        String clsName = event.getFrame().getName();
-        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Class_Created, clsName, true);
+        Cls cls = event.getCls();
+        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Class_Created, cls, cls.getName(), true);
 	}
     
     /* (non-Javadoc)
@@ -52,8 +53,8 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
             log.fine("In deleted class listener");
         }
         String deletedClsName = event.getOldName();
-        FrameID frameId = event.getCls().getFrameID();
-        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, frameId, deletedClsName);
+        Frame deletedFrame = event.getCls();
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, deletedFrame, deletedClsName);
     }
 
 
@@ -91,10 +92,11 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#frameNameChanged(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void frameNameChanged(KnowledgeBaseEvent event) {
+        Frame frame = event.getFrame();
         String oldName = event.getOldName();
-        String newName = event.getFrame().getName();
+        String newName = frame.getName();
 
-        ServerChangesUtil.createNameChange(changes_db, oldName, newName);
+        ServerChangesUtil.createNameChange(changes_db, frame, oldName, newName);
 
 	}
 
@@ -106,8 +108,7 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
             log.fine("In created instance listener");
         }
         Frame frame = event.getFrame();
-        String name = frame.getName();
-        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Instance_Created, name, false);
+        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Instance_Created, frame, frame.getName(), false);
 	}
 
 	/* (non-Javadoc)
@@ -118,8 +119,8 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
             log.fine("In deleted instance listener");
         }
         String name = event.getOldName();
-        FrameID frameId = event.getFrame().getFrameID();
-        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Instance_Deleted, frameId, name);
+        Frame frame = event.getFrame();
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Instance_Deleted, frame, name);
 	}
 
 	/* (non-Javadoc)
@@ -132,7 +133,7 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
         if (prop instanceof RDFProperty) {
             change = ChangeCls.Property_Created;
         }
-        ServerChangesUtil.createCreatedChange(changes_db, change, propName, true);
+        ServerChangesUtil.createCreatedChange(changes_db, change, prop, prop.getName(), true);
 	}
 
 	/* (non-Javadoc)
@@ -143,11 +144,11 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
             log.fine("In deleted slot listener");
         }
         String propName = event.getOldName();
-        FrameID frameId = event.getSlot().getFrameID();
+        Frame frame = event.getSlot();
         if (event.getSlot() instanceof RDFProperty) {
             ServerChangesUtil.createDeletedChange(changes_db,
                                                   ChangeCls.Property_Deleted,
-                                                  frameId, 
+                                                  frame, 
                                                   propName);
         }
 	}

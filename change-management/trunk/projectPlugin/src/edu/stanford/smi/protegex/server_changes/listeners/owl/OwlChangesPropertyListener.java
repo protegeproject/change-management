@@ -7,6 +7,7 @@ import edu.stanford.smi.protegex.owl.model.RDFSClass;
 import edu.stanford.smi.protegex.owl.model.event.PropertyAdapter;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
@@ -32,10 +33,7 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(arg1.getBrowserText());
 		context.append(")");
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(arg0.getName(), true);
-        
-        Change change = changes_db.createChange(ChangeCls.Subproperty_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Subproperty_Added, arg0, context.toString());
 	}
 
 	public void subpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
@@ -48,10 +46,8 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
             context.append(arg1.getBrowserText());
             context.append(")");
             
-            Ontology_Component applyTo = changes_db.getOntologyComponent(arg0, true);
-            
-            Change change = changes_db.createChange(ChangeCls.Subproperty_Removed);
-            changes_db.finalizeChange(change, applyTo, context.toString());
+            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Subproperty_Removed, arg0, context.toString());
+
 	}
 
 	public void superpropertyAdded(RDFProperty arg0, RDFProperty arg1) {
@@ -61,12 +57,8 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(" (added to: ");
 		context.append(arg1.getBrowserText());
 		context.append(")");
-		
         
-        Ontology_Component applyTo = changes_db.getOntologyComponent(arg0.getName(), true);
-        
-        Change change = changes_db.createChange(ChangeCls.Superproperty_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Superproperty_Added, arg0, context.toString());
 	}
 
 	public void superpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
@@ -79,10 +71,7 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(browserText1);
 		context.append(")");
 		
-        Ontology_Component applyTo = changes_db.getOntologyComponent(arg0, true);
-        
-        Change change = changes_db.createChange(ChangeCls.Superproperty_Removed);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Superproperty_Added, arg0, context.toString());
 
 	}
 
@@ -98,11 +87,8 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append("(added to: ");
 		context.append(clsText);
 		context.append(")");
-				
-        Ontology_Component applyTo = changes_db.getOntologyComponent(propName, true);
         
-        Change change = changes_db.createChange(ChangeCls.DomainProperty_Added);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.DomainProperty_Added, arg0, context.toString());
 
 	}
 
@@ -116,11 +102,8 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append("(removed from: ");
 		context.append(clsText);
 		context.append(")");
-		
-        Ontology_Component applyTo = changes_db.getOntologyComponent(arg0, true);
         
-        Change change = changes_db.createChange(ChangeCls.DomainProperty_Removed);
-        changes_db.finalizeChange(change, applyTo, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.DomainProperty_Removed, arg0, context.toString());
 
 	}
 
