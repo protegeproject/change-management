@@ -163,6 +163,7 @@ public class Ontology_Component extends AnnotatableThing {
     		
     		if (initialName == null) {
     			Log.getLogger().warning("Current or initial name not defined for " + this);
+    			return false;
     		}
     		
     		return initialName.startsWith(ANONYMOUS_NAME_PREFIX);
