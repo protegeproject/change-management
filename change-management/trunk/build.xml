@@ -7,6 +7,8 @@
    <property name = "pplugin.src"     value = "./projectPlugin/src"/>
    <property name = "model.src"       value = "./model/src"/>
 
+   <property name = "model.jar"       value = "changes_model.jar"/>
+
    <property name = "build"           value = "./build"/>
    <property name = "classes"         value = "${build}/classes"/>
    <property name = "model.classes"   value = "${build}/model.classes"/>  
@@ -114,7 +116,7 @@
    </target>
 
    <target name = "jar" depends = "compile">
-     <jar jarfile = "${plugins}/${plugin_dist}/model.jar" 
+     <jar jarfile = "${plugins}/${plugin_dist}/${model.jar}" 
           basedir = "${model.classes}" />
      <jar jarfile = "${plugins}/${plugin_dist}/${pluginName}.jar" 
           basedir = "${classes}" 
