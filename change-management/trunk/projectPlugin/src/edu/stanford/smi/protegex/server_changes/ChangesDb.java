@@ -59,13 +59,13 @@ public class ChangesDb {
     private Map<String, Ontology_Component> name_map = new HashMap<String, Ontology_Component>();
     
     /*
-     * This map tracks the relationship between frame id's and the names of the frames.
-     * When the delete event happens the name of the frame being deleted is present in the 
-     * event.  But there are events that occur immediately following the delete.  These events
-     * do not include the name of the frame being deleted.  This map allows us to retrieve the previous
-     * name and therefore know which frame is being effected.
+     * This map tracks the relationship between frame id's and information about the frame.
+     * After the delete event there may still be events that happen to the deleted frame.
+     * We no longer have a name for the frame or an ontology component.  This map tracks
+     * this information and allows us to recover it as needed.
      */
-    private Map<FrameID, String> frameIdMap = new HashMap<FrameID, String>();
+    
+    private Map<FrameID, Deleted_Change> deletedFrameMap = new HashMap<FrameID, Deleted_Change>();
    
     /*
      * When a component has just been created this map determines the change that caused the change.
@@ -370,6 +370,17 @@ public class ChangesDb {
         }
     }
     
+    public Ontology_Component getOntologyComponent(Frame frame, boolean create) {
+        if (frame.isDeleted()) {
+            Deleted_Change deletion = deletedFrameMap.get(frame.getFrameID());
+            return (Ontology_Component) deletion.getApplyTo();
+        }
+        else {
+            String name = frame.getName();
+            return getOntologyComponent(name, create);
+        }
+    }
+    
     public TransactionState getTransactionState() {
         TransactionState state = transactionMap.get(getCurrentSession());
         if (state == null) {
@@ -384,13 +395,17 @@ public class ChangesDb {
     }
 
     
-    public void updateDeletedFrameIdToNameMap(FrameID frameId, String name) {
-        frameIdMap.put(frameId, name);
+    public void updateDeletedFrameIdToNameMap(FrameID frameId, Deleted_Change deletion) {
+        deletedFrameMap.put(frameId, deletion);
     }
     
     public String getPossiblyDeletedFrameName (Frame frame) {
         if (frame.isDeleted()) {
-            return (String)frameIdMap.get(frame.getFrameID());
+            Deleted_Change deletion = deletedFrameMap.get(frame.getFrameID());
+            if (deletion == null) {
+                return null;
+            }
+            return deletion.getDeletionName();
         }
         else {
             return frame.getName();
@@ -399,7 +414,7 @@ public class ChangesDb {
     
     public String getPossiblyDeletedBrowserText(Frame frame) {
         if (frame.isDeleted()) {
-            return (String)frameIdMap.get(frame.getFrameID());
+            return getPossiblyDeletedFrameName(frame);
         }
         else {
             return frame.getBrowserText();
