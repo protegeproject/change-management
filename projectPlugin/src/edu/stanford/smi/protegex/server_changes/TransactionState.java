@@ -60,15 +60,18 @@ public class TransactionState {
         String action = ChangeCls.Composite_Change.toString();
         
         Ontology_Component applyTo = getApplyToFromContext(context);
-        Representative r;
-        try {
-            r = guessRepresentative(changes, context);
-        } catch (Exception e) {
-            r = null;
-        }
-        if (r != null) {
-            if (r.getAction() != null) action = r.getAction();
-            if (r.getApplyTo() != null && applyTo == null) applyTo = r.getApplyTo();
+        
+        if (applyTo == null) {
+        	Representative r;
+        	try {
+        		r = guessRepresentative(changes, context);
+        	} catch (Exception e) {
+        		r = null;
+        	}
+        	if (r != null) {
+        		//if (r.getAction() != null) action = r.getAction();
+        		if (r.getApplyTo() != null && applyTo == null) applyTo = r.getApplyTo();
+        	}
         }
         Composite_Change transaction = (Composite_Change) changesDb.createChange(ChangeCls.Composite_Change);
         transaction.setSubChanges(changes);
