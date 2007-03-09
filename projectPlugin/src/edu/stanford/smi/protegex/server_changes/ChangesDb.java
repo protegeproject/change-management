@@ -56,6 +56,7 @@ public class ChangesDb {
      * This map maps frame ids to ontology components.
      */
     private Map<FrameID, Ontology_Component> frameIdMap = new HashMap<FrameID, Ontology_Component>();
+    private Map<Ontology_Component, Frame> reverseFrameMap = new HashMap<Ontology_Component, Frame>();
     
     /*
      * This map tracks the relationship between frame id's and information about the frame.
@@ -86,10 +87,11 @@ public class ChangesDb {
         for (Instance i : model.getInstances(ChangeCls.Ontology_Component)) {
             Ontology_Component oc = (Ontology_Component) i;
             String name = oc.getCurrentName();
-            if (name != null) {
+            if (name != null && !oc.isAnonymous()) {
                 Frame frame = kb.getFrame(name);
                 if (frame != null) {
                     frameIdMap.put(frame.getFrameID(), oc);
+                    reverseFrameMap.put(oc, frame);
                 }
             }
         }
@@ -321,6 +323,9 @@ public class ChangesDb {
     /* -------------------------------------Interfaces ------------------------------*/
 
 
+    public KnowledgeBase getKb() {
+        return kb;
+    }
     
     public KnowledgeBase getChangesKb() {
         return changes_kb;
@@ -351,8 +356,13 @@ public class ChangesDb {
                 oc.setCurrentName(frame.getName());
             }
             frameIdMap.put(frameId, oc);
+            reverseFrameMap.put(oc, frame);
         }
         return oc;
+    }
+    
+    public Frame getFrame(Ontology_Component oc) {
+        return reverseFrameMap.get(oc);
     }
     
     public TransactionState getTransactionState() {
