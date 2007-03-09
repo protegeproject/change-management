@@ -154,21 +154,28 @@ public class Ontology_Component extends AnnotatableThing {
     	return topLevelChanges;
     }
     
-    
-    public boolean isAnonymous() {    	
-    	String currentName = getCurrentName();
-    	
-    	if (currentName == null) {
-    		String initialName = getInitialName();
-    		
-    		if (initialName == null) {
-    			Log.getLogger().warning("Current or initial name not defined for " + this);
-    			return false;
+    public String mostRecentName() {
+    	String name = getCurrentName();
+    	if (name != null) { return name; }
+    	List<Instance> changes = getSortedChanges();
+    	Collections.reverse(changes);
+    	for (Instance i : changes) {
+    		if (i instanceof Deleted_Change) {
+    			Deleted_Change change = (Deleted_Change) i;
+    			name = change.getDeletionName();
+    			if (!name.contains("<<missing frame name")) return name;  // TODO -- TR -- FIX ME
     		}
-    		
-    		return initialName.startsWith(ANONYMOUS_NAME_PREFIX);
     	}
-    	
-    	return currentName.startsWith(ANONYMOUS_NAME_PREFIX);
+    	return null;
+    }
+    
+    
+    public boolean isAnonymous() { 
+    	String name = mostRecentName();
+    	if (name != null) {
+    		return name.startsWith(ANONYMOUS_NAME_PREFIX);
+    	}
+		Log.getLogger().warning("Could not determine anonymous status of " + this);
+		return true;
     }
 }
