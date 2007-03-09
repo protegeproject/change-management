@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Stack;
 
 import edu.stanford.smi.protege.model.Frame;
-import edu.stanford.smi.protege.util.transaction.TransactionMonitor;
+import edu.stanford.smi.protege.model.Transaction;
 import edu.stanford.smi.protegex.owl.model.RDFResource;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
-import edu.stanford.smi.protegex.server_changes.model.generated.Slot_Value;
 
 
 public class TransactionState {
@@ -82,9 +81,9 @@ public class TransactionState {
     
     public Ontology_Component getApplyToFromContext(String context) {
         if (context == null) return null;
-        int index = context.indexOf(TransactionMonitor.APPLY_TO_TRAILER_STRING);
+        int index = context.indexOf(Transaction.APPLY_TO_TRAILER_STRING);
         if (index < 0) return null;
-        index += TransactionMonitor.APPLY_TO_TRAILER_STRING.length();
+        index += Transaction.APPLY_TO_TRAILER_STRING.length();
         String frame_name = context.substring(index);
         Frame frame = changesDb.getKb().getFrame(frame_name);
         if (frame == null) return null;
