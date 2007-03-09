@@ -149,6 +149,8 @@ public class OwlChangesFrameListener implements FrameListener {
             context.append(sName);
             context.append(" for class: ");
             context.append(cName);
+            context.append(" set to: ");
+            context.append(newSlotValues);
 
             Annotation_Change change = (Annotation_Change) changes_db.createChange(ChangeCls.Annotation_Modified);
             change.setOntologyAnnotation(ontologyAnnotation);
