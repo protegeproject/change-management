@@ -2,14 +2,17 @@ package edu.stanford.smi.protegex.server_changes;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+import edu.stanford.smi.protege.model.Frame;
+import edu.stanford.smi.protege.util.transaction.TransactionMonitor;
+import edu.stanford.smi.protegex.owl.model.RDFResource;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
+import edu.stanford.smi.protegex.server_changes.model.generated.Slot_Value;
 
 
 public class TransactionState {
@@ -46,28 +49,26 @@ public class TransactionState {
     }
     
     public void rollbackTransaction() {
-        changeStack.pop();  // this isn't right! but I am not calling it yet...
+        changeStack.pop();
         transactionNameStack.pop();
     }
     
     
-	public void createTransactionChange(List<Change> changes, String name) {
+	public void createTransactionChange(List<Change> changes, String context) {
         if (changes.size() == 0) return;
         
         String action = ChangeCls.Composite_Change.toString();
-        String context = name;
-        Ontology_Component applyTo = (Ontology_Component) changes.get(0).getApplyTo();
         
+        Ontology_Component applyTo = getApplyToFromContext(context);
         Representative r;
         try {
-            r = guessRepresentative(changes);
+            r = guessRepresentative(changes, context);
         } catch (Exception e) {
             r = null;
         }
         if (r != null) {
             if (r.getAction() != null) action = r.getAction();
-            if (r.getContext() != null) context = r.getContext();
-            if (r.getApplyTo() != null) applyTo = r.getApplyTo();
+            if (r.getApplyTo() != null && applyTo == null) applyTo = r.getApplyTo();
         }
         Composite_Change transaction = (Composite_Change) changesDb.createChange(ChangeCls.Composite_Change);
         transaction.setSubChanges(changes);
@@ -75,25 +76,44 @@ public class TransactionState {
         changesDb.finalizeChange(transaction, applyTo, context);
         
     }
+    
+    public Ontology_Component getApplyToFromContext(String context) {
+        if (context == null) return null;
+        int index = context.indexOf(TransactionMonitor.APPLY_TO_TRAILER_STRING);
+        if (index < 0) return null;
+        index += TransactionMonitor.APPLY_TO_TRAILER_STRING.length();
+        String frame_name = context.substring(index);
+        Frame frame = changesDb.getKb().getFrame(frame_name);
+        if (frame == null) return null;
+        return changesDb.getOntologyComponent(frame, true);
+    }
 
 	
-	private Representative guessRepresentative(List<Change> actions) {
+	private Representative guessRepresentative(List<Change> actions, String name) {
         boolean isOwl = changesDb.isOwl();
+        Representative r = null;
 		if (isOwl) {
-			// Check if we have a restriction
-			if (isRestriction(actions)) {
-				return findRestrictionInstance(actions);
-			} else {
-				return generateTransInstance(actions);
-			}
-		
-		// Not an OWL project
-		} else {
-			return generateTransInstance(actions);
-		}
+            if ((r = guessFirstNonAnonymousAction(actions, name)) != null) return r;
+            if ((r = guessFirstOrDelete(actions, name)) != null) return r;
+        }
+        else {
+            if ((r = guessFirstOrDelete(actions, name)) != null) return r;
+        }
+        return null;
 	}
-	
-	private Representative generateTransInstance(Collection<Change> transActions) {
+    
+    private Representative guessFirstNonAnonymousAction(List<Change> actions, String name) {
+        for (Change change : actions) {
+            if (!((Ontology_Component) change.getApplyTo()).isAnonymous()) {
+                return new Representative(change.getAction(), 
+                                          (Ontology_Component) change.getApplyTo());
+            }
+        }
+        return null;
+    }
+   
+    
+	private Representative guessFirstOrDelete(Collection<Change> transActions, String name) {
 	    boolean firstInfoInst = false;
 	    boolean firstDeleted = false;
 	    Change firstInst = null;
@@ -110,154 +130,33 @@ public class TransactionState {
 	        }
 	    }
         return new Representative(firstInst.getAction(), 
-                                  firstInst.getContext(), 
                                   (Ontology_Component) firstInst.getApplyTo());
 	}
-	
-	private Representative findRestrictionInstance(List<Change> actions) {
-        String contextVal;
-		String ctxt = null;
-		Ontology_Component applyToVal = null;
-		
-		Ontology_Component remApplyToVal = null;
-		String remCtxt = null;
-		String addCtxt = null;
-		
-		HashMap<String, String> equalityMap = new HashMap<String, String>();
-
-		boolean foundAppliesTo = false;
-		boolean foundRemAppliesTo = false;
-		
-		boolean containsRemoves = false;
-		boolean containsAdds = false;
-		 
-		for (Change change : actions) {
-
-		    String actionStr = change.getAction();
-
-		    // Checking here for equivalence (necessary vs. necessary and sufficient)
-		    if (actionStr.equals(ChangeCls.Superclass_Added.toString()) || 
-		            actionStr.equals(ChangeCls.Subclass_Added.toString())) {
-		        containsAdds = true;
-		        String possCtxt = change.getContext();
-		        if (!isAnon(possCtxt)) {
-
-		            // Find applies to field
-		            if (actionStr.equals(ChangeCls.Subclass_Added.toString()) && !foundAppliesTo) {
-
-		                applyToVal = (Ontology_Component) change.getApplyTo();
-		                addCtxt = (String) decomposeContext(possCtxt, "(added to:").get(1);
-		                foundAppliesTo = true;
-		            }
-
-		            List<String> names = decomposeContext(possCtxt, "(added to:");
-		            String fwd = actionStr+","+names.get(0)+","+names.get(1);
-		            if (equalityMap.containsKey(fwd)) {
-		                equalityMap.remove(fwd);
-		            } else {
-		                String rev = actionStr+","+names.get(1)+","+names.get(0);
-		                equalityMap.put(rev, null);
-		            }
-		        }
-		    } else if (actionStr.equals(ChangeCls.Superclass_Added.toString()) || 
-		            actionStr.equals(ChangeCls.Subclass_Added.toString())) {
-		        containsRemoves = true;
-		        String possCtxt = change.getContext();
-		        if (!isAnon(possCtxt)) {
-		            if (actionStr.equals(ChangeCls.Subclass_Removed.toString()) && !foundRemAppliesTo) {
-		                remApplyToVal = (Ontology_Component) change.getApplyTo();
-		                remCtxt = (String) decomposeContext(possCtxt, "(removed from:").get(1);
-		                foundRemAppliesTo = true;
-		            }	
-		        }
-		    }
-		}
-		
-		String act = "";
-		if (containsAdds && containsRemoves) {
-			act = "Restriction Modified";
-			ctxt = addCtxt;
-		} else if (containsAdds && !containsRemoves) {
-			ctxt = addCtxt;
-			act = "Restriction Created";
-			if (equalityMap.isEmpty()) {
-				act = "Restriction Created (defined)";
-			}
-		} else if (containsRemoves && ! containsAdds) {
-			act = "Restriction Removed";
-			applyToVal = remApplyToVal;
-			ctxt = remCtxt;
-		}
-		contextVal = act + ": " + ctxt;
-        
-        return new Representative(act, ctxt, applyToVal);
+    
+    private Frame findNamedClass(RDFResource resource) {
+        return resource;
     }
 	
-	// Decompose context into its constituent parts for "Action: name (added to: actUpon)"
-	private List<String> decomposeContext(String context, String actUponStr) {
-		ArrayList<String> result = new ArrayList<String>();
-		
-		String action = context.substring(context.indexOf(":")+1, context.length()).trim();
-		String name = action.substring(0, action.lastIndexOf(actUponStr)-1);
-		String actUpon = action.substring(action.indexOf(":")+1, action.length()-1).trim();
-		
-		result.add(name);
-		result.add(actUpon);
-		
-		return result;
-	}
-	
-	private boolean isRestriction(List<Change> actions) {
-		
-		boolean isRest = false;
-		
-		for (Change aInst : actions) {
-			String ctxt = aInst.getContext();
-			
-			if (isAnon(ctxt)) {
-				isRest = true;
-				return isRest;
-			}
-		}
-		
-		return isRest;
-	}
-	
-	private boolean isAnon(String context) {
-		boolean isAnon = false;
-		
-		if (context.contains("?") || context.contains("empty") || context.contains("ANONYMOUS")) {
-			isAnon = true;
-		}
-		
-		return isAnon;
-	}
-	
+
 	
     /*
      * This class provides values that the user wants to see.  If we use a poor heuristic for finding these
      * values then it is hard for the user to understand what the change tab is showing.
      */
-    public class Representative {
+    class Representative {
         private String action;
-        private String context;
         private Ontology_Component applyTo;
         
         public String getAction() {
             return action;
         }
         
-        public String getContext() {
-            return context;
-        }
-        
         public Ontology_Component getApplyTo() {
             return applyTo;
         }
         
-        public Representative(String action, String context, Ontology_Component applyTo) {
+        public Representative(String action, Ontology_Component applyTo) {
             this.action = action;
-            this.context = context;
             this.applyTo = applyTo;
         }
     }
