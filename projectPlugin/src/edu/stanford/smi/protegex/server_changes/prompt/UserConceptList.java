@@ -113,7 +113,7 @@ public class UserConceptList extends JPanel {
 			@Override
 			public void onView() {
 				for (int i = 0; i < changesTable.getSelectedRows().length; i++) {
-					Change change = ((ChangesTableModel)changesTable.getModel()).getChange(i);
+					Change change = ((ChangesTableModel)changesTable.getModel()).getChange(changesTable.getSelectedRows()[i]);
 					view(change);
 				}				
 			}
