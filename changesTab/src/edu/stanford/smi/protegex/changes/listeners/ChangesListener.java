@@ -25,7 +25,15 @@ public class ChangesListener extends AbstractChangeListener {
         ChangesTab.createChange(change);
     }
     
+    @Override
+    public void modifyChange(Change change) {
+        ChangeModel.logAnnotatableThing("ChangeTab listener received modification to change", log, Level.FINE, change);
+        ChangesTab.modifyChange(change);
+    }
+    
     public void addAnnotation(Annotation a) { }
+
+
     
 }
 
