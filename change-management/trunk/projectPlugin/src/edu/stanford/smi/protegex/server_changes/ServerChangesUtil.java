@@ -19,6 +19,7 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Deleted_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
+import edu.stanford.smi.protegex.server_changes.postprocess.JoinCreateAndNameChange;
 
 public class ServerChangesUtil {
     private static final Logger log = Log.getLogger(ServerChangesUtil.class);
@@ -44,8 +45,7 @@ public class ServerChangesUtil {
     public static Created_Change createCreatedChange(ChangesDb changes_db,
                                                      ChangeCls type,
                                                      Frame applyTo,
-                                                     String name,
-                                                     boolean createTransaction) {
+                                                     String name) {
         String context;
         switch (type) {
         case Class_Created:
@@ -71,10 +71,6 @@ public class ServerChangesUtil {
         Created_Change change = (Created_Change) changes_db.createChange(type);
         change.setCreationName(name);
         changes_db.finalizeChange(change, oc, context);
-        if (createTransaction) {
-            // Create artifical transaction for create class
-            changes_db.startChangeTransaction(change);
-        }
         return change;
     }
     
