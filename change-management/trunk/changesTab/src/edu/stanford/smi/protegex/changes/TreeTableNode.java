@@ -30,6 +30,10 @@ public class TreeTableNode {
             return ChangeCreateUtil.getActionDisplay(changeInst);
         }
     }
+    
+    public Change getChange() {
+        return changeInst;
+    }
 
     public Object getValueAt(int i) {
         ChangeTableColumn col = ChangeTableColumn.values()[i];
