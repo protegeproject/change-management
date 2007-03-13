@@ -42,7 +42,7 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 	 */
 	public void clsCreated(KnowledgeBaseEvent event) {
         Cls cls = event.getCls();
-        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Class_Created, cls, cls.getName(), true);
+        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Class_Created, cls, cls.getName());
 	}
     
     /* (non-Javadoc)
@@ -108,7 +108,7 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
             log.fine("In created instance listener");
         }
         Frame frame = event.getFrame();
-        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Instance_Created, frame, frame.getName(), false);
+        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Instance_Created, frame, frame.getName());
 	}
 
 	/* (non-Javadoc)
@@ -133,7 +133,7 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
         if (prop instanceof RDFProperty) {
             change = ChangeCls.Property_Created;
         }
-        ServerChangesUtil.createCreatedChange(changes_db, change, prop, prop.getName(), true);
+        ServerChangesUtil.createCreatedChange(changes_db, change, prop, prop.getName());
 	}
 
 	/* (non-Javadoc)
