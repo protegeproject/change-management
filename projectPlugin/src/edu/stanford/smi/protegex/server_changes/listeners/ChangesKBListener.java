@@ -38,7 +38,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 */
     public void clsCreated(KnowledgeBaseEvent event) {
         Cls createdCls = event.getCls();
-        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Class_Created, createdCls, createdCls.getName(), true);
+        ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Class_Created, createdCls, createdCls.getName());
     }
 
 	/* (non-Javadoc)
@@ -102,7 +102,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	        log.fine("In created instance listener");
 	    }
 	    Frame frame = event.getFrame();
-	    ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Instance_Created, frame, frame.getName(), false);
+	    ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Instance_Created, frame, frame.getName());
 	}
 
 	/* (non-Javadoc)
@@ -122,7 +122,7 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	 */
 	public void slotCreated(KnowledgeBaseEvent event) {
 		Slot createdSlot = event.getSlot();
-		ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Slot_Created, createdSlot, createdSlot.getName(), true);
+		ServerChangesUtil.createCreatedChange(changes_db, ChangeCls.Slot_Created, createdSlot, createdSlot.getName());
 	}
 
 	/* (non-Javadoc)
