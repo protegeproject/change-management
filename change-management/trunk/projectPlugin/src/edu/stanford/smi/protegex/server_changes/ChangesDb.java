@@ -34,6 +34,7 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Deleted_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
+import edu.stanford.smi.protegex.server_changes.postprocess.PostProcessor;
 import edu.stanford.smi.protegex.server_changes.util.Util;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
@@ -56,7 +57,11 @@ public class ChangesDb {
      * This map maps frame ids to ontology components.
      */
     private Map<FrameID, Ontology_Component> frameIdMap = new HashMap<FrameID, Ontology_Component>();
-    private Map<Ontology_Component, Frame> reverseFrameMap = new HashMap<Ontology_Component, Frame>();
+    
+    /*
+     * a list of postprocessing jobs.
+     */
+    private List<PostProcessor> post_processors = new ArrayList<PostProcessor>();
     
     /*
      * This map tracks the relationship between frame id's and information about the frame.
@@ -67,12 +72,6 @@ public class ChangesDb {
     
     private Map<FrameID, Deleted_Change> deletedFrameMap = new HashMap<FrameID, Deleted_Change>();
    
-    /*
-     * When a component has just been created this map determines the change that caused the change.
-     * This is used in the slightly tricky code that creates a transaction around sequential create +
-     * name change operations.
-     */
-    private Map<RemoteSession, Created_Change> lastCreateBySession = new HashMap<RemoteSession, Created_Change>();
 
     
     public ChangesDb(KnowledgeBase kb) {
@@ -91,7 +90,6 @@ public class ChangesDb {
                 Frame frame = kb.getFrame(name);
                 if (frame != null) {
                     frameIdMap.put(frame.getFrameID(), oc);
-                    reverseFrameMap.put(oc, frame);
                 }
             }
         }
@@ -158,19 +156,16 @@ public class ChangesDb {
     
     
 
-    private RemoteSession getCurrentSession() {
-        RemoteSession session = ServerFrameStore.getCurrentSession();
-        if (session != null) return session;
-        else return StandaloneSession.getInstance();
-    }
+
     
     /* -------------------------------- PostProcessing -------------------------------- */
     /* ToDo - put these in separate classes - there are getting to be too many of them */
     
     private void postProcessChange(Change aChange) {
         checkForTransaction(aChange);
-        checkForCreateAndNameChange(aChange);
-        possiblyCombineAnnotations(aChange);
+        for (PostProcessor p : post_processors) {
+            p.addChange(aChange);
+        }
     }
     
     /*
@@ -184,141 +179,8 @@ public class ChangesDb {
     }
     
     
-    /*
-     * This is a little tricky.  I  am trying to combine a create operation
-     * followed by a name change into a single transaction.  There are several cases.
-     * The simple case is the sequence
-     *      create operation
-     *      name change.
-     * In this case we create a transaction (**after the fact**) combining the create operation and 
-     * the name change.  But in the sequence
-     *      create operation
-     *      not name change (or name change of different object)
-     * The transaction does not happen in this case.  A similar case is 
-     *      create operation
-     *      begin transaction
-     *        xxx
-     *      end transaction
-     * In this case the attempt to create the transaction also must be aborted. Finally there
-     * is the owl case:
-     *      begin transaction
-     *         create change
-     *         xxx
-     *      end  transaction
-     *      name change
-     * Here we - again after the fact - create the transaction
-     *      begin transaction
-     *        begin transaction
-     *          create change
-     *          xxx
-     *        end transaction
-     *        name change
-     *      end transaction
-     * I think that the following code works.  Note that lastCreateBySession is only set by
-     * ChangesDb.startChangeTransaction.  This gives the routine creating a change event a 
-     * chance to not try to create a session.
-     */
-    private void checkForCreateAndNameChange(Change aChange) {
-        if (!getTransactionState().inTransaction()) {
-            Created_Change previous_change = lastCreateBySession.get(getCurrentSession());
-            if (previous_change == null) return;
-            if (aChange instanceof Name_Changed) {
-                possiblyCombineWithCreate((Name_Changed) aChange);
-            }
-            if (aChange instanceof Composite_Change) {
-                Composite_Change transaction = (Composite_Change) aChange;
-                Collection sub_changes = transaction.getSubChanges();
-                if (sub_changes != null && sub_changes.contains(previous_change)) return;
-            }
-            lastCreateBySession.remove(getCurrentSession());
-        }
-    }
-    
-    private void possiblyCombineWithCreate(Name_Changed changeInst) {
-        String newName = changeInst.getNewName();
-        Ontology_Component renamed_frame = (Ontology_Component) changeInst.getApplyTo();
-        Change createOp = lastCreateBySession.get(getCurrentSession());
-        if (createOp != null) {
-            Ontology_Component created = (Ontology_Component) createOp.getApplyTo();
-            if (renamed_frame.equals(created)) {
-                Composite_Change existingCreateTrans = (Composite_Change) createOp.getPartOfCompositeChange();
-                if (existingCreateTrans != null) {
-                    createOp = existingCreateTrans;
-                }
-                List<Change> changes = new ArrayList<Change>();
-                changes.add(createOp);
-                changes.add(changeInst);
-                Composite_Change transaction = (Composite_Change) createChange(ChangeCls.Composite_Change);
-                transaction.setSubChanges(changes);
-                finalizeChange(transaction, created, "Created " + newName);
-            }
-        }
-    }
-    
-    
-    private Map<RemoteSession, List<Annotation_Change>> lastAnnotationsBySession
-                = new HashMap<RemoteSession, List<Annotation_Change>>();
-    /*
-     * Combine Annotations.
-     */
-    private void possiblyCombineAnnotations(Change aChange) {
-        List<Annotation_Change> previous_annotations = lastAnnotationsBySession.get(getCurrentSession());
-        
-        if (aChange instanceof Annotation_Change) {
-            Annotation_Change annotation = (Annotation_Change) aChange;
 
-            if (previous_annotations == null) {
-                previous_annotations = new ArrayList<Annotation_Change>();
-                previous_annotations.add(annotation);
-                lastAnnotationsBySession.put(getCurrentSession(), previous_annotations);
-                return;
-            }
-            
-            Ontology_Component applyTo = (Ontology_Component) annotation.getApplyTo();
-            Ontology_Component property = (Ontology_Component) annotation.getOntologyAnnotation();
-            
-            Annotation_Change earlier_annotation = previous_annotations.get(0);
-            if (!applyTo.equals(earlier_annotation.getApplyTo()) || 
-                    !property.equals(earlier_annotation.getOntologyAnnotation())) {
-                combineAnnotations(previous_annotations);
-                List<Annotation_Change> new_annotations = new ArrayList<Annotation_Change>();
-                new_annotations.add(annotation);
-                lastAnnotationsBySession.put(getCurrentSession(), new_annotations);
-                return;
-            }
-            else {
-                previous_annotations.add(annotation);
-                return;
-            }
-        }
-        else if (previous_annotations != null) {
-            combineAnnotations(previous_annotations);
-        }
-        
-    }
-    
-    private void combineAnnotations(List<Annotation_Change> annotations) {
-        lastAnnotationsBySession.remove(getCurrentSession());
-        if (annotations.size() <= 1) return;
-        Ontology_Component applyTo = (Ontology_Component) annotations.get(0).getApplyTo();
-        Composite_Change transaction = (Composite_Change) createChange(ChangeCls.Composite_Change);
-        
-        transaction.setSubChanges(annotations);
-        
-        finalizeChange(transaction, applyTo, getContextForAnnotations(annotations));
 
-    }
-    
-    private String getContextForAnnotations(Collection<Annotation_Change> annotations) {
-        String context = null;
-        for (Annotation_Change annotation : annotations) {
-            context = annotation.getContext();
-            if (!(annotation instanceof Annotation_Removed)) {
-                break;
-            }
-        }
-        return context;
-    }
     
     /* -------------------------------------Interfaces ------------------------------*/
 
@@ -347,6 +209,27 @@ public class ChangesDb {
         return Util.kbInOwl(kb);
     }
     
+    public RemoteSession getCurrentSession() {
+        RemoteSession session = ServerFrameStore.getCurrentSession();
+        if (session != null) return session;
+        else return StandaloneSession.getInstance();
+    }
+    
+    public void addPostProcessor(PostProcessor p) {
+        p.initialize(this);
+        post_processors.add(p);
+    }
+    
+    public PostProcessor getPostProcessor(Class<? extends PostProcessor> clazz) {
+        for (PostProcessor p : post_processors) {
+            if (clazz.isAssignableFrom(p.getClass())) {
+                return p;
+            }
+        }
+        return null;
+    }
+    
+    
     public Ontology_Component getOntologyComponent(Frame frame, boolean create) {
         FrameID frameId = frame.getFrameID();
         Ontology_Component oc = frameIdMap.get(frameId);
@@ -356,13 +239,8 @@ public class ChangesDb {
                 oc.setCurrentName(frame.getName());
             }
             frameIdMap.put(frameId, oc);
-            reverseFrameMap.put(oc, frame);
         }
         return oc;
-    }
-    
-    public Frame getFrame(Ontology_Component oc) {
-        return reverseFrameMap.get(oc);
     }
     
     public TransactionState getTransactionState() {
@@ -372,10 +250,6 @@ public class ChangesDb {
             transactionMap.put(getCurrentSession(), state);
         }
         return state;
-    }
-    
-    public void startChangeTransaction(Created_Change change) {
-        lastCreateBySession.put(getCurrentSession(), change);
     }
 
     
