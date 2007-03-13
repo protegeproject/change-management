@@ -123,9 +123,6 @@ public class ChangesTab extends AbstractTabWidget {
 	private static String OWL_KB_INDICATOR = "OWL";
 	
 
-	
-	private static Map<String, String> nameChanges = new HashMap<String, String>();
-
 	private static ChangeMenu cMenu;
 	private static RemoveInstanceAction remInst;
 	private static EditInstanceAction editInst;
@@ -472,37 +469,26 @@ public class ChangesTab extends AbstractTabWidget {
 			cTreeTableModel.addChangeData(aInst);
 		}
 	}
-	
-	public static void addNameChange(String oldName, String newName) {
-		nameChanges.put(newName, oldName);
-	}
-	
-	public static Map<String, String> getNameChanges() {
-		return nameChanges;
-	}
-	
 
 	
 	
 	public static void createChange(Change aChange) {
 		boolean addChange = true;
 		
-		if (aChange instanceof Name_Changed) {
-			String oldName = ((Name_Changed) aChange).getOldName();
-			String newName = ((Name_Changed) aChange).getNewName();
-			addNameChange(oldName, newName);
-
-		}
-		if (aChange instanceof Subclass_Added) {
-		    addChange = false;
-		}
-		if (addChange) {
+		if (!(aChange instanceof Subclass_Added)) {
 		    cTableModel.addChangeData(aChange);
 		    cTreeTableModel.addChangeData(aChange);
 		    cMenu.setEnabledLastChange(true);
 		    cMenu.setChange(aChange);	
 		}
 	}
+    
+    public static void modifyChange(Change aChange) {
+        if (!(aChange instanceof Subclass_Added)) {
+            cTableModel.update();
+            cTreeTableModel.update(aChange);
+        }
+    }
 	
 	
 	private static void loadAnnotations(Collection<Instance> annotateInsts) {
