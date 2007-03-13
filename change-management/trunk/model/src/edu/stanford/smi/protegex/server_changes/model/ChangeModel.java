@@ -103,6 +103,7 @@ public class ChangeModel {
         context,
         date,
         ontology_annotation,
+        partOfCompositeChange,
         sequence,
         timestamp
     }
