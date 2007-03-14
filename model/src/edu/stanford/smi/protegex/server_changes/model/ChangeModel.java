@@ -2,7 +2,6 @@ package edu.stanford.smi.protegex.server_changes.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -13,6 +12,7 @@ import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protege.util.ProtegeJob;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
@@ -134,7 +134,7 @@ public class ChangeModel {
         return null;
     }
     
-    public static Collection<Instance> removeRoots(Collection<Instance> changes) {
+    public static Collection<Change> removeRoots(Collection<Change> changes) {
         Collection<Instance> roots = new ArrayList<Instance>();
         for (Instance change : changes) {
           if (isRoot((Change) change)) {
@@ -145,11 +145,16 @@ public class ChangeModel {
         return changes;
     }
     
-    public List<Instance> getSortedChanges() {
-        List<Instance> changes = new ArrayList<Instance>(getInstances(ChangeCls.Change));
-        removeRoots(changes);
-        Collections.sort(changes, new ChangeDateComparator(changes_kb));
-        return changes;
+    @SuppressWarnings("unchecked")
+    public List<Change> getSortedChanges() { 
+        ProtegeJob job = new GetSortedChangesJob(changes_kb);
+        return (List<Change>) job.execute();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Change> getSortedTopLevelChanges() {
+        ProtegeJob job = new GetSortedTopLevelChangesJob(changes_kb);
+        return (List<Change>) job.execute();
     }
     
     public Cls getCls(ChangeCls c) {
