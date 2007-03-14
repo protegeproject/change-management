@@ -108,12 +108,10 @@ public class ChangesTab extends AbstractTabWidget {
 	private static KnowledgeBase currKB;
     private static ChangeCreateUtil createUtil;
 	
-	private static JTable cTable;
 	private static JTable aTable;
 	private static JTable acTable;
 	
 	private static JComboBox annTypes;
-	private static ChangeTableModel cTableModel;
 	private static ChangeTableModel acTableModel;
 	
 	private static AnnotationTableModel aTableModel;
@@ -319,14 +317,11 @@ public class ChangesTab extends AbstractTabWidget {
 	
 		TreeTableNode root = new TreeTableNode(ROOT,changes_kb);
 		
-		
-		cTableModel = new ChangeTableModel(model);
 		acTableModel = new ChangeTableModel(model);
 
 		aTableModel = new AnnotationTableModel(changes_kb);
 		cTreeTableModel = new ChangeTreeTableModel(root, model);
 		
-		cTable = new JTable(cTableModel);
 		acTable = new JTable(acTableModel);
 	
 		aTable = new JTable(aTableModel);
@@ -450,22 +445,12 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	private static void loadExistingData() {      
 		Collection<Instance> annotateInsts = model.getInstances(ChangeCls.Annotation);
-		Collection<Instance> changeInsts = model.getInstances(ChangeCls.Change);
-		
-		loadChanges(changeInsts);
+		loadChanges();
 		loadAnnotations(annotateInsts);
-		
-	
 	}
 	
-	private static void loadChanges(Collection<Instance> changeInsts) {
-		List<Instance> changeList = new ArrayList<Instance>(changeInsts);
-		Collections.sort(changeList, new ChangeDateComparator(changes_kb));
-		
-		for (Instance i : changeList) {
-			Change aInst = (Change) i;
-			
-			cTableModel.addChangeData(aInst);
+	private static void loadChanges() {
+		for (Change aInst : model.getSortedChanges()) {
 			cTreeTableModel.addChangeData(aInst);
 		}
 	}
@@ -476,7 +461,6 @@ public class ChangesTab extends AbstractTabWidget {
 		boolean addChange = true;
 		
 		if (!(aChange instanceof Subclass_Added)) {
-		    cTableModel.addChangeData(aChange);
 		    cTreeTableModel.addChangeData(aChange);
 		    cMenu.setEnabledLastChange(true);
 		    cMenu.setChange(aChange);	
@@ -485,7 +469,6 @@ public class ChangesTab extends AbstractTabWidget {
     
     public static void modifyChange(Change aChange) {
         if (!(aChange instanceof Subclass_Added)) {
-            cTableModel.update();
             cTreeTableModel.update(aChange);
         }
     }
