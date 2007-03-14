@@ -11,6 +11,7 @@ import java.util.Set;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
@@ -20,6 +21,7 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Instance_Created
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 import edu.stanford.smi.protegex.server_changes.model.generated.Subclass_Added;
+import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 public class JoinCreateAndNameChange implements PostProcessor {
     private ChangesDb changes_db;
@@ -90,7 +92,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
                 return;
             }
             if (aChange instanceof Name_Changed) {
-                combineInTransaction(previous_change, aChange);
+                addNameChange(previous_change, (Name_Changed) aChange);
                 removeLastCreate(session);
                 return;
             }
@@ -119,18 +121,6 @@ public class JoinCreateAndNameChange implements PostProcessor {
         }
     }
     
-    private void possiblyCombineWithCreate(Name_Changed changeInst) {
-        String newName = changeInst.getNewName();
-        Ontology_Component renamed_frame = (Ontology_Component) changeInst.getApplyTo();
-        Change createOp = lastCreateBySession.get(changes_db.getCurrentSession());
-        if (createOp != null) {
-            Ontology_Component created = (Ontology_Component) createOp.getApplyTo();
-            if (renamed_frame.equals(created)) {
-
-            }
-        }
-    }
-    
     private Composite_Change combineInTransaction(Created_Change change1, Change change2) {
         Composite_Change transaction = getTopTransactionContaining(change1);
         if (transaction == null) {
@@ -139,17 +129,36 @@ public class JoinCreateAndNameChange implements PostProcessor {
             List<Change> changes = new ArrayList<Change>();
             changes.add(change1);
             changes.add(change2);
-            transaction = (Composite_Change) changes_db.createChange(ChangeCls.Composite_Change);
-            transaction.setSubChanges(changes);
-            changes_db.finalizeChange(transaction, created, "Created " + new_name);
+            transaction = ServerChangesUtil.createTransactionChange(changes_db, 
+                                                                    created, 
+                                                                    "Created " + new_name,
+                                                                    changes);
             return transaction;
         }
         else {
             Collection subChanges = new ArrayList(transaction.getSubChanges());
             subChanges.add(change2);
             transaction.setSubChanges(subChanges);
+            transaction.getTimestamp().delete();
+            transaction.setTimestamp(Timestamp.getTimestamp(changes_db.getModel()));
             return transaction;
         }
+    }
+    
+    private Composite_Change addNameChange(Created_Change change1, Name_Changed change2) {
+        Ontology_Component created = (Ontology_Component) change1.getApplyTo();
+        String new_name = change2.getNewName();
+        List<Change> sub_changes = new ArrayList<Change>();
+        Composite_Change top_created_transaction = getTopTransactionContaining(change1);
+        Change first_change = top_created_transaction == null ? change1 : top_created_transaction;
+        sub_changes.add(first_change);
+        sub_changes.add(change2);
+        
+        Composite_Change transaction = ServerChangesUtil.createTransactionChange(changes_db, 
+                                                                                 created, 
+                                                                                 "Created " + new_name, 
+                                                                                 sub_changes);
+        return transaction;
     }
 
     private Composite_Change getTopTransactionContaining(Change change) {
