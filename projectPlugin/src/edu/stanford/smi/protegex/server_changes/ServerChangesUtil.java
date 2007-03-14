@@ -3,6 +3,7 @@ package edu.stanford.smi.protegex.server_changes;
 
 
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,6 +15,7 @@ import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Created_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Deleted_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
@@ -128,8 +130,24 @@ public class ServerChangesUtil {
         changes_db.finalizeChange(change, applyToOc, context.toString());
         return change;
     }
-                                                  
     
+    public static Composite_Change createTransactionChange(ChangesDb changes_db,
+                                                           Frame applyTo,
+                                                           String context,
+                                                           List<Change> changes) {
+        Ontology_Component oc = changes_db.getOntologyComponent(applyTo, true);
+        return createTransactionChange(changes_db, oc, context, changes);
+    }
+                                                  
+    public static Composite_Change createTransactionChange(ChangesDb changes_db,
+                                                           Ontology_Component applyTo,
+                                                           String context,
+                                                           List<Change> changes) {
+        Composite_Change transaction = (Composite_Change) changes_db.createChange(ChangeCls.Composite_Change);
+        transaction.setSubChanges(changes);
+        changes_db.finalizeChange(transaction, applyTo, context);
+        return transaction;
+    }
 	
 	public Annotation createAnnotation(String annotType,Collection annotatables) {
         Annotation a = (Annotation) model.createInstance(ChangeCls.Annotation);
