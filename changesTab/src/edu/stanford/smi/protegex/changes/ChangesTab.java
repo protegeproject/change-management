@@ -311,17 +311,10 @@ public class ChangesTab extends AbstractTabWidget {
 	private void initTables() {
 		// Create Tables
 		
-		
-		// GETTING THE ROOT INSTANCE TO CREATE ROOT OF THE TREE
-		
-        Change ROOT = model.findRoot();
-	
-		TreeTableNode root = new TreeTableNode(ROOT,changes_kb);
-		
 		acTableModel = new ChangeTableModel(model);
 
 		aTableModel = new AnnotationTableModel(changes_kb);
-		cTreeTableModel = new ChangeTreeTableModel(root, model);
+		cTreeTableModel = new ChangeTreeTableModel(model);
 		
 		acTable = new JTable(acTableModel);
 	
@@ -451,7 +444,7 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 	
 	private static void loadChanges() {
-		for (Change aInst : model.getSortedChanges()) {
+		for (Change aInst : model.getSortedTopLevelChanges()) {
 			cTreeTableModel.addChangeData(aInst);
 		}
 	}
@@ -461,17 +454,13 @@ public class ChangesTab extends AbstractTabWidget {
 	public static void createChange(Change aChange) {
 		boolean addChange = true;
 		
-		if (!(aChange instanceof Subclass_Added)) {
-		    cTreeTableModel.addChangeData(aChange);
-		    cMenu.setEnabledLastChange(true);
-		    cMenu.setChange(aChange);	
-		}
+		cTreeTableModel.addChangeData(aChange);
+		cMenu.setEnabledLastChange(true);
+		cMenu.setChange(aChange);
 	}
     
-    public static void modifyChange(Change aChange) {
-        if (!(aChange instanceof Subclass_Added)) {
-            cTreeTableModel.update(aChange);
-        }
+    public static void modifyChange(Change aChange, Slot slot, List oldValues) {
+        cTreeTableModel.update(aChange, slot, oldValues);
     }
 	
 	
