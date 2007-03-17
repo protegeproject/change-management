@@ -149,8 +149,8 @@ public class ServerChangesUtil {
         return transaction;
     }
 	
-	public Annotation createAnnotation(String annotType,Collection annotatables) {
-        Annotation a = (Annotation) model.createInstance(ChangeCls.Annotation);
+	public Annotation createAnnotation(ChangeCls annotType,Collection annotatables) {
+        Annotation a = (Annotation) model.createInstance(annotType);
         a.setAnnotates(annotatables);
         a.setCreated(Timestamp.getTimestamp(model));
         ChangeModel.logAnnotatableThing("Creating change for annotation", log, Level.FINE, a);
