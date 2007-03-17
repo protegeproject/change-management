@@ -1,4 +1,4 @@
-; Sat Mar 17 13:07:36 PDT 2007
+; Sat Mar 17 14:03:49 PDT 2007
 ; 
 ;+ (version "3.3")
 ;+ (build "Build 386")
@@ -6,15 +6,15 @@
 ([BROWSER_SLOT_NAMES] of  Property_List
 
 	(properties
-		[changes_ProjectKB_Instance_20036]
-		[changes_ProjectKB_Instance_20037]
-		[changes_ProjectKB_Instance_20038]
-		[changes_ProjectKB_Instance_20039]
-		[changes_ProjectKB_Instance_20040]
-		[changes_ProjectKB_Instance_20041]
-		[changes_ProjectKB_Instance_20042]
-		[changes_ProjectKB_Instance_20043]
-		[changes_ProjectKB_Instance_20044]))
+		[changes_ProjectKB_Instance_20016]
+		[changes_ProjectKB_Instance_20017]
+		[changes_ProjectKB_Instance_20018]
+		[changes_ProjectKB_Instance_20019]
+		[changes_ProjectKB_Instance_20020]
+		[changes_ProjectKB_Instance_20021]
+		[changes_ProjectKB_Instance_20022]
+		[changes_ProjectKB_Instance_20023]
+		[changes_ProjectKB_Instance_20024]))
 
 ([changes_ProjectKB_Instance_0] of  Widget
 
@@ -210,7 +210,7 @@
 
 ([changes_ProjectKB_Instance_10131] of  Map
 
-	(entries [changes_ProjectKB_Instance_20045]))
+	(entries [changes_ProjectKB_Instance_20025]))
 
 ([changes_ProjectKB_Instance_102] of  Property_List
 )
@@ -281,52 +281,52 @@
 ([changes_ProjectKB_Instance_20015] of  Property_List
 )
 
-([changes_ProjectKB_Instance_20036] of  String
+([changes_ProjectKB_Instance_20016] of  String
 
 	(name "Ontology_Component")
 	(string_value "currentName"))
 
-([changes_ProjectKB_Instance_20037] of  String
-
-	(name "Annotation")
-	(string_value "body"))
-
-([changes_ProjectKB_Instance_20038] of  String
-
-	(name "Vote")
-	(string_value "voteValue"))
-
-([changes_ProjectKB_Instance_20039] of  String
-
-	(name "Proposal")
-	(string_value "subject"))
-
-([changes_ProjectKB_Instance_20040] of  String
-
-	(name ":INSTANCE-ANNOTATION")
-	(string_value "%3AANNOTATION-TEXT"))
-
-([changes_ProjectKB_Instance_20041] of  String
-
-	(name ":PAL-CONSTRAINT")
-	(string_value "%3APAL-NAME"))
-
-([changes_ProjectKB_Instance_20042] of  String
+([changes_ProjectKB_Instance_20017] of  String
 
 	(name "Timestamp")
 	(string_value "date"))
 
-([changes_ProjectKB_Instance_20043] of  String
+([changes_ProjectKB_Instance_20018] of  String
+
+	(name "Annotation")
+	(string_value "body"))
+
+([changes_ProjectKB_Instance_20019] of  String
+
+	(name ":INSTANCE-ANNOTATION")
+	(string_value "%3AANNOTATION-TEXT"))
+
+([changes_ProjectKB_Instance_20020] of  String
+
+	(name ":PAL-CONSTRAINT")
+	(string_value "%3APAL-NAME"))
+
+([changes_ProjectKB_Instance_20021] of  String
+
+	(name "Vote")
+	(string_value "voteValue"))
+
+([changes_ProjectKB_Instance_20022] of  String
 
 	(name ":META-CLASS")
 	(string_value "%3ANAME"))
 
-([changes_ProjectKB_Instance_20044] of  String
+([changes_ProjectKB_Instance_20023] of  String
+
+	(name "Proposal")
+	(string_value "subject"))
+
+([changes_ProjectKB_Instance_20024] of  String
 
 	(name "Change")
 	(string_value "context"))
 
-([changes_ProjectKB_Instance_20045] of  Map_Entry
+([changes_ProjectKB_Instance_20025] of  Map_Entry
 
 	(key "annotation_proj_exists")
 	(key_class "java.lang.String")
@@ -3034,21 +3034,21 @@
 
 	(browser_slot_names [BROWSER_SLOT_NAMES])
 	(customized_instance_widgets
-		[STANDARD_SLOT_FORM_WIDGET]
-		[changes_ProjectKB_Instance_82926]
-		[changes_ProjectKB_Instance_51308]
-		[changes_ProjectKB_Instance_80535]
-		[changes_ProjectKB_Instance_80822]
-		[PAL_FORM_WIDGET]
 		[changes_ProjectKB_Instance_50648]
-		[changes_ProjectKB_Instance_51393]
-		[changes_ProjectKB_Instance_40056]
+		[STANDARD_SLOT_FORM_WIDGET]
 		[changes_ProjectKB_Instance_81267]
-		[STANDARD_CLASS_FORM_WIDGET]
 		[changes_ProjectKB_Instance_16]
+		[PAL_FORM_WIDGET]
 		[changes_ProjectKB_Instance_51020]
+		[changes_ProjectKB_Instance_80535]
+		[changes_ProjectKB_Instance_40056]
+		[changes_ProjectKB_Instance_51393]
+		[STANDARD_CLASS_FORM_WIDGET]
 		[STANDARD_FACET_FORM_WIDGET]
+		[changes_ProjectKB_Instance_51308]
 		[INSTANCE_ANNOTATION_FORM_WIDGET]
+		[changes_ProjectKB_Instance_82926]
+		[changes_ProjectKB_Instance_80822]
 		[changes_ProjectKB_Instance_50854])
 	(default_cls_metaclass ":STANDARD-CLASS")
 	(default_facet_metaclass ":STANDARD-FACET")
