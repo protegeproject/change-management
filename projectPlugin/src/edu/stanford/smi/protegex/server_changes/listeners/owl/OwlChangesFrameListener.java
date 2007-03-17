@@ -123,7 +123,7 @@ public class OwlChangesFrameListener implements FrameListener {
             context.append(cText);
 
             Annotation_Change change = (Annotation_Change) changes_db.createChange(ChangeCls.Annotation_Removed);
-            change.setOntologyAnnotation(ontologyAnnotation);
+            change.setAssociatedProperty(ontologyAnnotation);
             changes_db.finalizeChange(change, applyTo, context.toString());
         }//Annotation deleted
         else if (oldSlotValues == null || oldSlotValues.isEmpty()) {
@@ -140,7 +140,7 @@ public class OwlChangesFrameListener implements FrameListener {
             context.append(cName);
 
             Annotation_Change change = (Annotation_Change) changes_db.createChange(ChangeCls.Annotation_Added);
-            change.setOntologyAnnotation(ontologyAnnotation);
+            change.setAssociatedProperty(ontologyAnnotation);
             changes_db.finalizeChange(change, applyTo, context.toString());
         }
         else {
@@ -153,7 +153,7 @@ public class OwlChangesFrameListener implements FrameListener {
             context.append(newSlotValues);
 
             Annotation_Change change = (Annotation_Change) changes_db.createChange(ChangeCls.Annotation_Modified);
-            change.setOntologyAnnotation(ontologyAnnotation);
+            change.setAssociatedProperty(ontologyAnnotation);
             changes_db.finalizeChange(change, applyTo, context.toString());
         }
     }
