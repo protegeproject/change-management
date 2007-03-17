@@ -88,6 +88,11 @@ public class ChangeModel {
         Composite_Change,
         
         Ontology_Component,
+        Ontology_Class,
+        Ontology_Slot,
+        Ontology_Property,
+        Ontology_Instance,
+        Ontology_Individual,
         
         Timestamp;
     }
@@ -121,12 +126,13 @@ public class ChangeModel {
         applyTo,
         annotates,
         associatedAnnotations,
+        associatedProperty,
+        associatedSlot,
         author,
         body,
         changes,
         context,
         date,
-        ontology_annotation,
         partOfCompositeChange,
         sequence,
         subChanges,
@@ -241,7 +247,12 @@ public class ChangeModel {
             log.log(level, "\tApplyTo = " + change.getApplyTo());
             log.log(level, "\tAuthor = " + change.getAuthor());
             log.log(level, "\tContext = " + change.getContext());
-            log.log(level, "\tCreated = " + ((Timestamp) change.getTimestamp()).getDate());
+            if (change.getTimestamp() != null) {
+                log.log(level, "\tCreated = " + ((Timestamp) change.getTimestamp()).getDate());
+            }
+            else {
+                log.log(level, "\tNo timestamp");
+            }
         }
         log.log(level, "\tDirect type = " + cls);
         log.log(level, "\tFrame ID = " + aInst.getFrameID().getLocalPart());
