@@ -63,6 +63,7 @@ import edu.stanford.smi.protegex.server_changes.GetAnnotationProjectName;
 import edu.stanford.smi.protegex.server_changes.model.AnnotationCreationComparator;
 import edu.stanford.smi.protegex.server_changes.model.ChangeDateComparator;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.AnnotationCls;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeSlot;
 import edu.stanford.smi.protegex.server_changes.model.generated.AnnotatableThing;
@@ -444,7 +445,7 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	
 	private static void loadExistingData() {      
-		Collection<Instance> annotateInsts = model.getInstances(ChangeCls.Annotation);
+		Collection<Instance> annotateInsts = model.getInstances(AnnotationCls.Annotation);
 		loadChanges();
 		loadAnnotations(annotateInsts);
 	}
