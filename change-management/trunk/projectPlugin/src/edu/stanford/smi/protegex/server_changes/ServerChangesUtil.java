@@ -10,9 +10,12 @@ import java.util.logging.Logger;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.FrameID;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeSlot;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
@@ -20,6 +23,8 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Created_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Deleted_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Property;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Slot;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 import edu.stanford.smi.protegex.server_changes.postprocess.JoinCreateAndNameChange;
 
@@ -148,6 +153,39 @@ public class ServerChangesUtil {
         changes_db.finalizeChange(transaction, applyTo, context);
         return transaction;
     }
+    
+    public static Change createChangeWithSlot(ChangesDb changes_db,
+                                              ChangeCls type,
+                                              Frame applyTo,
+                                              String context,
+                                              Slot slot) {
+        Ontology_Component oc = changes_db.getOntologyComponent(applyTo, true);
+        Change change = (Change) changes_db.createChange(type);
+        ChangeModel model = changes_db.getModel();
+        
+        Ontology_Slot s = (Ontology_Slot) changes_db.getOntologyComponent(slot, true);
+        change.setDirectOwnSlotValue(model.getSlot(ChangeSlot.associatedSlot), s);
+        
+        changes_db.finalizeChange(change, oc, context);
+        return change;
+    }
+    
+    public static Change createChangeWithProperty(ChangesDb changes_db,
+                                                  ChangeCls type,
+                                                  Frame applyTo,
+                                                  String context,
+                                                  RDFProperty property) {
+        Ontology_Component oc = changes_db.getOntologyComponent(applyTo, true);
+        Change change = (Change) changes_db.createChange(type);
+        ChangeModel model = changes_db.getModel();
+        
+        Ontology_Property p = (Ontology_Property) changes_db.getOntologyComponent(property, true);
+        change.setDirectOwnSlotValue(model.getSlot(ChangeSlot.associatedProperty), p);
+        
+        changes_db.finalizeChange(change, oc, context);
+        return change;
+    }
+                                                  
 	
 	public Annotation createAnnotation(ChangeCls annotType,Collection annotatables) {
         Annotation a = (Annotation) model.createInstance(annotType);
