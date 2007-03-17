@@ -42,11 +42,11 @@ public class AnnotationCombiner implements PostProcessor {
             }
             
             Ontology_Component applyTo = (Ontology_Component) annotation.getApplyTo();
-            Ontology_Component property = (Ontology_Component) annotation.getOntologyAnnotation();
+            Ontology_Component property = (Ontology_Component) annotation.getAssociatedProperty();
             
             Annotation_Change earlier_annotation = previous_annotations.get(0);
             if (!applyTo.equals(earlier_annotation.getApplyTo()) || 
-                    !property.equals(earlier_annotation.getOntologyAnnotation())) {
+                    !property.equals(earlier_annotation.getAssociatedProperty())) {
                 combineAnnotations(previous_annotations);
                 List<Annotation_Change> new_annotations = new ArrayList<Annotation_Change>();
                 new_annotations.add(annotation);
