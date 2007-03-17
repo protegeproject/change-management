@@ -22,6 +22,7 @@ public class ChangeModel {
     
     private KnowledgeBase changes_kb;
     private EnumMap<ChangeCls, Cls> clsMap = new EnumMap<ChangeCls, Cls>(ChangeCls.class);
+    private EnumMap<AnnotationCls, Cls> annotationClsMap = new EnumMap<AnnotationCls, Cls>(AnnotationCls.class);
     private EnumMap<ChangeSlot, Slot> slotMap = new EnumMap<ChangeSlot, Slot>(ChangeSlot.class);
     
     
@@ -31,8 +32,7 @@ public class ChangeModel {
     
     // not recommended style but it is very convenient (pretty?) for the enum name to be the name.
     // alternatively I could use a constructor...
-    public enum ChangeCls {
-        Annotation,
+    public enum ChangeCls {        
         Change,
         
         Class_Change,
@@ -91,6 +91,30 @@ public class ChangeModel {
         
         Timestamp;
     }
+    
+    
+    public enum AnnotationCls {
+    	Annotation,
+    	
+    	Advice,
+    	Comment,
+    	Example,
+    	Explanation,
+    	
+    	Proposal,
+    	SimpleProposal,
+    	VotingProposal,
+    	AgreeDisagreeVoteProposal,
+    	FiveStarsVoteProposal,
+    	
+    	Question,
+    	SeeAlso,	
+    	    	
+    	Vote,
+    	AgreeDisagreeVote,
+    	FiveStarsVote;    	
+    }
+    
     
     public enum ChangeSlot {
         action,
@@ -166,6 +190,14 @@ public class ChangeModel {
         return cls;
     }
     
+    public Cls getCls(AnnotationCls c) {
+        Cls cls = annotationClsMap.get(c);
+        if (cls == null) {
+            cls = changes_kb.getCls(c.name());
+            annotationClsMap.put(c, cls);
+        }
+        return cls;
+    }
     
     public Slot getSlot(ChangeSlot s) {
         Slot slot = slotMap.get(s);
@@ -177,6 +209,10 @@ public class ChangeModel {
     }
     
     public Collection<Instance> getInstances(ChangeCls cls) {
+        return getCls(cls).getInstances();
+    }
+    
+    public Collection<Instance> getInstances(AnnotationCls cls) {
         return getCls(cls).getInstances();
     }
     
@@ -192,6 +228,9 @@ public class ChangeModel {
         return getCls(cls).createDirectInstance(null);
     }
     
+    public Instance createInstance(AnnotationCls cls) {
+        return getCls(cls).createDirectInstance(null);
+    }
 
 
     /*
