@@ -2,9 +2,11 @@ package edu.stanford.smi.protegex.changes.listeners;
 
 
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.changes.ChangesTab;
 import edu.stanford.smi.protegex.server_changes.model.AbstractChangeListener;
@@ -26,9 +28,9 @@ public class ChangesListener extends AbstractChangeListener {
     }
     
     @Override
-    public void modifyChange(Change change) {
+    public void modifyChange(Change change, Slot slot, List oldValues) {
         ChangeModel.logAnnotatableThing("ChangeTab listener received modification to change", log, Level.FINE, change);
-        ChangesTab.modifyChange(change);
+        ChangesTab.modifyChange(change, slot, oldValues);
     }
     
     public void addAnnotation(Annotation a) { }
