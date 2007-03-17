@@ -1,5 +1,5 @@
 
-// Created on Wed Mar 07 13:03:39 PST 2007
+// Created on Sat Mar 17 13:07:57 PDT 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -34,5 +34,11 @@ public class TemplateSlot_Added extends Class_Change {
 		super(kb, id);
 	}
 
+
+	public void setAssociatedSlot(Instance associatedSlot) {
+		ModelUtilities.setOwnSlotValue(this, "associatedSlot", associatedSlot);	}
+	public Instance getAssociatedSlot() {
+		return ((Instance) ModelUtilities.getOwnSlotValue(this, "associatedSlot"));
+	}
 // __Code above is automatically generated. Do not change
 }

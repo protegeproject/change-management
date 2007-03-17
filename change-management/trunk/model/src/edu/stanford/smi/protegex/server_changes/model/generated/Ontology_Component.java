@@ -1,5 +1,5 @@
 
-// Created on Wed Mar 07 13:03:39 PST 2007
+// Created on Sat Mar 17 13:07:58 PDT 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -90,23 +90,7 @@ public class Ontology_Component extends AnnotatableThing {
         
     }
     
-    public String toString() {
-        switch (getStatus()) {
-        case CHANGED:
-            return "Modified Object: " + getCurrentName();
-        case CREATED:
-            return "New Object: " + getCurrentName();
-        case DELETED:
-            return "Deleted Object: " + getInitialName();
-        case CREATED_AND_DELETED:
-            return "Created and Deleted Object";
-        case UNCHANGED:
-            return "Unchanged Object: " + getCurrentName();
-        default:
-            throw new RuntimeException("Developer missed a case");
-        }
-    }
-    
+ 
     public String getInitialName() {
         List<Instance> changes = getSortedChanges();
         if (changes.get(0) instanceof Created_Change) {
@@ -178,4 +162,40 @@ public class Ontology_Component extends AnnotatableThing {
 		Log.getLogger().warning("Could not determine anonymous status of " + this);
 		return true;
     }
+    
+    public  String getComponentType() {
+        if (this instanceof Ontology_Class) {
+            return "Class";
+        }
+        else if (this instanceof Ontology_Slot) {
+            return "Slot";
+        }
+        else if (this instanceof Ontology_Property) {
+            return "Property";
+        }
+        else if (this instanceof Ontology_Instance) {
+            return "Instance";
+        }
+        else {
+            return "Individual";
+        }
+    }
+    
+    public String toString() {
+        switch (getStatus()) {
+        case CHANGED:
+            return "Modified Object: " + getCurrentName();
+        case CREATED:
+            return "New Object: " + getCurrentName();
+        case DELETED:
+            return "Deleted Object: " + getInitialName();
+        case CREATED_AND_DELETED:
+            return "Created and Deleted Object";
+        case UNCHANGED:
+            return "Unchanged Object: " + getCurrentName();
+        default:
+            throw new RuntimeException("Developer missed a case");
+        }
+    }
+    
 }
