@@ -42,7 +42,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import edu.stanford.smi.protege.resource.Icons;
-import edu.stanford.smi.protegex.changes.TreeTableNode;
+import edu.stanford.smi.protegex.changes.ChangeTreeTableNode;
 
 
 /**
@@ -74,8 +74,8 @@ public class JTreeTable extends JTable {
 
 			super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
-			if (value instanceof TreeTableNode) {
-				TreeTableNode node = (TreeTableNode) value;
+			if (value instanceof ChangeTreeTableNode) {
+				ChangeTreeTableNode node = (ChangeTreeTableNode) value;
                 /*
 				if(node.getChildCount()>0)
 			      setIcon(Icons.getHierarchyCollapsedIcon());
