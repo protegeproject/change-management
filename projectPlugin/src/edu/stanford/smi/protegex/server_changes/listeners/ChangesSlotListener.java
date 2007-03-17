@@ -28,6 +28,7 @@ public class ChangesSlotListener implements SlotListener{
 	public void templateSlotClsAdded(SlotEvent event) {
 		if (event.getArgument() instanceof Cls) {
 			Cls theCls = event.getCls();
+            Slot theSlot = event.getSlot();
 		
 			StringBuffer context = new StringBuffer();
 			context.append("Added template slot: ");
@@ -35,7 +36,7 @@ public class ChangesSlotListener implements SlotListener{
 			context.append(" to: ");
 			context.append(theCls.getBrowserText());
             
-            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.TemplateSlot_Added, theCls, context.toString());
+            ServerChangesUtil.createChangeWithSlot(changes_db, ChangeCls.TemplateSlot_Added, theCls, context.toString(), theSlot);
 		}
 	}
 
@@ -45,6 +46,7 @@ public class ChangesSlotListener implements SlotListener{
 	public void templateSlotClsRemoved(SlotEvent event) {
 		if (event.getArgument() instanceof Cls) {
 			Cls theCls = event.getCls();
+            Slot theSlot = event.getSlot();
             String name = changes_db.getPossiblyDeletedBrowserText(theCls);
 			
 			StringBuffer context = new StringBuffer();
@@ -53,7 +55,7 @@ public class ChangesSlotListener implements SlotListener{
 			context.append(" from: ");
 			context.append(name);
 			
-            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.TemplateSlot_Removed, theCls, context.toString());
+            ServerChangesUtil.createChangeWithSlot(changes_db, ChangeCls.TemplateSlot_Removed, theCls, context.toString(), theSlot);
 		}
 	}
 
