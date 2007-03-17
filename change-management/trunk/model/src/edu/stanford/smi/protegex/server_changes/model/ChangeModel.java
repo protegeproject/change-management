@@ -129,6 +129,7 @@ public class ChangeModel {
         ontology_annotation,
         partOfCompositeChange,
         sequence,
+        subChanges,
         timestamp
     }
     
@@ -144,18 +145,6 @@ public class ChangeModel {
     
     public static boolean isRoot(Change change) {
         return change.getApplyTo() == null;
-    }
-    
-    public Change findRoot() {
-        Cls chgs = getCls(ChangeCls.Composite_Change);
-        Collection<Instance> changeInst = changes_kb.getInstances(chgs);
-        for (Instance i : changeInst) {
-            Change aInst = (Change) i;
-            if (ChangeModel.isRoot(aInst)){
-                return aInst;
-            }
-        }
-        return null;
     }
     
     public static Collection<Change> removeRoots(Collection<Change> changes) {
