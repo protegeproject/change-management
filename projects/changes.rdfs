@@ -178,9 +178,29 @@
 	 rdfs:label="Name_Changed">
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
+<rdfs:Class rdf:about="&kb;Ontology_Class"
+	 rdfs:label="Ontology_Class">
+	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Ontology_Component"
 	 rdfs:label="Ontology_Component">
 	<rdfs:subClassOf rdf:resource="&kb;AnnotatableThing"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Ontology_Individual"
+	 rdfs:label="Ontology_Individual">
+	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Ontology_Instance"
+	 rdfs:label="Ontology_Instance">
+	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Ontology_Property"
+	 rdfs:label="Ontology_Property">
+	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Ontology_Slot"
+	 rdfs:label="Ontology_Slot">
+	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Property_Change"
 	 rdfs:label="Property_Change">
@@ -334,6 +354,19 @@
 	<rdfs:domain rdf:resource="&kb;Change"/>
 	<a:inverseProperty rdf:resource="&kb;annotates"/>
 </rdf:Property>
+<rdf:Property rdf:about="&kb;associatedProperty"
+	 a:maxCardinality="1"
+	 rdfs:label="associatedProperty">
+	<rdfs:domain rdf:resource="&kb;Annotation_Change"/>
+	<rdfs:range rdf:resource="&kb;Ontology_Property"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;associatedSlot"
+	 a:maxCardinality="1"
+	 rdfs:label="associatedSlot">
+	<rdfs:range rdf:resource="&kb;Ontology_Slot"/>
+	<rdfs:domain rdf:resource="&kb;TemplateSlot_Added"/>
+	<rdfs:domain rdf:resource="&kb;TemplateSlot_Removed"/>
+</rdf:Property>
 <rdf:Property rdf:about="&kb;author"
 	 a:maxCardinality="1"
 	 rdfs:label="author">
@@ -420,12 +453,6 @@
 	 rdfs:label="oldName">
 	<rdfs:domain rdf:resource="&kb;Name_Changed"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
-</rdf:Property>
-<rdf:Property rdf:about="&kb;ontologyAnnotation"
-	 a:maxCardinality="1"
-	 rdfs:label="ontologyAnnotation">
-	<rdfs:domain rdf:resource="&kb;Annotation_Change"/>
-	<rdfs:range rdf:resource="&kb;Ontology_Component"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;partOfCompositeChange"
 	 a:maxCardinality="1"
