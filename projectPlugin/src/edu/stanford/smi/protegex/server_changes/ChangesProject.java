@@ -113,12 +113,6 @@ public class ChangesProject extends ProjectPluginAdapter {
 			Log.getLogger().warning("Could not initialize the annotations ontology. ChangesTab will probably not work");
 			return;
 		}
-		
-		// AT THIS POINT, WE HAVE THE CHANGES PROJECT 'changes' and the KB 'changesKb'. 
-		// Creating the Root of the tree for the UI
-
-
-		changesDb.createRootChange();
 
 		//Check to see if the project is an OWL one
 		boolean isOwlProject = Util.kbInOwl(currentKB);
