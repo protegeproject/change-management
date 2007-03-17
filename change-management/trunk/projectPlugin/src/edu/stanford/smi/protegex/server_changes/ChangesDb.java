@@ -279,17 +279,6 @@ public class ChangesDb {
         }
     }
     
-    /**
-     * This implementation must be sychronized with ChangeModel.isRoot();
-     * 
-     * @return
-     */
-    public Change createRootChange() {
-        Change root = createChange(ChangeCls.Composite_Change);
-        finalizeChange(root, null, "Root");
-        return root;
-    }
-    
     public Change createChange(ChangeCls type) {
         Change change = (Change) model.createInstance(type);
         change.setAction(type.toString());
