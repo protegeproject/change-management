@@ -16,6 +16,7 @@ import edu.stanford.smi.protege.model.FrameID;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
+import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protege.server.Server;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
@@ -234,13 +235,26 @@ public class ChangesDb {
         FrameID frameId = frame.getFrameID();
         Ontology_Component oc = frameIdMap.get(frameId);
         if (oc == null && create) {
-            oc = (Ontology_Component) model.createInstance(ChangeCls.Ontology_Component);
+            oc = (Ontology_Component) model.createInstance(getOntologyComponentType(frame));
             if (!frame.isDeleted()) {
                 oc.setCurrentName(frame.getName());
             }
             frameIdMap.put(frameId, oc);
         }
         return oc;
+    }
+    
+    public ChangeCls getOntologyComponentType(Frame frame) {
+        if (frame instanceof Cls) {
+            return ChangeCls.Ontology_Class;
+        }
+        else if (frame instanceof Slot) {
+            return isOwl() ? ChangeCls.Ontology_Property : ChangeCls.Ontology_Slot;
+        }
+        else {
+            return isOwl() ? ChangeCls.Ontology_Individual : ChangeCls.Ontology_Instance;
+        }
+        
     }
     
     public TransactionState getTransactionState() {
