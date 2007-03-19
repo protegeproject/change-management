@@ -40,7 +40,7 @@ public class ChangesClsListener implements ClsListener{
 		context.append(clsOfInst.getBrowserText());
 		context.append(")");
         
-        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Instance_Added, addedInst, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Individual_Added, addedInst, context.toString());
 
 	}
 
@@ -60,7 +60,7 @@ public class ChangesClsListener implements ClsListener{
         
         Ontology_Component applyTo = changes_db.getOntologyComponent(removedInst, true);
         
-        Change change = changes_db.createChange(ChangeCls.Instance_Removed);
+        Change change = changes_db.createChange(ChangeCls.Individual_Removed);
         changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
