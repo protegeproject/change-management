@@ -14,7 +14,7 @@ import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Instance_Added;
+import edu.stanford.smi.protegex.server_changes.model.generated.Individual_Added;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
  
 public class OwlChangesClassListener extends ClassAdapter {
