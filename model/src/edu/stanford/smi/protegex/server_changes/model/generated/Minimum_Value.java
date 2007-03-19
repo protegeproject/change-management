@@ -1,5 +1,5 @@
 
-// Created on Sat Mar 17 13:07:58 PDT 2007
+// Created on Mon Mar 19 14:22:16 PDT 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -24,7 +24,7 @@ import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 
 /** 
  */
-public class Minimum_Value extends Slot_Change {
+public class Minimum_Value extends Property_Change {
 
 	public Minimum_Value() {
 	}

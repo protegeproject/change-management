@@ -1,5 +1,5 @@
 
-// Created on Sat Mar 17 13:07:57 PDT 2007
+// Created on Mon Mar 19 14:22:16 PDT 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -35,10 +35,16 @@ public class TemplateSlot_Added extends Class_Change {
 	}
 
 
-	public void setAssociatedSlot(Instance associatedSlot) {
-		ModelUtilities.setOwnSlotValue(this, "associatedSlot", associatedSlot);	}
-	public Instance getAssociatedSlot() {
-		return ((Instance) ModelUtilities.getOwnSlotValue(this, "associatedSlot"));
+	public void setAssociatedProperty(Instance associatedProperty) {
+		ModelUtilities.setOwnSlotValue(this, "associatedProperty", associatedProperty);	}
+	public Instance getAssociatedProperty() {
+		return ((Instance) ModelUtilities.getOwnSlotValue(this, "associatedProperty"));
+	}
+
+	public void setChanges_Slot_0(String changes_Slot_0) {
+		ModelUtilities.setOwnSlotValue(this, "changes_Slot_0", changes_Slot_0);	}
+	public String getChanges_Slot_0() {
+		return ((String) ModelUtilities.getOwnSlotValue(this, "changes_Slot_0"));
 	}
 // __Code above is automatically generated. Do not change
 }
