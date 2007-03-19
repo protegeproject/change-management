@@ -1,5 +1,5 @@
 
-// Created on Sat Mar 17 13:07:58 PDT 2007
+// Created on Mon Mar 19 14:22:16 PDT 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -24,13 +24,13 @@ import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 
 /** 
  */
-public abstract class Instance_Change extends Change {
+public class Property_Value extends Individual_Change {
 
-	public Instance_Change() {
+	public Property_Value() {
 	}
 
 
-	public Instance_Change(KnowledgeBase kb, FrameID id ) {
+	public Property_Value(KnowledgeBase kb, FrameID id ) {
 		super(kb, id);
 	}
 

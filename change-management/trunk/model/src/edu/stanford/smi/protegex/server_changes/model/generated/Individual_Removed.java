@@ -1,5 +1,5 @@
 
-// Created on Sat Mar 17 13:07:58 PDT 2007
+// Created on Mon Mar 19 14:22:16 PDT 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -23,15 +23,14 @@ import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 
 
 /** 
- *  Deleted_Change
  */
-public class Instance_Deleted extends Deleted_Change {
+public class Individual_Removed extends Individual_Change {
 
-	public Instance_Deleted() {
+	public Individual_Removed() {
 	}
 
 
-	public Instance_Deleted(KnowledgeBase kb, FrameID id ) {
+	public Individual_Removed(KnowledgeBase kb, FrameID id ) {
 		super(kb, id);
 	}
 
