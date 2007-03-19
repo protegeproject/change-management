@@ -116,7 +116,6 @@ public class ChangeModel {
         annotates,
         associatedAnnotations,
         associatedProperty,
-        associatedSlot,
         author,
         body,
         changes,
