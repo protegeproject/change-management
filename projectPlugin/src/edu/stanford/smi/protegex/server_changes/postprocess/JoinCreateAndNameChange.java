@@ -8,11 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Created_Change;
@@ -21,7 +19,6 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Individual_Creat
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Property;
-import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Slot;
 import edu.stanford.smi.protegex.server_changes.model.generated.Subclass_Added;
 import edu.stanford.smi.protegex.server_changes.model.generated.TemplateSlot_Added;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
@@ -122,7 +119,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
                 }
             }
             else if (!changes_db.isOwl() && aChange instanceof TemplateSlot_Added && 
-                     (created instanceof Ontology_Slot || created instanceof Ontology_Property)) {
+                     (created instanceof Ontology_Property)) {
                 if (!templateClassAddedSeen.contains(session)) {
                     templateClassAddedSeen.add(session);
                     combineInTransaction(previous_change, aChange);
