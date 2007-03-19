@@ -131,6 +131,6 @@ public class ChangesKBListener implements KnowledgeBaseListener {
 	public void slotDeleted(KnowledgeBaseEvent event) {
         String oldName = event.getOldName();
         Frame frame = event.getSlot();
-        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, frame, oldName);
+        ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Property_Deleted, frame, oldName);
 	}
 }
