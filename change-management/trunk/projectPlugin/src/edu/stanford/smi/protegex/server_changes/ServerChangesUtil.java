@@ -54,22 +54,21 @@ public class ServerChangesUtil {
                                                      Frame applyTo,
                                                      String name) {
         String context;
+//      TT: Do we want to make the difference between a slot and a property here?
         switch (type) {
         case Class_Created:
             context = "Class";
             break;
-        case Slot_Created:
-            context = "Slot";
-            break;
         case Property_Created:
             context = "Property";
             break;
-        case Instance_Created:
+        case Individual_Created:
             context = "Instance";
             break;
         default:
             throw new IllegalArgumentException("Change type " + type + " is not a create frame type");
         }
+        
         context = context + " Created: " + name;
         
         Ontology_Component oc = changes_db.getOntologyComponent(applyTo, true);
@@ -86,17 +85,15 @@ public class ServerChangesUtil {
                                                      Frame frame,
                                                      String name) {
         String context;
+//      TT: Do we want to make the difference between a slot and a property here?
         switch (type) {
         case Class_Deleted:
             context = "Class";
             break;
-        case Slot_Deleted:
-            context = "Slot";
-            break;
         case Property_Deleted:
             context = "Property";
             break;
-        case Instance_Deleted:
+        case Individual_Deleted:
             context = "Instance";
             break;
         default:
