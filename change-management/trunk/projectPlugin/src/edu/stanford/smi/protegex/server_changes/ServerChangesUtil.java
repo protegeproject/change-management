@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.model.Frame;
-import edu.stanford.smi.protege.model.FrameID;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
@@ -24,9 +23,7 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Deleted_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Property;
-import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Slot;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
-import edu.stanford.smi.protegex.server_changes.postprocess.JoinCreateAndNameChange;
 
 public class ServerChangesUtil {
     private static final Logger log = Log.getLogger(ServerChangesUtil.class);
@@ -160,7 +157,7 @@ public class ServerChangesUtil {
         Change change = (Change) changes_db.createChange(type);
         ChangeModel model = changes_db.getModel();
         
-        Ontology_Slot s = (Ontology_Slot) changes_db.getOntologyComponent(slot, true);
+        Ontology_Property s = (Ontology_Property) changes_db.getOntologyComponent(slot, true);
         change.setDirectOwnSlotValue(model.getSlot(ChangeSlot.associatedSlot), s);
         
         changes_db.finalizeChange(change, oc, context);
