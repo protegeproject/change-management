@@ -53,14 +53,14 @@ public class ChangeModel {
         TemplateSlot_Added,
         TemplateSlot_Removed,
         
-        Instance_Change,
-        Instance_Created,
-        Instance_Deleted,
+        Individual_Change,
+        Individual_Created,
+        Individual_Deleted,
         DirectType_Added,
         DirectType_Removed,
-        Instance_Added,
-        Instance_Removed,
-        Slot_Value,
+        Individual_Added,
+        Individual_Removed,
+        Property_Value,
         
         Property_Change,
         Property_Created,
@@ -69,29 +69,18 @@ public class ChangeModel {
         Subproperty_Removed,
         Superproperty_Added,
         Superproperty_Removed,
-        
-        Slot_Change,
         Maximum_Cardinality,
         Maximum_Value,
         Minimum_Cardinality,
         Minimum_Value,
-        Slot_Created,
-        Slot_Deleted,
-        Subslot_Added,
-        Subslot_Removed,
-        Superslot_Added,
-        Superslot_Removed,
-        
-        
+                
         Name_Changed,
         
         Composite_Change,
         
         Ontology_Component,
-        Ontology_Class,
-        Ontology_Slot,
-        Ontology_Property,
-        Ontology_Instance,
+        Ontology_Class,        
+        Ontology_Property,        
         Ontology_Individual,
         
         Timestamp;
