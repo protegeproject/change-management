@@ -16,8 +16,8 @@ import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Created_Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Instance_Added;
-import edu.stanford.smi.protegex.server_changes.model.generated.Instance_Created;
+import edu.stanford.smi.protegex.server_changes.model.generated.Individual_Added;
+import edu.stanford.smi.protegex.server_changes.model.generated.Individual_Created;
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Property;
@@ -82,7 +82,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
     public void addChange(Change aChange) {
         RemoteSession session = changes_db.getCurrentSession();
         if (aChange instanceof Created_Change 
-                && !(aChange instanceof Instance_Created) 
+                && !(aChange instanceof Individual_Created) 
                 && aChange.getApplyTo() != null) {
             lastCreateBySession.put(session, (Created_Change) aChange);
             return;
@@ -93,7 +93,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
             Ontology_Component created = (Ontology_Component) previous_change.getApplyTo();
 
             if (aChange instanceof TemplateSlot_Added && 
-                    !((TemplateSlot_Added) aChange).getAssociatedSlot().equals(created)) {
+                    !((TemplateSlot_Added) aChange).getAssociatedProperty().equals(created)) {
                removeLastCreate(session);
                return;         
             }
@@ -114,7 +114,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
                     return;
                 }
             }
-            else if (!changes_db.isOwl() && aChange instanceof Instance_Added) {
+            else if (!changes_db.isOwl() && aChange instanceof Individual_Added) {
                 if (!instanceAddedSeen.contains(session)) {
                     instanceAddedSeen.add(session);
                     combineInTransaction(previous_change, aChange);
