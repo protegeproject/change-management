@@ -89,11 +89,11 @@
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;DirectType_Added"
 	 rdfs:label="DirectType_Added">
-	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Individual_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;DirectType_Removed"
 	 rdfs:label="DirectType_Removed">
-	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Individual_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;DisjointClass_Added"
 	 rdfs:label="DisjointClass_Added">
@@ -133,46 +133,46 @@
 	 rdfs:label="FiveStarsVoteProposal">
 	<rdfs:subClassOf rdf:resource="&kb;VotingProposal"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;Instance_Added"
-	 rdfs:label="Instance_Added">
-	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
+<rdfs:Class rdf:about="&kb;Individual_Added"
+	 rdfs:label="Individual_Added">
+	<rdfs:subClassOf rdf:resource="&kb;Individual_Change"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;Instance_Change"
+<rdfs:Class rdf:about="&kb;Individual_Change"
 	 a:role="abstract"
-	 rdfs:label="Instance_Change">
+	 rdfs:label="Individual_Change">
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;Instance_Created"
+<rdfs:Class rdf:about="&kb;Individual_Created"
 	 rdfs:comment="Created_Change"
-	 rdfs:label="Instance_Created">
+	 rdfs:label="Individual_Created">
 	<rdfs:subClassOf rdf:resource="&kb;Created_Change"/>
-	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Individual_Change"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;Instance_Deleted"
+<rdfs:Class rdf:about="&kb;Individual_Deleted"
 	 rdfs:comment="Deleted_Change"
-	 rdfs:label="Instance_Deleted">
+	 rdfs:label="Individual_Deleted">
 	<rdfs:subClassOf rdf:resource="&kb;Deleted_Change"/>
-	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Individual_Change"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;Instance_Removed"
-	 rdfs:label="Instance_Removed">
-	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
+<rdfs:Class rdf:about="&kb;Individual_Removed"
+	 rdfs:label="Individual_Removed">
+	<rdfs:subClassOf rdf:resource="&kb;Individual_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Maximum_Cardinality"
 	 rdfs:label="Maximum_Cardinality">
-	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Maximum_Value"
 	 rdfs:label="Maximum_Value">
-	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Minimum_Cardinality"
 	 rdfs:label="Minimum_Cardinality">
-	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Minimum_Value"
 	 rdfs:label="Minimum_Value">
-	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Name_Changed"
 	 rdfs:label="Name_Changed">
@@ -190,16 +190,8 @@
 	 rdfs:label="Ontology_Individual">
 	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;Ontology_Instance"
-	 rdfs:label="Ontology_Instance">
-	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
-</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Ontology_Property"
 	 rdfs:label="Ontology_Property">
-	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Ontology_Slot"
-	 rdfs:label="Ontology_Slot">
 	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Property_Change"
@@ -217,6 +209,10 @@
 	 rdfs:label="Property_Deleted">
 	<rdfs:subClassOf rdf:resource="&kb;Deleted_Change"/>
 	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Property_Value"
+	 rdfs:label="Property_Value">
+	<rdfs:subClassOf rdf:resource="&kb;Individual_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Proposal"
 	 a:role="abstract"
@@ -237,27 +233,6 @@
 	 rdfs:label="SimpleProposal">
 	<rdfs:subClassOf rdf:resource="&kb;Proposal"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;Slot_Change"
-	 a:role="abstract"
-	 rdfs:label="Slot_Change">
-	<rdfs:subClassOf rdf:resource="&kb;Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Slot_Created"
-	 rdfs:comment="Created_Change"
-	 rdfs:label="Slot_Created">
-	<rdfs:subClassOf rdf:resource="&kb;Created_Change"/>
-	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Slot_Deleted"
-	 rdfs:comment="Deleted_Change"
-	 rdfs:label="Slot_Deleted">
-	<rdfs:subClassOf rdf:resource="&kb;Deleted_Change"/>
-	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Slot_Value"
-	 rdfs:label="Slot_Value">
-	<rdfs:subClassOf rdf:resource="&kb;Instance_Change"/>
-</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Subclass_Added"
 	 rdfs:label="Subclass_Added">
 	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
@@ -274,14 +249,6 @@
 	 rdfs:label="Subproperty_Removed">
 	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;Subslot_Added"
-	 rdfs:label="Subslot_Added">
-	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Subslot_Removed"
-	 rdfs:label="Subslot_Removed">
-	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
-</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Superclass_Added"
 	 rdfs:label="Superclass_Added">
 	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
@@ -297,14 +264,6 @@
 <rdfs:Class rdf:about="&kb;Superproperty_Removed"
 	 rdfs:label="Superproperty_Removed">
 	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Superslot_Added"
-	 rdfs:label="Superslot_Added">
-	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Superslot_Removed"
-	 rdfs:label="Superslot_Removed">
-	<rdfs:subClassOf rdf:resource="&kb;Slot_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;TemplateSlot_Added"
 	 rdfs:label="TemplateSlot_Added">
@@ -359,11 +318,6 @@
 	 rdfs:label="associatedProperty">
 	<rdfs:domain rdf:resource="&kb;Annotation_Change"/>
 	<rdfs:range rdf:resource="&kb;Ontology_Property"/>
-</rdf:Property>
-<rdf:Property rdf:about="&kb;associatedSlot"
-	 a:maxCardinality="1"
-	 rdfs:label="associatedSlot">
-	<rdfs:range rdf:resource="&kb;Ontology_Slot"/>
 	<rdfs:domain rdf:resource="&kb;TemplateSlot_Added"/>
 	<rdfs:domain rdf:resource="&kb;TemplateSlot_Removed"/>
 </rdf:Property>
@@ -385,6 +339,18 @@
 	<rdfs:range rdf:resource="&kb;Change"/>
 	<rdfs:domain rdf:resource="&kb;Ontology_Component"/>
 	<a:inverseProperty rdf:resource="&kb;applyTo"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;changes_Slot_0"
+	 a:maxCardinality="1"
+	 rdfs:label="changes_Slot_0">
+	<rdfs:domain rdf:resource="&kb;TemplateSlot_Added"/>
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;changes_Slot_1"
+	 a:maxCardinality="1"
+	 rdfs:label="changes_Slot_1">
+	<rdfs:domain rdf:resource="&kb;TemplateSlot_Removed"/>
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;comment"
 	 rdfs:label="comment">
