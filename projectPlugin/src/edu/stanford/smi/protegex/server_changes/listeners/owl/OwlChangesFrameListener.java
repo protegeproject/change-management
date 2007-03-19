@@ -203,7 +203,7 @@ public class OwlChangesFrameListener implements FrameListener {
         context.append(" set to: ");
         context.append(newSlotValue);
 
-        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Slot_Value, i, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Property_Value, i, context.toString());
     }
 
 
