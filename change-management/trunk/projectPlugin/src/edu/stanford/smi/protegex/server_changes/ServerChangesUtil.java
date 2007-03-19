@@ -158,7 +158,7 @@ public class ServerChangesUtil {
         ChangeModel model = changes_db.getModel();
         
         Ontology_Property s = (Ontology_Property) changes_db.getOntologyComponent(slot, true);
-        change.setDirectOwnSlotValue(model.getSlot(ChangeSlot.associatedSlot), s);
+        change.setDirectOwnSlotValue(model.getSlot(ChangeSlot.associatedProperty), s);
         
         changes_db.finalizeChange(change, oc, context);
         return change;
