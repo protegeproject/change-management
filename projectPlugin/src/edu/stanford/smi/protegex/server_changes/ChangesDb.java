@@ -248,11 +248,11 @@ public class ChangesDb {
         if (frame instanceof Cls) {
             return ChangeCls.Ontology_Class;
         }
-        else if (frame instanceof Slot) {
-            return isOwl() ? ChangeCls.Ontology_Property : ChangeCls.Ontology_Slot;
+        else if (frame instanceof Slot) {            
+            return ChangeCls.Ontology_Property;
         }
         else {
-            return isOwl() ? ChangeCls.Ontology_Individual : ChangeCls.Ontology_Instance;
+        	return ChangeCls.Ontology_Individual;            
         }
         
     }
