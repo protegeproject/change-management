@@ -167,14 +167,8 @@ public class Ontology_Component extends AnnotatableThing {
         if (this instanceof Ontology_Class) {
             return "Class";
         }
-        else if (this instanceof Ontology_Slot) {
-            return "Slot";
-        }
         else if (this instanceof Ontology_Property) {
             return "Property";
-        }
-        else if (this instanceof Ontology_Instance) {
-            return "Instance";
         }
         else {
             return "Individual";
