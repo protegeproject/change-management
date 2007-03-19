@@ -38,7 +38,7 @@ public class OwlChangesClassListener extends ClassAdapter {
 		context.append(arg0.getBrowserText() );
 		context.append(")");
         
-        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Instance_Added, arg1, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Individual_Added, arg1, context.toString());
 	}
 
 	public void instanceRemoved(RDFSClass arg0, RDFResource arg1) {
@@ -53,7 +53,7 @@ public class OwlChangesClassListener extends ClassAdapter {
             
             Ontology_Component applyTo = changes_db.getOntologyComponent(arg1, true);
             
-            Change change = changes_db.createChange(ChangeCls.Instance_Removed);
+            Change change = changes_db.createChange(ChangeCls.Individual_Removed);
             changes_db.finalizeChange(change, applyTo, context.toString());
 	}
 
