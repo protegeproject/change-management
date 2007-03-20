@@ -230,6 +230,9 @@ public class ChangesDb {
         return null;
     }
     
+    public Ontology_Component getOntologyComponent(Frame frame) {
+    	return getOntologyComponent(frame, false);
+    }    
     
     public Ontology_Component getOntologyComponent(Frame frame, boolean create) {
         FrameID frameId = frame.getFrameID();
