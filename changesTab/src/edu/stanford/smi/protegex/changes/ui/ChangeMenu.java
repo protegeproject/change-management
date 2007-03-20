@@ -142,6 +142,10 @@ public class ChangeMenu extends JMenu {
 			TabWidget tWidget = pvw.getSelectedTab();
 			Collection selection = tWidget.getSelection();
 			
+			if (selection == null || selection.size() == 0) {				
+				return;
+			}
+			
 			ArrayList selArray = new ArrayList(selection);
 			Object elem = selArray.get(selArray.size()-1);
 			String className = null;
