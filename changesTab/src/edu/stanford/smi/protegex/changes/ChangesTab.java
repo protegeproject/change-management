@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.TreePath;
 
 import edu.stanford.smi.protege.model.DefaultKnowledgeBase;
 import edu.stanford.smi.protege.model.Instance;
@@ -45,6 +46,8 @@ import edu.stanford.smi.protege.ui.HeaderComponent;
 import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.LabeledComponent;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protege.util.SelectableTable;
+import edu.stanford.smi.protege.util.ViewAction;
 import edu.stanford.smi.protege.widget.AbstractTabWidget;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
 import edu.stanford.smi.protegex.changes.action.ChangesSearchClear;
@@ -96,8 +99,8 @@ public class ChangesTab extends AbstractTabWidget {
 	private KnowledgeBase currentKB;
 	private ChangeCreateUtil createUtil;
 
-	private JTable annotationsTable;
-	private JTable annotationChangesTable;
+	private SelectableTable annotationsTable;
+	private SelectableTable annotationChangesTable;
 
 	private JComboBox annotationTypes;
 	private ChangeTableModel annotationChangesTableModel;
@@ -108,19 +111,17 @@ public class ChangesTab extends AbstractTabWidget {
 	private Instance instToEdit;
 	private String OWL_KB_INDICATOR = "OWL";
 
-
 	private ChangeMenu changesMenu;
 	private RemoveInstanceAction removeAnnotationAction;
 	private EditInstanceAction editAnnotationAction;
 	private AddInstanceAction addAnnotationAction;
 
-
-	private JTreeTable cTreeTable;
+	private JTreeTable changesTreeTable;
 	private ChangeTreeTableModel changesTreeTableModel;
 
 	private boolean inRemoveAnnotation = false;
 
-
+	
 	public boolean getInRemoveAnnotation() {
 		return inRemoveAnnotation;
 	}
@@ -166,18 +167,14 @@ public class ChangesTab extends AbstractTabWidget {
 		menuBar.add (changesMenu);
 
 		annotationsTable.addMouseListener(new AnnotationShowAction(annotationsTable, annotationsTableModel, changes_project));
-		JScrollPane scroll = ComponentFactory.createScrollPane(cTreeTable);
+		JScrollPane scroll = ComponentFactory.createScrollPane(changesTreeTable);
 
 		JScrollPane scroll2 = ComponentFactory.createScrollPane(annotationsTable);
 		JScrollPane scroll3 = ComponentFactory.createScrollPane(annotationChangesTable);
-
-		JPanel interPane = new JPanel();
-		interPane.setLayout(new BoxLayout(interPane, BoxLayout.PAGE_AXIS));
-		interPane.add(initSearchPanel());
-
-		interPane.add(scroll);
-		LabeledComponent changeHistLC = new LabeledComponent(LABELCOMP_NAME_CHANGE_HIST, interPane,true);
-
+	
+		LabeledComponent changeHistLC = new LabeledComponent(LABELCOMP_NAME_CHANGE_HIST, scroll,true);
+		changeHistLC.setFooterComponent(initSearchPanel());
+		
 		changeHistLC.doLayout();
 		changeHistLC.addHeaderSeparator();
 		addAnnotationAction = new AddInstanceAction(changeHistLC, ACTION_NAME_CREATE_ANNOTATE);
@@ -185,21 +182,54 @@ public class ChangesTab extends AbstractTabWidget {
 
 		changeHistLC.setHeaderComponent(initAnnotPanel(), BorderLayout.EAST);
 		changeHistLC.addHeaderButton(addAnnotationAction);
+		
+		changeHistLC.addHeaderButton(new ViewAction("View change details", null) {
+			@Override			
+			public void onView() {
+				TreePath[] selectedTreePaths = changesTreeTable.getTree().getSelectionPaths();
+
+				for (TreePath treePath : selectedTreePaths) {
+					Object lastPathComp = treePath.getLastPathComponent();
+					try {
+						if (lastPathComp instanceof ChangeTreeTableNode) {
+							Change change = ((ChangeTreeTableNode)lastPathComp).getChange();
+							changes_kb.getProject().show(change);
+						} 
+					} catch (Exception e) {
+						Log.getLogger().warning("Error at getting change table row " + treePath);
+					}
+				}					
+			}
+		});
+			
 
 		LabeledComponent annotLC = new LabeledComponent(LABELCOMP_NAME_ANNOTATIONS, scroll2, true);
 		annotLC.doLayout();
 		annotLC.addHeaderSeparator();
-		removeAnnotationAction = new RemoveInstanceAction(ACTION_NAME_REMOVE_ANNOTATE);
+		
 		editAnnotationAction = new EditInstanceAction(ACTION_NAME_EDIT_ANNOTATE);
-		removeAnnotationAction.setEnabled(false);
 		editAnnotationAction.setEnabled(false);
-		annotLC.addHeaderButton(removeAnnotationAction);
 		annotLC.addHeaderButton(editAnnotationAction);
-
+		
+		removeAnnotationAction = new RemoveInstanceAction(ACTION_NAME_REMOVE_ANNOTATE);		
+		removeAnnotationAction.setEnabled(false);		
+		annotLC.addHeaderButton(removeAnnotationAction);		
+		
 		LabeledComponent assocLC = new LabeledComponent(LABELCOMP_NAME_ASSOC_CHANGES, scroll3, true);
 		assocLC.doLayout();
 		assocLC.addHeaderSeparator();
 
+		assocLC.addHeaderButton(new ViewAction("View Change", annotationChangesTable) {
+			@Override
+			public void onView() {
+				int[] selRows = annotationChangesTable.getSelectedRows(); 
+				for (int i = 0; i < selRows.length; i++) {
+					Instance instance = (Instance) annotationChangesTableModel.getObjInRow(selRows[i]);
+					changes_kb.getProject().show(instance);
+				}				
+			}
+		});
+		
 		JSplitPane splitPanel = ComponentFactory.createTopBottomSplitPane(false);
 		splitPanel.setResizeWeight(0.5);
 		splitPanel.setDividerLocation(0.5);
@@ -217,7 +247,7 @@ public class ChangesTab extends AbstractTabWidget {
 
 		add(splitPanelBig);
 
-		cTreeTable.getTree().expandPath(changesTreeTableModel.getRootPath());
+		changesTreeTable.getTree().expandPath(changesTreeTableModel.getRootPath());
 
 	}
 
@@ -263,7 +293,13 @@ public class ChangesTab extends AbstractTabWidget {
 
 		ActionListener searchClear = new ChangesSearchClear(changesTreeTableModel);
 		clearButton.addActionListener(searchClear);
-
+		
+		//FIXME: The following lines shoule be deleted when the search is implemented
+		searchButton.setEnabled(false);
+		clearButton.setEnabled(false);
+		searchButton.setToolTipText("Search functionality not implemented yet");
+		clearButton.setToolTipText("Search functionality not implemented yet");
+		
 		searchPanel.add(searchLabel);
 		searchPanel.add(cbox);
 		searchPanel.add(searchText);
@@ -284,10 +320,12 @@ public class ChangesTab extends AbstractTabWidget {
 		annotationsTableModel = new AnnotationTableModel(changes_kb);
 		changesTreeTableModel = new ChangeTreeTableModel(model);
 
-		annotationChangesTable = new JTable(annotationChangesTableModel);
+		annotationChangesTable = new SelectableTable();
+		annotationChangesTable.setModel(annotationChangesTableModel);
 
-		annotationsTable = new JTable(annotationsTableModel);
-		cTreeTable = new JTreeTable(changesTreeTableModel);
+		annotationsTable = new SelectableTable();
+		annotationsTable.setModel(annotationsTableModel);
+		changesTreeTable = new JTreeTable(changesTreeTableModel);
 
 		ComponentFactory.configureTable(annotationsTable);
 		ComponentFactory.configureTable(annotationChangesTable);
@@ -305,8 +343,8 @@ public class ChangesTab extends AbstractTabWidget {
 		annotationChangesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		annotationChangesTable.setDefaultRenderer(Object.class, new ColoredTableCellRenderer());
 
-		cTreeTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		cTreeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		changesTreeTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		changesTreeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
 		ListSelectionModel lsm = annotationsTable.getSelectionModel();
 		lsm.addListSelectionListener(new ListSelectionListener() {
@@ -327,7 +365,7 @@ public class ChangesTab extends AbstractTabWidget {
 			}
 		});
 
-		ListSelectionModel tlsm = cTreeTable.getSelectionModel();
+		ListSelectionModel tlsm = changesTreeTable.getSelectionModel();
 		tlsm.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting()){
@@ -459,16 +497,23 @@ public class ChangesTab extends AbstractTabWidget {
 		 */
 		public void actionPerformed(ActionEvent arg0) {
 
-			if (cTreeTable.getSelectedRowCount() > 0) {
-
-				int[] selected = cTreeTable.getSelectedRows();
+			if (changesTreeTable.getSelectedRowCount() > 0) {
 				final Collection chngInstSelected = new ArrayList();
+				
+				TreePath[] selectedTreePaths = changesTreeTable.getTree().getSelectionPaths();
 
-				for (int i = 0; i < selected.length; i++) {
-					AnnotatableThing changeInst = (AnnotatableThing)changesTreeTableModel.getObjInRow(selected[i]-1);
+				for (TreePath treePath : selectedTreePaths) {
+					Object lastPathComp = treePath.getLastPathComponent();
+					try {
+						if (lastPathComp instanceof ChangeTreeTableNode) {
+							Change change = ((ChangeTreeTableNode)lastPathComp).getChange();
+							chngInstSelected.add(change);
+						} 
+					} catch (Exception e) {
+						Log.getLogger().warning("Error at getting change table row " + treePath);
+					}
+				}		
 
-					chngInstSelected.add(changeInst);
-				}
 				String annotType = (String)annotationTypes.getSelectedItem();
 				annotateInst = createUtil.createAnnotation(annotType, chngInstSelected);
 				JFrame edit = changes_project.show(annotateInst);
