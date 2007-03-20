@@ -99,11 +99,10 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	private static final String CHANGES_TAB_NAME = "Changes";
 
-	private static Project currProj;
 	private static Project changes_project;
     private static ChangeModel model;
 	private static KnowledgeBase changes_kb;
-	private static KnowledgeBase currKB;
+	private static KnowledgeBase currentKB;
     private static ChangeCreateUtil createUtil;
 	
 	private static JTable annotationsTable;
@@ -161,9 +160,8 @@ public class ChangesTab extends AbstractTabWidget {
 	// Initialize the plugin
 	public void initialize() {
 	    setLabel(CHANGES_TAB_NAME);
-	    
-	    currProj = getProject();
-	    currKB = currProj.getKnowledgeBase();
+	  
+	    currentKB = getKnowledgeBase();
 
 	    // GET INSTANCE OF CHANGE PROJECT 'changes' and corresponding KB 'cKB' HERE
 	    getChangeProject();
@@ -205,8 +203,7 @@ public class ChangesTab extends AbstractTabWidget {
 
 	    changeHistLC.setHeaderComponent(initAnnotPanel(), BorderLayout.EAST);
 		changeHistLC.addHeaderButton(addAnnotationAction);
-		
-			
+				
 		LabeledComponent annotLC = new LabeledComponent(LABELCOMP_NAME_ANNOTATIONS, scroll2, true);
 		annotLC.doLayout();
 		annotLC.addHeaderSeparator();
@@ -216,20 +213,17 @@ public class ChangesTab extends AbstractTabWidget {
 		editAnnotationAction.setEnabled(false);
 		annotLC.addHeaderButton(removeAnnotationAction);
 		annotLC.addHeaderButton(editAnnotationAction);
-	
-		
+			
 		LabeledComponent assocLC = new LabeledComponent(LABELCOMP_NAME_ASSOC_CHANGES, scroll3, true);
 		assocLC.doLayout();
 		assocLC.addHeaderSeparator();
-	
-		
+			
 		JSplitPane splitPanel = ComponentFactory.createTopBottomSplitPane(false);
 		splitPanel.setResizeWeight(0.5);
 		splitPanel.setDividerLocation(0.5);
 		splitPanel.setTopComponent(annotLC);
 		splitPanel.setBottomComponent(assocLC);
-		
-		
+			
 		HeaderComponent changeView = new HeaderComponent(HEADERCOMP_NAME_CHANGE_VIEWER, null, changeHistLC);
 		HeaderComponent annotView = new HeaderComponent(HEADERCOMP_NAME_ANNOTATE_VIEWER, null, splitPanel);
 		
@@ -242,7 +236,7 @@ public class ChangesTab extends AbstractTabWidget {
 		add(splitPanelBig);
 		
 		cTreeTable.getTree().expandPath(cTreeTableModel.getRootPath());
-		
+	
 	}
 	
 	private JPanel initAnnotPanel() {
@@ -381,20 +375,22 @@ public class ChangesTab extends AbstractTabWidget {
 	
 
     private static void getChangeProject(){
+    	Project currentProj = currentKB.getProject(); 
+    		
         // NEED TO ADD IMPLEMENTATION FOR SERVER MODE
         // But this project must "essentially" be the same as the project that the project plugin is using
         // same events, contents etc.
         // it also runs after the changes project plugin has initialized.
-        if (currProj.isMultiUserClient()) {
+        if (currentProj.isMultiUserClient()) {
             getServerSideChangeProject();
         }
         else {
-            if (ChangesProject.getChangesProj(currKB) == null) { // the tab has just been configured so the
-                new ChangesProject().afterLoad(currProj);  // project plugin is not initialized                           
+            if (ChangesProject.getChangesProj(currentKB) == null) { // the tab has just been configured so the
+                new ChangesProject().afterLoad(currentProj);  // project plugin is not initialized                           
             }
-            changes_project = ChangesProject.getChangesProj(currKB);
+            changes_project = ChangesProject.getChangesProj(currentKB);
             changes_kb = changes_project.getKnowledgeBase();
-            ChangesDb changes_db = ChangesProject.getChangesDb(currKB);
+            ChangesDb changes_db = ChangesProject.getChangesDb(currentKB);
             model = changes_db.getModel();
             
             createUtil = new ChangeCreateUtil(model);
@@ -402,14 +398,14 @@ public class ChangesTab extends AbstractTabWidget {
     }
     
     private static void getServerSideChangeProject() {
-        String annotationName = (String) new GetAnnotationProjectName(currKB).execute();
+        String annotationName = (String) new GetAnnotationProjectName(currentKB).execute();
         if (annotationName == null) {
             Log.getLogger().warning("annotation project not configured (use " +
                                     GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT +
                                     " slot)");
         }
         RemoteProjectManager manager = RemoteProjectManager.getInstance();
-        FrameStoreManager fsmanager = ((DefaultKnowledgeBase) currKB).getFrameStoreManager();
+        FrameStoreManager fsmanager = ((DefaultKnowledgeBase) currentKB).getFrameStoreManager();
         RemoteClientFrameStore rcfs = (RemoteClientFrameStore) fsmanager.getFrameStoreFromClass(RemoteClientFrameStore.class);
         changes_project = manager.connectToProject(rcfs.getRemoteServer(), rcfs.getSession(), annotationName);
         changes_kb = changes_project.getKnowledgeBase();
