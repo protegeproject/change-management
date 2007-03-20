@@ -191,11 +191,13 @@ public class ChangeTableModel extends AbstractTableModel {
         completeData.clear();
 		colorList.clear();
 		for (Instance i : changeInsts) {
-			Change cInst = (Change) i;
-			workingData.add(cInst);
-            completeData.add(cInst);
-			colorList.add(currColor);
-			updateCurrColor();
+			if (i instanceof Change) {
+				Change cInst = (Change) i;
+				workingData.add(cInst);
+				completeData.add(cInst);
+				colorList.add(currColor);
+				updateCurrColor();
+			}
 		}
 		fireTableDataChanged();
 	}
