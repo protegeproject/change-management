@@ -1,6 +1,7 @@
 package edu.stanford.smi.protegex.changes;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -188,5 +189,11 @@ public class AnnotationTableModel extends AbstractTableModel{
 		data.remove(index);
 		data.add(index, (Annotation) annotate);
 		fireTableDataChanged();
+	}
+	
+	public void setAnnotations(Collection<Annotation> annotations) {
+		data = new ArrayList<Annotation>(annotations);
+		
+		update();
 	}
 }
