@@ -81,6 +81,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
         if (aChange instanceof Created_Change 
                 && !(aChange instanceof Individual_Created) 
                 && aChange.getApplyTo() != null) {
+        	removeLastCreate(session);
             lastCreateBySession.put(session, (Created_Change) aChange);
             return;
         }
