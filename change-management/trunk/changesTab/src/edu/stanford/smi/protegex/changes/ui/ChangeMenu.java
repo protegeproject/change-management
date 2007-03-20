@@ -104,7 +104,8 @@ public class ChangeMenu extends JMenu {
 			aEdit.addWindowListener(new WindowListener() {
 				
 				public void windowClosed(WindowEvent arg0) {
-					ChangesTab.createAnnotation((Annotation) annotateInst);	
+					//TT: this is strange and it shoule be reimplemented
+					//ChangesTab.createAnnotation((Annotation) annotateInst);
 					setEnabledLastChange(false);
 				}
 				
