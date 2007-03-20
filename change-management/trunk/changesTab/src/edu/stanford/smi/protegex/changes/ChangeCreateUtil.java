@@ -25,6 +25,12 @@ public class ChangeCreateUtil {
     
     public static String getActionDisplay(Change aInst) {
         String actionStr = aInst.getAction();
+        
+        //This should not be the case
+        if (actionStr == null) {
+        	return "No Action";
+        }
+        
         return actionStr.replace('_', ' ');
     }
     
