@@ -11,6 +11,7 @@ import edu.stanford.smi.protegex.owl.model.RDFResource;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Deleted_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
 
@@ -92,6 +93,27 @@ public class TransactionState {
 
 	
 	private Representative guessRepresentative(List<Change> actions, String name) {
+		boolean owl = changesDb.isOwl();
+		Ontology_Component first = null;
+		Ontology_Component named = null;
+		for (Change change : actions) {
+			if (first == null) {
+				first = (Ontology_Component) change.getApplyTo();
+				if (!owl) break;
+			}
+			if (owl && named == null) {
+				Ontology_Component current = (Ontology_Component) change.getApplyTo();
+				if (!current.isAnonymous()) {
+					named = current;
+					break;
+				}
+			}
+		}
+		Representative r = new Representative(name, named != null ? named : first);
+		return r;
+	}
+	/*
+	{
         boolean isOwl = changesDb.isOwl();
         Representative r = null;
 		if (isOwl) {
@@ -103,6 +125,7 @@ public class TransactionState {
         }
         return null;
 	}
+    */
     
     private Representative guessFirstNonAnonymousAction(List<Change> actions, String name) {
         for (Change change : actions) {
@@ -126,7 +149,7 @@ public class TransactionState {
 	            firstInfoInst = true;
 	        }
 
-	        if (change.getDirectType().getName().equals(ChangeCls.Class_Deleted.toString()) && !firstDeleted) {
+	        if (change instanceof Deleted_Change && !firstDeleted) {
 	            firstInst = change;
 	            firstDeleted = true;
 	        }
