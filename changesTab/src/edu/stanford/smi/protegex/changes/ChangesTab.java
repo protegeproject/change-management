@@ -245,9 +245,13 @@ public class ChangesTab extends AbstractTabWidget {
 		HeaderComponent changeView = new HeaderComponent(HEADERCOMP_NAME_CHANGE_VIEWER, null, changeHistLC);
 		HeaderComponent annotView = new HeaderComponent(HEADERCOMP_NAME_ANNOTATE_VIEWER, null, splitPanel);
 		
-		setLayout(new GridLayout(2,1));
-		add(changeView);
-		add(annotView);
+		JSplitPane splitPanelBig = ComponentFactory.createTopBottomSplitPane(false);
+		splitPanelBig.setTopComponent(changeView);
+		splitPanelBig.setBottomComponent(annotView);
+		splitPanelBig.setResizeWeight(0.7);
+		splitPanelBig.setDividerLocation(0.7);
+		
+		add(splitPanelBig);
 		
 	}
 	
