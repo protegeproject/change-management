@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import edu.stanford.smi.protege.model.DefaultSimpleInstance;
 import edu.stanford.smi.protege.model.FrameID;
@@ -41,4 +42,27 @@ public class Composite_Change extends Change {
 		return  ModelUtilities.getOwnSlotValues(this, "subChanges");
 	}
 // __Code above is automatically generated. Do not change
+	
+	public List<Change> getAllSubChanges() {
+		return getAllSubChanges(this);
+	}
+
+
+	private List<Change> getAllSubChanges(Change change) {
+		ArrayList<Change> allSubChanges = new ArrayList<Change>();
+		
+		allSubChanges.add(change);
+		
+		if (!(change instanceof Composite_Change)) {
+			return allSubChanges;
+		}
+		
+		for (Iterator iter = ((Composite_Change)change).getSubChanges().iterator(); iter.hasNext();) {
+			Change subChange = (Change) iter.next();
+			allSubChanges.addAll(getAllSubChanges(subChange));
+		}
+		
+		return allSubChanges;
+	}
+	
 }
