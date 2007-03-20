@@ -116,7 +116,7 @@ public class ChangesTab extends AbstractTabWidget {
 
 
 	private JTreeTable cTreeTable;
-	private ChangeTreeTableModel cTreeTableModel;
+	private ChangeTreeTableModel changesTreeTableModel;
 
 	private boolean inRemoveAnnotation = false;
 
@@ -217,7 +217,7 @@ public class ChangesTab extends AbstractTabWidget {
 
 		add(splitPanelBig);
 
-		cTreeTable.getTree().expandPath(cTreeTableModel.getRootPath());
+		cTreeTable.getTree().expandPath(changesTreeTableModel.getRootPath());
 
 	}
 
@@ -256,12 +256,12 @@ public class ChangesTab extends AbstractTabWidget {
 		JTextField searchText = new JTextField(25);
 		JButton searchButton = new JButton(SEARCH_PANEL_BUTTON_GO);
 
-		ActionListener searchExecute = new ChangesSearchExecute(cbox, searchText, cTreeTableModel);
+		ActionListener searchExecute = new ChangesSearchExecute(cbox, searchText, changesTreeTableModel);
 		searchButton.addActionListener(searchExecute);
 
 		JButton clearButton = new JButton(SEARCH_PANEL_BUTTON_CLEAR);
 
-		ActionListener searchClear = new ChangesSearchClear(cTreeTableModel);
+		ActionListener searchClear = new ChangesSearchClear(changesTreeTableModel);
 		clearButton.addActionListener(searchClear);
 
 		searchPanel.add(searchLabel);
@@ -282,12 +282,12 @@ public class ChangesTab extends AbstractTabWidget {
 		annotationChangesTableModel = new ChangeTableModel(model);
 
 		annotationsTableModel = new AnnotationTableModel(changes_kb);
-		cTreeTableModel = new ChangeTreeTableModel(model);
+		changesTreeTableModel = new ChangeTreeTableModel(model);
 
 		annotationChangesTable = new JTable(annotationChangesTableModel);
 
 		annotationsTable = new JTable(annotationsTableModel);
-		cTreeTable = new JTreeTable(cTreeTableModel);
+		cTreeTable = new JTreeTable(changesTreeTableModel);
 
 		ComponentFactory.configureTable(annotationsTable);
 		ComponentFactory.configureTable(annotationChangesTable);
@@ -392,18 +392,18 @@ public class ChangesTab extends AbstractTabWidget {
 
 	private void loadChanges() {
 		for (Change aInst : model.getSortedTopLevelChanges()) {
-			cTreeTableModel.addChangeData(aInst);
+			changesTreeTableModel.addChangeData(aInst);
 		}
 	}
 	
 	public void createChange(Change aChange) {
-		cTreeTableModel.addChangeData(aChange);
+		changesTreeTableModel.addChangeData(aChange);
 		changesMenu.setEnabledLastChange(true);
 		changesMenu.setChange(aChange);
 	}
 
 	public void modifyChange(Change aChange, Slot slot, List oldValues) {
-		cTreeTableModel.update(aChange, slot, oldValues);
+		changesTreeTableModel.update(aChange, slot, oldValues);
 	}
 	
 	private void loadAnnotations(Collection<Instance> annotateInsts) {
@@ -465,7 +465,7 @@ public class ChangesTab extends AbstractTabWidget {
 				final Collection chngInstSelected = new ArrayList();
 
 				for (int i = 0; i < selected.length; i++) {
-					AnnotatableThing changeInst = (AnnotatableThing)cTreeTableModel.getObjInRow(selected[i]-1);
+					AnnotatableThing changeInst = (AnnotatableThing)changesTreeTableModel.getObjInRow(selected[i]-1);
 
 					chngInstSelected.add(changeInst);
 				}
