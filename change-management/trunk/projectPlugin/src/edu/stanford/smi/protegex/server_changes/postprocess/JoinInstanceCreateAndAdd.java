@@ -32,10 +32,9 @@ public class JoinInstanceCreateAndAdd implements PostProcessor {
             return;
         }
         if (change instanceof Individual_Added) {
-            Individual_Created create_op = lastCreateBySession.get(session);
+            Individual_Created create_op = lastCreateBySession.remove(session);
             Ontology_Component created = (Ontology_Component) change.getApplyTo();
             if (create_op == null || !created.equals(change.getApplyTo())) return;
-            lastCreateBySession.remove(session);
             
             List<Instance> subChanges = new ArrayList<Instance>();
             subChanges.add(create_op);
