@@ -94,7 +94,7 @@ public class ChangeAnnotateWindow {
 		
 		if (nameChangeOn) {
 			//cTable.addMouseListener(new ChangeShowAction(cTable, cTableModel, ChangesTab.getChangesProj()));
-			aTable.addMouseListener(new AnnotationShowAction(aTable, aTableModel, ChangesTab.getChangesProj()));
+			aTable.addMouseListener(new AnnotationShowAction(aTable, aTableModel, change_kb.getProject()));
 		}
 		
 		JScrollPane scroll = ComponentFactory.createScrollPane(cTable);
