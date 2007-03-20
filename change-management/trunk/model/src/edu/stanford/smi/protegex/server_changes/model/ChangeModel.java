@@ -124,7 +124,8 @@ public class ChangeModel {
         partOfCompositeChange,
         sequence,
         subChanges,
-        timestamp
+        timestamp,
+        currentName,
     }
     
     public KnowledgeBase getChangeKb() {
