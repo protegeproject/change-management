@@ -42,6 +42,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import edu.stanford.smi.protege.resource.Icons;
+import edu.stanford.smi.protege.util.SelectableTable;
 import edu.stanford.smi.protegex.changes.ChangeTreeTableNode;
 
 
@@ -55,7 +56,7 @@ import edu.stanford.smi.protegex.changes.ChangeTreeTableNode;
  * @author Philip Milne
  * @author Scott Violet
  */
-public class JTreeTable extends JTable {
+public class JTreeTable extends SelectableTable {
 	/** A subclass of JTree. */
 	protected TreeTableCellRenderer tree;
     
