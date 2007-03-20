@@ -29,6 +29,7 @@ import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesFrameLis
 import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesPropertyListener;
 import edu.stanford.smi.protegex.server_changes.postprocess.AnnotationCombiner;
 import edu.stanford.smi.protegex.server_changes.postprocess.JoinCreateAndNameChange;
+import edu.stanford.smi.protegex.server_changes.postprocess.JoinInstanceCreateAndAdd;
 import edu.stanford.smi.protegex.server_changes.util.Util;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
@@ -153,6 +154,7 @@ public class ChangesProject extends ProjectPluginAdapter {
             changesDb = new ChangesDb(currentKB);
             changesDb.addPostProcessor(new AnnotationCombiner());
             changesDb.addPostProcessor(new JoinCreateAndNameChange());
+            changesDb.addPostProcessor(new JoinInstanceCreateAndAdd());
             changesDbMap.put(currentKB, changesDb);
         }
 	}
