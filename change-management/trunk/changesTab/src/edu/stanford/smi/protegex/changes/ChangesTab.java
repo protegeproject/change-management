@@ -97,9 +97,6 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	private static final String ANNOT_PANEL_TITLE = "Create Annotation";
 	
-
-	
-
 	private static final String CHANGES_TAB_NAME = "Changes";
 
 	private static Project currProj;
@@ -109,26 +106,25 @@ public class ChangesTab extends AbstractTabWidget {
 	private static KnowledgeBase currKB;
     private static ChangeCreateUtil createUtil;
 	
-	private static JTable aTable;
-	private static JTable acTable;
+	private static JTable annotationsTable;
+	private static JTable annotationChangesTable;
 	
-	private static JComboBox annTypes;
-	private static ChangeTableModel acTableModel;
+	private static JComboBox annotationTypes;
+	private static ChangeTableModel annotationChangesTableModel;
 	
-	private static AnnotationTableModel aTableModel;
+	private static AnnotationTableModel annotationsTableModel;
 	
 	private static Annotation annotateInst;
 	private static Instance instToEdit;
 	private static String OWL_KB_INDICATOR = "OWL";
 	
 
-	private static ChangeMenu cMenu;
-	private static RemoveInstanceAction remInst;
-	private static EditInstanceAction editInst;
-	private static AddInstanceAction addInst;
-
+	private static ChangeMenu changesMenu;
+	private static RemoveInstanceAction removeAnnotationAction;
+	private static EditInstanceAction editAnnotationAction;
+	private static AddInstanceAction addAnnotationAction;
 	
-	private static boolean isOwlProject;
+
 	//JTreeTable
 	
 	private static JTreeTable cTreeTable;
@@ -164,13 +160,10 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	// Initialize the plugin
 	public void initialize() {
-
+	    setLabel(CHANGES_TAB_NAME);
+	    
 	    currProj = getProject();
 	    currKB = currProj.getKnowledgeBase();
-
-
-	    //Check to see if the project is an OWL one
-	    isOwlProject = kbInOwl(currKB);
 
 	    // GET INSTANCE OF CHANGE PROJECT 'changes' and corresponding KB 'cKB' HERE
 	    getChangeProject();
@@ -180,28 +173,23 @@ public class ChangesTab extends AbstractTabWidget {
 	    loadExistingData();
 
 	    changes_kb.addFrameListener(new ChangesListener(model));		
-
-
-	    // Initialize the tab text
-	    setLabel(CHANGES_TAB_NAME);
-
+	   
 	    // Initialize the UI
-	    initUI();
-	    cTreeTable.getTree().expandPath(cTreeTableModel.getRootPath());
+	    initUI();	    
 	}
 
 	
 	private void initUI() {
 		// Create menu item
-		cMenu = new ChangeMenu(getKnowledgeBase(), changes_kb);
+		changesMenu = new ChangeMenu(getKnowledgeBase(), changes_kb);
 		JMenuBar menuBar = getMainWindowMenuBar();
-	    menuBar.add (cMenu);
+	    menuBar.add (changesMenu);
 
-		aTable.addMouseListener(new AnnotationShowAction(aTable, aTableModel, changes_project));
+		annotationsTable.addMouseListener(new AnnotationShowAction(annotationsTable, annotationsTableModel, changes_project));
 		JScrollPane scroll = ComponentFactory.createScrollPane(cTreeTable);
 
-		JScrollPane scroll2 = ComponentFactory.createScrollPane(aTable);
-		JScrollPane scroll3 = ComponentFactory.createScrollPane(acTable);
+		JScrollPane scroll2 = ComponentFactory.createScrollPane(annotationsTable);
+		JScrollPane scroll3 = ComponentFactory.createScrollPane(annotationChangesTable);
 				
 		JPanel interPane = new JPanel();
 		interPane.setLayout(new BoxLayout(interPane, BoxLayout.PAGE_AXIS));
@@ -212,22 +200,22 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		changeHistLC.doLayout();
 		changeHistLC.addHeaderSeparator();
-		addInst = new AddInstanceAction(changeHistLC, ACTION_NAME_CREATE_ANNOTATE);
-	    addInst.setEnabled(false);
+		addAnnotationAction = new AddInstanceAction(changeHistLC, ACTION_NAME_CREATE_ANNOTATE);
+	    addAnnotationAction.setEnabled(false);
 
 	    changeHistLC.setHeaderComponent(initAnnotPanel(), BorderLayout.EAST);
-		changeHistLC.addHeaderButton(addInst);
+		changeHistLC.addHeaderButton(addAnnotationAction);
 		
 			
 		LabeledComponent annotLC = new LabeledComponent(LABELCOMP_NAME_ANNOTATIONS, scroll2, true);
 		annotLC.doLayout();
 		annotLC.addHeaderSeparator();
-		remInst = new RemoveInstanceAction(ACTION_NAME_REMOVE_ANNOTATE);
-		editInst = new EditInstanceAction(ACTION_NAME_EDIT_ANNOTATE);
-		remInst.setEnabled(false);
-		editInst.setEnabled(false);
-		annotLC.addHeaderButton(remInst);
-		annotLC.addHeaderButton(editInst);
+		removeAnnotationAction = new RemoveInstanceAction(ACTION_NAME_REMOVE_ANNOTATE);
+		editAnnotationAction = new EditInstanceAction(ACTION_NAME_EDIT_ANNOTATE);
+		removeAnnotationAction.setEnabled(false);
+		editAnnotationAction.setEnabled(false);
+		annotLC.addHeaderButton(removeAnnotationAction);
+		annotLC.addHeaderButton(editAnnotationAction);
 	
 		
 		LabeledComponent assocLC = new LabeledComponent(LABELCOMP_NAME_ASSOC_CHANGES, scroll3, true);
@@ -253,6 +241,8 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		add(splitPanelBig);
 		
+		cTreeTable.getTree().expandPath(cTreeTableModel.getRootPath());
+		
 	}
 	
 	private JPanel initAnnotPanel() {
@@ -266,12 +256,12 @@ public class ChangesTab extends AbstractTabWidget {
 				                    AnnotationTableModel.TYPE_SEEALSO,
 		                       };
 		
-		annTypes = new JComboBox(annotFields);
-		annTypes.setSelectedIndex(0);
+		annotationTypes = new JComboBox(annotFields);
+		annotationTypes.setSelectedIndex(0);
 	
 		
 		annotPanel.add(annotLabel);
-		annotPanel.add(annTypes);
+		annotPanel.add(annotationTypes);
 		return annotPanel;
 	}
 	
@@ -315,33 +305,33 @@ public class ChangesTab extends AbstractTabWidget {
 	private void initTables() {
 		// Create Tables
 		
-		acTableModel = new ChangeTableModel(model);
+		annotationChangesTableModel = new ChangeTableModel(model);
 
-		aTableModel = new AnnotationTableModel(changes_kb);
+		annotationsTableModel = new AnnotationTableModel(changes_kb);
 		cTreeTableModel = new ChangeTreeTableModel(model);
 		
-		acTable = new JTable(acTableModel);
+		annotationChangesTable = new JTable(annotationChangesTableModel);
 	
-		aTable = new JTable(aTableModel);
+		annotationsTable = new JTable(annotationsTableModel);
 		cTreeTable = new JTreeTable(cTreeTableModel);
 	
-		ComponentFactory.configureTable(aTable);
-		ComponentFactory.configureTable(acTable);
+		ComponentFactory.configureTable(annotationsTable);
+		ComponentFactory.configureTable(annotationChangesTable);
 	
 		
-		aTable.setShowGrid(false);
-		aTable.setIntercellSpacing(new Dimension(0, 0));
-		aTable.setColumnSelectionAllowed(false);
-		aTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		aTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		annotationsTable.setShowGrid(false);
+		annotationsTable.setIntercellSpacing(new Dimension(0, 0));
+		annotationsTable.setColumnSelectionAllowed(false);
+		annotationsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		annotationsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		
-		acTable.setShowGrid(false);
-		acTable.setIntercellSpacing(new Dimension(0, 0));
-		acTable.setColumnSelectionAllowed(false);
-		acTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		acTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		acTable.setDefaultRenderer(Object.class, new ColoredTableCellRenderer());
+		annotationChangesTable.setShowGrid(false);
+		annotationChangesTable.setIntercellSpacing(new Dimension(0, 0));
+		annotationChangesTable.setColumnSelectionAllowed(false);
+		annotationChangesTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		annotationChangesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		annotationChangesTable.setDefaultRenderer(Object.class, new ColoredTableCellRenderer());
 		
 		cTreeTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		cTreeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -349,7 +339,7 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		
 		
-		ListSelectionModel lsm = aTable.getSelectionModel();
+		ListSelectionModel lsm = annotationsTable.getSelectionModel();
 		lsm.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting()){
@@ -358,12 +348,12 @@ public class ChangesTab extends AbstractTabWidget {
 				
 				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
 				if(!lsm.isSelectionEmpty()) {
-					remInst.setEnabled(true);
-					editInst.setEnabled(true);
+					removeAnnotationAction.setEnabled(true);
+					editAnnotationAction.setEnabled(true);
 					int selectedRow = lsm.getMinSelectionIndex();
-					String instName = aTableModel.getInstanceName(selectedRow);
+					String instName = annotationsTableModel.getInstanceName(selectedRow);
 					Instance selectedInst = changes_kb.getInstance(instName);
-					acTableModel.setChanges(((Annotation) selectedInst).getAnnotates());
+					annotationChangesTableModel.setChanges(((Annotation) selectedInst).getAnnotates());
 				} 
 			}
 		});
@@ -379,7 +369,7 @@ public class ChangesTab extends AbstractTabWidget {
 				
 				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
 				if(!lsm.isSelectionEmpty()) {
-					addInst.setEnabled(true);
+					addAnnotationAction.setEnabled(true);
 			
 				} 
 			}
@@ -459,8 +449,8 @@ public class ChangesTab extends AbstractTabWidget {
 		boolean addChange = true;
 		
 		cTreeTableModel.addChangeData(aChange);
-		cMenu.setEnabledLastChange(true);
-		cMenu.setChange(aChange);
+		changesMenu.setEnabledLastChange(true);
+		changesMenu.setChange(aChange);
 	}
     
     public static void modifyChange(Change aChange, Slot slot, List oldValues) {
@@ -475,7 +465,7 @@ public class ChangesTab extends AbstractTabWidget {
 		
 		for (Iterator iter = annotationList.iterator(); iter.hasNext();) {
 			Instance aInst = (Instance) iter.next();
-			aTableModel.addAnnotationData((Annotation) aInst);
+			annotationsTableModel.addAnnotationData((Annotation) aInst);
 		}
 		
 	}
@@ -484,7 +474,7 @@ public class ChangesTab extends AbstractTabWidget {
 	
 
 	public static void updateAnnotationTable() {
-		aTableModel.update();
+		annotationsTableModel.update();
 	}
 	
 	public static void createAnnotation(Annotation annotateInst) {
@@ -494,7 +484,7 @@ public class ChangesTab extends AbstractTabWidget {
 		}
 		else{
 		    annotateInst = createUtil.updateAnnotation(annotateInst);
-		    aTableModel.addAnnotationData((Annotation) annotateInst);
+		    annotationsTableModel.addAnnotationData((Annotation) annotateInst);
 		}
 	}
 	
@@ -537,7 +527,7 @@ public class ChangesTab extends AbstractTabWidget {
 			
 					chngInstSelected.add(changeInst);
 				}
-			    String annotType = (String)annTypes.getSelectedItem();
+			    String annotType = (String)annotationTypes.getSelectedItem();
 				annotateInst = createUtil.createAnnotation(annotType, chngInstSelected);
 				JFrame edit = changes_project.show(annotateInst);
 				
@@ -581,20 +571,20 @@ public class ChangesTab extends AbstractTabWidget {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent arg0) {
-			int numSelect = aTable.getSelectedRowCount();
+			int numSelect = annotationsTable.getSelectedRowCount();
 			
 			if (numSelect > 1) { 
-				aTableModel.removeAnnotationData(aTable.getSelectedRows());
+				annotationsTableModel.removeAnnotationData(annotationsTable.getSelectedRows());
 			} else if (numSelect == 1) {
-				String delName = aTableModel.getInstanceName(aTable.getSelectedRow());
+				String delName = annotationsTableModel.getInstanceName(annotationsTable.getSelectedRow());
 				Instance instToDel = changes_kb.getInstance(delName);
 				changes_kb.deleteInstance(instToDel);
-				aTableModel.removeAnnotationData(aTable.getSelectedRow());
+				annotationsTableModel.removeAnnotationData(annotationsTable.getSelectedRow());
 			}
 			
-			aTable.clearSelection();
-			remInst.setEnabled(false);
-			editInst.setEnabled(false);
+			annotationsTable.clearSelection();
+			removeAnnotationAction.setEnabled(false);
+			editAnnotationAction.setEnabled(false);
 			
 			
 		}
@@ -610,10 +600,10 @@ public class ChangesTab extends AbstractTabWidget {
 		 */
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
-			int numSelect = aTable.getSelectedRowCount();
+			int numSelect = annotationsTable.getSelectedRowCount();
 			
 			if (numSelect == 1) {
-				String instEditName = aTableModel.getInstanceName(aTable.getSelectedRow());
+				String instEditName = annotationsTableModel.getInstanceName(annotationsTable.getSelectedRow());
 				
 				instToEdit = changes_kb.getInstance(instEditName);
 				
@@ -626,9 +616,9 @@ public class ChangesTab extends AbstractTabWidget {
 					}
 
 					public void windowClosed(WindowEvent arg0) {
-						aTableModel.editAnnotationData(instToEdit, aTable.getSelectedRow());
-						remInst.setEnabled(false);
-						editInst.setEnabled(false);
+						annotationsTableModel.editAnnotationData(instToEdit, annotationsTable.getSelectedRow());
+						removeAnnotationAction.setEnabled(false);
+						editAnnotationAction.setEnabled(false);
 					}
 
 					public void windowIconified(WindowEvent arg0) {
