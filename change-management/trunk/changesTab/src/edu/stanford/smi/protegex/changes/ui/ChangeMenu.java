@@ -19,6 +19,7 @@ import javax.swing.KeyStroke;
 
 import edu.stanford.smi.protege.exception.ProtegeException;
 import edu.stanford.smi.protege.model.Cls;
+import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
@@ -149,8 +150,8 @@ public class ChangeMenu extends JMenu {
 			ArrayList selArray = new ArrayList(selection);
 			Object elem = selArray.get(selArray.size()-1);
 			String className = null;
-			if (elem instanceof Cls) {
-				className = ((Cls)elem).getName();
+			if (elem instanceof Frame) {
+				className = ((Frame)elem).getName();
 				ChangeAnnotateWindow cmWindow = new ChangeAnnotateWindow(change_model, className, true);
 				cmWindow.show();
 			}
