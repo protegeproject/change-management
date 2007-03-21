@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.text.SimpleDateFormat;
@@ -33,6 +34,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
 
+import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.DefaultKnowledgeBase;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
@@ -59,6 +61,7 @@ import edu.stanford.smi.protegex.changes.ui.JTreeTable;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.GetAnnotationProjectName;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.model.AnnotationCreationComparator;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.AnnotationCls;
@@ -97,8 +100,8 @@ public class ChangesTab extends AbstractTabWidget {
 	private ChangeModel model;
 	private KnowledgeBase changes_kb;
 	private KnowledgeBase currentKB;
-	private ChangeCreateUtil createUtil;
-
+	private ChangeCreateUtil changeCreateUtil;
+	
 	private SelectableTable annotationsTable;
 	private SelectableTable annotationChangesTable;
 
@@ -231,8 +234,8 @@ public class ChangesTab extends AbstractTabWidget {
 		});
 		
 		JSplitPane splitPanel = ComponentFactory.createTopBottomSplitPane(false);
-		splitPanel.setResizeWeight(0.5);
-		splitPanel.setDividerLocation(0.5);
+		splitPanel.setResizeWeight(0.75);
+		splitPanel.setDividerLocation(0.75);
 		splitPanel.setTopComponent(annotLC);
 		splitPanel.setBottomComponent(assocLC);
 
@@ -242,8 +245,8 @@ public class ChangesTab extends AbstractTabWidget {
 		JSplitPane splitPanelBig = ComponentFactory.createTopBottomSplitPane(false);
 		splitPanelBig.setTopComponent(changeView);
 		splitPanelBig.setBottomComponent(annotView);
-		splitPanelBig.setResizeWeight(0.7);
-		splitPanelBig.setDividerLocation(0.7);
+		splitPanelBig.setResizeWeight(0.5);
+		splitPanelBig.setDividerLocation(0.5);
 
 		add(splitPanelBig);
 
@@ -399,10 +402,11 @@ public class ChangesTab extends AbstractTabWidget {
 			changes_project = ChangesProject.getChangesProj(currentKB);
 			changes_kb = changes_project.getKnowledgeBase();
 			ChangesDb changes_db = ChangesProject.getChangesDb(currentKB);
-			model = changes_db.getModel();
-
-			createUtil = new ChangeCreateUtil(model);
+			model = changes_db.getModel();			
 		}
+		
+		changeCreateUtil = new ChangeCreateUtil(currentKB, model);
+				
 	}
 
 	private  void getServerSideChangeProject() {
@@ -458,13 +462,13 @@ public class ChangesTab extends AbstractTabWidget {
 		annotationsTableModel.update();
 	}
 
-	public void createAnnotation(Annotation annotateInst) {
+	public void createAnnotationItemInTable(Annotation annotateInst) {
 		String body = ((Annotation) annotateInst).getBody();
-		if (body == null) {
+		if (body == null || body.length() == 0) {
 			changes_kb.deleteInstance(annotateInst);
 		}
-		else{
-			annotateInst = createUtil.updateAnnotation(annotateInst);
+		else{			
+			//annotateInst = createUtil.updateAnnotation(annotateInst);
 			annotationsTableModel.addAnnotationData((Annotation) annotateInst);
 		}
 	}
@@ -514,33 +518,22 @@ public class ChangesTab extends AbstractTabWidget {
 					}
 				}		
 
-				String annotType = (String)annotationTypes.getSelectedItem();
-				annotateInst = createUtil.createAnnotation(annotType, chngInstSelected);
+				String annotTypeName = (String)annotationTypes.getSelectedItem();
+				
+				Cls annotType = changes_kb.getCls(annotTypeName);
+				
+				annotateInst = changeCreateUtil.createAnnotation(annotType, chngInstSelected);
+				
+				//this does not work in the client
+				//ChangesDb changesDb = ChangesProject.getChangesDb(currentKB); 
+				//annotateInst = changesDb.createAnnotation(annotType);
+				//changesDb.finalizeAnnotation(annotateInst, chngInstSelected, "");
+				
 				JFrame edit = changes_project.show(annotateInst);
 
-				edit.addWindowListener(new WindowListener() {
-
+				edit.addWindowListener(new WindowAdapter() {
 					public void windowClosed(WindowEvent arg0) {
-						createAnnotation((Annotation) annotateInst);	
-
-					}
-
-					public void windowClosing(WindowEvent arg0) {
-					}
-
-					public void windowOpened(WindowEvent arg0) {
-					}
-
-					public void windowIconified(WindowEvent arg0) {
-					}
-
-					public void windowDeiconified(WindowEvent arg0) {
-					}
-
-					public void windowActivated(WindowEvent arg0) {
-					}
-
-					public void windowDeactivated(WindowEvent arg0) {
+						createAnnotationItemInTable((Annotation) annotateInst);
 					}
 				});
 				edit.setVisible(true);
