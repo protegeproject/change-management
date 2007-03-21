@@ -2,6 +2,7 @@ package edu.stanford.smi.protegex.changes.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import edu.stanford.smi.protegex.changes.ChangeCreateUtil;
 import edu.stanford.smi.protegex.changes.ChangesTab;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.AnnotationCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 
 public class ChangeMenu extends JMenu {
@@ -62,7 +64,7 @@ public class ChangeMenu extends JMenu {
 		this.change_kb = changeKb;
 		this.change_project = change_kb.getProject();
         this.change_model = new ChangeModel(changeKb);
-        this.create_util = new ChangeCreateUtil(change_model);
+        this.create_util = new ChangeCreateUtil(kb, change_model);
 		
 		JMenuItem annotate = new JMenuItem(MENU_ITEM_ANNOTATE_LAST);
 		JMenuItem changeInfo = new JMenuItem(MENU_ITEM_CHANGE_INFO);
@@ -99,34 +101,21 @@ public class ChangeMenu extends JMenu {
 		public void actionPerformed(ActionEvent arg0) {
 			Collection changeInsts = new ArrayList();
 			changeInsts.add(lastInst);
-			annotateInst = create_util.createAnnotation("Comment", changeInsts);
+			annotateInst = create_util.createAnnotation(change_model.getCls(AnnotationCls.Comment), changeInsts);
 			
 			JFrame aEdit = change_project.show(annotateInst);
-			aEdit.addWindowListener(new WindowListener() {
+			aEdit.addWindowListener(new WindowAdapter() {
 				
 				public void windowClosed(WindowEvent arg0) {
-					//TT: this is strange and it shoule be reimplemented
-					//ChangesTab.createAnnotation((Annotation) annotateInst);
+					//try to get the ChangesTab					
+					ChangesTab changesTab = (ChangesTab) ProjectManager.getProjectManager().getCurrentProjectView().getTabByClassName("edu.stanford.smi.protegex.changes.ChangesTab");
+					
+					if (changesTab != null) {
+						changesTab.createAnnotationItemInTable((Annotation)annotateInst);
+					}
+					
 					setEnabledLastChange(false);
-				}
-				
-				public void windowClosing(WindowEvent arg0) {
-				}
-				
-				public void windowOpened(WindowEvent arg0) {
-				}
-				
-				public void windowIconified(WindowEvent arg0) {
-				}
-				
-				public void windowDeiconified(WindowEvent arg0) {
-				}
-				
-				public void windowActivated(WindowEvent arg0) {
-				}
-				
-				public void windowDeactivated(WindowEvent arg0) {
-				}
+				}				
 			});
 			aEdit.setVisible(true);
 		}
