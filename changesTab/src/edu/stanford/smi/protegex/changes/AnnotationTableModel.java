@@ -112,6 +112,11 @@ public class AnnotationTableModel extends AbstractTableModel{
 		// This is the instance object,
 		// get the particular piece of info out of it.
 		Annotation aInst = data.get(row);
+		
+		if (aInst == null) {
+			return "";			
+		}
+		
 		Cls annotType = aInst.getDirectType();
 		
         if (col < 0 || col >= Column.values().length) {
@@ -124,8 +129,10 @@ public class AnnotationTableModel extends AbstractTableModel{
             return aInst.getBody();
 		case ANNOTATE_COLNAME_AUTHOR:
 			return aInst.getAuthor();
-		case ANNOTATE_COLNAME_CREATED: 
-			return ((Timestamp) aInst.getCreated()).getDate();
+		case ANNOTATE_COLNAME_CREATED: {
+			Timestamp ts = (Timestamp) aInst.getCreated(); 
+			return (ts == null ? "" : ts.getDate());
+		}
 
 		}
 		
