@@ -1,6 +1,7 @@
 package edu.stanford.smi.protegex.changes;
 
 import java.util.Collection;
+import java.util.logging.Level;
 
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
@@ -17,10 +18,12 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 public class ChangeCreateUtil {
     private ChangeModel model;
     private KnowledgeBase cKb;
+    private KnowledgeBase kb;
 
-	public ChangeCreateUtil(ChangeModel model) {
+	public ChangeCreateUtil(KnowledgeBase kb, ChangeModel model) {
 	    this.model = model;
-        cKb = model.getChangeKb();
+	    this.kb = kb;
+        this.cKb = model.getChangeKb();
     }
     
     public static String getActionDisplay(Change aInst) {
@@ -38,14 +41,16 @@ public class ChangeCreateUtil {
 /**
  * I don't think that this method will work right - see the AbstractChangeListener & ChangeDb.createAnnotation
  */
-	public Annotation createAnnotation(String annotType,Collection changeInsts) {
-		Cls annotate = cKb.getCls(annotType);
-		Slot annotates = model.getSlot(ChangeSlot.annotates);
-		
-		Annotation annotateInst = (Annotation) cKb.createInstance(null, annotate);
-		annotateInst.setOwnSlotValues(annotates, changeInsts);
-		//annotateInst.setOwnSlotValue(title, annotateInst.getName());
-		
+	public Annotation createAnnotation(Cls annotType, Collection annotatableThings) {
+			
+		Annotation annotateInst = (Annotation) cKb.createInstance(null, annotType);
+		annotateInst.setAnnotates(annotatableThings);
+
+		Timestamp now = Timestamp.getTimestamp(model);
+		annotateInst.setCreated(now);
+		annotateInst.setModified(now);
+		annotateInst.setAuthor(kb.getUserName());
+	     
 		return annotateInst;
 	}
 	
@@ -57,7 +62,7 @@ public class ChangeCreateUtil {
         Timestamp now = Timestamp.getTimestamp(model);
         annotateInst.setCreated(now);
         annotateInst.setModified(now);
-        annotateInst.setAuthor(cKb.getUserName());
+        annotateInst.setAuthor(kb.getUserName());
 		
 		// If no comments are added, add empty string as comment
 		if (annotateInst.getBody() == null) {
