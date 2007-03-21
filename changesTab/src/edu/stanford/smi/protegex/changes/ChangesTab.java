@@ -297,7 +297,7 @@ public class ChangesTab extends AbstractTabWidget {
 		ActionListener searchClear = new ChangesSearchClear(changesTreeTableModel);
 		clearButton.addActionListener(searchClear);
 		
-		//FIXME: The following lines shoule be deleted when the search is implemented
+		//FIXME: The following lines should be deleted when the search is implemented
 		searchButton.setEnabled(false);
 		clearButton.setEnabled(false);
 		searchButton.setToolTipText("Search functionality not implemented yet");
