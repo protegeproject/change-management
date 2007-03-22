@@ -582,34 +582,32 @@ public class ServerChangesUtil {
     
     
    
-   public static SufficientCondition_Added createSufficientConditionAddedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+   public static SufficientCondition_Added createSufficientConditionAddedChange(ChangesDb changes_db, Frame applyTo, String value, Frame restr){
 
        
 	   String desc = "Added sufficient condition: "+value+" to: "+applyTo.getName();
        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+       Ontology_Class c = (Ontology_Class) changes_db.getOntologyComponent(restr, true);
        //applyToOc.setCurrentName(value);
 
        SufficientCondition_Added change = (SufficientCondition_Added) changes_db.createChange(ChangeCls.SufficientCondition_Added);
-       change.setValue(value);
-       change.setProperty(property);
-       change.setRestriction(restriction);
+       change.setAssociatedRestriction(c);
       
        changes_db.finalizeChange(change, applyToOc, desc);
        return change;
    }
   
   
-  public static SufficientCondition_Removed createSufficientConditionDeletedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+  public static SufficientCondition_Removed createSufficientConditionDeletedChange(ChangesDb changes_db, Frame applyTo, String value, Frame restr){
 
       
 	  String desc = "Removed sufficient condition: "+value+" from: "+applyTo.getName();
       Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+      Ontology_Class c = (Ontology_Class) changes_db.getOntologyComponent(restr, true);
       //applyToOc.setCurrentName(value);
 
       SufficientCondition_Removed change = (SufficientCondition_Removed) changes_db.createChange(ChangeCls.SufficientCondition_Removed);
-      change.setValue(value);
-      change.setProperty(property);
-      change.setRestriction(restriction);
+      change.setAssociatedRestriction(c);
      
       changes_db.finalizeChange(change, applyToOc, desc);
       return change;
@@ -617,18 +615,18 @@ public class ServerChangesUtil {
   
   
   
-  public static SufficientCondition_Modified createSufficientConditionModifiedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String oldVal, String newVal){
+  public static SufficientCondition_Modified createSufficientConditionModifiedChange(ChangesDb changes_db, Frame applyTo, String oldVal, String newVal, Frame restr){
 
       
 	  String desc = "Modified sufficient condition from: "+oldVal+" to: "+newVal;
       Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+      Ontology_Class c = (Ontology_Class) changes_db.getOntologyComponent(restr, true);
       //applyToOc.setCurrentName(value);
 
       SufficientCondition_Modified change = (SufficientCondition_Modified) changes_db.createChange(ChangeCls.SufficientCondition_Modified);
       change.setOldValue(oldVal);
       change.setNewValue(newVal);
-      change.setProperty(property);
-      change.setRestriction(restriction);
+      change.setAssociatedRestriction(c);
      
       changes_db.finalizeChange(change, applyToOc, desc);
       return change;
@@ -674,7 +672,8 @@ public class ServerChangesUtil {
      //applyToOc.setCurrentName(value);
 
      Superclass_Modified change = (Superclass_Modified) changes_db.createChange(ChangeCls.Superclass_Modified);
-
+     change.setOldValue(oldVal);
+     change.setNewValue(newVal);
     
      changes_db.finalizeChange(change, applyToOc, desc);
      return change;
