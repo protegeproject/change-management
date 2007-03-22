@@ -1,4 +1,4 @@
-; Thu Mar 22 12:17:25 PDT 2007
+; Thu Mar 22 12:37:21 PDT 2007
 ; 
 ;+ (version "3.2.1")
 ;+ (build "Build 365")
@@ -338,13 +338,13 @@
 
 ([changes_ProjectKB_Instance_20016] of  String
 
-	(name "Vote")
-	(string_value "voteValue"))
+	(name "Proposal")
+	(string_value "subject"))
 
 ([changes_ProjectKB_Instance_20017] of  String
 
-	(name "Proposal")
-	(string_value "subject"))
+	(name "Vote")
+	(string_value "voteValue"))
 
 ([changes_ProjectKB_Instance_20018] of  String
 
@@ -3038,8 +3038,8 @@
 		[INSTANCE_ANNOTATION_FORM_WIDGET]
 		[changes_ProjectKB_Instance_50854]
 		[changes_ProjectKB_Instance_40056]
-		[changes_ProjectKB_Instance_80822]
 		[changes_ProjectKB_Instance_82926]
+		[changes_ProjectKB_Instance_80822]
 		[changes_ProjectKB_Instance_51393])
 	(default_cls_metaclass ":STANDARD-CLASS")
 	(default_facet_metaclass ":STANDARD-FACET")
