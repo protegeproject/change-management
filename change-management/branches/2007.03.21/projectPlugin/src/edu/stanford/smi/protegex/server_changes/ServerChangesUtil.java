@@ -500,7 +500,7 @@ public class ServerChangesUtil {
         return change;
     }
     
-    public static Property_Created createPropertyAddedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+    public static Property_Created createPropertyAddedChange(ChangesDb changes_db, Frame applyTo, String value){
 
         
     	String desc = "Added property: "+value+" to: "+applyTo.getName();
@@ -508,16 +508,14 @@ public class ServerChangesUtil {
         applyToOc.setCurrentName(value);
 
         Property_Created change = (Property_Created) changes_db.createChange(ChangeCls.Property_Created);
-        change.setValue(value);
-        change.setProperty(property);
-        change.setRestriction(restriction);
+
        
         changes_db.finalizeChange(change, applyToOc, desc);
         return change;
     }
     
     
-    public static Property_Deleted createPropertyDeletedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+    public static Property_Deleted createPropertyDeletedChange(ChangesDb changes_db, Frame applyTo, String value){
 
         
     	String desc = "Removed property: "+value+" from: "+applyTo.getName();
@@ -525,10 +523,7 @@ public class ServerChangesUtil {
         applyToOc.setCurrentName(null);
 
         Property_Deleted change = (Property_Deleted) changes_db.createChange(ChangeCls.Property_Deleted);
-        change.setValue(value);
-        change.setProperty(property);
-        change.setRestriction(restriction);
-       
+
         changes_db.finalizeChange(change, applyToOc, desc);
         return change;
     }
