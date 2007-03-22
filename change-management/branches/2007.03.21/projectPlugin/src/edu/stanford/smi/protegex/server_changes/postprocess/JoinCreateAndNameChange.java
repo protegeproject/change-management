@@ -21,7 +21,7 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Property;
 import edu.stanford.smi.protegex.server_changes.model.generated.Subclass_Added;
-import edu.stanford.smi.protegex.server_changes.model.generated.TemplateSlot_Added;
+
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 public class JoinCreateAndNameChange implements PostProcessor {
