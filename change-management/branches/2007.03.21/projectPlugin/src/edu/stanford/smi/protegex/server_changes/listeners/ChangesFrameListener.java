@@ -139,27 +139,34 @@ public class ChangesFrameListener implements FrameListener {
             String sName = s.getName();
             StringBuffer context = new StringBuffer();
 
-
+            ArrayList oldValue = (ArrayList)event.getArgument2();
+		    String oldSlotValue = oldValue.toString();
 
             if(sName.equals(":DOCUMENTATION")) {
                 String newSlotValue = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
                 if(newSlotValue.equals("")) {
                     //REMOVED DOCUMENTATION
-                    context.append("Removed documentation from ");
+                   /* context.append("Removed documentation from ");
                     context.append(cName);
                     
-                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Removed, c, context.toString());
+                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Removed, c, context.toString());*/
+                	ServerChangesUtil.createPropertyValueDeletedChange(changes_db, c, sName ,"" , oldSlotValue);
+                    
                 }
                 else {
                     // ADDED DOCUMENTATION
-                    context.append("Added documentation: ");
+                 /*   context.append("Added documentation: ");
                     context.append(newSlotValue);
                     context.append(" to: ");
                     context.append(cName);
                     
-                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Added, c, context.toString());
+                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Added, c, context.toString());*/
+                	
+                	ServerChangesUtil.createPropertyValueAddedChange(changes_db, c, sName ,"" , newSlotValue);
+                	
                 }
             } // Handles documentation slot
+
         }
         else if (f instanceof Instance) {
             Instance i = (Instance)f;
