@@ -528,34 +528,34 @@ public class ServerChangesUtil {
         return change;
     }
     
-   public static PropertyValue_Added createPropertyValueAddedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+   public static PropertyValue_Added createPropertyValueAddedChange(ChangesDb changes_db, Frame applyTo, String value, Slot prop){
 
         
     	String desc = "Added property value: "+value+" to: "+applyTo.getName();
         Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        Ontology_Property p = (Ontology_Property) changes_db.getOntologyComponent(prop, true);
         //applyToOc.setCurrentName(value);
 
         PropertyValue_Added change = (PropertyValue_Added) changes_db.createChange(ChangeCls.PropertyValue_Added);
         change.setValue(value);
-        change.setProperty(property);
-        change.setRestriction(restriction);
+        change.setAssociatedProperty(p);
        
         changes_db.finalizeChange(change, applyToOc, desc);
         return change;
     }
    
    
-   public static PropertyValue_Removed createPropertyValueDeletedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+   public static PropertyValue_Removed createPropertyValueDeletedChange(ChangesDb changes_db, Frame applyTo, String value, Slot prop){
 
        
    	   String desc = "Removed property value: "+value+" from: "+applyTo.getName();
        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+       Ontology_Property p = (Ontology_Property) changes_db.getOntologyComponent(prop, true);
        //applyToOc.setCurrentName(value);
 
        PropertyValue_Removed change = (PropertyValue_Removed) changes_db.createChange(ChangeCls.PropertyValue_Removed);
        change.setValue(value);
-       change.setProperty(property);
-       change.setRestriction(restriction);
+       change.setAssociatedProperty(p);
       
        changes_db.finalizeChange(change, applyToOc, desc);
        return change;
@@ -563,18 +563,18 @@ public class ServerChangesUtil {
    
    
    
-   public static PropertyValue_Modified createPropertyValueModifiedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String oldVal, String newVal){
+   public static PropertyValue_Modified createPropertyValueModifiedChange(ChangesDb changes_db, Frame applyTo, String oldVal, String newVal, Slot prop){
 
        
    	   String desc = "Modified property value from: "+oldVal+" to: "+newVal;
        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+       Ontology_Property p = (Ontology_Property) changes_db.getOntologyComponent(prop, true);
        //applyToOc.setCurrentName(value);
 
        PropertyValue_Modified change = (PropertyValue_Modified) changes_db.createChange(ChangeCls.PropertyValue_Modified);
        change.setOldValue(oldVal);
        change.setNewValue(newVal);
-       change.setProperty(property);
-       change.setRestriction(restriction);
+       change.setAssociatedProperty(p);
       
        changes_db.finalizeChange(change, applyToOc, desc);
        return change;
