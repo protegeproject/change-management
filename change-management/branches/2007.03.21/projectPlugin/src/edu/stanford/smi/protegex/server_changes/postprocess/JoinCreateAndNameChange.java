@@ -14,6 +14,7 @@ import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Created_Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.DomainProperty_Added;
 import edu.stanford.smi.protegex.server_changes.model.generated.Individual_Added;
 import edu.stanford.smi.protegex.server_changes.model.generated.Individual_Created;
 import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
@@ -90,12 +91,12 @@ public class JoinCreateAndNameChange implements PostProcessor {
             if (previous_change == null) return;
             Ontology_Component created = (Ontology_Component) previous_change.getApplyTo();
 
-            if (aChange instanceof TemplateSlot_Added && 
-                    !((TemplateSlot_Added) aChange).getAssociatedProperty().equals(created)) {
+            if (aChange instanceof DomainProperty_Added && 
+                    !((DomainProperty_Added) aChange).getAssociatedProperty().equals(created)) {
                removeLastCreate(session);
                return;         
             }
-            else if (!(aChange instanceof TemplateSlot_Added) && !(aChange.getApplyTo().equals(created))) {
+            else if (!(aChange instanceof DomainProperty_Added) && !(aChange.getApplyTo().equals(created))) {
                 removeLastCreate(session);
                 return;
             }
@@ -119,7 +120,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
                     return;
                 }
             }
-            else if (!changes_db.isOwl() && aChange instanceof TemplateSlot_Added && 
+            else if (!changes_db.isOwl() && aChange instanceof DomainProperty_Added && 
                      (created instanceof Ontology_Property)) {
                 if (!templateClassAddedSeen.contains(session)) {
                     templateClassAddedSeen.add(session);
