@@ -234,7 +234,7 @@ public class ServerChangesUtil {
         return change;
     }
     
-    public static TemplateSlotValue_Added createTemplateSlotValueAddedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
+ /*   public static TemplateSlotValue_Added createTemplateSlotValueAddedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
 
         
     	String desc = "Added template slot value: "+value+" to: "+applyTo.getName();
@@ -366,7 +366,7 @@ public class ServerChangesUtil {
         return change;
     }
     
-    
+    */
     public static Facet_Added createFacetAddedChange(ChangesDb changes_db, Frame applyTo, String value){
 
         
