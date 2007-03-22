@@ -14,15 +14,14 @@ import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.CollectionUtilities;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
-import edu.stanford.smi.protegex.owl.model.impl.DefaultOWLDatatypeProperty;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
-import edu.stanford.smi.protegex.server_changes.model.generated.Annotation_Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
+import edu.stanford.smi.protegex.server_changes.model.generated.PropertyValue_Added;
+import edu.stanford.smi.protegex.server_changes.model.generated.PropertyValue_Modified;
+import edu.stanford.smi.protegex.server_changes.model.generated.PropertyValue_Removed;
 
 public class OwlChangesFrameListener implements FrameListener {
     private OWLModel om;
@@ -122,7 +121,7 @@ public class OwlChangesFrameListener implements FrameListener {
             context.append(" from class: ");
             context.append(cText);
 
-            Annotation_Change change = (Annotation_Change) changes_db.createChange(ChangeCls.Annotation_Removed);
+            PropertyValue_Removed change = (PropertyValue_Removed) changes_db.createChange(ChangeCls.PropertyValue_Removed);
             change.setAssociatedProperty(ontologyAnnotation);
             changes_db.finalizeChange(change, applyTo, context.toString());
         }//Annotation deleted
@@ -139,7 +138,7 @@ public class OwlChangesFrameListener implements FrameListener {
             context.append(" to class: ");
             context.append(cName);
 
-            Annotation_Change change = (Annotation_Change) changes_db.createChange(ChangeCls.Annotation_Added);
+            PropertyValue_Added change = (PropertyValue_Added) changes_db.createChange(ChangeCls.PropertyValue_Added);
             change.setAssociatedProperty(ontologyAnnotation);
             changes_db.finalizeChange(change, applyTo, context.toString());
         }
@@ -152,7 +151,7 @@ public class OwlChangesFrameListener implements FrameListener {
             context.append(" set to: ");
             context.append(newSlotValues);
 
-            Annotation_Change change = (Annotation_Change) changes_db.createChange(ChangeCls.Annotation_Modified);
+            PropertyValue_Modified change = (PropertyValue_Modified) changes_db.createChange(ChangeCls.PropertyValue_Modified);
             change.setAssociatedProperty(ontologyAnnotation);
             changes_db.finalizeChange(change, applyTo, context.toString());
         }

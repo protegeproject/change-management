@@ -32,22 +32,6 @@
 	 rdfs:label="Annotation">
 	<rdfs:subClassOf rdf:resource="&kb;AnnotatableThing"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;Annotation_Added"
-	 rdfs:label="Annotation_Added">
-	<rdfs:subClassOf rdf:resource="&kb;Annotation_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Annotation_Change"
-	 rdfs:label="Annotation_Change">
-	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Annotation_Modified"
-	 rdfs:label="Annotation_Modified">
-	<rdfs:subClassOf rdf:resource="&kb;Annotation_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Annotation_Removed"
-	 rdfs:label="Annotation_Removed">
-	<rdfs:subClassOf rdf:resource="&kb;Annotation_Change"/>
-</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Change"
 	 a:role="abstract"
 	 rdfs:label="Change">
@@ -80,10 +64,12 @@
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Created_Change"
+	 a:role="abstract"
 	 rdfs:label="Created_Change">
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Deleted_Change"
+	 a:role="abstract"
 	 rdfs:label="Deleted_Change">
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
@@ -97,14 +83,6 @@
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;DisjointClass_Added"
 	 rdfs:label="DisjointClass_Added">
-	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Documentation_Added"
-	 rdfs:label="Documentation_Added">
-	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;Documentation_Removed"
-	 rdfs:label="Documentation_Removed">
 	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;DomainProperty_Added"
@@ -124,6 +102,43 @@
 	 rdfs:comment="A class of Annotations representing explanations of content"
 	 rdfs:label="Explanation">
 	<rdfs:subClassOf rdf:resource="&kb;Annotation"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;FacetValue_Added"
+	 rdfs:label="FacetValue_Added">
+	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;FacetValue_Modified"
+	 rdfs:label="FacetValue_Modified">
+	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;FacetValue_Removed"
+	 rdfs:label="FacetValue_Removed">
+	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Facet_Added"
+	 rdfs:label="Facet_Added">
+	<rdfs:subClassOf rdf:resource="&kb;Facet_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Facet_Change"
+	 a:role="abstract"
+	 rdfs:label="Facet_Change">
+	<rdfs:subClassOf rdf:resource="&kb;Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Facet_Created"
+	 rdfs:comment="Created_Change"
+	 rdfs:label="Facet_Created">
+	<rdfs:subClassOf rdf:resource="&kb;Created_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Facet_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Facet_Deleted"
+	 rdfs:comment="Deleted_Change"
+	 rdfs:label="Facet_Deleted">
+	<rdfs:subClassOf rdf:resource="&kb;Deleted_Change"/>
+	<rdfs:subClassOf rdf:resource="&kb;Facet_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Facet_Removed"
+	 rdfs:label="Facet_Removed">
+	<rdfs:subClassOf rdf:resource="&kb;Facet_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;FiveStarsVote"
 	 rdfs:label="FiveStarsVote">
@@ -186,6 +201,10 @@
 	 rdfs:label="Ontology_Component">
 	<rdfs:subClassOf rdf:resource="&kb;AnnotatableThing"/>
 </rdfs:Class>
+<rdfs:Class rdf:about="&kb;Ontology_Facet"
+	 rdfs:label="Ontology_Facet">
+	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Ontology_Individual"
 	 rdfs:label="Ontology_Individual">
 	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
@@ -194,7 +213,25 @@
 	 rdfs:label="Ontology_Property">
 	<rdfs:subClassOf rdf:resource="&kb;Ontology_Component"/>
 </rdfs:Class>
+<rdfs:Class rdf:about="&kb;PropertyValue_Added"
+	 rdfs:label="PropertyValue_Added">
+	<rdfs:subClassOf rdf:resource="&kb;PropertyValue_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;PropertyValue_Change"
+	 a:role="abstract"
+	 rdfs:label="PropertyValue_Change">
+	<rdfs:subClassOf rdf:resource="&kb;Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;PropertyValue_Modified"
+	 rdfs:label="PropertyValue_Modified">
+	<rdfs:subClassOf rdf:resource="&kb;PropertyValue_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;PropertyValue_Removed"
+	 rdfs:label="PropertyValue_Removed">
+	<rdfs:subClassOf rdf:resource="&kb;PropertyValue_Change"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Property_Change"
+	 a:role="abstract"
 	 rdfs:label="Property_Change">
 	<rdfs:subClassOf rdf:resource="&kb;Change"/>
 </rdfs:Class>
@@ -210,10 +247,6 @@
 	<rdfs:subClassOf rdf:resource="&kb;Deleted_Change"/>
 	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="&kb;Property_Value"
-	 rdfs:label="Property_Value">
-	<rdfs:subClassOf rdf:resource="&kb;Individual_Change"/>
-</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Proposal"
 	 a:role="abstract"
 	 rdfs:label="Proposal">
@@ -223,6 +256,18 @@
 	 rdfs:label="Question">
 	<rdfs:comment>A class of Annotations representing questions about the content</rdfs:comment>
 	<rdfs:subClassOf rdf:resource="&kb;Annotation"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Restriction_Added"
+	 rdfs:label="Restriction_Added">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Restriction_Modified"
+	 rdfs:label="Restriction_Modified">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Restriction_Removed"
+	 rdfs:label="Restriction_Removed">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;SeeAlso"
 	 rdfs:label="SeeAlso">
@@ -249,8 +294,24 @@
 	 rdfs:label="Subproperty_Removed">
 	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
 </rdfs:Class>
+<rdfs:Class rdf:about="&kb;SufficientCondition_Added"
+	 rdfs:label="SufficientCondition_Added">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;SufficientCondition_Modified"
+	 rdfs:label="SufficientCondition_Modified">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;SufficientCondition_Removed"
+	 rdfs:label="SufficientCondition_Removed">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;Superclass_Added"
 	 rdfs:label="Superclass_Added">
+	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;Superclass_Modified"
+	 rdfs:label="Superclass_Modified">
 	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Superclass_Removed"
@@ -264,14 +325,6 @@
 <rdfs:Class rdf:about="&kb;Superproperty_Removed"
 	 rdfs:label="Superproperty_Removed">
 	<rdfs:subClassOf rdf:resource="&kb;Property_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;TemplateSlot_Added"
-	 rdfs:label="TemplateSlot_Added">
-	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="&kb;TemplateSlot_Removed"
-	 rdfs:label="TemplateSlot_Removed">
-	<rdfs:subClassOf rdf:resource="&kb;Class_Change"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Timestamp"
 	 rdfs:label="Timestamp">
@@ -313,13 +366,29 @@
 	<rdfs:domain rdf:resource="&kb;Change"/>
 	<a:inverseProperty rdf:resource="&kb;annotates"/>
 </rdf:Property>
+<rdf:Property rdf:about="&kb;associatedFacet"
+	 a:maxCardinality="1"
+	 rdfs:label="associatedFacet">
+	<rdfs:domain rdf:resource="&kb;Facet_Change"/>
+	<rdfs:range rdf:resource="&kb;Ontology_Facet"/>
+</rdf:Property>
 <rdf:Property rdf:about="&kb;associatedProperty"
 	 a:maxCardinality="1"
 	 rdfs:label="associatedProperty">
-	<rdfs:domain rdf:resource="&kb;Annotation_Change"/>
 	<rdfs:range rdf:resource="&kb;Ontology_Property"/>
-	<rdfs:domain rdf:resource="&kb;TemplateSlot_Added"/>
-	<rdfs:domain rdf:resource="&kb;TemplateSlot_Removed"/>
+	<rdfs:domain rdf:resource="&kb;PropertyValue_Change"/>
+	<rdfs:domain rdf:resource="&kb;Property_Change"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;associatedRestriction"
+	 a:maxCardinality="1"
+	 rdfs:label="associatedRestriction">
+	<rdfs:range rdf:resource="&kb;Ontology_Class"/>
+	<rdfs:domain rdf:resource="&kb;Restriction_Added"/>
+	<rdfs:domain rdf:resource="&kb;Restriction_Modified"/>
+	<rdfs:domain rdf:resource="&kb;Restriction_Removed"/>
+	<rdfs:domain rdf:resource="&kb;SufficientCondition_Added"/>
+	<rdfs:domain rdf:resource="&kb;SufficientCondition_Modified"/>
+	<rdfs:domain rdf:resource="&kb;SufficientCondition_Removed"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;author"
 	 a:maxCardinality="1"
@@ -339,18 +408,6 @@
 	<rdfs:range rdf:resource="&kb;Change"/>
 	<rdfs:domain rdf:resource="&kb;Ontology_Component"/>
 	<a:inverseProperty rdf:resource="&kb;applyTo"/>
-</rdf:Property>
-<rdf:Property rdf:about="&kb;changes_Slot_0"
-	 a:maxCardinality="1"
-	 rdfs:label="changes_Slot_0">
-	<rdfs:domain rdf:resource="&kb;TemplateSlot_Added"/>
-	<rdfs:range rdf:resource="&rdfs;Literal"/>
-</rdf:Property>
-<rdf:Property rdf:about="&kb;changes_Slot_1"
-	 a:maxCardinality="1"
-	 rdfs:label="changes_Slot_1">
-	<rdfs:domain rdf:resource="&kb;TemplateSlot_Removed"/>
-	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;comment"
 	 rdfs:label="comment">
@@ -393,10 +450,6 @@
 	<rdfs:domain rdf:resource="&kb;Deleted_Change"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
-<rdf:Property rdf:about="&kb;inverse_of_annotates"
-	 rdfs:label="inverse_of_annotates">
-	<rdfs:range rdf:resource="&kb;Annotation"/>
-</rdf:Property>
 <rdf:Property rdf:about="&kb;modified"
 	 a:maxCardinality="1"
 	 rdfs:label="modified">
@@ -414,10 +467,30 @@
 	<rdfs:domain rdf:resource="&kb;Name_Changed"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
+<rdf:Property rdf:about="&kb;newValue"
+	 a:maxCardinality="1"
+	 rdfs:label="newValue">
+	<rdfs:domain rdf:resource="&kb;FacetValue_Modified"/>
+	<rdfs:domain rdf:resource="&kb;PropertyValue_Modified"/>
+	<rdfs:domain rdf:resource="&kb;Restriction_Modified"/>
+	<rdfs:domain rdf:resource="&kb;SufficientCondition_Modified"/>
+	<rdfs:domain rdf:resource="&kb;Superclass_Modified"/>
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</rdf:Property>
 <rdf:Property rdf:about="&kb;oldName"
 	 a:maxCardinality="1"
 	 rdfs:label="oldName">
 	<rdfs:domain rdf:resource="&kb;Name_Changed"/>
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;oldValue"
+	 a:maxCardinality="1"
+	 rdfs:label="oldValue">
+	<rdfs:domain rdf:resource="&kb;FacetValue_Modified"/>
+	<rdfs:domain rdf:resource="&kb;PropertyValue_Modified"/>
+	<rdfs:domain rdf:resource="&kb;Restriction_Modified"/>
+	<rdfs:domain rdf:resource="&kb;SufficientCondition_Modified"/>
+	<rdfs:domain rdf:resource="&kb;Superclass_Modified"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;partOfCompositeChange"
@@ -461,6 +534,17 @@
 <rdf:Property rdf:about="&kb;title"
 	 a:maxCardinality="1"
 	 rdfs:label="title">
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;value"
+	 a:maxCardinality="1"
+	 rdfs:label="value">
+	<rdfs:domain rdf:resource="&kb;FacetValue_Added"/>
+	<rdfs:domain rdf:resource="&kb;FacetValue_Removed"/>
+	<rdfs:domain rdf:resource="&kb;PropertyValue_Added"/>
+	<rdfs:domain rdf:resource="&kb;PropertyValue_Removed"/>
+	<rdfs:domain rdf:resource="&kb;SufficientCondition_Added"/>
+	<rdfs:domain rdf:resource="&kb;SufficientCondition_Removed"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;voteValue"

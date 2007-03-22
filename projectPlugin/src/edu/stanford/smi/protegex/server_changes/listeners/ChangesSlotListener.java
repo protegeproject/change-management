@@ -36,7 +36,7 @@ public class ChangesSlotListener implements SlotListener{
 			context.append(" to: ");
 			context.append(theCls.getBrowserText());
             
-            ServerChangesUtil.createChangeWithSlot(changes_db, ChangeCls.TemplateSlot_Added, theCls, context.toString(), theSlot);
+            ServerChangesUtil.createChangeWithSlot(changes_db, ChangeCls.DomainProperty_Added, theCls, context.toString(), theSlot);
 		}
 	}
 
@@ -55,7 +55,7 @@ public class ChangesSlotListener implements SlotListener{
 			context.append(" from: ");
 			context.append(name);
 			
-            ServerChangesUtil.createChangeWithSlot(changes_db, ChangeCls.TemplateSlot_Removed, theCls, context.toString(), theSlot);
+            ServerChangesUtil.createChangeWithSlot(changes_db, ChangeCls.DomainProperty_Removed, theCls, context.toString(), theSlot);
 		}
 	}
 

@@ -36,9 +36,6 @@ public class ChangeModel {
         Change,
         
         Class_Change,
-        Annotation_Added,
-        Annotation_Modified,
-        Annotation_Removed,
         Class_Created,
         Class_Deleted,
         DisjointClass_Added,
@@ -50,9 +47,7 @@ public class ChangeModel {
         Subclass_Removed,
         Superclass_Added,
         Superclass_Removed,
-        TemplateSlot_Added,
-        TemplateSlot_Removed,
-        
+          
         Individual_Change,
         Individual_Created,
         Individual_Deleted,
@@ -73,7 +68,12 @@ public class ChangeModel {
         Maximum_Value,
         Minimum_Cardinality,
         Minimum_Value,
-                
+  
+        PropertyValue_Change,
+        PropertyValue_Removed,
+        PropertyValue_Added,
+        PropertyValue_Modified,
+        
         Name_Changed,
         
         Composite_Change,

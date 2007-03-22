@@ -9,8 +9,7 @@ import java.util.Map;
 import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
-import edu.stanford.smi.protegex.server_changes.model.generated.Annotation_Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Annotation_Removed;
+
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
