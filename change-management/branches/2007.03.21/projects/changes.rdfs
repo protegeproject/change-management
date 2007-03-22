@@ -539,10 +539,16 @@
 <rdf:Property rdf:about="&kb;value"
 	 a:maxCardinality="1"
 	 rdfs:label="value">
+	<rdfs:domain rdf:resource="&kb;DomainProperty_Added"/>
+	<rdfs:domain rdf:resource="&kb;DomainProperty_Removed"/>
 	<rdfs:domain rdf:resource="&kb;FacetValue_Added"/>
 	<rdfs:domain rdf:resource="&kb;FacetValue_Removed"/>
+	<rdfs:domain rdf:resource="&kb;Facet_Added"/>
+	<rdfs:domain rdf:resource="&kb;Facet_Removed"/>
 	<rdfs:domain rdf:resource="&kb;PropertyValue_Added"/>
 	<rdfs:domain rdf:resource="&kb;PropertyValue_Removed"/>
+	<rdfs:domain rdf:resource="&kb;Restriction_Added"/>
+	<rdfs:domain rdf:resource="&kb;Restriction_Removed"/>
 	<rdfs:domain rdf:resource="&kb;SufficientCondition_Added"/>
 	<rdfs:domain rdf:resource="&kb;SufficientCondition_Removed"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
