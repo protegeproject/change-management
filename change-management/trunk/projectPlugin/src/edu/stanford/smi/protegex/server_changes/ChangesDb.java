@@ -20,9 +20,11 @@ import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protege.server.Server;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
+import edu.stanford.smi.protege.util.CollectionUtilities;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.URIUtilities;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.AnnotationCls;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.AnnotatableThing;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
@@ -314,9 +316,12 @@ public class ChangesDb {
     }
     
     public Annotation createAnnotation(Cls direct_type) {
+    	if (direct_type == null) {
+    		direct_type = getModel().getCls(AnnotationCls.Comment);
+    	}
         return (Annotation) direct_type.createDirectInstance(null);
     }
-    
+
     public void finalizeAnnotation(Annotation annotation,
                                    Collection<AnnotatableThing> annotated,
                                    String body) {
