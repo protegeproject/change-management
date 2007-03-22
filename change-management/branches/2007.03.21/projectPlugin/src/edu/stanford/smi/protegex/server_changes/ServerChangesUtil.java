@@ -450,53 +450,51 @@ public class ServerChangesUtil {
         return change;
     }
     
-    public static Restriction_Added createRestrictionAddedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+    public static Restriction_Added createRestrictionAddedChange(ChangesDb changes_db, Frame applyTo, String value, Frame restr){
 
         
     	String desc = "Added restriction: "+value+" to: "+applyTo.getName();
         Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        Ontology_Class c = (Ontology_Class) changes_db.getOntologyComponent(restr, true);
         //applyToOc.setCurrentName(value);
 
         Restriction_Added change = (Restriction_Added) changes_db.createChange(ChangeCls.Restriction_Added);
-        change.setValue(value);
-        change.setProperty(property);
-        change.setRestriction(restriction);
+        change.setAssociatedRestriction(c);
        
         changes_db.finalizeChange(change, applyToOc, desc);
         return change;
     }
     
     
-    public static Restriction_Modified createRestrictionModifiedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String oldVal, String newVal){
+    public static Restriction_Modified createRestrictionModifiedChange(ChangesDb changes_db, Frame applyTo, String oldVal, String newVal, Frame restr){
 
         
     	String desc = "Modified restriction from: "+oldVal+" to: "+newVal;
         Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        Ontology_Class c = (Ontology_Class) changes_db.getOntologyComponent(restr, true);
         //applyToOc.setCurrentName(value);
 
         Restriction_Modified change = (Restriction_Modified) changes_db.createChange(ChangeCls.Restriction_Modified);
         change.setOldValue(oldVal);
         change.setNewValue(newVal);
-        change.setProperty(property);
-        change.setRestriction(restriction);
+        change.setAssociatedRestriction(c);
        
         changes_db.finalizeChange(change, applyToOc, desc);
         return change;
     }
     
     
-    public static Restriction_Removed createRestrictionRemovedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+    public static Restriction_Removed createRestrictionRemovedChange(ChangesDb changes_db, Frame applyTo, String value, Frame restr){
 
         
     	String desc = "Removed restriction: "+value+" from: "+applyTo.getName();
 		
         Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        Ontology_Class c = (Ontology_Class) changes_db.getOntologyComponent(restr, true);
         //applyToOc.setCurrentName(value);
 
         Restriction_Removed change = (Restriction_Removed) changes_db.createChange(ChangeCls.Restriction_Removed);
-        change.setValue(value);
-        change.setProperty(property);
-        change.setRestriction(restriction);
+        change.setAssociatedRestriction(c);
        
         changes_db.finalizeChange(change, applyToOc, desc);
         return change;
