@@ -1,4 +1,4 @@
-package edu.stanford.smi.protegex.server_changes.postprocess;
+/*package edu.stanford.smi.protegex.server_changes.postprocess;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +15,7 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
 public class AnnotationCombiner implements PostProcessor {
-    private ChangesDb changes_db;
+   private ChangesDb changes_db;
     private Map<RemoteSession, List<Annotation_Change>> lastAnnotationsBySession
                                     = new HashMap<RemoteSession, List<Annotation_Change>>();
     
@@ -87,3 +87,4 @@ public class AnnotationCombiner implements PostProcessor {
     }
 
 }
+*/

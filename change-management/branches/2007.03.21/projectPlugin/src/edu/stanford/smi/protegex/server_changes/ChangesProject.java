@@ -27,7 +27,7 @@ import edu.stanford.smi.protegex.server_changes.listeners.owl.ChangesOwlKBListen
 import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesClassListener;
 import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesFrameListener;
 import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesPropertyListener;
-import edu.stanford.smi.protegex.server_changes.postprocess.AnnotationCombiner;
+
 import edu.stanford.smi.protegex.server_changes.postprocess.JoinCreateAndNameChange;
 import edu.stanford.smi.protegex.server_changes.postprocess.JoinInstanceCreateAndAdd;
 import edu.stanford.smi.protegex.server_changes.util.Util;
@@ -152,7 +152,7 @@ public class ChangesProject extends ProjectPluginAdapter {
         ChangesDb changesDb = changesDbMap.get(currentKB);
         if (changesDb == null) {
             changesDb = new ChangesDb(currentKB);
-            changesDb.addPostProcessor(new AnnotationCombiner());
+            //changesDb.addPostProcessor(new AnnotationCombiner());
             changesDb.addPostProcessor(new JoinCreateAndNameChange());
             changesDb.addPostProcessor(new JoinInstanceCreateAndAdd());
             changesDbMap.put(currentKB, changesDb);
