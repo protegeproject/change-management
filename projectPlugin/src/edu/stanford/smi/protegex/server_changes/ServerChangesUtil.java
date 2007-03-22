@@ -14,6 +14,9 @@ import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+
+import edu.stanford.smi.protegex.server_changes.model.generated.*;
+
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeSlot;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
@@ -24,6 +27,7 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Property;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
+
 
 public class ServerChangesUtil {
     private static final Logger log = Log.getLogger(ServerChangesUtil.class);
@@ -130,6 +134,8 @@ public class ServerChangesUtil {
         return change;
     }
     
+    
+
     public static Composite_Change createTransactionChange(ChangesDb changes_db,
                                                            Frame applyTo,
                                                            String context,
@@ -199,4 +205,487 @@ public class ServerChangesUtil {
 		ChangeModel.logAnnotatableThing("Updated Annotation", log, Level.FINE, a);
 		return a;	
 	}
+	
+    public static TemplateSlot_Added createTemplateSlotAddedChange(ChangesDb changes_db, Frame applyTo, String value){
+
+        
+    	String desc = "Added template slot: "+value+" to: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        TemplateSlot_Added change = (TemplateSlot_Added) changes_db.createChange(ChangeCls.TemplateSlot_Added);
+        change.setValue(value);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static TemplateSlot_Removed createTemplateSlotRemovedChange(ChangesDb changes_db, Frame applyTo, String value){
+
+        
+    	String desc = "Removed template slot: "+value+" from: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        TemplateSlot_Removed change = (TemplateSlot_Removed) changes_db.createChange(ChangeCls.TemplateSlot_Removed);
+        change.setValue(value);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static TemplateSlotValue_Added createTemplateSlotValueAddedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
+
+        
+    	String desc = "Added template slot value: "+value+" to: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        TemplateSlotValue_Added change = (TemplateSlotValue_Added) changes_db.createChange(ChangeCls.TemplateSlotValue_Added);
+        change.setValue(value);
+        change.setSlot(slot);
+        change.setFacet(facet);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    
+    public static TemplateSlotValue_Modified createTemplateSlotValueModifiedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String oldVal, String newVal){
+
+        
+    	String desc = "Modified template slot value from: "+oldVal+" to: "+newVal;
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(newVal);
+
+        TemplateSlotValue_Modified change = (TemplateSlotValue_Modified) changes_db.createChange(ChangeCls.TemplateSlotValue_Modified);
+        change.setOldValue(oldVal);
+        change.setNewValue(newVal);
+        change.setFacet(facet);
+        change.setSlot(slot);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static TemplateSlotValue_Removed createTemplateSlotValueRemovedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
+
+        
+    	String desc = "Removed template slot value: "+value+" from: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        TemplateSlotValue_Removed change = (TemplateSlotValue_Removed) changes_db.createChange(ChangeCls.TemplateSlotValue_Removed);
+        change.setValue(value);
+        change.setSlot(slot);
+        change.setFacet(facet);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static OwnSlot_Added createOwnSlotAddedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
+
+        
+    	String desc = "Added own slot: "+value+" to: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        OwnSlot_Added change = (OwnSlot_Added) changes_db.createChange(ChangeCls.OwnSlot_Added);
+        change.setValue(value);
+        change.setSlot(slot);
+        change.setFacet(facet);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static OwnSlot_Removed createOwnSlotRemovedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
+
+        
+    	String desc = "Removed own slot: "+value+" from: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        OwnSlot_Removed change = (OwnSlot_Removed) changes_db.createChange(ChangeCls.OwnSlot_Removed);
+        change.setValue(value);
+        change.setSlot(slot);
+        change.setFacet(facet);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static OwnSlotValue_Added createOwnSlotValueAddedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
+
+        
+    	String desc = "Added own slot value: "+value+" to: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        OwnSlotValue_Added change = (OwnSlotValue_Added) changes_db.createChange(ChangeCls.OwnSlotValue_Added);
+        change.setValue(value);
+        change.setSlot(slot);
+        change.setFacet(facet);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    
+    public static OwnSlotValue_Modified createOwnSlotValueModifiedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String oldVal, String newVal){
+
+        
+    	String desc = "Modified own slot value from: "+oldVal+" to: "+newVal;
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(newVal);
+
+        OwnSlotValue_Modified change = (OwnSlotValue_Modified) changes_db.createChange(ChangeCls.OwnSlotValue_Modified);
+        change.setOldValue(oldVal);
+        change.setNewValue(newVal);
+        change.setFacet(facet);
+        change.setSlot(slot);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static OwnSlotValue_Removed createOwnSlotValueRemovedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
+
+        
+    	String desc = "Removed own slot value: "+value+" from: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        OwnSlotValue_Removed change = (OwnSlotValue_Removed) changes_db.createChange(ChangeCls.OwnSlotValue_Removed);
+        change.setValue(value);
+        change.setSlot(slot);
+        change.setFacet(facet);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    
+    public static Facet_Added createFacetAddedChange(ChangesDb changes_db, Frame applyTo, String value){
+
+        
+    	String desc = "Added facet: "+value+" to: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        Facet_Added change = (Facet_Added) changes_db.createChange(ChangeCls.Facet_Added);
+        change.setValue(value);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static Facet_Removed createFacetRemovedChange(ChangesDb changes_db, Frame applyTo, String value){
+
+        
+    	String desc = "Removed facet: "+value+" from: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        Facet_Removed change = (Facet_Removed) changes_db.createChange(ChangeCls.Facet_Removed);
+        change.setValue(value);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static FacetValue_Added createFacetValueAddedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
+
+        
+    	String desc = "Added facet value: "+value+" to: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        FacetValue_Added change = (FacetValue_Added) changes_db.createChange(ChangeCls.FacetValue_Added);
+        change.setValue(value);
+        change.setSlot(slot);
+        change.setFacet(facet);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    
+    public static FacetValue_Modified createFacetValueModifiedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String oldVal, String newVal){
+
+        
+    	String desc = "Modified facet value from: "+oldVal+" to: "+newVal;
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(newVal);
+
+        FacetValue_Modified change = (FacetValue_Modified) changes_db.createChange(ChangeCls.FacetValue_Modified);
+        change.setOldValue(oldVal);
+        change.setNewValue(newVal);
+        change.setFacet(facet);
+        change.setSlot(slot);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static FacetValue_Removed createFacetValueRemovedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
+
+        
+    	String desc = "Removed facet value: "+value+" from: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        FacetValue_Removed change = (FacetValue_Removed) changes_db.createChange(ChangeCls.FacetValue_Removed);
+        change.setValue(value);
+        change.setSlot(slot);
+        change.setFacet(facet);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static Restriction_Added createRestrictionAddedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+
+        
+    	String desc = "Added restriction: "+value+" to: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        Restriction_Added change = (Restriction_Added) changes_db.createChange(ChangeCls.Restriction_Added);
+        change.setValue(value);
+        change.setProperty(property);
+        change.setRestriction(restriction);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    
+    public static Restriction_Modified createRestrictionModifiedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String oldVal, String newVal){
+
+        
+    	String desc = "Modified restriction from: "+oldVal+" to: "+newVal;
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        Restriction_Modified change = (Restriction_Modified) changes_db.createChange(ChangeCls.Restriction_Modified);
+        change.setOldValue(oldVal);
+        change.setNewValue(newVal);
+        change.setProperty(property);
+        change.setRestriction(restriction);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    
+    public static Restriction_Removed createRestrictionRemovedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+
+        
+    	String desc = "Removed restriction: "+value+" from: "+applyTo.getName();
+		
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        Restriction_Removed change = (Restriction_Removed) changes_db.createChange(ChangeCls.Restriction_Removed);
+        change.setValue(value);
+        change.setProperty(property);
+        change.setRestriction(restriction);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    public static Property_Created createPropertyAddedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+
+        
+    	String desc = "Added property: "+value+" to: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        applyToOc.setCurrentName(value);
+
+        Property_Created change = (Property_Created) changes_db.createChange(ChangeCls.Property_Created);
+        change.setValue(value);
+        change.setProperty(property);
+        change.setRestriction(restriction);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+    
+    public static Property_Deleted createPropertyDeletedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+
+        
+    	String desc = "Removed property: "+value+" from: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        applyToOc.setCurrentName(null);
+
+        Property_Deleted change = (Property_Deleted) changes_db.createChange(ChangeCls.Property_Deleted);
+        change.setValue(value);
+        change.setProperty(property);
+        change.setRestriction(restriction);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+    
+   public static PropertyValue_Added createPropertyValueAddedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+
+        
+    	String desc = "Added property value: "+value+" to: "+applyTo.getName();
+        Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        //applyToOc.setCurrentName(value);
+
+        PropertyValue_Added change = (PropertyValue_Added) changes_db.createChange(ChangeCls.PropertyValue_Added);
+        change.setValue(value);
+        change.setProperty(property);
+        change.setRestriction(restriction);
+       
+        changes_db.finalizeChange(change, applyToOc, desc);
+        return change;
+    }
+   
+   
+   public static PropertyValue_Removed createPropertyValueDeletedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+
+       
+   	   String desc = "Removed property value: "+value+" from: "+applyTo.getName();
+       Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+       //applyToOc.setCurrentName(value);
+
+       PropertyValue_Removed change = (PropertyValue_Removed) changes_db.createChange(ChangeCls.PropertyValue_Removed);
+       change.setValue(value);
+       change.setProperty(property);
+       change.setRestriction(restriction);
+      
+       changes_db.finalizeChange(change, applyToOc, desc);
+       return change;
+   }
+   
+   
+   
+   public static PropertyValue_Modified createPropertyValueModifiedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String oldVal, String newVal){
+
+       
+   	   String desc = "Modified property value from: "+oldVal+" to: "+newVal;
+       Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+       //applyToOc.setCurrentName(value);
+
+       PropertyValue_Modified change = (PropertyValue_Modified) changes_db.createChange(ChangeCls.PropertyValue_Modified);
+       change.setOldValue(oldVal);
+       change.setNewValue(newVal);
+       change.setProperty(property);
+       change.setRestriction(restriction);
+      
+       changes_db.finalizeChange(change, applyToOc, desc);
+       return change;
+   }
+    
+    
+   
+   public static SufficientCondition_Added createSufficientConditionAddedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+
+       
+	   String desc = "Added sufficient condition: "+value+" to: "+applyTo.getName();
+       Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+       //applyToOc.setCurrentName(value);
+
+       SufficientCondition_Added change = (SufficientCondition_Added) changes_db.createChange(ChangeCls.SufficientCondition_Added);
+       change.setValue(value);
+       change.setProperty(property);
+       change.setRestriction(restriction);
+      
+       changes_db.finalizeChange(change, applyToOc, desc);
+       return change;
+   }
+  
+  
+  public static SufficientCondition_Removed createSufficientConditionDeletedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String value){
+
+      
+	  String desc = "Removed sufficient condition: "+value+" from: "+applyTo.getName();
+      Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+      //applyToOc.setCurrentName(value);
+
+      SufficientCondition_Removed change = (SufficientCondition_Removed) changes_db.createChange(ChangeCls.SufficientCondition_Removed);
+      change.setValue(value);
+      change.setProperty(property);
+      change.setRestriction(restriction);
+     
+      changes_db.finalizeChange(change, applyToOc, desc);
+      return change;
+  }
+  
+  
+  
+  public static SufficientCondition_Modified createSufficientConditionModifiedChange(ChangesDb changes_db, Frame applyTo, String property, String restriction, String oldVal, String newVal){
+
+      
+	  String desc = "Modified sufficient condition from: "+oldVal+" to: "+newVal;
+      Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+      //applyToOc.setCurrentName(value);
+
+      SufficientCondition_Modified change = (SufficientCondition_Modified) changes_db.createChange(ChangeCls.SufficientCondition_Modified);
+      change.setOldValue(oldVal);
+      change.setNewValue(newVal);
+      change.setProperty(property);
+      change.setRestriction(restriction);
+     
+      changes_db.finalizeChange(change, applyToOc, desc);
+      return change;
+  }
+   
+    
+  public static Superclass_Added createNecessaryConditionAddedChange(ChangesDb changes_db, Frame applyTo,String value){
+
+      
+	  String desc = "Added superclass: "+value+" to: "+applyTo.getName();
+      Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+      //applyToOc.setCurrentName(value);
+
+      Superclass_Added change = (Superclass_Added) changes_db.createChange(ChangeCls.Superclass_Added);
+
+     
+      changes_db.finalizeChange(change, applyToOc, desc);
+      return change;
+  }
+ 
+ 
+ 
+ public static Superclass_Removed createNecessaryConditionRemovedChange(ChangesDb changes_db, Frame applyTo,String value){
+
+      
+	  String desc = "Removed superclass: "+value+" from: "+applyTo.getName();
+      Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+      //applyToOc.setCurrentName(value);
+
+      Superclass_Removed change = (Superclass_Removed) changes_db.createChange(ChangeCls.Superclass_Removed);
+
+     
+      changes_db.finalizeChange(change, applyToOc, desc);
+      return change;
+  }
+ 
+ 
+ public static Superclass_Modified createNecessaryConditionModifiedChange(ChangesDb changes_db, Frame applyTo,String oldVal, String newVal){
+
+     
+	 String desc = "Modified superclass from: "+oldVal+" to: "+newVal;
+     Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+     //applyToOc.setCurrentName(value);
+
+     Superclass_Modified change = (Superclass_Modified) changes_db.createChange(ChangeCls.Superclass_Modified);
+
+    
+     changes_db.finalizeChange(change, applyToOc, desc);
+     return change;
+ }
+ 
+ 
+   
+    
+
+    
+    
  }
