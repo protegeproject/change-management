@@ -23,9 +23,9 @@ public class AnnotationCombiner implements PostProcessor {
         this.changes_db = changes_db;
     }
 
-    /*
+    
      * Combine Annotations.
-     */
+     
     public void addChange(Change aChange) {
         RemoteSession session = changes_db.getCurrentSession();
         List<Annotation_Change> previous_annotations = lastAnnotationsBySession.get(session);

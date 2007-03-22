@@ -150,7 +150,7 @@ public class ChangesFrameListener implements FrameListener {
                     context.append(cName);
                     
                     ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Removed, c, context.toString());*/
-                	ServerChangesUtil.createPropertyValueDeletedChange(changes_db, c, sName ,"" , oldSlotValue);
+                	ServerChangesUtil.createPropertyValueDeletedChange(changes_db, c, oldSlotValue, s);
                     
                 }
                 else {
@@ -162,7 +162,7 @@ public class ChangesFrameListener implements FrameListener {
                     
                     ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Added, c, context.toString());*/
                 	
-                	ServerChangesUtil.createPropertyValueAddedChange(changes_db, c, sName ,"" , newSlotValue);
+                	ServerChangesUtil.createPropertyValueAddedChange(changes_db, c, newSlotValue, s);
                 	
                 }
             } // Handles documentation slot
