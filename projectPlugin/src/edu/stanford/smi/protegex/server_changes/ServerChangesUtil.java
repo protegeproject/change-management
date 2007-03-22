@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protege.model.Facet;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
@@ -206,29 +207,31 @@ public class ServerChangesUtil {
 		return a;	
 	}
 	
-    public static TemplateSlot_Added createTemplateSlotAddedChange(ChangesDb changes_db, Frame applyTo, String value){
+    public static DomainProperty_Added createDomainPropertyAddedChange(ChangesDb changes_db, Frame applyTo, String value, Frame prop){
 
         
-    	String desc = "Added template slot: "+value+" to: "+applyTo.getName();
+    	String desc = "Added domain property: "+value+" to: "+applyTo.getName();
         Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        Ontology_Property p = (Ontology_Property) changes_db.getOntologyComponent(prop, true);
         //applyToOc.setCurrentName(value);
 
-        TemplateSlot_Added change = (TemplateSlot_Added) changes_db.createChange(ChangeCls.TemplateSlot_Added);
-        change.setValue(value);
+        DomainProperty_Added change = (DomainProperty_Added) changes_db.createChange(ChangeCls.DomainProperty_Added);
+        change.setAssociatedProperty(p);
        
         changes_db.finalizeChange(change, applyToOc, desc);
         return change;
     }
     
-    public static TemplateSlot_Removed createTemplateSlotRemovedChange(ChangesDb changes_db, Frame applyTo, String value){
+    public static DomainProperty_Removed createDomainPropertyRemovedChange(ChangesDb changes_db, Frame applyTo, String value, Frame prop){
 
         
-    	String desc = "Removed template slot: "+value+" from: "+applyTo.getName();
+    	String desc = "Removed domain property: "+value+" from: "+applyTo.getName();
         Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        Ontology_Property p = (Ontology_Property) changes_db.getOntologyComponent(prop, true);
         //applyToOc.setCurrentName(value);
 
-        TemplateSlot_Removed change = (TemplateSlot_Removed) changes_db.createChange(ChangeCls.TemplateSlot_Removed);
-        change.setValue(value);
+        DomainProperty_Removed change = (DomainProperty_Removed) changes_db.createChange(ChangeCls.DomainProperty_Removed);
+        change.setAssociatedProperty(p);
        
         changes_db.finalizeChange(change, applyToOc, desc);
         return change;
@@ -395,51 +398,53 @@ public class ServerChangesUtil {
         return change;
     }
     
-    public static FacetValue_Added createFacetValueAddedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
+    public static FacetValue_Added createFacetValueAddedChange(ChangesDb changes_db, Frame applyTo, Facet facet, String value){
 
         
     	String desc = "Added facet value: "+value+" to: "+applyTo.getName();
         Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        Ontology_Facet f = (Ontology_Facet) changes_db.getOntologyComponent(facet, true);
         //applyToOc.setCurrentName(value);
 
         FacetValue_Added change = (FacetValue_Added) changes_db.createChange(ChangeCls.FacetValue_Added);
         change.setValue(value);
-        change.setSlot(slot);
-        change.setFacet(facet);
+        change.setAssociatedFacet(f);
+
        
         changes_db.finalizeChange(change, applyToOc, desc);
         return change;
     }
     
     
-    public static FacetValue_Modified createFacetValueModifiedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String oldVal, String newVal){
+    public static FacetValue_Modified createFacetValueModifiedChange(ChangesDb changes_db, Frame applyTo, Facet facet, String oldVal, String newVal){
 
         
     	String desc = "Modified facet value from: "+oldVal+" to: "+newVal;
         Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        Ontology_Facet f = (Ontology_Facet) changes_db.getOntologyComponent(facet, true);
+        
         //applyToOc.setCurrentName(newVal);
 
         FacetValue_Modified change = (FacetValue_Modified) changes_db.createChange(ChangeCls.FacetValue_Modified);
         change.setOldValue(oldVal);
         change.setNewValue(newVal);
-        change.setFacet(facet);
-        change.setSlot(slot);
+        change.setAssociatedFacet(f);
        
         changes_db.finalizeChange(change, applyToOc, desc);
         return change;
     }
     
-    public static FacetValue_Removed createFacetValueRemovedChange(ChangesDb changes_db, Frame applyTo, String slot, String facet, String value){
+    public static FacetValue_Removed createFacetValueRemovedChange(ChangesDb changes_db, Frame applyTo, Facet facet, String value){
 
         
     	String desc = "Removed facet value: "+value+" from: "+applyTo.getName();
         Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        Ontology_Facet f = (Ontology_Facet) changes_db.getOntologyComponent(facet, true);
         //applyToOc.setCurrentName(value);
 
         FacetValue_Removed change = (FacetValue_Removed) changes_db.createChange(ChangeCls.FacetValue_Removed);
         change.setValue(value);
-        change.setSlot(slot);
-        change.setFacet(facet);
+        change.setAssociatedFacet(f);
        
         changes_db.finalizeChange(change, applyToOc, desc);
         return change;
