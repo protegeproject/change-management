@@ -1,5 +1,5 @@
 
-// Created on Wed Mar 21 17:52:27 PDT 2007
+// Created on Thu Mar 22 12:38:19 PDT 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -18,10 +18,10 @@ public abstract class Facet_Change extends Change {
 		super(kb, id);
 	}
 
-	public void setAssociatedFacet(Instance associatedFacet) {
-		ModelUtilities.setOwnSlotValue(this, "associatedFacet", associatedFacet);	}
-	public Instance getAssociatedFacet() {
-		return ((Instance) ModelUtilities.getOwnSlotValue(this, "associatedFacet"));
+	public void setAssociatedProperty(Instance associatedProperty) {
+		ModelUtilities.setOwnSlotValue(this, "associatedProperty", associatedProperty);	}
+	public Instance getAssociatedProperty() {
+		return ((Instance) ModelUtilities.getOwnSlotValue(this, "associatedProperty"));
 	}
 // __Code above is automatically generated. Do not change
 }

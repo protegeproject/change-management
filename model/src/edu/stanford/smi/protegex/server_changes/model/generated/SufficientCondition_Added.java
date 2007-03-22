@@ -1,5 +1,5 @@
 
-// Created on Wed Mar 21 17:52:27 PDT 2007
+// Created on Thu Mar 22 12:38:19 PDT 2007
 // "Copyright Stanford University 2006"
 
 package edu.stanford.smi.protegex.server_changes.model.generated;
@@ -22,12 +22,6 @@ public class SufficientCondition_Added extends Class_Change {
 		ModelUtilities.setOwnSlotValue(this, "associatedRestriction", associatedRestriction);	}
 	public Instance getAssociatedRestriction() {
 		return ((Instance) ModelUtilities.getOwnSlotValue(this, "associatedRestriction"));
-	}
-
-	public void setValue(String value) {
-		ModelUtilities.setOwnSlotValue(this, "value", value);	}
-	public String getValue() {
-		return ((String) ModelUtilities.getOwnSlotValue(this, "value"));
 	}
 // __Code above is automatically generated. Do not change
 }
