@@ -39,14 +39,24 @@ public class ChangeModel {
         Class_Created,
         Class_Deleted,
         DisjointClass_Added,
-        Documentation_Added,
-        Documentation_Removed,
+        FacetValue_Added,
+        FacetValue_Modified,
+        FacetValue_Removed,
+        Facet_Added,
+        Facet_Removed,
         DomainProperty_Added,
         DomainProperty_Removed,
         Subclass_Added,
         Subclass_Removed,
         Superclass_Added,
         Superclass_Removed,
+        Restriction_Added,
+        Restriction_Modified,
+        Restriction_Removed,
+        SufficientCondition_Added,
+        SufficientCondition_Modified,
+        SufficientCondition_Removed,
+        Superclass_Modified,
           
         Individual_Change,
         Individual_Created,
@@ -56,7 +66,7 @@ public class ChangeModel {
         Individual_Added,
         Individual_Removed,
         Property_Value,
-        
+
         Property_Change,
         Property_Created,
         Property_Deleted,
@@ -126,6 +136,9 @@ public class ChangeModel {
         subChanges,
         timestamp,
         currentName,
+        newValue,
+        oldValue,
+        value,
     }
     
     public KnowledgeBase getChangeKb() {
