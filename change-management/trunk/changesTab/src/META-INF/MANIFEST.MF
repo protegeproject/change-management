@@ -10,3 +10,6 @@ Project-Plugin: True
 Name: edu/stanford/smi/protegex/server_changes/prompt/UsersTab.class
 Tab-Widget: True
 
+Name: edu.stanford.smi.protege.collab.gui.changesKBViewTab.ChangesKBViewTab.class
+Tab-Widget: True
+
