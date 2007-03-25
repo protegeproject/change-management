@@ -5,14 +5,12 @@
 package edu.stanford.smi.protegex.server_changes.prompt;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -28,10 +26,16 @@ import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.DefaultRenderer;
 import edu.stanford.smi.protege.util.LabeledComponent;
+import edu.stanford.smi.protege.util.ModalDialog;
 import edu.stanford.smi.protege.util.SelectionListener;
+import edu.stanford.smi.protegex.owl.model.OWLModel;
 
 public class DiffUserView extends JPanel {
 	private static final long serialVersionUID = 3771686927172752103L;
+    
+
+    
+    private boolean isOwl;
 
 	private JTable userTable = ComponentFactory.createTable(null);
 
@@ -44,6 +48,7 @@ public class DiffUserView extends JPanel {
 
 	public DiffUserView(KnowledgeBase old_kb, KnowledgeBase new_kb) {
 		userConceptLists = new UserConceptList(old_kb, new_kb);
+        isOwl = (new_kb instanceof OWLModel);
 	}
 
 	public void setAuthorManagement(AuthorManagement authorManagement) {
@@ -119,16 +124,7 @@ public class DiffUserView extends JPanel {
 		LabeledComponent listsLabeledComponent = new LabeledComponent(
 				"Changed ontology components", result, true);
 
-		listsLabeledComponent.setHeaderComponent(getHeaderCenterComponent(
-				"Show anonymous ontology components",
-				((authorManagement == null ? false : authorManagement
-						.isShowAnonymousOntologyComponents())),
-				new ItemListener() {
-					public void itemStateChanged(ItemEvent e) {
-						onShowAnonymousResources(e.getSource());
-					}
-				}));
-
+		listsLabeledComponent.setHeaderComponent(getHeaderCenterComponent());
 		return listsLabeledComponent;
 	}
 
@@ -141,40 +137,34 @@ public class DiffUserView extends JPanel {
 				});
 	}
 
-	private void onShowAnonymousResources(Object source) {
-		JCheckBox cb = (JCheckBox) source;
+	private JComponent getHeaderCenterComponent() {
+	    JButton button = new JButton("Set Filters");
+        button.setSize(button.getMinimumSize());
+        button.addActionListener(new ActionListener() {
 
-		int[] selectedIndexes = userTable.getSelectedRows();
+            public void actionPerformed(ActionEvent e) {
+                popupFiltersDialog();
+            }
+        });
+        return button;
+    }
+    
+    private void popupFiltersDialog() {
 
-		authorManagement.setShowAnonymousOntologyComponents(cb.isSelected());
+        final FilterPanel filterPanel = new FilterPanel(isOwl, authorManagement.getFilters());
+        ModalDialog.showDialog(this, filterPanel, "Filters Panel", ModalDialog.MODE_OK_CANCEL,
+                               new ModalDialog.CloseCallback() {
 
-		// reinitialize the users table
-		userTable.setModel(createTableModel());
+            public boolean canClose(int result) {
+                if (result == ModalDialog.OPTION_OK) {
+                    authorManagement.setFilters(filterPanel.getResult());
+                    // reinitialize the users table
+                    userTable.setModel(createTableModel());
+                }
+                return true;
+            }
+        });
 
-		for (int i = 0; i < selectedIndexes.length; i++) {
-			userTable.addRowSelectionInterval(selectedIndexes[i],
-					selectedIndexes[i]);
-		}
-	}
-
-	private JComponent getHeaderCenterComponent(String text, boolean selected,
-			ItemListener itemListener) {
-		final JCheckBox showAllChanges = ComponentFactory.createCheckBox(text);
-		showAllChanges.setSelected(selected);
-
-		Font font = showAllChanges.getFont();
-		showAllChanges.setFont(font.deriveFont(Font.BOLD, font.getSize()));
-		showAllChanges.setForeground(new Color(140, 140, 140));
-		showAllChanges.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(showAllChanges, BorderLayout.EAST);
-
-		if (itemListener != null) {
-			showAllChanges.addItemListener(itemListener);
-		}
-
-		return panel;
 	}
 
 }
