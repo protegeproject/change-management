@@ -1,5 +1,7 @@
 package edu.stanford.smi.protegex.server_changes.prompt;
 
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,6 +15,7 @@ import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
+import edu.stanford.smi.protegex.server_changes.prompt.FilterPanel.ComponentFilter;
 
 public class AuthorManagement {
     private KnowledgeBase kb;
@@ -25,13 +28,17 @@ public class AuthorManagement {
     
     private Set<String> active_users  = new HashSet<String>();
     
-    private boolean showAnonymousOntologyComponents = false;
+    private Set<ComponentFilter> filters;
+    private boolean filter_anonymous_guys;
+    private boolean nothing_to_filter;
+    public final static Set<FilterPanel.ComponentFilter> DEFAULT_FILTERS = Collections.unmodifiableSet(EnumSet.of(FilterPanel.ComponentFilter.CLASS));
     
     private AuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
         this.kb = kb2;
         changes_db = ChangesProject.getChangesDb(kb);
         model = changes_db.getModel();
         evaluateConflicts();
+        setFilters(AuthorManagement.DEFAULT_FILTERS);
     }
     
     public static AuthorManagement getAuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
@@ -117,49 +124,63 @@ public class AuthorManagement {
 
 	
 	public Set<Ontology_Component> getFilteredConflictedFrames(String user) {
-		  Set<Ontology_Component> myConflictingFrames = new HashSet<Ontology_Component>(getConflictedFrames(user));
-		  
-		  if (!showAnonymousOntologyComponents) {
-	        	filterAnonymousOntologyComponent(myConflictingFrames);
-	      } 
-		  
-		  return myConflictingFrames;
-	  }
-
-	
-	public Set<Ontology_Component> getFilteredUnConflictedFrames(String user) {
-		  Set<Ontology_Component> myUnConflictingFrames = new HashSet<Ontology_Component>(getUnConlictedFrames(user));
-		  
-		  if (!showAnonymousOntologyComponents) {
-	        	filterAnonymousOntologyComponent(myUnConflictingFrames);
-	      } 
-		  
-		  return myUnConflictingFrames;
-	  }
-
-	
-	
-    private void filterAnonymousOntologyComponent(Set<Ontology_Component> myConflictingFrames) {
-    	for (Iterator iter = myConflictingFrames.iterator(); iter.hasNext();) {
-			Ontology_Component ontoComp = (Ontology_Component) iter.next();
-			if (ontoComp.isAnonymous()) {
-				iter.remove();
-			}
-		}		
+	    Set<Ontology_Component> myConflictingFrames = new HashSet<Ontology_Component>(getConflictedFrames(user));
+	    filter(myConflictingFrames);
+	    return myConflictingFrames;
 	}
 
+    
 	
+	public Set<Ontology_Component> getFilteredUnConflictedFrames(String user) {
+	    Set<Ontology_Component> myUnConflictingFrames = new HashSet<Ontology_Component>(getUnConlictedFrames(user));
+	    filter(myUnConflictingFrames);
+	    return myUnConflictingFrames;
+	}
+    
     public Set<String> getUsers() {
         return active_users;
     }
-
-	public boolean isShowAnonymousOntologyComponents() {
-		return showAnonymousOntologyComponents;
-	}
-
-	public void setShowAnonymousOntologyComponents(
-			boolean showAnonymousOntologyComponents) {
-		this.showAnonymousOntologyComponents = showAnonymousOntologyComponents;
-	}
     
+    private void filter(Set<Ontology_Component> frames) {
+        if (nothing_to_filter) return;
+        Set<Ontology_Component> remove = new HashSet<Ontology_Component>();
+        for (Ontology_Component frame : frames) {
+            if (doFilter(frame)) { 
+                remove.add(frame);
+            }
+        }
+        frames.removeAll(remove);
+    }
+    
+    private boolean doFilter(Ontology_Component frame) {
+        if (filter_anonymous_guys && frame.isAnonymous()) {
+            return true;
+        }
+        for (ComponentFilter filter : filters) {
+            if (filter != ComponentFilter.ANONYMOUS && filter.allow(frame)) return false;
+        }
+        return true;
+    }
+	
+    
+    public Set<ComponentFilter> getFilters() {
+        return Collections.unmodifiableSet(filters);
+    }
+
+    
+    public void setFilters(Set<ComponentFilter> filters) {
+        this.filters = filters;
+        filter_anonymous_guys = changes_db.isOwl() && !filters.contains(ComponentFilter.ANONYMOUS);
+        nothing_to_filter = nothingToFilter();
+    }
+    
+    private boolean nothingToFilter() {
+        for (ComponentFilter filter : ComponentFilter.values()) {
+            if (!filters.contains(filter)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
