@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -63,6 +64,11 @@ public class DiffUserView extends JPanel {
 		initializeUserTable();
 		add(buildGUI(), BorderLayout.CENTER);
 	}
+    
+    private void reinitialize() {
+        authorManagement.reinitialize();
+        userTable.setModel(createTableModel());
+    }
 
 	private void initializeUserTable() {
 		userTable.setModel(createTableModel());
@@ -124,7 +130,7 @@ public class DiffUserView extends JPanel {
 		LabeledComponent listsLabeledComponent = new LabeledComponent(
 				"Changed ontology components", result, true);
 
-		listsLabeledComponent.setHeaderComponent(getHeaderCenterComponent(), BorderLayout.EAST);
+		listsLabeledComponent.setHeaderComponent(getHeaderComponent(), BorderLayout.EAST);
 		return listsLabeledComponent;
 	}
 
@@ -136,8 +142,17 @@ public class DiffUserView extends JPanel {
 					}
 				});
 	}
+    
+    private JComponent getHeaderComponent() {
+        JPanel panel = new JPanel();
+        BoxLayout layout = new BoxLayout(panel, BoxLayout.X_AXIS);
+        panel.setLayout(layout);
+        panel.add(getConfigureButton());
+        panel.add(getRefreshButton());
+        return panel;
+    }
 
-	private JComponent getHeaderCenterComponent() {
+	private JComponent getConfigureButton() {
 	    JButton button = new JButton("Set Filters");
         button.setSize(button.getMinimumSize());
         button.addActionListener(new ActionListener() {
@@ -166,5 +181,17 @@ public class DiffUserView extends JPanel {
         });
 
 	}
+    
+    private JComponent getRefreshButton() {
+        JButton button = new JButton("Recalculate");
+        button.setSize(button.getMinimumSize());
+        button.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                reinitialize();
+            }
+        });
+        return button;
+    }
 
 }
