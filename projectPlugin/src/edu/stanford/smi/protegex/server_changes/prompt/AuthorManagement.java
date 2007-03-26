@@ -50,6 +50,14 @@ public class AuthorManagement {
         }
     }
     
+    public void reinitialize() {
+        userConflictsMap.clear();
+        conflictingFrames.clear();
+        unconflictedFrames.clear();
+        active_users.clear();
+        evaluateConflicts();
+    }
+    
     private void evaluateConflicts() {
         
         Map<Ontology_Component, Set<String>> whoChangedMeMap = new HashMap<Ontology_Component, Set<String>>();
