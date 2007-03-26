@@ -124,7 +124,7 @@ public class DiffUserView extends JPanel {
 		LabeledComponent listsLabeledComponent = new LabeledComponent(
 				"Changed ontology components", result, true);
 
-		listsLabeledComponent.setHeaderComponent(getHeaderCenterComponent());
+		listsLabeledComponent.setHeaderComponent(getHeaderCenterComponent(), BorderLayout.EAST);
 		return listsLabeledComponent;
 	}
 
