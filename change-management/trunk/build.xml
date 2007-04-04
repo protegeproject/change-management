@@ -85,6 +85,9 @@
 
 	
    <target name = "init">
+     <tstamp>
+       <format property="build.time" pattern="MM/dd/yyyy hh:mm aa"/>
+     </tstamp>
      <mkdir dir = "${build}"/>
      <mkdir dir = "${classes}"/>
      <mkdir dir = "${model.classes}"/>
@@ -113,15 +116,22 @@
      <javac srcdir = "${pplugin.src}:${tab.src}:${kbViewTab.src}" 
             destdir = "${classes}" debug="on">
        <classpath refid = "project.classpath"/>  
-     </javac>  
+     </javac>
    </target>
 
    <target name = "jar" depends = "compile">
+     <copy todir="${build}" 
+           file="${tab.src}/META-INF/MANIFEST.MF" overwrite="true"/>
+     <manifest file="${build}/MANIFEST.MF" 
+               mode = "update">
+        <attribute name="Built-By" value = "${user.name}"/>
+        <attribute name="Build-Date" value = "${build.time}"/>
+     </manifest>
      <jar jarfile = "${plugins}/${plugin_dist}/${model.jar}" 
           basedir = "${model.classes}" />
      <jar jarfile = "${plugins}/${plugin_dist}/${pluginName}.jar" 
           basedir = "${classes}" 
-          manifest = "${tab.src}/META-INF/MANIFEST.MF"/>
+          manifest = "${build}/MANIFEST.MF"/>
      <copy file = "${lib}/icu4j.jar"
            todir = "${plugins}/${plugin_dist}"/>
      <copy file = "plugin.properties"
