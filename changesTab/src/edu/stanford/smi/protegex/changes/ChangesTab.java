@@ -540,6 +540,30 @@ public class ChangesTab extends AbstractTabWidget {
 			}
 		}
 	}
+	
+	@Override
+	public void dispose() {
+		//TODO: This will be reimplemented once we will have a start/stop model for the ChangesProject
+		// This is just a quick fix
+		
+		if (getProject().isMultiUserClient()) {
+
+			if (changes_kb != null) {
+				Project changesProject = changes_kb.getProject();
+
+				try {
+					changesProject.dispose();
+				} catch (Exception e) {
+					Log.getLogger().warning("Errors at disposing changes project " + changesProject + " of project " + changes_kb);
+				}
+			}
+		}
+		
+		//TODO: remove the listeners
+		
+		super.dispose();
+	}
+	
 
 	public class RemoveInstanceAction extends AbstractAction {
 
@@ -616,6 +640,7 @@ public class ChangesTab extends AbstractTabWidget {
 			}
 		}
 	}
+
 
 }
 
