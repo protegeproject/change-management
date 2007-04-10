@@ -16,17 +16,12 @@ import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.MessageError;
 import edu.stanford.smi.protegex.changes.ChangesTab;
-import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesClsListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesFrameListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesInstanceListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesKBListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesSlotListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesTransListener;
-import edu.stanford.smi.protegex.server_changes.listeners.owl.ChangesOwlKBListener;
-import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesClassListener;
-import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesFrameListener;
-import edu.stanford.smi.protegex.server_changes.listeners.owl.OwlChangesPropertyListener;
 import edu.stanford.smi.protegex.server_changes.postprocess.AnnotationCombiner;
 import edu.stanford.smi.protegex.server_changes.postprocess.JoinCreateAndNameChange;
 import edu.stanford.smi.protegex.server_changes.postprocess.JoinInstanceCreateAndAdd;
@@ -53,7 +48,7 @@ public class ChangesProject extends ProjectPluginAdapter {
 		}
 		initialize(p);
 	}
-    
+
     public void afterSave(Project p) {
         if (p.isMultiUserClient()) {
             return;
@@ -120,7 +115,7 @@ public class ChangesProject extends ProjectPluginAdapter {
 
 		// Register listeners
 		if (isOwlProject) {
-			registerOwlListeners((OWLModel) currentKB);
+			ChangesProjectOWL.registerOwlListeners(currentKB);
 		} else {
 			registerKBListeners(currentKB);
 		}
@@ -140,13 +135,6 @@ public class ChangesProject extends ProjectPluginAdapter {
 		currentKB.addFrameListener(new ChangesFrameListener(currentKB));
 	}
     
-    private static void registerOwlListeners(OWLModel om) {
-        om.addClassListener(new OwlChangesClassListener(om));
-        om.addPropertyListener(new OwlChangesPropertyListener(om));
-        ((KnowledgeBase) om).addFrameListener(new OwlChangesFrameListener(om));
-        om.addTransactionListener(new ChangesTransListener(om));
-        ((KnowledgeBase) om).addKnowledgeBaseListener(new ChangesOwlKBListener(om)); // Handles Class Deletes
-    }
 
 	private static void createChangeProject(KnowledgeBase currentKB) {
         ChangesDb changesDb = changesDbMap.get(currentKB);
