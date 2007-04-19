@@ -126,6 +126,8 @@ public class ChangeModel {
         subChanges,
         timestamp,
         currentName,
+        subject,
+        voteValue,
     }
     
     public KnowledgeBase getChangeKb() {
