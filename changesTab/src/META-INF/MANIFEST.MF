@@ -13,3 +13,6 @@ Tab-Widget: True
 Name: edu.stanford.smi.protegex.changes.changesKBViewTab.ChangesKBViewTab.class
 Tab-Widget: True
 
+Name: edu.stanford.smi.protegex.changes.stats.ChangeStatisticsTab.class
+Tab-Widget: True
+
