@@ -1,190 +1,109 @@
 package edu.stanford.smi.protegex.server_changes.listeners;
 
-import java.util.ArrayList;
-
+import edu.stanford.smi.protege.event.FrameAdapter;
 import edu.stanford.smi.protege.event.FrameEvent;
-import edu.stanford.smi.protege.event.FrameListener;
-import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Frame;
-import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protege.model.SystemFrames;
 import edu.stanford.smi.protege.util.CollectionUtilities;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
-import edu.stanford.smi.protegex.server_changes.model.generated.Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
 
-public class ChangesFrameListener implements FrameListener {
-    private KnowledgeBase kb;
-    private ChangesDb changes_db;
-    private KnowledgeBase changesKb;
-
-    public ChangesFrameListener(KnowledgeBase kb) {
-        this.kb = kb;
-        changes_db = ChangesProject.getChangesDb(kb);
-        changesKb = changes_db.getChangesKb();
-    }
-
-    public void browserTextChanged(FrameEvent event) {
-
-    }
-
-    public void deleted(FrameEvent event) {
-
-    }
-
-    public void nameChanged(FrameEvent event) {
-
-    }
-
-    public void visibilityChanged(FrameEvent event) {
-
-    }
-
-    public void ownFacetAdded(FrameEvent event) {
-
-    }
-
-    public void ownFacetRemoved(FrameEvent event) {
-
-    }
-
-    public void ownFacetValueChanged(FrameEvent event) {
-
-    }
-
-    public void ownSlotAdded(FrameEvent event) {
-
-    }
-
-    public void ownSlotRemoved(FrameEvent event) {
-
-    }
-
-    public void ownSlotValueChanged(FrameEvent event) {
-
-        Frame f = event.getFrame();
-
-        if (f instanceof Slot) {
-            Slot s = (Slot)f;
-            String sName = s.getName();
-            Slot ownS = event.getSlot();
-            String ownSName = ownS.getName();
-            String newSlotValue = CollectionUtilities.toString(s.getOwnSlotValues(event.getSlot()));
-
-            StringBuffer context = new StringBuffer();
-            if(ownSName.equals(":SLOT-NUMERIC-MAXIMUM")) {
-                context.append("Maximum value for: ");
-                context.append(sName);
-                context.append(" set to: ");
-                context.append(newSlotValue);
-                
-                ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Maximum_Value, s, context.toString());
-            }
-            if(ownSName.equals(":SLOT-NUMERIC-MINIMUM")){
-                context.append("Minimum value for: ");
-                context.append(sName);
-                context.append(" set to: ");
-                context.append(newSlotValue);
-                
-                ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Minimum_Value, s, context.toString());
-
-            }
+public class ChangesFrameListener extends FrameAdapter {    
+	private ChangesDb changes_db;
 
 
-            if(ownSName.equals(":SLOT-MINIMUM-CARDINALITY")){
-                if(!newSlotValue.equals("")){
-                    //should have atleast - value
-                    context.append("Minimum cardinality for: ");
-                    context.append(sName);
-                    context.append(" set to: ");
-                    context.append(newSlotValue);
-                    
-                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Minimum_Cardinality, s, context.toString());
-                }
+	public ChangesFrameListener(KnowledgeBase kb) {
+		changes_db = ChangesProject.getChangesDb(kb);    
+	}
 
-            }
-            if(ownSName.equals(":SLOT-MAXIMUM-CARDINALITY")){
-                if(newSlotValue.equals("")){
-                    //slot can take multiple values
+	public void ownSlotValueChanged(FrameEvent event) {
 
-                    context.append(sName);
-                    context.append(" can take multiple values");
-                    
-                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Maximum_Cardinality, s, context.toString());
-                }
-                else{
-                    //maximum values set to -
-                    context.append("Maximum cardinality for: ");
-                    context.append(sName);
-                    context.append(" set to: ");
-                    context.append(newSlotValue);
-                    
-                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Maximum_Cardinality, s, context.toString());
-                }
+		Frame frame = event.getFrame();
+		String frameName = frame.getBrowserText();
+		KnowledgeBase kb = frame.getKnowledgeBase();
+		SystemFrames systemFrames = kb.getSystemFrames();
 
-            }
-        }
+		Slot ownSlot = event.getSlot();  
+		String newSlotValue = CollectionUtilities.toString(frame.getOwnSlotValues(event.getSlot()));
 
-        else if (f instanceof Cls) {
+		StringBuffer context = new StringBuffer();
 
-            Cls c = (Cls)f;
-            String cName = c.getBrowserText();
-            Slot s = event.getSlot();
-            String sName = s.getName();
-            StringBuffer context = new StringBuffer();
+		if(ownSlot.equals(systemFrames.getDocumentationSlot())) {
 
+			if(newSlotValue.equals("")) {				
+				context.append("Removed documentation from ");
+				context.append(frameName);
+				ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Removed, frame, context.toString());
+			}
+			else {		
+				context.append("Added documentation: ");
+				context.append(newSlotValue);
+				context.append(" to: ");
+				context.append(frameName);
 
+				ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Added, frame, context.toString());
+			}
 
-            if(sName.equals(":DOCUMENTATION")) {
-                String newSlotValue = CollectionUtilities.toString(c.getOwnSlotValues(event.getSlot()));
-                if(newSlotValue.equals("")) {
-                    //REMOVED DOCUMENTATION
-                    context.append("Removed documentation from ");
-                    context.append(cName);
-                    
-                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Removed, c, context.toString());
-                }
-                else {
-                    // ADDED DOCUMENTATION
-                    context.append("Added documentation: ");
-                    context.append(newSlotValue);
-                    context.append(" to: ");
-                    context.append(cName);
-                    
-                    ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Documentation_Added, c, context.toString());
-                }
-            } // Handles documentation slot
-        }
-        else if (f instanceof Instance) {
-            Instance i = (Instance)f;
-            String iName = i.getBrowserText();
-            Slot ownS = event.getSlot();
-            String ownSName = ownS.getName();
-            String newSlotValue = CollectionUtilities.toString(i.getOwnSlotValues(event.getSlot()));
-            ArrayList oldValue = (ArrayList)event.getArgument2();
-            String oldSlotValue = oldValue.toString();
+		} else if (ownSlot.equals(systemFrames.getMaximumValueSlot())) {
 
-            StringBuffer context = new StringBuffer();
-            context.append("Slot: ");
-            context.append(ownSName);
-            context.append(" for Instance: ");
-            context.append(iName);
-            context.append(" set to: ");
-            context.append(newSlotValue);
-            
-            ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Property_Value, i, context.toString());
+			context.append("Maximum value for: ");
+			context.append(frameName);
+			context.append(" set to: ");
+			context.append(newSlotValue);
 
-        }
+			ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Maximum_Value, frame, context.toString());
 
-    }
+		} else if (ownSlot.equals(systemFrames.getMinimumValueSlot())){
+			
+			context.append("Minimum value for: ");
+			context.append(frameName);
+			context.append(" set to: ");
+			context.append(newSlotValue);
 
+			ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Minimum_Value, frame, context.toString());
 
+		} else if (ownSlot.equals(systemFrames.getMinimumCardinalitySlot())){
+			
+			if(!newSlotValue.equals("")){
+				context.append("Minimum cardinality for: ");
+				context.append(frameName);
+				context.append(" set to: ");
+				context.append(newSlotValue);
 
+				ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Minimum_Cardinality, frame, context.toString());
+			}
+		} else if (ownSlot.equals(systemFrames.getMaximumCardinalitySlot())){
+			
+			if (newSlotValue.equals("")){
+				context.append(frameName);
+				context.append(" can take multiple values");
+
+				ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Maximum_Cardinality, frame, context.toString());
+			}
+			else {
+				context.append("Maximum cardinality for: ");
+				context.append(frameName);
+				context.append(" set to: ");
+				context.append(newSlotValue);
+
+				ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Maximum_Cardinality, frame, context.toString());
+			}
+		} else {
+			
+			context.append("Set value for ");
+			context.append(ownSlot.getBrowserText());
+			context.append(" for ");
+			context.append(frameName);
+			context.append(" to: ");
+			context.append(newSlotValue);
+
+			ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Property_Value, frame, context.toString());
+		}
+	}
 
 }
