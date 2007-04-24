@@ -3,34 +3,24 @@ package edu.stanford.smi.protegex.server_changes.listeners;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import edu.stanford.smi.protege.event.KnowledgeBaseAdapter;
 import edu.stanford.smi.protege.event.KnowledgeBaseEvent;
-import edu.stanford.smi.protege.event.KnowledgeBaseListener;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Frame;
-import edu.stanford.smi.protege.model.FrameID;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.TransactionState;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
-import edu.stanford.smi.protegex.server_changes.model.generated.Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Class_Created;
-import edu.stanford.smi.protegex.server_changes.model.generated.Class_Deleted;
-import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
-public class ChangesKBListener implements KnowledgeBaseListener {
+public class ChangesKBListener extends KnowledgeBaseAdapter {
     private final static Logger log = Log.getLogger(ChangesKBListener.class);
-    private KnowledgeBase kb;
-    private KnowledgeBase changesKb;
+      
     private ChangesDb changes_db;
     
-    public ChangesKBListener(KnowledgeBase kb) {
-        this.kb = kb;
-        changesKb = ChangesProject.getChangesKB(kb);
+    public ChangesKBListener(KnowledgeBase kb) {    
         changes_db = ChangesProject.getChangesDb(kb);   
     }
 	/* (non-Javadoc)
@@ -51,36 +41,6 @@ public class ChangesKBListener implements KnowledgeBaseListener {
             String oldName = event.getOldName();
             Frame frame = event.getCls();
             ServerChangesUtil.createDeletedChange(changes_db, ChangeCls.Class_Deleted, frame, oldName);
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#defaultClsMetaClsChanged(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
-	 */
-	public void defaultClsMetaClsChanged(KnowledgeBaseEvent event) {
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#defaultFacetMetaClsChanged(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
-	 */
-	public void defaultFacetMetaClsChanged(KnowledgeBaseEvent event) {
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#defaultSlotMetaClsChanged(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
-	 */
-	public void defaultSlotMetaClsChanged(KnowledgeBaseEvent event) {
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#facetCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
-	 */
-	public void facetCreated(KnowledgeBaseEvent event) {
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#facetDeleted(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
-	 */
-	public void facetDeleted(KnowledgeBaseEvent event) {
 	}
 
 	/* (non-Javadoc)
