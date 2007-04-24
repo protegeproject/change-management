@@ -1,29 +1,22 @@
 package edu.stanford.smi.protegex.server_changes.listeners;
 
+import edu.stanford.smi.protege.event.ClsAdapter;
 import edu.stanford.smi.protege.event.ClsEvent;
-import edu.stanford.smi.protege.event.ClsListener;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protege.model.Model;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.TransactionState;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
-public class ChangesClsListener implements ClsListener{
-    private KnowledgeBase kb;
-    private ChangesDb changes_db;
-    private KnowledgeBase changesKb;
+public class ChangesClsListener extends ClsAdapter{    
+    private ChangesDb changes_db;    
     
-    public ChangesClsListener(KnowledgeBase kb) {
-        this.kb = kb;
-        changes_db = ChangesProject.getChangesDb(kb);
-        changesKb = changes_db.getChangesKb();
+    public ChangesClsListener(KnowledgeBase kb) {       
+        changes_db = ChangesProject.getChangesDb(kb);        
     }
 
 	/* (non-Javadoc)
@@ -41,7 +34,6 @@ public class ChangesClsListener implements ClsListener{
 		context.append(")");
         
         ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Individual_Added, addedInst, context.toString());
-
 	}
 
 	/* (non-Javadoc)
@@ -81,12 +73,6 @@ public class ChangesClsListener implements ClsListener{
         ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Subclass_Added, subClass, context.toString());
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.ClsListener#directSubclassMoved(edu.stanford.smi.protege.event.ClsEvent)
-	 */
-	public void directSubclassMoved(ClsEvent event) {
-		// Method is not used/called
-	}
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.ClsListener#directSubclassRemoved(edu.stanford.smi.protege.event.ClsEvent)
@@ -142,39 +128,4 @@ public class ChangesClsListener implements ClsListener{
         ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Superclass_Removed, subClass, context.toString());
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.ClsListener#templateFacetAdded(edu.stanford.smi.protege.event.ClsEvent)
-	 */
-	public void templateFacetAdded(ClsEvent event) {
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.ClsListener#templateFacetRemoved(edu.stanford.smi.protege.event.ClsEvent)
-	 */
-	public void templateFacetRemoved(ClsEvent event) {
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.ClsListener#templateFacetValueChanged(edu.stanford.smi.protege.event.ClsEvent)
-	 */
-	public void templateFacetValueChanged(ClsEvent event) {
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.ClsListener#templateSlotAdded(edu.stanford.smi.protege.event.ClsEvent)
-	 */
-	public void templateSlotAdded(ClsEvent event) {
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.ClsListener#templateSlotRemoved(edu.stanford.smi.protege.event.ClsEvent)
-	 */
-	public void templateSlotRemoved(ClsEvent event) {
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.ClsListener#templateSlotValueChanged(edu.stanford.smi.protege.event.ClsEvent)
-	 */
-	public void templateSlotValueChanged(ClsEvent event) {
-	}
 }

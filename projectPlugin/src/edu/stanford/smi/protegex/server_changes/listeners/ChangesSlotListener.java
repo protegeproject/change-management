@@ -1,27 +1,25 @@
 package edu.stanford.smi.protegex.server_changes.listeners;
 
+import edu.stanford.smi.protege.event.SlotAdapter;
 import edu.stanford.smi.protege.event.SlotEvent;
-import edu.stanford.smi.protege.event.SlotListener;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.TransactionState;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
 
 
-public class ChangesSlotListener implements SlotListener{
-    private KnowledgeBase kb;
+public class ChangesSlotListener extends SlotAdapter{
+    
     private ChangesDb changes_db;
-    private KnowledgeBase changesKb;
+    
     
     public ChangesSlotListener(KnowledgeBase kb) {
-        this.kb = kb;
-        changes_db = ChangesProject.getChangesDb(kb);
-        changesKb = ChangesProject.getChangesKB(kb);
+        changes_db = ChangesProject.getChangesDb(kb);        
     }
+    
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.SlotListener#templateSlotClsAdded(edu.stanford.smi.protege.event.SlotEvent)
 	 */
@@ -32,7 +30,7 @@ public class ChangesSlotListener implements SlotListener{
 		
 			StringBuffer context = new StringBuffer();
 			context.append("Added template slot: ");
-			context.append(event.getSlot().getName());
+			context.append(theSlot.getBrowserText());
 			context.append(" to: ");
 			context.append(theCls.getBrowserText());
             
@@ -51,7 +49,7 @@ public class ChangesSlotListener implements SlotListener{
 			
 			StringBuffer context = new StringBuffer();
 			context.append("Removed template slot: ");
-			context.append(event.getSlot().getName());
+			context.append(theSlot.getBrowserText());
 			context.append(" from: ");
 			context.append(name);
 			
@@ -84,11 +82,6 @@ public class ChangesSlotListener implements SlotListener{
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.SlotListener#directSubslotMoved(edu.stanford.smi.protege.event.SlotEvent)
-	 */
-	public void directSubslotMoved(SlotEvent event) {
-	}
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.smi.protege.event.SlotListener#directSuperslotAdded(edu.stanford.smi.protege.event.SlotEvent)
@@ -107,8 +100,7 @@ public class ChangesSlotListener implements SlotListener{
 	 */
 	public void directSuperslotRemoved(SlotEvent event) {
 		if (event.getArgument() instanceof Slot) {
-			Slot eventSlot = (Slot) event.getArgument();
-            String name = changes_db.getPossiblyDeletedBrowserText(eventSlot);
+			Slot eventSlot = (Slot) event.getArgument();            
 			String context = "Direct Superslot Removed: " + eventSlot.getBrowserText();
             
             ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Superproperty_Removed, eventSlot, context);

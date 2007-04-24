@@ -93,6 +93,8 @@ public class ChangesFrameListener extends FrameAdapter {
 
 				ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Maximum_Cardinality, frame, context.toString());
 			}
+		} else if (ownSlot.isSystem()) {
+			//TT: do nothing, it is handled somewhere else (hpefully!)
 		} else {
 			
 			context.append("Set value for ");
