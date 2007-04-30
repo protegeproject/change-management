@@ -4,10 +4,11 @@
 	<property name = "project.name" value = "change-management"/>
 	<property name = "build.dir" value = "./build"/>
 
-	<!-- unlike most other projects, we need to pull source code from three separate directories -->
-	<property name = "build.src.tab" value = "${build.dir}/changesTab/src"/>
-	<property name = "build.src.pplugin" value = "${build.dir}/projectPlugin/src"/>
+	<!-- unlike most other projects, we need to pull source code from multiple directories -->
+	<property name = "build.src.kbviewtab" value = "${build.dir}/changesKbViewTab/src"/>
 	<property name = "build.src.model" value = "${build.dir}/model/src"/>
+	<property name = "build.src.pplugin" value = "${build.dir}/projectPlugin/src"/>
+	<property name = "build.src.tab" value = "${build.dir}/changesTab/src"/>
 
 	<!-- need two output directories because this build file will create two separate jar files for the change management tab -->
 	<property name = "build.dest" value = "${build.dir}/classes"/>
@@ -15,12 +16,8 @@
 
 	<property name = "lib.dir" value = "./lib"/>
 	<property name = "docs.dir" value = "./docs"/>
-	<property name = "deprecation" value = "on"/>    
-	<property name = "debug" value = "off"/>
-	<property name = "includeAntRuntime" value = "no"/>
-	<property name = "optimize" value = "on"/>
-	<property name = "packages" value = "edu.*"/>
 	<property name = "dist.dir" value = "./dist"/>
+	<property name = "packages" value = "edu.*"/>
 
 	<property file = "../global.properties"/>
 	
@@ -41,6 +38,9 @@
 		<!-- get source code from subversion repository -->
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk ../${project.name} --non-recursive"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/changesKbViewTab/src ../${project.name}/${build.src.kbviewtab}"/>
 		</exec>
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/changesTab/src ../${project.name}/${build.src.tab}"/>
@@ -68,6 +68,12 @@
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.pplugin}"/>
 		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.model}"/>
+		</exec>
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.kbviewtab}"/>
+		</exec>
 	</target>
 
 	<!-- ============================================================================================== -->
@@ -92,7 +98,7 @@
 	<!-- Compile the source directory. -->
 	<!-- =================================================================== -->
 	<target name = "compile" depends = "compile-model">
-		<javac srcdir = "${build.src.tab}:${build.src.pplugin}" destdir = "${build.dest}" deprecation = "${deprecation}" debug = "${debug}" optimize = "${optimize}" includeAntRuntime = "${includeAntRuntime}">
+		<javac srcdir = "${build.src.tab}:${build.src.pplugin}:${build.src.kbviewtab}" destdir = "${build.dest}" deprecation = "on" debug = "off" optimize = "on" includeAntRuntime = "no">
 			<classpath>
 				<pathelement path = "${protege.jar}"/>
 				<pathelement path = "${protege-owl.jar}"/>
