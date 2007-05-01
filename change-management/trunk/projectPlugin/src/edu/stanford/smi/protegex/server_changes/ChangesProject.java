@@ -43,7 +43,7 @@ public class ChangesProject extends ProjectPluginAdapter {
 
     /* ---------------------------- Project Plugin Interfaces ---------------------------- */
 	public void afterLoad(Project p) {
-		if (!isChangesTabProject(p) || p.isMultiUserClient()) {
+		if (!isChangeTrackingEnabled(p) || p.isMultiUserClient()) {
 			return;
 		}
 		initialize(p);
@@ -84,7 +84,15 @@ public class ChangesProject extends ProjectPluginAdapter {
     
     /* ---------------------------- End of Project Plugin Interfaces ---------------------------- */
     
-    private boolean isChangesTabProject(Project p) {
+    public static boolean isChangeTrackingEnabled(Project p) {
+    	boolean trackChanges = p.getUpdateModificationSlots();
+    	
+    	if (trackChanges) {
+    		return true;
+    	}
+    	
+    	//If the update modification slots is not set, try to find the changes tab
+    	
         String changesTabClassName = ChangesTab.class.getName();
         for (Object o : p.getTabWidgetDescriptors()) {
             WidgetDescriptor w = (WidgetDescriptor) o;
@@ -92,7 +100,7 @@ public class ChangesProject extends ProjectPluginAdapter {
                 return true;
             }
         }
-        return false;
+        return false;   	
     }
 	
 	
