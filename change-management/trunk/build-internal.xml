@@ -5,6 +5,7 @@
 	<property name = "build.dir" value = "./build"/>
 
 	<!-- unlike most other projects, we need to pull source code from multiple directories -->
+	<property name = "build.src.changestats" value = "${build.dir}/changeStats/src"/>
 	<property name = "build.src.kbviewtab" value = "${build.dir}/changesKbViewTab/src"/>
 	<property name = "build.src.model" value = "${build.dir}/model/src"/>
 	<property name = "build.src.pplugin" value = "${build.dir}/projectPlugin/src"/>
@@ -29,8 +30,6 @@
 	<!-- PREPARE-SRC -->
 	<!-- =================================================================== -->
 	<target name = "prepare-src" depends = "init">
-		<mkdir dir = "${build.src.tab}"/>
-		<mkdir dir = "${build.src.pplugin}"/>
 		<mkdir dir = "${build.dest}"/>
 		<mkdir dir = "${build.dest.model}"/>
 		<mkdir dir = "${dist.dir}"/>
@@ -39,46 +38,64 @@
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk ../${project.name} --non-recursive"/>
 		</exec>
+		
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/changeStats/src ../${project.name}/${build.src.changestats}"/>
+		</exec>
+
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/changesKbViewTab/src ../${project.name}/${build.src.kbviewtab}"/>
 		</exec>
+
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/changesTab/src ../${project.name}/${build.src.tab}"/>
 		</exec>
+
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/projectPlugin/src ../${project.name}/${build.src.pplugin}"/>
 		</exec>
+
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/model/src ../${project.name}/${build.src.model}"/>
 		</exec>
+
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/docs ../${project.name}/docs"/>
 		</exec>
+
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/lib ../${project.name}/lib"/>
 		</exec>
+
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c checkout ${svn.core.url}/${project.name}/trunk/projects ../${project.name}/projects"/>
 		</exec>
 
 		<!-- add license text to top of source files -->
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
-			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.tab}"/>
+			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.changestats}"/>
 		</exec>
+
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
-			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.pplugin}"/>
+			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.kbviewtab}"/>
 		</exec>
+
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
 			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.model}"/>
 		</exec>
+
 		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
-			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.kbviewtab}"/>
+			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.pplugin}"/>
+		</exec>
+
+		<exec executable = "cmd.exe" dir = "${batch.files}" os = "${os}">
+			<arg line = "/c merge_license_with_source ../${project.name}/${build.src.tab}"/>
 		</exec>
 	</target>
 
 	<!-- ============================================================================================== -->
 	<!-- COMPILE-MODEL -->
-	<!-- Compile the model source directory (doing this separately because we need to make a separate jar file for this portion of the tree). -->
+	<!-- Compile the model source directory (doing this separately because we need to make a separate jar file for this portion of the tree).  -->
 	<!-- ============================================================================================== -->
 	<target name = "compile-model" depends = "prepare-src">
 		<javac srcdir = "${build.src.model}" destdir = "${build.dest.model}" deprecation = "${deprecation}" debug = "${debug}" optimize = "${optimize}" includeAntRuntime = "${includeAntRuntime}">
@@ -98,7 +115,7 @@
 	<!-- Compile the source directory. -->
 	<!-- =================================================================== -->
 	<target name = "compile" depends = "compile-model">
-		<javac srcdir = "${build.src.tab}:${build.src.pplugin}:${build.src.kbviewtab}" destdir = "${build.dest}" deprecation = "on" debug = "off" optimize = "on" includeAntRuntime = "no">
+		<javac srcdir = "${build.src.tab}:${build.src.pplugin}:${build.src.kbviewtab}:${build.src.changestats}" destdir = "${build.dest}" deprecation = "on" debug = "off" optimize = "on" includeAntRuntime = "no">
 			<classpath>
 				<pathelement path = "${protege.jar}"/>
 				<pathelement path = "${protege-owl.jar}"/>
