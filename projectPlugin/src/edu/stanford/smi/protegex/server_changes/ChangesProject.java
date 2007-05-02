@@ -85,7 +85,7 @@ public class ChangesProject extends ProjectPluginAdapter {
     /* ---------------------------- End of Project Plugin Interfaces ---------------------------- */
     
     public static boolean isChangeTrackingEnabled(Project p) {
-    	boolean trackChanges = p.getUpdateModificationSlots();
+    	boolean trackChanges = p.getChangeTrackingActive();
     	
     	if (trackChanges) {
     		return true;
