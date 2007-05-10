@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -43,6 +43,8 @@ import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.model.framestore.FrameStoreManager;
 import edu.stanford.smi.protege.resource.Icons;
 import edu.stanford.smi.protege.server.RemoteProjectManager;
+import edu.stanford.smi.protege.server.RemoteServer;
+import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protege.server.framestore.RemoteClientFrameStore;
 import edu.stanford.smi.protege.ui.HeaderComponent;
 import edu.stanford.smi.protege.util.ComponentFactory;
@@ -61,11 +63,9 @@ import edu.stanford.smi.protegex.changes.ui.JTreeTable;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.GetAnnotationProjectName;
-import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 import edu.stanford.smi.protegex.server_changes.model.AnnotationCreationComparator;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.AnnotationCls;
-import edu.stanford.smi.protegex.server_changes.model.generated.AnnotatableThing;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 
@@ -416,10 +416,18 @@ public class ChangesTab extends AbstractTabWidget {
 					GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT +
 			" slot)");
 		}
-		RemoteProjectManager manager = RemoteProjectManager.getInstance();
-		FrameStoreManager fsmanager = ((DefaultKnowledgeBase) currentKB).getFrameStoreManager();
-		RemoteClientFrameStore rcfs = (RemoteClientFrameStore) fsmanager.getFrameStoreFromClass(RemoteClientFrameStore.class);
-		changes_project = manager.connectToProject(rcfs.getRemoteServer(), rcfs.getSession(), annotationName);
+		RemoteProjectManager project_manager = RemoteProjectManager.getInstance();
+		FrameStoreManager framestore_manager = ((DefaultKnowledgeBase) currentKB).getFrameStoreManager();
+		RemoteClientFrameStore remote_frame_store = (RemoteClientFrameStore) framestore_manager.getFrameStoreFromClass(RemoteClientFrameStore.class);
+		RemoteServer server = remote_frame_store.getRemoteServer();
+        RemoteSession session = remote_frame_store.getSession();
+        try {
+            session = server.cloneSession(session);
+        } catch (RemoteException e) {
+            Log.getLogger().info("Could not find server side change project " + e);
+            return;
+        }
+        changes_project = project_manager.connectToProject(server, session, annotationName);
 		changes_kb = changes_project.getKnowledgeBase();
 
 		model = new ChangeModel(changes_kb);
