@@ -22,6 +22,11 @@ public class GetAnnotationProjectName extends ProtegeJob {
         KnowledgeBase metaProject = server.getMetaProject();
         SimpleInstance myProjectInstance = getMyProjectInstance(server);
         Slot annotationProjectSlot = metaProject.getSlot(METAPROJECT_ANNOTATION_PROJECT_SLOT);
+        
+        if (annotationProjectSlot == null) {
+        	return null;
+        }
+        
         Object value = myProjectInstance.getDirectOwnSlotValue(annotationProjectSlot);
         return ((SimpleInstance) value).getDirectOwnSlotValue(server.getNameSlot());
     }
