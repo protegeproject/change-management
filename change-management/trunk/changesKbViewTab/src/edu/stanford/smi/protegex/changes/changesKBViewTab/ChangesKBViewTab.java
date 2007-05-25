@@ -153,7 +153,7 @@ public class ChangesKBViewTab extends AbstractTabWidget {
 	
 	@Override
 	public void dispose() {
-		if (changesProject != null) {			
+		if (getProject().isMultiUserClient() && changesProject != null) {			
 			try {
 				changesProject.dispose();
 			} catch (Exception e) {
@@ -161,7 +161,7 @@ public class ChangesKBViewTab extends AbstractTabWidget {
 			}
 		}	
 		
-		//TODO: remove the listeners		
+		//TODO: remove the listeners
 		super.dispose();
 	}
 	
