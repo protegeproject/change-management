@@ -110,11 +110,11 @@
 
    <target name = "compile" depends = "init, checkProtegeLibsAndReport">
      <javac srcdir = "${model.src}"
-            destdir = "${model.classes}" debug="on">
+            destdir = "${model.classes}" debug="on" includeAntRuntime="false">
        <classpath refid = "project.classpath"/>  
      </javac>
      <javac srcdir = "${pplugin.src}:${tab.src}:${kbViewTab.src}" 
-            destdir = "${classes}" debug="on">
+            destdir = "${classes}" debug="on" includeAntRuntime="false">
        <classpath refid = "project.classpath"/>  
      </javac>
    </target>
