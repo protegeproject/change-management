@@ -82,10 +82,8 @@ public class TransactionState {
     
     public Ontology_Component getApplyToFromContext(String context) {
         if (context == null) return null;
-        int index = context.indexOf(Transaction.APPLY_TO_TRAILER_STRING);
-        if (index < 0) return null;
-        index += Transaction.APPLY_TO_TRAILER_STRING.length();
-        String frame_name = context.substring(index);
+        String frame_name = Transaction.getApplyTo(context);
+        if (frame_name == null) return null;
         Frame frame = changesDb.getKb().getFrame(frame_name);
         if (frame == null) return null;
         return changesDb.getOntologyComponent(frame, true);
