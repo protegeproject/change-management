@@ -8,7 +8,7 @@
    <property name = "kbViewTab.src"     value = "./changesKbViewTab/src"/>
    <property name = "model.src"       value = "./model/src"/>
 
-   <property name = "model.jar"       value = "changes-model.jar"/>
+   <property name = "model.jar"       value = "change-model.jar"/>
 
    <property name = "build"           value = "./build"/>
    <property name = "classes"         value = "${build}/classes"/>
