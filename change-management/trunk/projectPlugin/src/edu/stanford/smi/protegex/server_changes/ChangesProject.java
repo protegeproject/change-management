@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import edu.stanford.smi.protege.Application;
+import edu.stanford.smi.protege.model.DefaultKnowledgeBase;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.model.WidgetDescriptor;
@@ -25,6 +26,7 @@ import edu.stanford.smi.protegex.server_changes.listeners.ChangesTransListener;
 import edu.stanford.smi.protegex.server_changes.postprocess.AnnotationCombiner;
 import edu.stanford.smi.protegex.server_changes.postprocess.JoinCreateAndNameChange;
 import edu.stanford.smi.protegex.server_changes.postprocess.JoinInstanceCreateAndAdd;
+import edu.stanford.smi.protegex.server_changes.server.ChangeOntStateMachine;
 import edu.stanford.smi.protegex.server_changes.util.Util;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
@@ -130,6 +132,7 @@ public class ChangesProject extends ProjectPluginAdapter {
 
 		if (changesProj.isMultiUserServer()) {
 			ServerFrameStore.requestEventDispatch(currentKB);
+            ((DefaultKnowledgeBase) changesKb).setCacheMachine(new ChangeOntStateMachine(changesKb));
 		}		
 
 	}
