@@ -1,16 +1,12 @@
 package edu.stanford.smi.protegex.changes.listeners;
 
-
-
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
-import edu.stanford.smi.protegex.changes.ChangeTreeTableModel;
 import edu.stanford.smi.protegex.changes.ChangesTab;
-import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
 import edu.stanford.smi.protegex.server_changes.model.AbstractChangeListener;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
