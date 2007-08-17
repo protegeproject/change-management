@@ -121,9 +121,11 @@ public class ChangesTab extends AbstractTabWidget {
 
 	private JTreeTable changesTreeTable;
 	private ChangeTreeTableModel changesTreeTableModel;
+	
+	private ChangesListener changesListener;
 
 	private boolean inRemoveAnnotation = false;
-
+	
 	
 	public boolean getInRemoveAnnotation() {
 		return inRemoveAnnotation;
@@ -157,16 +159,16 @@ public class ChangesTab extends AbstractTabWidget {
 		initTables();
 		loadExistingData();
 
-		changes_kb.addFrameListener(new ChangesListener(model, this));		
+		changesListener = new ChangesListener(model, this);
+		changes_kb.addFrameListener(changesListener);
 
 		buildGUI();	    
 	}
 
-
 	private void buildGUI() {
 		// Create menu item
 		changesMenu = new ChangeMenu(getKnowledgeBase(), changes_kb);
-		JMenuBar menuBar = getMainWindowMenuBar();
+		JMenuBar menuBar = getMainWindowMenuBar();		
 		menuBar.add (changesMenu);
 
 		annotationsTable.addMouseListener(new AnnotationShowAction(annotationsTable, annotationsTableModel, changes_project));
@@ -567,7 +569,15 @@ public class ChangesTab extends AbstractTabWidget {
 			}
 		}
 		
-		//TODO: remove the listeners
+		//remove the menu item
+		JMenuBar menuBar = getMainWindowMenuBar();
+		menuBar.remove(changesMenu);
+		
+		if (changes_kb != null) {
+			changes_kb.removeFrameListener(changesListener);
+		}
+		
+		//TODO: remove other listeners
 		
 		super.dispose();
 	}
