@@ -120,20 +120,18 @@ public class ChangeStatisticsTab extends AbstractTabWidget {
 
 	@Override
 	public void dispose() {
-		Project changesProject = null;
-		
-		if (changesKb != null) {
-			changesProject = changesKb.getProject();
-		}
-		
-		if (changesProject != null) {			
-			try {
-				changesProject.dispose();
-			} catch (Exception e) {
-				Log.getLogger().warning("Errors at disposing changes project " + changesProject + " of project " + changesProject);
+		if (getProject().isMultiUserClient()) {
+			if (changesKb != null) {
+				Project changesProject = changesKb.getProject();
+	
+				try {
+					changesProject.dispose();
+				} catch (Exception e) {
+					Log.getLogger().warning("Errors at disposing changes project " + changesProject + " of project " + changesKb);
+				}
 			}
-		}	
-
+		}
+	
 		super.dispose();
 	}
 
