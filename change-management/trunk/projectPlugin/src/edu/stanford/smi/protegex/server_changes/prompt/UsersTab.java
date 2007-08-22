@@ -1,5 +1,8 @@
 package edu.stanford.smi.protegex.server_changes.prompt;
 
+import java.util.Collection;
+
+import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.widget.AbstractTabWidget;
 
@@ -20,5 +23,14 @@ public class UsersTab extends AbstractTabWidget {
 		
 		add(diffUserView);
 	}
+	
+	//TT: Until we fix it to work in multi-user client, too.
+    public static boolean isSuitable(Project p, Collection errors) {
+        if (p.isMultiUserClient()) {
+        	errors.add("Works only in stand-alone mode");
+        	return false;
+        }
+        return true;
+    }
 
 }
