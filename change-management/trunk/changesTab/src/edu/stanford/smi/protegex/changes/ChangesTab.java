@@ -555,6 +555,16 @@ public class ChangesTab extends AbstractTabWidget {
 	public void dispose() {
 		//TODO: This will be reimplemented once we will have a start/stop model for the ChangesProject
 		// This is just a quick fix
+			
+		//remove the menu item
+		JMenuBar menuBar = getMainWindowMenuBar();
+		menuBar.remove(changesMenu);
+		
+		if (changes_kb != null) {
+			changes_kb.removeFrameListener(changesListener);
+		}
+	
+		//TODO: remove other listeners
 		
 		if (getProject().isMultiUserClient()) {
 
@@ -568,17 +578,7 @@ public class ChangesTab extends AbstractTabWidget {
 				}
 			}
 		}
-		
-		//remove the menu item
-		JMenuBar menuBar = getMainWindowMenuBar();
-		menuBar.remove(changesMenu);
-		
-		if (changes_kb != null) {
-			changes_kb.removeFrameListener(changesListener);
-		}
-		
-		//TODO: remove other listeners
-		
+			
 		super.dispose();
 	}
 	
