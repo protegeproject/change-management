@@ -1,6 +1,7 @@
 package edu.stanford.smi.protegex.changes.changesKBViewTab;
 
 import java.awt.Container;
+import java.rmi.RemoteException;
 import java.util.Collection;
 
 import edu.stanford.smi.protege.model.DefaultKnowledgeBase;
@@ -9,6 +10,8 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.model.framestore.FrameStoreManager;
 import edu.stanford.smi.protege.server.RemoteProjectManager;
+import edu.stanford.smi.protege.server.RemoteServer;
+import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protege.server.framestore.RemoteClientFrameStore;
 import edu.stanford.smi.protege.ui.DirectInstancesList;
 import edu.stanford.smi.protege.ui.FrameRenderer;
@@ -137,6 +140,7 @@ public class ChangesKBViewTab extends AbstractTabWidget {
 		return changesKb;
 	}
 	
+	
 	private KnowledgeBase getServerSideChangeKb(KnowledgeBase kb) {
 		String annotationName = (String) new GetAnnotationProjectName(kb).execute();
 		if (annotationName == null) {
@@ -144,12 +148,21 @@ public class ChangesKBViewTab extends AbstractTabWidget {
 					GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT +
 			" slot)");
 		}
-		RemoteProjectManager manager = RemoteProjectManager.getInstance();
-		FrameStoreManager fsmanager = ((DefaultKnowledgeBase) kb).getFrameStoreManager();
-		RemoteClientFrameStore rcfs = (RemoteClientFrameStore) fsmanager.getFrameStoreFromClass(RemoteClientFrameStore.class);
-		Project changes_project = manager.connectToProject(rcfs.getRemoteServer(), rcfs.getSession(), annotationName);
-		return changes_project.getKnowledgeBase();	
+		RemoteProjectManager project_manager = RemoteProjectManager.getInstance();
+		FrameStoreManager framestore_manager = ((DefaultKnowledgeBase) kb).getFrameStoreManager();
+		RemoteClientFrameStore remote_frame_store = (RemoteClientFrameStore) framestore_manager.getFrameStoreFromClass(RemoteClientFrameStore.class);
+		RemoteServer server = remote_frame_store.getRemoteServer();
+        RemoteSession session = remote_frame_store.getSession();
+        try {
+            session = server.cloneSession(session);
+        } catch (RemoteException e) {
+            Log.getLogger().info("Could not find server side change project " + e);
+            return null;
+        }
+        Project changes_project = project_manager.connectToProject(server, session, annotationName);
+        return (changes_project == null ? null : changes_project.getKnowledgeBase());
 	}
+	
 	
 	@Override
 	public void dispose() {
