@@ -98,7 +98,7 @@
 	<!-- Compile the model source directory (doing this separately because we need to make a separate jar file for this portion of the tree).  -->
 	<!-- ============================================================================================== -->
 	<target name = "compile-model" depends = "prepare-src">
-		<javac srcdir = "${build.src.model}" destdir = "${build.dest.model}" deprecation = "${deprecation}" debug = "${debug}" optimize = "${optimize}" includeAntRuntime = "${includeAntRuntime}">
+		<javac srcdir = "${build.src.model}" destdir = "${build.dest.model}" debug = "true" debuglevel = "lines" includeAntRuntime = "no">
 			<classpath>
 				<pathelement path = "${protege.jar}"/>
 				<pathelement path = "${protege-owl.jar}"/>
@@ -115,7 +115,7 @@
 	<!-- Compile the source directory. -->
 	<!-- =================================================================== -->
 	<target name = "compile" depends = "compile-model">
-		<javac srcdir = "${build.src.tab}:${build.src.pplugin}:${build.src.kbviewtab}:${build.src.changestats}" destdir = "${build.dest}" deprecation = "on" debug = "off" optimize = "on" includeAntRuntime = "no">
+		<javac srcdir = "${build.src.tab}:${build.src.pplugin}:${build.src.kbviewtab}:${build.src.changestats}" destdir = "${build.dest}" deprecation = "on" debug = "true" debuglevel = "lines" optimize = "on" includeAntRuntime = "no">
 			<classpath>
 				<pathelement path = "${protege.jar}"/>
 				<pathelement path = "${protege-owl.jar}"/>
