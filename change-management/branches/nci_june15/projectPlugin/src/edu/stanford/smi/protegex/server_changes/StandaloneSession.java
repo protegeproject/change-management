@@ -22,4 +22,7 @@ public class StandaloneSession implements RemoteSession {
 		return null;
 	}
 
+        public int getSessionGroup() {
+            return 0;
+        }
 }
