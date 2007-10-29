@@ -38,6 +38,7 @@ import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.LabeledComponent;
 import edu.stanford.smi.protege.util.Selectable;
+import edu.stanford.smi.protege.util.SelectableList;
 import edu.stanford.smi.protege.util.SimpleListModel;
 import edu.stanford.smi.protege.util.ViewAction;
 import edu.stanford.smi.protegex.server_changes.ChangesDb;
@@ -50,7 +51,7 @@ public class UserConceptList extends JPanel {
     private JTable changesTable;
         
 	private Collection<String> _userList = new ArrayList<String>(); 
-	private JList _noConflictList, _conflictList;
+	private SelectableList _noConflictList, _conflictList;
 	private Set<Ontology_Component> _noConflictConcepts = new HashSet<Ontology_Component> ();
 	private Set<Ontology_Component> _conflictConcepts = new HashSet<Ontology_Component> ();
     
@@ -187,8 +188,8 @@ public class UserConceptList extends JPanel {
 	    ((SimpleListModel)_conflictList.getModel()).setValues (_conflictConcepts);
 	}
 	
-	private JList createConceptList (Collection concepts) {
-		JList list = ComponentFactory.createList(null);
+	private SelectableList createConceptList (Collection concepts) {
+		SelectableList list = ComponentFactory.createSelectableList(null, false);
 		
 		list.setCellRenderer(new ChangeTabRenderer(old_kb, new_kb));
 		((SimpleListModel)list.getModel()).setValues(concepts);
@@ -221,6 +222,22 @@ public class UserConceptList extends JPanel {
 		
 		showAllChangesInTable = cb.isSelected();		
 		((ChangesTableModel)changesTable.getModel()).setShowAllChanges(showAllChangesInTable);		
+	}
+	
+	public Set<Ontology_Component> getSelection() {
+	    Set<Ontology_Component> result = new HashSet<Ontology_Component>();
+	    for (Object o : _conflictList.getSelection()) {
+	        result.add((Ontology_Component) o);
+	    }
+	    for (Object o : _noConflictList.getSelection()) {
+	        result.add((Ontology_Component) o);
+	    }
+	    return result;
+	}
+	
+	public void clearSelection() {
+	    _conflictList.clearSelection();
+	    _noConflictList.clearSelection();
 	}
 		
 }
