@@ -129,9 +129,9 @@ public class ChangesProject extends ProjectPluginAdapter {
 		} else {
 			registerKBListeners(currentKB);
 		}
-
+		
 		if (changesProj.isMultiUserServer()) {
-			ServerFrameStore.requestEventDispatch(currentKB);
+			ServerFrameStore.requestEventDispatch(currentKB);			
             ((DefaultKnowledgeBase) changesKb).setCacheMachine(new ChangeOntStateMachine(changesKb));
 		}		
 
@@ -169,7 +169,7 @@ public class ChangesProject extends ProjectPluginAdapter {
 
 	public static KnowledgeBase getChangesKB(KnowledgeBase kb) {
         ChangesDb changesDb = changesDbMap.get(kb);
-		return changesDb.getChangesKb();
+		return (changesDb == null ? null: changesDb.getChangesKb());
 	}
 
 	public static Project getChangesProj(KnowledgeBase kb) {
