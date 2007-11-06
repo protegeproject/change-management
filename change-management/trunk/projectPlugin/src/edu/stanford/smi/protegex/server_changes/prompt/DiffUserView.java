@@ -126,7 +126,7 @@ public class DiffUserView extends JPanel {
 						ComponentFactory.createScrollPane(userTable), true));
 		result.setRightComponent(userConceptLists);
 
-		addSelectionListener(null);
+		synchronizeUserSelection();
 		LabeledComponent listsLabeledComponent = new LabeledComponent(
 				"Changed ontology components", result, true);
 
@@ -134,7 +134,7 @@ public class DiffUserView extends JPanel {
 		return listsLabeledComponent;
 	}
 
-	public void addSelectionListener(SelectionListener listener) {
+	private void synchronizeUserSelection() {
 		userTable.getSelectionModel().addListSelectionListener(
 				new ListSelectionListener() {
 					public void valueChanged(ListSelectionEvent e) {
