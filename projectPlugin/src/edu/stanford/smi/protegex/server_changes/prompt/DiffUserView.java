@@ -12,11 +12,11 @@ import java.util.Collection;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -28,34 +28,53 @@ import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.DefaultRenderer;
 import edu.stanford.smi.protege.util.LabeledComponent;
 import edu.stanford.smi.protege.util.ModalDialog;
-import edu.stanford.smi.protege.util.SelectionListener;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 
 public class DiffUserView extends JPanel {
 	private static final long serialVersionUID = 3771686927172752103L;
     
-
-    
     private boolean isOwl;
+    
+    protected KnowledgeBase kb1;
+    protected KnowledgeBase kb2;
 
-	private JTable userTable = ComponentFactory.createTable(null);
+	protected JTable userTable = ComponentFactory.createTable(null);
 
 	private UserConceptList userConceptLists;
 
-	private AuthorManagement authorManagement;
-
-	private static final String[] COLUMN_NAMES = { "User", "Changed",
-			"Conflicts", "Conflicts with" };
+	protected AuthorManagement authorManagement;
+	
+	public enum UserColumn {
+	    USER("User"), CHANGED("Changed"), CONFLICTS("Conflicts"), CONFLICTS_WITH("Conflicts with");
+	    
+	    private String name;
+	    private UserColumn(String name) {
+	        this.name = name;
+	    }
+	    
+	    public String getName() {
+	        return name;
+	    }
+	}
 
 	public DiffUserView(KnowledgeBase old_kb, KnowledgeBase new_kb) {
-		userConceptLists = new UserConceptList(old_kb, new_kb);
+	    kb1 = old_kb;
+	    kb2 = new_kb;
         isOwl = (new_kb instanceof OWLModel);
 	}
 
 	public void setAuthorManagement(AuthorManagement authorManagement) {
 		this.authorManagement = authorManagement;
-		userConceptLists.setAuthorManagement(authorManagement);
+		getUserConceptList().setAuthorManagement(authorManagement);
 		initialize();
+	}
+	
+	protected UserConceptList getUserConceptList() {
+	    if (userConceptLists == null) {
+	        userConceptLists = new UserConceptList(kb1, kb2);
+	        userConceptLists.initialize();
+	    }
+	    return userConceptLists;
 	}
 
 	private void initialize() {
@@ -70,39 +89,47 @@ public class DiffUserView extends JPanel {
         userTable.setModel(createTableModel());
     }
 
+    @SuppressWarnings("unused")
 	private void initializeUserTable() {
 		userTable.setModel(createTableModel());
 		DefaultRenderer renderer = new DefaultRenderer();
-		for (int i = 0; i < COLUMN_NAMES.length; i++)
-			ComponentUtilities.addColumn(userTable, renderer);
-
+		for (UserColumn col : UserColumn.values()) {
+		    ComponentUtilities.addColumn(userTable, renderer);
+		}
 	}
 
 	private TableModel createTableModel() {
 		DefaultTableModel table_model = new DefaultTableModel() {
-			public boolean isCellEditable(int row, int col) {
+            private static final long serialVersionUID = 6503930747934822085L;
+
+            public boolean isCellEditable(int row, int col) {
 				return false;
 			}
+            
 		};
-		for (int c = 0; c < COLUMN_NAMES.length; c++) {
-			table_model.addColumn(COLUMN_NAMES[c]);
+		for (UserColumn col : UserColumn.values()) {
+		    table_model.addColumn(col.getName());
 		}
 
 		for (String user : authorManagement.getUsers()) {
-			int conceptsNotInConflict = authorManagement
-					.getFilteredUnConflictedFrames(user).size();
-			int conceptsInConflict = authorManagement
-					.getFilteredConflictedFrames(user).size();
-			String conflictsWith = authorManagement
-					.getUsersInConflictWith(user).toString();
-			table_model.addRow(new Object[] { user,
-					new Integer(conceptsNotInConflict + conceptsInConflict),
-					new Integer(conceptsInConflict), conflictsWith });
+			table_model.addRow(createUserTableRow(user));
 		}
 		return table_model;
 	}
+	
+	private Object[] createUserTableRow(String user) {
+	    Object[] row = new Object[UserColumn.values().length];
+	    int conceptsNotInConflict = authorManagement.getFilteredUnConflictedFrames(user).size();
+	    int conceptsInConflict = authorManagement.getFilteredConflictedFrames(user).size();
+	    String conflictsWith = authorManagement.getUsersInConflictWith(user).toString();
+	    row[UserColumn.USER.ordinal()] = user;
+	    row[UserColumn.CONFLICTS.ordinal()] = conceptsInConflict;
+	    row[UserColumn.CHANGED.ordinal()] = conceptsNotInConflict + conceptsInConflict;
+	    row[UserColumn.CONFLICTS_WITH.ordinal()] = conflictsWith;
+	    return row;
+	}
 
-	public Collection<String> getSelection() {
+	public Collection<String> getSelectedUsers() {
 
 		Collection<String> selection = new ArrayList<String>();
 
@@ -113,10 +140,22 @@ public class DiffUserView extends JPanel {
 
 		TableModel model = userTable.getModel();
 		for (int i = 0; i < indices.length; i++) {
-			selection.add((String) model.getValueAt(indices[i], 0));
+			selection.add((String) model.getValueAt(indices[i], UserColumn.USER.ordinal()));
 		}
 
 		return selection;
+	}
+	
+	public void setSelectedUsers(Collection<String> users) {
+	    TableModel model = userTable.getModel();
+	    ListSelectionModel selectionModel = userTable.getSelectionModel();
+	    selectionModel.clearSelection();
+	    for (int i = 0; i < model.getRowCount(); i++) {
+	        if (users.contains(model.getValueAt(i, UserColumn.USER.ordinal()))) {
+	            selectionModel.addSelectionInterval(i, i);
+	        }
+	    }
+
 	}
 
 	private LabeledComponent buildGUI() {
@@ -124,7 +163,7 @@ public class DiffUserView extends JPanel {
 		result.setLeftComponent(new LabeledComponent(
 						"Users with changes (select multiple rows to see changes from several users on the rigt)",
 						ComponentFactory.createScrollPane(userTable), true));
-		result.setRightComponent(userConceptLists);
+		result.setRightComponent(getUserConceptList());
 
 		synchronizeUserSelection();
 		LabeledComponent listsLabeledComponent = new LabeledComponent(
@@ -138,7 +177,7 @@ public class DiffUserView extends JPanel {
 		userTable.getSelectionModel().addListSelectionListener(
 				new ListSelectionListener() {
 					public void valueChanged(ListSelectionEvent e) {
-						userConceptLists.setUserList(getSelection());
+						getUserConceptList().setUserList(getSelectedUsers());
 					}
 				});
 	}
