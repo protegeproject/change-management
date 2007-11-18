@@ -26,6 +26,7 @@ import edu.stanford.smi.protege.util.URIUtilities;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.AnnotationCls;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
+import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeSlot;
 import edu.stanford.smi.protegex.server_changes.model.generated.AnnotatableThing;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
 import edu.stanford.smi.protegex.server_changes.model.generated.Annotation_Change;
@@ -231,6 +232,7 @@ public class ChangesDb {
         }
         return null;
     }
+    
     
     public Ontology_Component getOntologyComponent(Frame frame) {
     	return getOntologyComponent(frame, false);
