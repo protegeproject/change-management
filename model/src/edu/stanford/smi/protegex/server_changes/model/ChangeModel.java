@@ -8,12 +8,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.model.Cls;
+import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.ProtegeJob;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Deleted_Change;
+import edu.stanford.smi.protegex.server_changes.model.generated.Name_Changed;
+import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 public class ChangeModel {
@@ -121,6 +125,8 @@ public class ChangeModel {
         changes,
         context,
         date,
+        deletionName,
+        oldName,
         partOfCompositeChange,
         sequence,
         subChanges,
@@ -224,6 +230,51 @@ public class ChangeModel {
      */
     public static void logAnnotatableThing(Instance i) {
         logAnnotatableThing("debug:", Log.getLogger(), Level.CONFIG, i);
+    }
+    
+    public Ontology_Component getOntologyComponentByInitialName(String name) {
+        Ontology_Component firstTry = getOntologyComponentByFinalName(name);
+        if (firstTry != null && firstTry.getCurrentName().equals(name)) {
+            return firstTry;
+        }
+        Collection<Frame> matchingFrames;
+        matchingFrames = changes_kb.getMatchingFrames(getSlot(ChangeSlot.deletionName), 
+                                                      null, false, name, -1);
+        if (matchingFrames != null) {
+            for (Frame frame : matchingFrames) {
+                if (frame instanceof Deleted_Change) {
+                    Instance secondTry = ((Deleted_Change) frame).getApplyTo();
+                    if (secondTry instanceof Ontology_Component 
+                            && ((Ontology_Component) secondTry).getInitialName().equals(name)) {
+                        return (Ontology_Component) secondTry;
+                    }
+                }
+            }
+        }
+        matchingFrames = changes_kb.getMatchingFrames(getSlot(ChangeSlot.oldName), 
+                                                      null, false, name, -1);
+        if (matchingFrames != null) {
+            for (Frame frame : matchingFrames) {
+                if (frame instanceof Name_Changed) {
+                    Instance thirdTry = ((Name_Changed) frame).getApplyTo();
+                    if (thirdTry instanceof Ontology_Component 
+                            && ((Ontology_Component) thirdTry).getInitialName().equals(name)) {
+                        return (Ontology_Component) thirdTry;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
+    public Ontology_Component getOntologyComponentByFinalName(String name) {
+        for (Frame frame : changes_kb.getMatchingFrames(getSlot(ChangeSlot.currentName), 
+                                                        null, false, name, -1)) {
+            if (frame instanceof Ontology_Component) {
+                return (Ontology_Component) frame;
+            }
+        }
+        return null;
     }
 
 
