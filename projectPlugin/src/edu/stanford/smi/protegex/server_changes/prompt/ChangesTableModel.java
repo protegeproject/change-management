@@ -12,8 +12,19 @@ import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Compone
 import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 public class ChangesTableModel extends DefaultTableModel {
-	private static final String[] COLUMN_NAMES =
-	   	{"Context", "Applied to", "Author", "Timestamp"};
+    private static final long serialVersionUID = -2032588342562373978L;
+
+    public enum Column {
+	    CONTEXT("Context"), APPLIED_TO("Applied to"), AUTHOR("Author"), TIMESTAMP("Timestamp");
+	    
+	    private String name;
+	    private Column(String name) {
+	        this.name = name;
+	    }
+	    public String getName() {
+	        return name;
+	    }
+	}
 
 	private Ontology_Component ontologyComp;
 	
@@ -28,35 +39,38 @@ public class ChangesTableModel extends DefaultTableModel {
 		//this.changesList = (ontologyComp == null ? new ArrayList<Instance>() : (ontologyComp).getSortedTopLevelChanges());
 		refillTableValues();
 		
-		for (int i = 0; i < COLUMN_NAMES.length; i++) {
-			addColumn(COLUMN_NAMES[i]);
-		}		
+		for (Column col : Column.values()) {
+		    addColumn(col.getName());
+		}	
 	}
 	
 	@Override
 	public Class getColumnClass(int columnIndex) {
-		switch (columnIndex) {
-		case 0:
-			return String.class;
-		case 1:
-			return Instance.class;
-		case 2:
-			return String.class;
-		case 3:
-			return Timestamp.class;
-		default:
-			return String.class;
-		}		
+	    if (columnIndex >=0 && columnIndex < Column.values().length) {
+	        switch (Column.values()[columnIndex]) {
+	        case CONTEXT:
+	            return String.class;
+	        case APPLIED_TO:
+	            return Instance.class;
+	        case AUTHOR:
+	            return String.class;
+	        case TIMESTAMP:
+	            return Timestamp.class;
+	        default:
+	            throw new UnsupportedOperationException("Programmer missed a case");
+	        }
+	    }
+	    return String.class;	
 	}
 	
 	@Override
 	public String getColumnName(int column) {
-		return COLUMN_NAMES[column];
+	    return Column.values()[column].getName();
 	}
 	
 	@Override
 	public int getColumnCount() {
-		return COLUMN_NAMES.length;
+		return Column.values().length;
 	}
 	
 	@Override
@@ -73,18 +87,21 @@ public class ChangesTableModel extends DefaultTableModel {
 
 	@Override
 	public Object getValueAt(int row, int column) {	
-		switch (column) {
-		case 0:
-			return ((Change)changesList.get(row)).getContext();
-		case 1:
-			return ((Change)changesList.get(row)).getApplyTo();
-		case 2:
-			return ((Change)changesList.get(row)).getAuthor();
-		case 3:
-			return ((Change)changesList.get(row)).getTimestamp();
-		default:
-			return null;
-		}				
+	    if (column >=0 && column < Column.values().length) {
+	        switch (Column.values()[column]) {
+	        case CONTEXT:
+	            return ((Change)changesList.get(row)).getContext();
+	        case APPLIED_TO:
+	            return ((Change)changesList.get(row)).getApplyTo();
+	        case AUTHOR:
+	            return ((Change)changesList.get(row)).getAuthor();
+	        case TIMESTAMP:
+	            return ((Change)changesList.get(row)).getTimestamp();
+	        default:
+	            throw new UnsupportedOperationException("Programmer missed a case");
+	        }			
+	    }
+	    return null;
 	}
 	
 	
