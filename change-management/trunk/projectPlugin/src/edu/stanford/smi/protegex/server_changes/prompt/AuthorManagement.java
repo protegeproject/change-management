@@ -1,10 +1,10 @@
 package edu.stanford.smi.protegex.server_changes.prompt;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -23,8 +23,10 @@ public class AuthorManagement {
     private ChangeModel model;
     
     private Map<String, Set<String>> userConflictsMap = new HashMap<String, Set<String>>();
-    private Map<String, Set<Ontology_Component>> conflictingFrames = new HashMap<String, Set<Ontology_Component>>();
-    private Map<String, Set<Ontology_Component>> unconflictedFrames = new HashMap<String, Set<Ontology_Component>>();
+    private Map<String, Set<Ontology_Component>> conflictingFrameMap = new HashMap<String, Set<Ontology_Component>>();
+    private Set<Ontology_Component> conflictedFrames = new HashSet<Ontology_Component>();
+    private Map<String, Set<Ontology_Component>> unconflictedFrameMap = new HashMap<String, Set<Ontology_Component>>();
+    private Set<Ontology_Component> unconflictedFrames = new HashSet<Ontology_Component>();
     
     private Set<String> active_users  = new HashSet<String>();
     
@@ -52,7 +54,9 @@ public class AuthorManagement {
     
     public void reinitialize() {
         userConflictsMap.clear();
-        conflictingFrames.clear();
+        conflictingFrameMap.clear();
+        conflictedFrames.clear();
+        unconflictedFrameMap.clear();
         unconflictedFrames.clear();
         active_users.clear();
         evaluateConflicts();
@@ -81,6 +85,7 @@ public class AuthorManagement {
                 for (String user : users) {
                     Set<Ontology_Component> frames = getConflictedFrames(user);
                     frames.add(frame);
+                    conflictedFrames.add(frame);
                     
                     Set<String> conflictingUsers = getUsersInConflictWith(user);
                     conflictingUsers.addAll(users);
@@ -90,6 +95,7 @@ public class AuthorManagement {
                 for (String user : users) {
                     Set<Ontology_Component> frames = getUnConlictedFrames(user);
                     frames.add(frame);
+                    unconflictedFrames.add(frame);
                 }
             }
         }
@@ -110,34 +116,40 @@ public class AuthorManagement {
     }
     
     public Set<Ontology_Component> getConflictedFrames(String user) {
-        Set<Ontology_Component> myConflictingFrames = conflictingFrames.get(user);
+        Set<Ontology_Component> myConflictingFrames = conflictingFrameMap.get(user);
         if (myConflictingFrames == null) {
             myConflictingFrames = new HashSet<Ontology_Component>();
-            conflictingFrames.put(user, myConflictingFrames);
+            conflictingFrameMap.put(user, myConflictingFrames);
         }
         
         return myConflictingFrames;
     }
+    
+    public Set<Ontology_Component> getConflictedFrames() {
+        return Collections.unmodifiableSet(conflictedFrames);
+    }
    
 
 	public Set<Ontology_Component> getUnConlictedFrames(String user) {
-        Set<Ontology_Component> myUnconflictedFrames = unconflictedFrames.get(user);
+        Set<Ontology_Component> myUnconflictedFrames = unconflictedFrameMap.get(user);
         if (myUnconflictedFrames == null) {
             myUnconflictedFrames = new HashSet<Ontology_Component>();
-            unconflictedFrames.put(user, myUnconflictedFrames);
+            unconflictedFrameMap.put(user, myUnconflictedFrames);
         }
         
         return myUnconflictedFrames;
     }
+	
+	public Set<Ontology_Component> getUnconflictedFrames() {
+	    return Collections.unmodifiableSet(unconflictedFrames);
+	}
 
 	
 	public Set<Ontology_Component> getFilteredConflictedFrames(String user) {
 	    Set<Ontology_Component> myConflictingFrames = new HashSet<Ontology_Component>(getConflictedFrames(user));
 	    filter(myConflictingFrames);
 	    return myConflictingFrames;
-	}
-
-    
+	} 
 	
 	public Set<Ontology_Component> getFilteredUnConflictedFrames(String user) {
 	    Set<Ontology_Component> myUnConflictingFrames = new HashSet<Ontology_Component>(getUnConlictedFrames(user));
@@ -149,7 +161,24 @@ public class AuthorManagement {
         return active_users;
     }
     
-    private void filter(Set<Ontology_Component> frames) {
+    public Set<String> getEditorsByFrameName(String name, boolean oldName) {
+        Ontology_Component component = oldName ? model.getOntologyComponentByInitialName(name) :
+                                                 model.getOntologyComponentByFinalName(name);
+        Set<String> editors  = new HashSet<String>();
+        if (component == null) return editors;
+        Collection changes = component.getChanges();
+        if (changes != null) {
+            for (Object o : changes) {
+                if (o instanceof Change) {
+                    Change change = (Change) o;
+                    editors.add(change.getAuthor());
+                }
+            }
+        }
+        return editors;
+    }
+    
+    public void filter(Set<Ontology_Component> frames) {
         if (nothing_to_filter) return;
         Set<Ontology_Component> remove = new HashSet<Ontology_Component>();
         for (Ontology_Component frame : frames) {
