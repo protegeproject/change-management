@@ -20,20 +20,17 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.ui.FrameRenderer;
-import edu.stanford.smi.protege.ui.InstanceDisplay;
-import edu.stanford.smi.protege.ui.ProjectManager;
+import edu.stanford.smi.protege.util.AbstractSelectableComponent;
 import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.LabeledComponent;
@@ -41,12 +38,11 @@ import edu.stanford.smi.protege.util.Selectable;
 import edu.stanford.smi.protege.util.SelectableList;
 import edu.stanford.smi.protege.util.SimpleListModel;
 import edu.stanford.smi.protege.util.ViewAction;
-import edu.stanford.smi.protegex.server_changes.ChangesDb;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
-public class UserConceptList extends JPanel {
+public class UserConceptList extends AbstractSelectableComponent implements Selectable {
     private KnowledgeBase old_kb, new_kb;
     private JTable changesTable;
         
@@ -63,30 +59,42 @@ public class UserConceptList extends JPanel {
         super ();
         this.old_kb = old_kb;
         this.new_kb = new_kb;
-        
-        buildGUI();
-        
-        _noConflictList.addListSelectionListener(new ListSelectionListener() {		
-        	public void valueChanged(ListSelectionEvent e) {										
-				updateChangeTable((Instance) _noConflictList.getSelectedValue());				
-			}        	
-        });
-
-        _conflictList.addListSelectionListener(new ListSelectionListener() {		
-        	public void valueChanged(ListSelectionEvent e) {										
-				updateChangeTable((Instance) _conflictList.getSelectedValue());				
-			}        	
-        });  
+ 
     } 
     
-    protected void updateChangeTable(Instance ontologyComponent) {    	
-		((ChangesTableModel)changesTable.getModel()).setOntologyComponent((Ontology_Component)ontologyComponent);		
+    public void initialize() { 
+        buildGUI();
+        
+        /* these tweedledee-tweedledum listeners are a bit funky... */
+        _noConflictList.addListSelectionListener(new ListSelectionListener() {      
+            public void valueChanged(ListSelectionEvent e) {  
+                if (_noConflictList.getSelectedValue() != null) {
+                    updateChangeTable((Ontology_Component) _noConflictList.getSelectedValue()); 
+                    _conflictList.clearSelection();
+                }
+                notifySelectionListeners();
+            }           
+        });
+
+        _conflictList.addListSelectionListener(new ListSelectionListener() {        
+            public void valueChanged(ListSelectionEvent e) {   
+                if (_conflictList.getSelectedValue() != null) {
+                    updateChangeTable((Ontology_Component) _conflictList.getSelectedValue());   
+                    _noConflictList.clearSelection();
+                }
+                notifySelectionListeners();
+            }           
+        }); 
+    }
+    
+    protected void updateChangeTable(Ontology_Component ontologyComponent) {    	
+		((ChangesTableModel)changesTable.getModel()).setOntologyComponent(ontologyComponent);		
 	}
 
 	private void buildGUI() {
     	setLayout(new BorderLayout());
     	
-    	LabeledComponent changeTablePanel = createChangesTable();
+    	JComponent changeTablePanel = createChangesTable();
     	
 		JPanel changesPanel = new JPanel(new BorderLayout());
 		changesPanel.add(createConceptLists(), BorderLayout.CENTER);
@@ -99,7 +107,7 @@ public class UserConceptList extends JPanel {
 		add(topBottomSplitPane, BorderLayout.CENTER);	
 	}
 
-	private LabeledComponent createChangesTable() {
+	protected JComponent createChangesTable() {
 		changesTable = ComponentFactory.createSelectableTable(null);
 				
 		changesTable.setModel(new ChangesTableModel(null));
@@ -150,7 +158,9 @@ public class UserConceptList extends JPanel {
 		result.setLayout (new GridLayout (0, 2, 10, 0));
 
 		_noConflictList = createConceptList (_noConflictConcepts);
-		_conflictList = createConceptList (_conflictConcepts);		
+		_noConflictList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		_conflictList = createConceptList (_conflictConcepts);	
+		_conflictList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		LabeledComponent labeledComponent1 = new LabeledComponent ("Ontology components changed by one user", ComponentFactory.createScrollPane (_noConflictList)); 
 		LabeledComponent labeledComponent2 = new LabeledComponent ("Ontology components changed by multiple users", ComponentFactory.createScrollPane (_conflictList));
@@ -239,5 +249,10 @@ public class UserConceptList extends JPanel {
 	    _conflictList.clearSelection();
 	    _noConflictList.clearSelection();
 	}
+
+    public void setSelection(Collection<Ontology_Component> unconflicted, Collection<Ontology_Component> conflicted) {
+        ComponentUtilities.setSelectedValues(_noConflictList, unconflicted);
+        ComponentUtilities.setSelectedValues(_conflictList, conflicted);
+    }
 		
 }
