@@ -7,8 +7,9 @@ import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.widget.AbstractTabWidget;
 
 public class UsersTab extends AbstractTabWidget {
+    private static final long serialVersionUID = 1289119067038250399L;
 
-	public void initialize() {
+    public void initialize() {
 		setLabel("UsersTab");
 		
 		AuthorManagement authorManagement = AuthorManagement.getAuthorManagement(null, getKnowledgeBase());
@@ -25,6 +26,7 @@ public class UsersTab extends AbstractTabWidget {
 	}
 	
 	//TT: Until we fix it to work in multi-user client, too.
+    @SuppressWarnings("unchecked")
     public static boolean isSuitable(Project p, Collection errors) {
         if (p.isMultiUserClient()) {
         	errors.add("Works only in stand-alone mode");
