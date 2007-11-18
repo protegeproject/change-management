@@ -159,6 +159,8 @@
       </fail>
       <copy file="${plugins}/${plugin_dist}/${pluginName}.jar"
             todir="${protege.home}/plugins/${plugin_dist}"/>
+   	  <copy file="${plugins}/${plugin_dist}/${model.jar}"
+    		todir="${protege.home}/plugins/${plugin_dist}"/>
    </target>
 
    <target name = "install" depends = "dist">
