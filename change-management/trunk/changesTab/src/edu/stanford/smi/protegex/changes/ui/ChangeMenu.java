@@ -32,6 +32,7 @@ import edu.stanford.smi.protege.util.ProtegeJob;
 import edu.stanford.smi.protege.widget.TabWidget;
 import edu.stanford.smi.protegex.changes.ChangeCreateUtil;
 import edu.stanford.smi.protegex.changes.ChangesTab;
+import edu.stanford.smi.protegex.changes.action.CleanUpChangesOntAction;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
 import edu.stanford.smi.protegex.server_changes.model.ChangeModel.AnnotationCls;
@@ -69,6 +70,7 @@ public class ChangeMenu extends JMenu {
 		JMenuItem annotate = new JMenuItem(MENU_ITEM_ANNOTATE_LAST);
 		JMenuItem changeInfo = new JMenuItem(MENU_ITEM_CHANGE_INFO);
 		JMenuItem saveChangesPrj = new JMenuItem(MENU_ITEM_SAVE_CHANGE_PRJ);
+		JMenuItem extract = new JMenuItem(new CleanUpChangesOntAction(change_kb));
 				
 		annotate.setAction(lastChange);
 		annotate.setMnemonic(KeyEvent.VK_A);
@@ -83,6 +85,7 @@ public class ChangeMenu extends JMenu {
 		add(annotate);
 		add(changeInfo);
 		addSeparator();
+		add(extract);
 		add(saveChangesPrj);
 				
 		lastChange.setEnabled(false);
