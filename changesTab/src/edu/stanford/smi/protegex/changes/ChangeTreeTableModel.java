@@ -1,12 +1,10 @@
 package edu.stanford.smi.protegex.changes;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.stanford.smi.protege.model.Instance;
-import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.changes.ui.AbstractTreeTableModel;
@@ -19,11 +17,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
     private static final transient Logger log = Log.getLogger(ChangeTreeTableModel.class);
 	
 	private String[] colNames;
-	private ArrayList<Instance> completeData;
-    
-	private KnowledgeBase changeKB;
-    private ChangeModel model;
-    
+   
     private RootTreeTableNode root;
     
     private Slot partOfCompositeChangeSlot;
@@ -33,8 +27,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	public ChangeTreeTableModel(ChangeModel model) {
 		super(new RootTreeTableNode());
         root = (RootTreeTableNode) super.root;
-        this.model = model;
-		this.changeKB = model.getChangeKb();
+ 
         partOfCompositeChangeSlot = model.getSlot(ChangeSlot.partOfCompositeChange);
         subChangesSlot = model.getSlot(ChangeSlot.subChanges);
 		init();
@@ -47,8 +40,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 		colNames = new String[cols.length];
         for (int i = 0; i < cols.length; i++) {
             colNames[i] = cols[i].getName();
-        }
-		completeData = new ArrayList<Instance>();;
+        }	
 	}
 	
 	
@@ -171,14 +163,12 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 		setNewFilter();
 	}
 	
-	public void setSearchQuery(String field, String text) {
-		
+	public void setSearchQuery(String field, String text) {		
 		setNewSearch(field, text);
 	}
 	
 	
 	private void setNewSearch(String field, String text) {
-
 	    throw new UnsupportedOperationException("fix me");
 	}
 	
