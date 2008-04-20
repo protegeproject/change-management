@@ -124,6 +124,8 @@ public class ChangesTab extends AbstractTabWidget {
 	
 	private ChangesListener changesListener;
 
+	private LabeledComponent changesLabledComponent;
+
 	private boolean inRemoveAnnotation = false;
 	
 	
@@ -177,18 +179,18 @@ public class ChangesTab extends AbstractTabWidget {
 		JScrollPane scroll2 = ComponentFactory.createScrollPane(annotationsTable);
 		JScrollPane scroll3 = ComponentFactory.createScrollPane(annotationChangesTable);
 	
-		LabeledComponent changeHistLC = new LabeledComponent(LABELCOMP_NAME_CHANGE_HIST, scroll,true);
-		changeHistLC.setFooterComponent(initSearchPanel());
+		changesLabledComponent = new LabeledComponent(LABELCOMP_NAME_CHANGE_HIST, scroll,true);
+		changesLabledComponent.setFooterComponent(initSearchPanel());
 		
-		changeHistLC.doLayout();
-		changeHistLC.addHeaderSeparator();
-		addAnnotationAction = new AddInstanceAction(changeHistLC, ACTION_NAME_CREATE_ANNOTATE);
+		changesLabledComponent.doLayout();
+		changesLabledComponent.addHeaderSeparator();
+		addAnnotationAction = new AddInstanceAction(changesLabledComponent, ACTION_NAME_CREATE_ANNOTATE);
 		addAnnotationAction.setEnabled(false);
 
-		changeHistLC.setHeaderComponent(initAnnotPanel(), BorderLayout.EAST);
-		changeHistLC.addHeaderButton(addAnnotationAction);
+		changesLabledComponent.setHeaderComponent(initAnnotPanel(), BorderLayout.EAST);
+		changesLabledComponent.addHeaderButton(addAnnotationAction);
 		
-		changeHistLC.addHeaderButton(new ViewAction("View change details", null) {
+		changesLabledComponent.addHeaderButton(new ViewAction("View change details", null) {
 			@Override			
 			public void onView() {
 				TreePath[] selectedTreePaths = changesTreeTable.getTree().getSelectionPaths();
@@ -241,7 +243,7 @@ public class ChangesTab extends AbstractTabWidget {
 		splitPanel.setTopComponent(annotLC);
 		splitPanel.setBottomComponent(assocLC);
 
-		HeaderComponent changeView = new HeaderComponent(HEADERCOMP_NAME_CHANGE_VIEWER, null, changeHistLC);
+		HeaderComponent changeView = new HeaderComponent(HEADERCOMP_NAME_CHANGE_VIEWER, null, changesLabledComponent);
 		HeaderComponent annotView = new HeaderComponent(HEADERCOMP_NAME_ANNOTATE_VIEWER, null, splitPanel);
 
 		JSplitPane splitPanelBig = ComponentFactory.createTopBottomSplitPane(false);
@@ -327,7 +329,6 @@ public class ChangesTab extends AbstractTabWidget {
 
 		annotationChangesTable = new SelectableTable();
 		annotationChangesTable.setModel(annotationChangesTableModel);
-
 		annotationsTable = new SelectableTable();
 		annotationsTable.setModel(annotationsTableModel);
 		changesTreeTable = new JTreeTable(changesTreeTableModel);
@@ -436,6 +437,21 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 
 
+	public void refreshTables() {
+		annotationChangesTableModel = new ChangeTableModel(model);
+		annotationsTableModel = new AnnotationTableModel(changes_kb);
+		changesTreeTableModel = new ChangeTreeTableModel(model);
+
+		annotationChangesTable.setModel(annotationChangesTableModel);		
+		annotationsTable.setModel(annotationsTableModel);
+		changesTreeTable = new JTreeTable(changesTreeTableModel);
+		
+		changesLabledComponent.setCenterComponent(changesTreeTable);
+		
+		loadExistingData();
+		
+	}
+	
 	private void loadExistingData() {      
 		Collection<Instance> annotateInsts = model.getInstances(AnnotationCls.Annotation);
 		loadChanges();
