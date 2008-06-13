@@ -20,7 +20,7 @@ import edu.stanford.smi.protegex.changes.ChangesTab;
 
 public class CleanUpChangesOntAction extends AbstractAction {
 
-	private static final String EXTRACT_FROM_CHG_ONT = "Clean-up Changes Ontology ...";
+	private static final String EXTRACT_FROM_CHG_ONT = "Clean Up Changes Ontology ...";
 	
 	private KnowledgeBase changesKb;
 	
