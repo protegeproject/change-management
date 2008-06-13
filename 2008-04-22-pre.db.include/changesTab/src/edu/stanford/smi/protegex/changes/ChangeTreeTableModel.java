@@ -17,7 +17,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
     private static final transient Logger log = Log.getLogger(ChangeTreeTableModel.class);
 	
 	private String[] colNames;
-    
+   
     private RootTreeTableNode root;
     
     private Slot partOfCompositeChangeSlot;
@@ -40,7 +40,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 		colNames = new String[cols.length];
         for (int i = 0; i < cols.length; i++) {
             colNames[i] = cols[i].getName();
-        }
+        }	
 	}
 	
 	
@@ -163,7 +163,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 		setNewFilter();
 	}
 	
-	public void setSearchQuery(String field, String text) {
+	public void setSearchQuery(String field, String text) {		
 		setNewSearch(field, text);
 	}
 	

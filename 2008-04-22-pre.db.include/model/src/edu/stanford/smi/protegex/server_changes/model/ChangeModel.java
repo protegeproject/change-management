@@ -297,7 +297,7 @@ public class ChangeModel {
             }
         }
         log.log(level, "\tDirect type = " + cls);
-        log.log(level, "\tFrame = " + aInst);
+        log.log(level, "\tFrame ID = " + aInst.getFrameID().getLocalPart());
     }
 
 

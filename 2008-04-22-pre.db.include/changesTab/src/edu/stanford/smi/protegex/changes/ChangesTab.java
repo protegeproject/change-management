@@ -123,7 +123,7 @@ public class ChangesTab extends AbstractTabWidget {
 	private ChangeTreeTableModel changesTreeTableModel;
 	
 	private ChangesListener changesListener;
-
+	
 	private LabeledComponent changesLabledComponent;
 
 	private boolean inRemoveAnnotation = false;

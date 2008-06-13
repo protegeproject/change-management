@@ -106,6 +106,8 @@ public class ChangesKBViewTab extends AbstractTabWidget {
 		@Override
 		public void load(Object value) {
 			super.load(value);
+			if (value instanceof Frame)
+				appendText(" id=" + ((Frame)value).getFrameID().getLocalPart());
 		}
 	}
 	
