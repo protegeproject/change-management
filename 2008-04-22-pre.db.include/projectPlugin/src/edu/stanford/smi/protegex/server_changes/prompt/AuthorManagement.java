@@ -35,7 +35,7 @@ public class AuthorManagement {
     private boolean nothing_to_filter;
     public final static Set<FilterPanel.ComponentFilter> DEFAULT_FILTERS = Collections.unmodifiableSet(EnumSet.of(FilterPanel.ComponentFilter.CLASS));
     
-    private AuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
+    protected AuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
         this.kb = kb2;
         changes_db = ChangesProject.getChangesDb(kb);
         model = changes_db.getModel();
@@ -130,7 +130,7 @@ public class AuthorManagement {
     }
    
 
-	public Set<Ontology_Component> getUnConlictedFrames(String user) {
+	protected Set<Ontology_Component> getUnConlictedFrames(String user) {
         Set<Ontology_Component> myUnconflictedFrames = unconflictedFrameMap.get(user);
         if (myUnconflictedFrames == null) {
             myUnconflictedFrames = new HashSet<Ontology_Component>();
