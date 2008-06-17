@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -19,7 +20,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
 import edu.stanford.smi.protege.model.KnowledgeBase;
@@ -39,6 +40,7 @@ public class DiffUserView extends JPanel {
     protected KnowledgeBase kb2;
 
 	protected JTable userTable = ComponentFactory.createTable(null);
+	protected AbstractTableModel userTableModel;
 
 	private UserConceptList userConceptLists;
 
@@ -90,45 +92,58 @@ public class DiffUserView extends JPanel {
     }
 
     @SuppressWarnings("unused")
-	private void initializeUserTable() {
-		userTable.setModel(createTableModel());
+	protected void initializeUserTable() {
+        userTableModel = createTableModel();
+		userTable.setModel(userTableModel);
 		DefaultRenderer renderer = new DefaultRenderer();
 		for (UserColumn col : UserColumn.values()) {
 		    ComponentUtilities.addColumn(userTable, renderer);
 		}
 	}
 
-	private TableModel createTableModel() {
-		DefaultTableModel table_model = new DefaultTableModel() {
+	private AbstractTableModel createTableModel() {
+		return new AbstractTableModel() {
             private static final long serialVersionUID = 6503930747934822085L;
+            private List<String> users = new ArrayList<String>(authorManagement.getUsers());
 
             public boolean isCellEditable(int row, int col) {
 				return false;
 			}
+
+            public int getColumnCount() {
+                return UserColumn.values().length;
+            }
+
+            public int getRowCount() {
+                return authorManagement.getUsers().size();
+            }
+
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                if (rowIndex >= users.size() || columnIndex >= UserColumn.values().length) {
+                    return null;
+                }
+                String user = users.get(rowIndex);
+                int conceptsNotInConflict = authorManagement.getFilteredUnConflictedFrames(user).size();
+                int conceptsInConflict = authorManagement.getFilteredConflictedFrames(user).size();
+                String conflictsWith = authorManagement.getUsersInConflictWith(user).toString();
+                
+                switch (UserColumn.values()[columnIndex])  {
+                case USER:
+                    return user;
+                case CONFLICTS:
+                    return  conceptsInConflict;
+                case CHANGED:
+                    return conceptsNotInConflict + conceptsInConflict;
+                case CONFLICTS_WITH:
+                    return conflictsWith;
+                default:
+                    return null;
+                }
+            }
             
 		};
-		for (UserColumn col : UserColumn.values()) {
-		    table_model.addColumn(col.getName());
-		}
-
-		for (String user : authorManagement.getUsers()) {
-			table_model.addRow(createUserTableRow(user));
-		}
-		return table_model;
 	}
 	
-	private Object[] createUserTableRow(String user) {
-	    Object[] row = new Object[UserColumn.values().length];
-	    int conceptsNotInConflict = authorManagement.getFilteredUnConflictedFrames(user).size();
-	    int conceptsInConflict = authorManagement.getFilteredConflictedFrames(user).size();
-	    String conflictsWith = authorManagement.getUsersInConflictWith(user).toString();
-	    row[UserColumn.USER.ordinal()] = user;
-	    row[UserColumn.CONFLICTS.ordinal()] = conceptsInConflict;
-	    row[UserColumn.CHANGED.ordinal()] = conceptsNotInConflict + conceptsInConflict;
-	    row[UserColumn.CONFLICTS_WITH.ordinal()] = conflictsWith;
-	    return row;
-	}
-
 	public Collection<String> getSelectedUsers() {
 
 		Collection<String> selection = new ArrayList<String>();
