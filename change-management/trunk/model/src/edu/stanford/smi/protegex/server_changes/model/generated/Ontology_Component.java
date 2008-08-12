@@ -54,9 +54,11 @@ public class Ontology_Component extends AnnotatableThing {
     
     private final static String ANONYMOUS_NAME_PREFIX = "@";
     
-    @SuppressWarnings("unchecked")
+    private String initialName = null;
+    
     public Status getStatus() {
-        List<Instance> changes = getSortedChanges();
+        Collection changes = getChanges();
+        List<Instance> nameChanges = getSortedNameChanges();
         if (changes == null || changes.isEmpty()) {
             return Status.UNCHANGED;
         }
@@ -65,7 +67,7 @@ public class Ontology_Component extends AnnotatableThing {
             boolean deleted = false;
             // Can't assume that the deleted change is last 
             //     - there might be a composite change following
-            for (Instance change : changes) {
+            for (Instance change : nameChanges) {
                 if (change instanceof Created_Change) {
                     created = true;
                 }
@@ -92,13 +94,19 @@ public class Ontology_Component extends AnnotatableThing {
     
  
     public String getInitialName() {
-        List<Instance> changes = getSortedChanges();
-        if (changes.get(0) instanceof Created_Change) {
+        if (initialName != null) {
+            return initialName;
+        }
+        List<Instance> nameChanges = getSortedNameChanges();
+        if (nameChanges.isEmpty()) {
+            return getCurrentName();
+        } 
+        if (nameChanges.get(0) instanceof Created_Change) {
             return null;
         }
-        Collections.reverse(changes);
+        Collections.reverse(nameChanges);
         String name = getCurrentName();
-        for (Instance i : changes) {
+        for (Instance i : nameChanges) {
             if (i instanceof Deleted_Change) {
                 Deleted_Change change = (Deleted_Change) i;
                 name = change.getDeletionName();
@@ -112,7 +120,23 @@ public class Ontology_Component extends AnnotatableThing {
                 return null;
             }
         }
+        initialName = name;
         return name;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Instance> getSortedNameChanges() {
+        Collection changes = getChanges();
+        List<Instance> nameChanges = new ArrayList<Instance>();
+        for (Object i : changes) {
+            if (i instanceof Deleted_Change || i instanceof Name_Changed || i instanceof  Created_Change) {
+                nameChanges.add((Instance) i);
+            }
+        }
+        if (!nameChanges.isEmpty()) {
+            Collections.sort(nameChanges, new ChangeDateComparator(getKnowledgeBase()));
+        }
+        return nameChanges;
     }
     
     public List<Instance> getSortedChanges() {
