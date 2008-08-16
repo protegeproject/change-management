@@ -165,7 +165,7 @@ public class Ontology_Component extends AnnotatableThing {
     public String mostRecentName() {
     	String name = getCurrentName();
     	if (name != null) { return name; }
-    	List<Instance> changes = getSortedChanges();
+    	List<Instance> changes = getSortedNameChanges();
     	Collections.reverse(changes);
     	for (Instance i : changes) {
     		if (i instanceof Deleted_Change) {
