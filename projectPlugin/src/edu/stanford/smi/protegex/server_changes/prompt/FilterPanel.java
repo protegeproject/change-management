@@ -9,61 +9,63 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Class;
-import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
-import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Individual;
-import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Property;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Class;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Individual;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Property;
 
 public class FilterPanel extends JPanel {
     private Map<ComponentFilter, JCheckBox> buttons = new EnumMap<ComponentFilter, JCheckBox>(ComponentFilter.class);
-    
+
     public FilterPanel(boolean isOwl, Set<ComponentFilter> existing_filters) {
 
         BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
         setLayout(layout);
-        
+
         for (ComponentFilter filter : ComponentFilter.values()) {
-            if (!isOwl && filter == ComponentFilter.ANONYMOUS) continue;
-            
+            if (!isOwl && filter == ComponentFilter.ANONYMOUS) {
+				continue;
+			}
+
             JCheckBox button = new JCheckBox(filter.getTitle(isOwl));
             button.setSelected(existing_filters.contains(filter));
             add(button);
             buttons.put(filter, button);
         }
     }
-    
+
     public EnumSet<ComponentFilter> getResult() {
         EnumSet<ComponentFilter> result = EnumSet.noneOf(ComponentFilter.class);
-        
+
         for (Map.Entry<ComponentFilter, JCheckBox> entry : buttons.entrySet()) {
             ComponentFilter filter = entry.getKey();
             JCheckBox button = entry.getValue();
-            
+
             if (button.isSelected()) {
                 result.add(filter);
             }
         }
         return result;
     }
-    
+
     public enum ComponentFilter {
         CLASS("Show Classes"),
         PROPERTY("Show Slots", "Show Properties"),
         INDIVIDUAL("Show Instances", "Show Individuals"),
         ANONYMOUS("Show Anonymous Ontology Components")
         ;
-        
+
         private String title;
         private String owlTitle;
         private ComponentFilter(String title) {
             this(title, title);
         }
-        
+
         private ComponentFilter(String title, String owlTitle) {
             this.title = title;
             this.owlTitle = owlTitle;
         }
-        
+
         public String getTitle(boolean isOwl) {
             if (isOwl) {
                 return owlTitle;
@@ -72,7 +74,7 @@ public class FilterPanel extends JPanel {
                 return title;
             }
         }
-        
+
         public boolean allow(Ontology_Component frame) {
             switch (this) {
             case CLASS:
