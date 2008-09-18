@@ -4,36 +4,31 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import edu.stanford.bmir.protegex.chao.change.api.Annotation_Change;
+import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Property;
 import edu.stanford.smi.protege.event.FrameEvent;
 import edu.stanford.smi.protege.event.FrameListener;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.Instance;
-import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.CollectionUtilities;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
-import edu.stanford.smi.protegex.owl.model.impl.DefaultOWLDatatypeProperty;
-import edu.stanford.smi.protegex.server_changes.ChangesDb;
+import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
-import edu.stanford.smi.protegex.server_changes.model.generated.Annotation_Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
 
 public class OwlChangesFrameListener implements FrameListener {
-    private OWLModel om;
-    private ChangesDb changes_db;
-    private KnowledgeBase changesKb;
+    private PostProcessorManager changes_db;
+    private ChangeFactory factory;
 
     public OwlChangesFrameListener(OWLModel kb) {
-        om = kb;
         changes_db = ChangesProject.getChangesDb(kb);
-        changesKb = changes_db.getChangesKb();
-    }	
+        factory = new ChangeFactory(changes_db.getChangesKb());
+    }
     public void browserTextChanged(FrameEvent event) {
 
     }
@@ -81,11 +76,11 @@ public class OwlChangesFrameListener implements FrameListener {
         else if (f instanceof Cls) {
 
             Cls c = (Cls)f;
- 
+
             if (slot instanceof RDFProperty && ((RDFProperty) slot).isAnnotationProperty()) {
                 handleAnnotation(c, (RDFProperty) slot, event);
             }
-            else if (slot.getName().equals("owl:disjointWith")) { 
+            else if (slot.getName().equals("owl:disjointWith")) {
                 handleOwlDisjoint(c, slot, event);
             } // Handles disjoints
 
@@ -98,7 +93,7 @@ public class OwlChangesFrameListener implements FrameListener {
         }
 
     }
-    
+
 
     private void handleAnnotation(Cls c, RDFProperty prop, FrameEvent event) {
         String cText = c.getBrowserText();
@@ -109,26 +104,24 @@ public class OwlChangesFrameListener implements FrameListener {
 
         StringBuffer context = new StringBuffer();
         Collection newSlotValues = c.getOwnSlotValues(prop);
-        if ((newSlotValues == null && oldSlotValues  == null) || newSlotValues.equals(oldSlotValues)) {
+        if (newSlotValues == null && oldSlotValues  == null || newSlotValues.equals(oldSlotValues)) {
             return;
         }
-        
+
         Ontology_Component applyTo = changes_db.getOntologyComponent(c, true);
-        Ontology_Component ontologyAnnotation = changes_db.getOntologyComponent(s, true);
-        
+        Ontology_Property ontologyAnnotation = (Ontology_Property) changes_db.getOntologyComponent(s, true);
+
         if (newSlotValues == null || newSlotValues.isEmpty()){
             context.append("Annotation Removed: ");
             context.append(sName);
             context.append(" from class: ");
             context.append(cText);
 
-            Annotation_Change change = (Annotation_Change) changes_db.createChange(ChangeCls.Annotation_Removed);
+            Annotation_Change change = factory.createAnnotation_Removed(null);
             change.setAssociatedProperty(ontologyAnnotation);
             changes_db.finalizeChange(change, applyTo, context.toString());
         }//Annotation deleted
         else if (oldSlotValues == null || oldSlotValues.isEmpty()) {
-
-
             context.append("Annotation Added: ");
             context.append(sName);
             context.append(": ");
@@ -139,7 +132,7 @@ public class OwlChangesFrameListener implements FrameListener {
             context.append(" to class: ");
             context.append(cName);
 
-            Annotation_Change change = (Annotation_Change) changes_db.createChange(ChangeCls.Annotation_Added);
+            Annotation_Change change =  factory.createAnnotation_Added(null);
             change.setAssociatedProperty(ontologyAnnotation);
             changes_db.finalizeChange(change, applyTo, context.toString());
         }
@@ -152,12 +145,12 @@ public class OwlChangesFrameListener implements FrameListener {
             context.append(" set to: ");
             context.append(newSlotValues);
 
-            Annotation_Change change = (Annotation_Change) changes_db.createChange(ChangeCls.Annotation_Modified);
+            Annotation_Change change = factory.createAnnotation_Modified(null);
             change.setAssociatedProperty(ontologyAnnotation);
             changes_db.finalizeChange(change, applyTo, context.toString());
         }
     }
-    
+
     private void handleOwlDisjoint(Cls c, Slot slot, FrameEvent event) {
         String cText = c.getBrowserText();
         String cName = c.getName();
@@ -165,7 +158,7 @@ public class OwlChangesFrameListener implements FrameListener {
         ArrayList oldSlotValues = (ArrayList) event.getOldValues();
         String sName = s.getName();
         StringBuffer context = new StringBuffer();
-        
+
         Collection newSlotValues = c.getOwnSlotValues(slot);
         Collection deleted = new HashSet(oldSlotValues);
         deleted.removeAll(newSlotValues);
@@ -184,10 +177,10 @@ public class OwlChangesFrameListener implements FrameListener {
         }
         context.append(" to: ");
         context.append(cName);
-        
-        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.DisjointClass_Added, c, context.toString());
+
+        ServerChangesUtil.createChangeStd(changes_db, factory.createDisjointClass_Added(null), c, context.toString());
     }
-    
+
     private void handleInstanceSlotValueChange(Instance i, Slot ownS, FrameEvent event) {
         String iName = i.getName();
         String iText = i.getBrowserText();
@@ -203,7 +196,7 @@ public class OwlChangesFrameListener implements FrameListener {
         context.append(" set to: ");
         context.append(newSlotValue);
 
-        ServerChangesUtil.createChangeStd(changes_db, ChangeCls.Property_Value, i, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, factory.createProperty_Value(null), i, context.toString());
     }
 
 
