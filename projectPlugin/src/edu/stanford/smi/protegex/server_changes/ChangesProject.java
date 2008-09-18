@@ -1,12 +1,12 @@
 package edu.stanford.smi.protegex.server_changes;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 
+import edu.stanford.bmir.protegex.chao.ChAOKbManager;
 import edu.stanford.smi.protege.Application;
 import edu.stanford.smi.protege.model.DefaultKnowledgeBase;
 import edu.stanford.smi.protege.model.KnowledgeBase;
@@ -28,22 +28,13 @@ import edu.stanford.smi.protegex.server_changes.postprocess.JoinCreateAndNameCha
 import edu.stanford.smi.protegex.server_changes.postprocess.JoinInstanceCreateAndAdd;
 import edu.stanford.smi.protegex.server_changes.server.ChangeOntStateMachine;
 import edu.stanford.smi.protegex.server_changes.util.Util;
-import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
 public class ChangesProject extends ProjectPluginAdapter {
 
-	public static final String ANNOTATION_PROJECT_NAME_PREFIX = "annotation_";
-
-	public static final String PROTEGE_NAMESPACE = "http://protege.stanford.edu/kb#";
-	
-	// Transaction signals
-	public static final String TRANS_SIGNAL_TRANS_BEGIN = "transaction_begin";
-	public static final String TRANS_SIGNAL_TRANS_END = "transaction_end";
-	public static final String TRANS_SIGNAL_START = "start";
-    
-    private static Map<KnowledgeBase, ChangesDb> changesDbMap = new HashMap<KnowledgeBase, ChangesDb>();
+    private static Map<KnowledgeBase, PostProcessorManager> changesDbMap = new HashMap<KnowledgeBase, PostProcessorManager>();
 
     /* ---------------------------- Project Plugin Interfaces ---------------------------- */
+	@Override
 	public void afterLoad(Project p) {
 		if (!isChangeTrackingEnabled(p) || p.isMultiUserClient()) {
 			return;
@@ -51,50 +42,41 @@ public class ChangesProject extends ProjectPluginAdapter {
 		initialize(p);
 	}
 
-    public void afterSave(Project p) {
+    @Override
+	public void afterSave(Project p) {
         if (p.isMultiUserClient()) {
             return;
         }
-        ArrayList errors = new ArrayList();
-        KnowledgeBase kb = p.getKnowledgeBase();
-        Project changesProject = getChangesProj(kb);
-        if (changesProject != null) {
-            RDFBackend.setSourceFiles(changesProject.getSources(), 
-                                      ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + p.getName() + ".rdfs", 
-                                      ChangesProject.ANNOTATION_PROJECT_NAME_PREFIX + p.getName() + ".rdf", 
-                                      ChangesProject.PROTEGE_NAMESPACE);
-            changesProject.setProjectURI(ChangesDb.getAnnotationProjectURI(p));
-
-            changesProject.save(errors);
-            displayErrors(errors);
-        }
+        ChAOKbManager.saveChAOProject(p.getKnowledgeBase());
     }
-    
-    public void beforeClose(Project p) {
+
+    @Override
+	public void beforeClose(Project p) {
         if (p.isMultiUserClient()) {
             return;
         }
         KnowledgeBase kb = p.getKnowledgeBase();
-        ChangesDb changesDb  = getChangesDb(kb);
+        PostProcessorManager changesDb  = getChangesDb(kb);
         if (changesDb != null) {
             if (!p.isMultiUserServer()) {
-                changesDb.getChangesKb().dispose();
+            	//FIXME: don't dispose for now. The ChAOKBManager should handle this.
+                //changesDb.getChangesKb().dispose();
             }
             changesDbMap.remove(kb);
         }
     }
-    
+
     /* ---------------------------- End of Project Plugin Interfaces ---------------------------- */
-    
+
     public static boolean isChangeTrackingEnabled(Project p) {
     	boolean trackChanges = p.getChangeTrackingActive();
-    	
+
     	if (trackChanges) {
     		return true;
     	}
-    	
+
     	//If the update modification slots is not set, try to find the changes tab
-    	
+
         String changesTabClassName = ChangesTab.class.getName();
         for (Object o : p.getTabWidgetDescriptors()) {
             WidgetDescriptor w = (WidgetDescriptor) o;
@@ -102,17 +84,17 @@ public class ChangesProject extends ProjectPluginAdapter {
                 return true;
             }
         }
-        return false;   	
+        return false;
     }
-	
-	
-	public void initialize(Project p) {	
+
+
+	public void initialize(Project p) {
 		Project currentProj = p;
 		KnowledgeBase currentKB = currentProj.getKnowledgeBase();
-		
-		createChangeProject(currentKB); 
 
-        ChangesDb changesDb = changesDbMap.get(currentKB);
+		createChangeProject(currentKB);
+
+        PostProcessorManager changesDb = changesDbMap.get(currentKB);
         KnowledgeBase changesKb = changesDb.getChangesKb();
         Project changesProj = changesDb.getChangesProject();
 		if (changesKb == null) {
@@ -129,11 +111,11 @@ public class ChangesProject extends ProjectPluginAdapter {
 		} else {
 			registerKBListeners(currentKB);
 		}
-		
+
 		if (changesProj.isMultiUserServer()) {
-			ServerFrameStore.requestEventDispatch(currentKB);			
+			ServerFrameStore.requestEventDispatch(currentKB);
             ((DefaultKnowledgeBase) changesKb).setCacheMachine(new ChangeOntStateMachine(changesKb));
-		}		
+		}
 
 	}
 
@@ -145,41 +127,42 @@ public class ChangesProject extends ProjectPluginAdapter {
 		currentKB.addTransactionListener(new ChangesTransListener(currentKB));
 		currentKB.addFrameListener(new ChangesFrameListener(currentKB));
 	}
-    
+
 
 	private static void createChangeProject(KnowledgeBase currentKB) {
-        ChangesDb changesDb = changesDbMap.get(currentKB);
+        PostProcessorManager changesDb = changesDbMap.get(currentKB);
         if (changesDb == null) {
-            changesDb = new ChangesDb(currentKB);
+            changesDb = new PostProcessorManager(currentKB);
             changesDb.addPostProcessor(new AnnotationCombiner());
             changesDb.addPostProcessor(new JoinCreateAndNameChange());
             changesDb.addPostProcessor(new JoinInstanceCreateAndAdd());
             changesDbMap.put(currentKB, changesDb);
         }
 	}
-	
-	
+
+
 	public static String getUserName(KnowledgeBase currentKB) {
 		return currentKB.getUserName();
 	}
-    
-    public static ChangesDb getChangesDb(KnowledgeBase kb) {
+
+    public static PostProcessorManager getChangesDb(KnowledgeBase kb) {
         return changesDbMap.get(kb);
     }
 
 	public static KnowledgeBase getChangesKB(KnowledgeBase kb) {
-        ChangesDb changesDb = changesDbMap.get(kb);
-		return (changesDb == null ? null: changesDb.getChangesKb());
+        PostProcessorManager changesDb = changesDbMap.get(kb);
+		return changesDb == null ? null: changesDb.getChangesKb();
 	}
 
 	public static Project getChangesProj(KnowledgeBase kb) {
-        ChangesDb changesDb = changesDbMap.get(kb);
+        PostProcessorManager changesDb = changesDbMap.get(kb);
         if (changesDb == null) {
         		return null;
-        }	
+        }
         return changesDb.getChangesProject();
 	}
 
+	@Override
 	public String getName() {
 		return "Changes Project Plugin";
 	}
@@ -187,7 +170,7 @@ public class ChangesProject extends ProjectPluginAdapter {
 	public static void displayErrors(Collection errors) {
         Iterator i = errors.iterator();
         while (i.hasNext()) {
-            Object elem = i.next();         
+            Object elem = i.next();
             if (elem instanceof Throwable) {
                 Log.getLogger().log(Level.WARNING, "Warnings at loading changes project", (Throwable)elem);
             } else if (elem instanceof MessageError) {
