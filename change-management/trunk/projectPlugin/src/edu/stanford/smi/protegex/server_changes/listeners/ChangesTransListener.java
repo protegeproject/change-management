@@ -3,12 +3,12 @@ package edu.stanford.smi.protegex.server_changes.listeners;
 import edu.stanford.smi.protege.event.TransactionEvent;
 import edu.stanford.smi.protege.event.TransactionListener;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protegex.server_changes.ChangesDb;
+import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.TransactionState;
 
 public class ChangesTransListener implements TransactionListener {
-    private ChangesDb changes_db;
+    private PostProcessorManager changes_db;
     
     public ChangesTransListener(KnowledgeBase currentKB) {
         changes_db = ChangesProject.getChangesDb(currentKB);
