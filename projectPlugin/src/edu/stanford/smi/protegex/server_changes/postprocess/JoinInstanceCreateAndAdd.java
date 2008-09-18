@@ -5,27 +5,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.stanford.smi.protege.model.Instance;
+import edu.stanford.bmir.protegex.chao.change.api.Change;
+import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
+import edu.stanford.bmir.protegex.chao.change.api.Composite_Change;
+import edu.stanford.bmir.protegex.chao.change.api.Individual_Added;
+import edu.stanford.bmir.protegex.chao.change.api.Individual_Created;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
 import edu.stanford.smi.protege.server.RemoteSession;
-import edu.stanford.smi.protegex.server_changes.ChangesDb;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeCls;
-import edu.stanford.smi.protegex.server_changes.model.generated.Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Composite_Change;
-import edu.stanford.smi.protegex.server_changes.model.generated.Individual_Added;
-import edu.stanford.smi.protegex.server_changes.model.generated.Individual_Created;
-import edu.stanford.smi.protegex.server_changes.model.generated.Ontology_Component;
+import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 
 public class JoinInstanceCreateAndAdd implements PostProcessor {
-    
-    private ChangesDb changes_db;
-    
+
+    private PostProcessorManager changes_db;
+
     private boolean owl;
-    
+
     private Map<RemoteSession, Individual_Created> lastCreateBySession = new HashMap<RemoteSession, Individual_Created>();
 
     public void addChange(Change change) {
-        if (owl) return;
-        
+        if (owl) {
+			return;
+		}
+
         RemoteSession session = changes_db.getCurrentSession();
         if (change instanceof Individual_Created) {
             lastCreateBySession.put(session, (Individual_Created) change);
@@ -33,21 +34,23 @@ public class JoinInstanceCreateAndAdd implements PostProcessor {
         }
         if (change instanceof Individual_Added) {
             Individual_Created create_op = lastCreateBySession.remove(session);
-            Ontology_Component created = (Ontology_Component) change.getApplyTo();
-            if (create_op == null || !created.equals(change.getApplyTo())) return;
-            
-            List<Instance> subChanges = new ArrayList<Instance>();
+            Ontology_Component created = change.getApplyTo();
+            if (create_op == null || !created.equals(change.getApplyTo())) {
+				return;
+			}
+
+            List<Change> subChanges = new ArrayList<Change>();
             subChanges.add(create_op);
             subChanges.add(change);
-            
-            Composite_Change transaction = (Composite_Change) changes_db.createChange(ChangeCls.Composite_Change);
+
+            Composite_Change transaction = new ChangeFactory(changes_db.getChangesKb()).createComposite_Change(null);
             transaction.setSubChanges(subChanges);
-            changes_db.finalizeChange(transaction, (Ontology_Component) create_op.getApplyTo(), 
+            changes_db.finalizeChange(transaction, create_op.getApplyTo(),
                                       "Created Instance " + created.getCurrentName());
         }
     }
 
-    public void initialize(ChangesDb changes_db) {
+    public void initialize(PostProcessorManager changes_db) {
         this.changes_db = changes_db;
         owl = changes_db.isOwl();
     }
