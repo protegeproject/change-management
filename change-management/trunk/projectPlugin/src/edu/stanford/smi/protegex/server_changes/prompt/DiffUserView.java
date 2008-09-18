@@ -33,9 +33,9 @@ import edu.stanford.smi.protegex.owl.model.OWLModel;
 
 public class DiffUserView extends JPanel {
 	private static final long serialVersionUID = 3771686927172752103L;
-    
+
     private boolean isOwl;
-    
+
     protected KnowledgeBase kb1;
     protected KnowledgeBase kb2;
 
@@ -45,15 +45,15 @@ public class DiffUserView extends JPanel {
 	private UserConceptList userConceptLists;
 
 	protected AuthorManagement authorManagement;
-	
+
 	public enum UserColumn {
 	    USER("User"), CHANGED("Changed"), CONFLICTS("Conflicts"), CONFLICTS_WITH("Conflicts with");
-	    
+
 	    private String name;
 	    private UserColumn(String name) {
 	        this.name = name;
 	    }
-	    
+
 	    public String getName() {
 	        return name;
 	    }
@@ -62,7 +62,7 @@ public class DiffUserView extends JPanel {
 	public DiffUserView(KnowledgeBase old_kb, KnowledgeBase new_kb) {
 	    kb1 = old_kb;
 	    kb2 = new_kb;
-        isOwl = (new_kb instanceof OWLModel);
+        isOwl = new_kb instanceof OWLModel;
 	}
 
 	public void setAuthorManagement(AuthorManagement authorManagement) {
@@ -70,7 +70,7 @@ public class DiffUserView extends JPanel {
 		getUserConceptList().setAuthorManagement(authorManagement);
 		initialize();
 	}
-	
+
 	protected UserConceptList getUserConceptList() {
 	    if (userConceptLists == null) {
 	        userConceptLists = new UserConceptList(kb1, kb2);
@@ -85,7 +85,7 @@ public class DiffUserView extends JPanel {
 		initializeUserTable();
 		add(buildGUI(), BorderLayout.CENTER);
 	}
-    
+
     private void reinitialize() {
         authorManagement.reinitialize();
         userTable.setModel(createTableModel());
@@ -106,7 +106,8 @@ public class DiffUserView extends JPanel {
             private static final long serialVersionUID = 6503930747934822085L;
             private List<String> users = new ArrayList<String>(authorManagement.getUsers());
 
-            public boolean isCellEditable(int row, int col) {
+            @Override
+			public boolean isCellEditable(int row, int col) {
 				return false;
 			}
 
@@ -126,7 +127,7 @@ public class DiffUserView extends JPanel {
                 int conceptsNotInConflict = authorManagement.getFilteredUnConflictedFrames(user).size();
                 int conceptsInConflict = authorManagement.getFilteredConflictedFrames(user).size();
                 String conflictsWith = authorManagement.getUsersInConflictWith(user).toString();
-                
+
                 switch (UserColumn.values()[columnIndex])  {
                 case USER:
                     return user;
@@ -140,10 +141,10 @@ public class DiffUserView extends JPanel {
                     return null;
                 }
             }
-            
+
 		};
 	}
-	
+
 	public Collection<String> getSelectedUsers() {
 
 		Collection<String> selection = new ArrayList<String>();
@@ -154,13 +155,13 @@ public class DiffUserView extends JPanel {
 		}
 
 		TableModel model = userTable.getModel();
-		for (int i = 0; i < indices.length; i++) {
-			selection.add((String) model.getValueAt(indices[i], UserColumn.USER.ordinal()));
+		for (int indice : indices) {
+			selection.add((String) model.getValueAt(indice, UserColumn.USER.ordinal()));
 		}
 
 		return selection;
 	}
-	
+
 	public void setSelectedUsers(Collection<String> users) {
 	    TableModel model = userTable.getModel();
 	    ListSelectionModel selectionModel = userTable.getSelectionModel();
@@ -196,7 +197,7 @@ public class DiffUserView extends JPanel {
 					}
 				});
 	}
-    
+
     private JComponent getHeaderComponent() {
         JPanel panel = new JPanel();
         BoxLayout layout = new BoxLayout(panel, BoxLayout.X_AXIS);
@@ -217,7 +218,7 @@ public class DiffUserView extends JPanel {
         });
         return button;
     }
-    
+
     private void popupFiltersDialog() {
 
         final FilterPanel filterPanel = new FilterPanel(isOwl, authorManagement.getFilters());
@@ -235,7 +236,7 @@ public class DiffUserView extends JPanel {
         });
 
 	}
-    
+
     private JComponent getRefreshButton() {
         JButton button = new JButton("Recalculate");
         button.setSize(button.getMinimumSize());
