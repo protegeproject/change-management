@@ -5,34 +5,34 @@ import java.util.Collection;
 
 import javax.swing.table.AbstractTableModel;
 
-import edu.stanford.smi.protege.model.Cls;
+import edu.stanford.bmir.protegex.chao.annotation.api.Annotation;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Timestamp;
+import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protegex.server_changes.model.generated.Annotation;
-import edu.stanford.smi.protegex.server_changes.model.generated.Timestamp;
 
 /**
  * The tabel model for the annotation specific table
  *
  */
 public class AnnotationTableModel extends AbstractTableModel{
-    
+
     public enum Column {
         ANNOTATE_COLNAME_TYPE("Type"),
         ANNOTATE_COLNAME_COMMENTS("Description"),
         ANNOTATE_COLNAME_AUTHOR("Author"),
         ANNOTATE_COLNAME_CREATED("Created");
-        
+
         private String name;
-        
+
         private Column(String name) {
             this.name = name;
         }
-        
+
         public String getName() {
             return name;
         }
-        
+
         public int getColumn() {
             return ordinal();
         }
@@ -48,10 +48,10 @@ public class AnnotationTableModel extends AbstractTableModel{
 	private String[] colNames;
 	private ArrayList<Annotation> data;
 	private KnowledgeBase changeKB;
-	
+
 	public AnnotationTableModel(KnowledgeBase changeKB) {
 		this.changeKB = changeKB;
-		
+
 		// Setup the table column size/names
 
         Column[] cols = Column.values();
@@ -59,15 +59,15 @@ public class AnnotationTableModel extends AbstractTableModel{
         for (int i = 0; i < cols.length; i++) {
             colNames[i] = cols[i].getName();
         }
-		
+
 		data = new ArrayList<Annotation>();
 	}
-	
+
 	public void update() {
 		fireTableDataChanged();
 	}
-	
-	
+
+
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableModel#getRowCount()
 	 */
@@ -86,76 +86,76 @@ public class AnnotationTableModel extends AbstractTableModel{
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableModel#getColumnName(int)
 	 */
+	@Override
 	public String getColumnName(int column) {
         if (column >= 0 && column <= colNames.length) {
             return colNames[column];
         }
         return "";
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableModel#getColumnClass(int)
 	 */
+	@Override
 	public Class getColumnClass(int c) {
 		if (getValueAt(0, c) == null) {
 			return String.class;
 		}
 		return getValueAt(0, c).getClass();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableModel#getValueAt(int, int)
 	 */
 	public Object getValueAt(int row, int col) {
-		
+
 		// This is the instance object,
 		// get the particular piece of info out of it.
 		Annotation aInst = data.get(row);
-		
+
 		if (aInst == null) {
-			return "";			
+			return "";
 		}
-		
-		Cls annotType = aInst.getDirectType();
-		
+
         if (col < 0 || col >= Column.values().length) {
             return "";
         }
 		switch(Column.values()[col]) {
         case ANNOTATE_COLNAME_TYPE:
-            return annotType.getName(); 
-        case ANNOTATE_COLNAME_COMMENTS: 
+            return aInst.getClass().getSimpleName();
+        case ANNOTATE_COLNAME_COMMENTS:
             return aInst.getBody();
 		case ANNOTATE_COLNAME_AUTHOR:
 			return aInst.getAuthor();
 		case ANNOTATE_COLNAME_CREATED: {
-			Timestamp ts = (Timestamp) aInst.getCreated(); 
-			return (ts == null ? "" : ts.getDate());
+			Timestamp ts = aInst.getCreated();
+			return ts == null ? "" : ts.getDate();
 		}
 
 		}
-		
+
 		return "";
 	}
-	
+
 	public Object getObjInRow(int row) {
 		Instance aInst = (Instance) data.get(row);
 		return aInst;
 	}
-	
+
 	/**
 	 * @param index
 	 * @return Returns the instance name associated with the given index in the table
 	 */
 	public String getInstanceName(int index) {
 		String name;
-		
-		Instance annotate = (Instance)data.get(index);
-		name = annotate.getName();
-		
+
+		Annotation annotation = data.get(index);
+		name = ((AbstractWrappedInstance)annotation).getWrappedProtegeInstance().getName();
+
 		return name;
 	}
-	
+
 	/**
 	 * @param annotate
 	 * Add the given annotation to the internal data structure of instances
@@ -164,7 +164,7 @@ public class AnnotationTableModel extends AbstractTableModel{
 		data.add(annotate);
 		fireTableRowsInserted(data.size()-1, data.size()-1);
 	}
-	
+
 	/**
 	 * @param index
 	 * Remove the given annotation with the associated index
@@ -172,9 +172,9 @@ public class AnnotationTableModel extends AbstractTableModel{
 	public void removeAnnotationData(int index) {
 		data.remove(index);
 		fireTableRowsDeleted(data.size()-1, data.size()-1);
-		
+
 	}
-	
+
 	/**
 	 * @param indicies
 	 * Remove the given annotations associated with the given indicies
@@ -185,7 +185,7 @@ public class AnnotationTableModel extends AbstractTableModel{
 		}
 		fireTableRowsDeleted(data.size()-1, data.size()-1);
 	}
-	
+
 	/**
 	 * @param annotate
 	 * @param index
@@ -196,10 +196,10 @@ public class AnnotationTableModel extends AbstractTableModel{
 		data.add(index, (Annotation) annotate);
 		fireTableDataChanged();
 	}
-	
+
 	public void setAnnotations(Collection<Annotation> annotations) {
 		data = new ArrayList<Annotation>(annotations);
-		
+
 		update();
 	}
 }

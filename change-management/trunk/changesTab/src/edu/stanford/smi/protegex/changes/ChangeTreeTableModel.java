@@ -4,35 +4,34 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import edu.stanford.smi.protege.model.Instance;
+import edu.stanford.bmir.protegex.chao.change.api.Change;
+import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
+import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.changes.ui.AbstractTreeTableModel;
 import edu.stanford.smi.protegex.changes.ui.TreeTableModel;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel;
-import edu.stanford.smi.protegex.server_changes.model.ChangeModel.ChangeSlot;
-import edu.stanford.smi.protegex.server_changes.model.generated.Change;
 
 public class ChangeTreeTableModel extends AbstractTreeTableModel implements TreeTableModel{
     private static final transient Logger log = Log.getLogger(ChangeTreeTableModel.class);
-	
+
 	private String[] colNames;
-    
+
     private RootTreeTableNode root;
-    
+
     private Slot partOfCompositeChangeSlot;
     private Slot subChangesSlot;
-	
-	
-	public ChangeTreeTableModel(ChangeModel model) {
+
+
+	public ChangeTreeTableModel(KnowledgeBase changesKb) {
 		super(new RootTreeTableNode());
         root = (RootTreeTableNode) super.root;
- 
-        partOfCompositeChangeSlot = model.getSlot(ChangeSlot.partOfCompositeChange);
-        subChangesSlot = model.getSlot(ChangeSlot.subChanges);
+        ChangeFactory factory = new ChangeFactory(changesKb);
+        partOfCompositeChangeSlot = factory.getPartOfCompositeChangeSlot();
+        subChangesSlot = factory.getSubChangesSlot();
 		init();
 	}
-    
+
 
 	// init the column names, data structures
 	private void init() {
@@ -42,15 +41,16 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
             colNames[i] = cols[i].getName();
         }
 	}
-	
-	
+
+
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableModel#getColumnCount()
 	 */
 	public int getColumnCount() {
 		return colNames.length;
 	}
-	
+
+	@Override
 	public Class getColumnClass(int column) {
 		return column == 0 ? TreeTableModel.class : Object.class;
     }
@@ -64,7 +64,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
         }
         return colNames[column];
 	}
-	
+
 
 
 	public int getChildCount(Object node) {
@@ -79,25 +79,28 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
 	public Object getValueAt(Object node, int col) {
 	    return ((TreeTableNode) node).getValueAt(col);
 	}
-	
 
-   public void setValueAt(Object aValue, Object node, int column) {
+
+   @Override
+public void setValueAt(Object aValue, Object node, int column) {
    	((TreeTableNode) node).setValueAt(aValue, column);
    }
 
-	
+
    public void addChangeData(Change changeInst) {
        addChangeData(changeInst, true);
    }
 
    private void addChangeData(Change changeInst,  boolean completeUpdate) {
-       ChangeModel.logAnnotatableThing("adding change to ui model", log, Level.FINE, changeInst);
-       if (ChangeModel.isRoot(changeInst)) return;
-       
+       ChangeProjectUtil.logAnnotatableThing("adding change to ui model", log, Level.FINE, changeInst);
+       if (ChangeProjectUtil.isRoot(changeInst)) {
+		return;
+	}
+
        ChangeTreeTableNode node = new ChangeTreeTableNode(root, changeInst);
        TreeTableNode parent = node.getParent();
        if (parent.isRoot()) {
-           int index = ((RootTreeTableNode) root).addChild(node);
+           int index = root.addChild(node);
            if (index >= 0) {
                int childIndices[] = { index };
                Object children[] = { node };
@@ -118,7 +121,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
    }
 
    public void update(Change changeInst, Slot slot, List oldValues) {
-       ChangeModel.logAnnotatableThing("Updating ui model with slot = " + slot, log, Level.FINE, changeInst);
+       ChangeProjectUtil.logAnnotatableThing("Updating ui model with slot = " + slot, log, Level.FINE, changeInst);
        if (slot.equals(partOfCompositeChangeSlot)) {
            removeFromParent(changeInst, oldValues);
        }
@@ -126,7 +129,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
            updateChildren(new ChangeTreeTableNode(root, changeInst));
        }
    }
-   
+
    private void removeFromParent(Change change, List oldValues) {
        TreeTableNode parent;
        if (oldValues == null || oldValues.isEmpty()) {
@@ -148,7 +151,7 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
            updateChildren(parent);
        }
    }
-   
+
    private void updateChildren(TreeTableNode parent) {
        Object[] children = parent.getChildren();
        int childIndices[] = new int[children.length];
@@ -158,31 +161,31 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
        fireTreeStructureChanged(parent, makePath(parent), childIndices, children);
    }
 
-	
+
 	public void cancelQuery() {
 		setNewFilter();
 	}
-	
+
 	public void setSearchQuery(String field, String text) {
 		setNewSearch(field, text);
 	}
-	
-	
+
+
 	private void setNewSearch(String field, String text) {
 	    throw new UnsupportedOperationException("fix me");
 	}
-	
-	
+
+
 	public Object getObjInRow(int row) {
         // this is extremely massively suspect...
-		Instance aInst = ((ChangeTreeTableNode) root.getChildAt(row)).getChange();
+		Change aInst = ((ChangeTreeTableNode) root.getChildAt(row)).getChange();
 		return aInst;
 	}
-	
+
 	private void setNewFilter() {
 	    throw new UnsupportedOperationException("fix me");
 	}
-    
+
     private Object[] makePath(TreeTableNode node) {
         int len = 1;
         for (TreeTableNode climber = node; !climber.isRoot(); climber = climber.getParent()) {
