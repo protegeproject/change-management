@@ -59,6 +59,7 @@ import edu.stanford.smi.protegex.changes.listeners.ChangesListener;
 import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
 import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
 import edu.stanford.smi.protegex.changes.ui.JTreeTable;
+import edu.stanford.smi.protegex.server_changes.ChangesProject;
 
 /**
  * Change Management Tab widget
@@ -136,8 +137,13 @@ public class ChangesTab extends AbstractTabWidget {
 	public void initialize() {
 		setLabel(CHANGES_TAB_NAME);
 
+		if (!ChangesProject.isInitialized(getProject())) {
+		    ChangesProject.initialize(getProject());
+		}
+		
 		currentKB = getKnowledgeBase();
 		changes_kb = ChAOKbManager.getChAOKb(currentKB);
+
 
 		initTables();
 		loadExistingData();
