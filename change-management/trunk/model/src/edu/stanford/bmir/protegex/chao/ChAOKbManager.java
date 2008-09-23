@@ -166,7 +166,13 @@ public class ChAOKbManager {
 			}
 			return chaoPrj != null ? chaoPrj.getKnowledgeBase() : null;
 		}
-		return null;
+		else {
+		    /*
+		     * ToDo Tania - this originally returned null.  Caused trouble with the first time the 
+		     * changes tab was opened.  Is there any reason not to create it here?
+		     */
+		    return createRDFFileChAOKb(kb, annotationProjURI);
+		}
 	}
 
 	public static URI getChAOProjectURI(KnowledgeBase kb) {
@@ -243,8 +249,9 @@ public class ChAOKbManager {
 	}
 
 	private static void putInMap(KnowledgeBase kb, KnowledgeBase chaoKb) {
-		kb2chaoKb.put(kb, chaoKb);
-		kb.getProject().addProjectListener(kbListener);
+		if (kb2chaoKb.put(kb, chaoKb) == null) {
+		    kb.getProject().addProjectListener(kbListener);
+		}
 	}
 
 	private static void removeFromMap(KnowledgeBase kb) {
