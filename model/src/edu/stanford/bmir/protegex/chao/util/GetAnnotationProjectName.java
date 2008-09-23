@@ -17,33 +17,12 @@ public class GetAnnotationProjectName extends ProtegeJob {
     }
 
     @Override
-    public Object run() throws ProtegeException {
-        Server server = Server.getInstance();
-        KnowledgeBase metaProject = server.getMetaProject();
-        SimpleInstance myProjectInstance = getMyProjectInstance(server);
-        Slot annotationProjectSlot = metaProject.getSlot(METAPROJECT_ANNOTATION_PROJECT_SLOT);
-        
-        if (annotationProjectSlot == null) {
-        	return null;
-        }
-        
-        Object value = myProjectInstance.getDirectOwnSlotValue(annotationProjectSlot);
-        return ((SimpleInstance) value).getDirectOwnSlotValue(server.getNameSlot());
+    public String run() throws ProtegeException {
+        return getMetaProjectInstance().getAnnotationProject().getName();
     }
-    
-    private SimpleInstance getMyProjectInstance(Server server) {
-        Project myProject = getKnowledgeBase().getProject();
-        for (Object o : server.getProjectCls().getInstances()) {
-            if (o instanceof SimpleInstance) {
-                SimpleInstance projectInstance = (SimpleInstance) o;
-                Object name = projectInstance.getDirectOwnSlotValue(server.getNameSlot());
-                if (name instanceof String &&
-                        myProject.equals(server.getProject((String) name))) {
-                    return projectInstance;
-                }
-            }
-        }
-        throw new IllegalStateException("Sorry - the caller doesn't seem to have a project!");
+
+    public String execute() {
+        return (String) super.execute();
     }
     
 }
