@@ -21,7 +21,10 @@ import edu.stanford.smi.protege.model.framestore.FrameStoreManager;
 import edu.stanford.smi.protege.server.RemoteProjectManager;
 import edu.stanford.smi.protege.server.RemoteServer;
 import edu.stanford.smi.protege.server.RemoteSession;
+import edu.stanford.smi.protege.server.Server;
 import edu.stanford.smi.protege.server.framestore.RemoteClientFrameStore;
+import edu.stanford.smi.protege.server.metaproject.MetaProject;
+import edu.stanford.smi.protege.server.metaproject.ProjectInstance;
 import edu.stanford.smi.protege.storage.database.DatabaseKnowledgeBaseFactory;
 import edu.stanford.smi.protege.ui.ProjectManager;
 import edu.stanford.smi.protege.util.Log;
@@ -75,8 +78,12 @@ public class ChAOKbManager {
 		}
 		try {
 			if (kb.getProject().isMultiUserClient()) {
-				changesKb = getServerSideChangeKb(kb);
-			} else {
+				changesKb = getChAOKbFromServer(kb);
+			}
+			else if (kb.getProject().isMultiUserServer()) {
+			    changesKb = getChAOKbOnServer(kb);
+			}
+			else {
 				changesKb = getFileBasedChAOKb(kb);
 			}
 			putInMap(kb, changesKb);
@@ -125,7 +132,7 @@ public class ChAOKbManager {
 		throw new RuntimeException(new OperationNotSupportedException());
 	}
 
-	private static KnowledgeBase getServerSideChangeKb(KnowledgeBase kb) {
+	private static KnowledgeBase getChAOKbFromServer(KnowledgeBase kb) {
 		String annotationName = (String) new GetAnnotationProjectName(kb).execute();
 		if (annotationName == null) {
 			Log.getLogger().warning("Annotation/Change project not configured on server (use " +
@@ -146,6 +153,25 @@ public class ChAOKbManager {
 		}
 		Project changes_project = project_manager.connectToProject(server, session, annotationName);
 		return changes_project == null ? null: changes_project.getKnowledgeBase();
+	}
+	
+	private static KnowledgeBase getChAOKbOnServer(KnowledgeBase kb) {
+	    Server server = Server.getInstance();
+	    String serverProjectName = null;
+	    // ToDo - this is very awkward and inefficient (each call involves io)
+	    for (String name : server.getAvailableProjectNames(null)) {
+	        if (server.getProject(name).equals(kb.getProject())) {
+	            serverProjectName = name;
+	            break;
+	        }
+	    }
+	    if (serverProjectName != null) {
+	        MetaProject mp = server.getMetaProjectNew();
+	        ProjectInstance pi = mp.getProject(serverProjectName);
+	        String chaoProjectName = pi.getAnnotationProject().getName();
+	        return server.getProject(chaoProjectName).getKnowledgeBase();
+	    }
+	    return null;
 	}
 
 	private static KnowledgeBase getFileBasedChAOKb(KnowledgeBase kb) {
