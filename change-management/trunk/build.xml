@@ -1,26 +1,33 @@
 <?xml version = "1.0" encoding = "utf-8"?>
-<project name = "Query Plugin" default = "dist" basedir = ".">    
+<project name = "Change Management" default = "dist" basedir = ".">    
    <property environment="env"/>
    <property name="protege.home" value="${env.PROTEGE_HOME}"/>
 
-   <property name = "kbViewTab.src"   value = "./changesKbViewTab/src"/>
-   <property name = "pplugin.src"     value = "./projectPlugin/src"/>
-   <property name = "stats.src"       value="./changeStats/src"/>
-   <property name = "tab.src"         value = "./changesTab/src"/>  
+   <property name = "build"              value = "./build"/>
+   <property name = "annotation.classes" value = "${build}/classes/chao-annotation"/>
+   <property name = "component.classes"  value = "${build}/classes/chao-component"/>
+   <property name = "changelib.classes"  value = "${build}/classes/chao-changes"/>
+   <property name = "util.classes"       value = "${build}/classes/chao-util"/>
+   <property name = "plugin.classes"     value = "${build}/classes/plugin"/>
 
+   <property name = "plugin.dist"     value = "edu.stanford.smi.protegex.changes"/>
+   <property name = "plugin.dir"      location = "${build}/plugins/${plugin.dist}"/>
+   <property name = "annotation.jar"  location = "${plugin.dir}/chao-annotation.jar"/>
+   <property name = "component.jar"   location = "${plugin.dir}/chao-component.jar"/>
+   <property name = "changelib.jar"   location = "${plugin.dir}/chao-changes.jar"/>
+   <property name = "util.jar"        location = "${plugin.dir}/chao-util.jar"/>
+   <property name = "plugin.jar"      location = "${plugin.dir}/change-management.jar"/>
 
-   <property name = "model.src"       value = "./model/src"/>
-   <property name = "model.jar"       value = "change-model.jar"/>
+   <property name = "distribution"    location = "${build}/change-management.zip"/>
 
-   <property name = "build"           value = "./build"/>
-   <property name = "classes"         value = "${build}/classes"/>
-   <property name = "model.classes"   value = "${build}/model.classes"/>  
-   <property name = "plugins"         value = "${build}/plugins"/>
+   <property name = "plugin.manifest" location = "${build}/plugin-manifest.mf"/>
+   <property name = "lib.manifest"    location = "${build}/lib-manifest.mf"/>
+
    <property name = "lib"             value = "./lib"/>
    <property name = "junit"           value = "./junit"/>
-   <property name = "plugin_dist"     value = "edu.stanford.smi.protegex.changes"/>
-   <property name = "pluginName"      value = "change-management"/>
 
+
+   <property name = "debug"           value = "true"/>
 
     <!-- 
        #  ********** Finding Protege Libraries. *************
@@ -65,7 +72,6 @@
         <pathelement location = "${owl.lib}"/>
         <pathelement location = "${rdf.lib}"/> 
         <pathelement location = "${lib}/icu4j.jar"/>
-        <pathelement location = "${model.classes}"/>
       </path>
 
     </target>
@@ -91,89 +97,128 @@
        <format property="build.time" pattern="MM/dd/yyyy hh:mm aa"/>
      </tstamp>
      <mkdir dir = "${build}"/>
-     <mkdir dir = "${classes}"/>
-     <mkdir dir = "${model.classes}"/>
-     <mkdir dir = "${plugins}"/>
-     <mkdir dir = "${plugins}/${plugin_dist}"/>
    </target>  
 
-   <target name = "generateModel" depends = "checkProtegeLibsAndReport">
-     <fail unless="protege.home.set"
-           message="in place model generation not supported yet"/>
-     <java classname="edu.stanford.smi.protegex.jsave.protege2java" fork="true" failonerror="true">
-       <classpath>
-         <pathelement location = "${protege.lib}"/>
-         <pathelement location = "${lib}/jsave.jar"/>
-       </classpath>
-       <jvmarg value="-Dprotege.dir=${protege.home}"/>
-       <arg value="jsave.cfg"/>
-     </java>
-   </target> 
-
    <target name = "compile" depends = "init, checkProtegeLibsAndReport">
-     <javac srcdir = "${model.src}"
-            destdir = "${model.classes}" debug="on" includeAntRuntime="false">
-       <classpath refid = "project.classpath"/>  
+     <mkdir dir="${annotation.classes}"/>
+     <javac srcdir="model/src" 
+            destdir="${annotation.classes}"
+            debug="${debug}">
+       <include name = "edu/stanford/bmir/protegex/chao/annotation/api/**/*.java"/>
+       <classpath refid = "project.classpath"/>
      </javac>
-     <javac srcdir = "${pplugin.src}:${tab.src}:${kbViewTab.src}:${stats.src}" 
-            destdir = "${classes}" debug="on" includeAntRuntime="false">
-       <classpath refid = "project.classpath"/>  
+
+     <mkdir dir="${component.classes}"/>
+     <javac srcdir="model/src"
+            destdir="${component.classes}"
+            debug="${debug}">
+       <include name = "edu/stanford/bmir/protegex/chao/ontologycomp/api/**/*.java"/>
+       <classpath refid = "project.classpath"/>
      </javac>
+
+     <mkdir dir="${changelib.classes}"/>
+     <javac srcdir="model/src"
+            destdir="${changelib.classes}"
+            debug="${debug}">
+       <include name = "edu/stanford/bmir/protegex/chao/change/api/**/*.java"/>
+       <classpath refid = "project.classpath"/>
+       <classpath>
+         <pathelement location = "${annotation.classes}"/>
+         <pathelement location = "${component.classes}"/>
+       </classpath>
+     </javac>
+
+     <mkdir dir="${util.classes}"/>
+     <javac srcdir="model/src"
+            destdir="${util.classes}"
+            debug="${debug}">
+       <include name = "edu/stanford/bmir/protegex/chao/*.java"/>
+       <include name = "edu/stanford/bmir/protegex/chao/util/**/*.java"/>
+       <classpath refid = "project.classpath"/>
+       <classpath>
+         <pathelement location = "${annotation.classes}"/>
+         <pathelement location = "${component.classes}"/>
+         <pathelement location = "${changelib.classes}"/>
+       </classpath>
+     </javac>
+
+     <mkdir dir="${plugin.classes}"/>
+     <javac destdir="${plugin.classes}"
+            debug="${debug}">
+       <src path = "changesKbViewTab/src"/>
+       <src path = "changesTab/src"/>
+       <src path = "changeStats/src"/>
+       <src path = "projectPlugin/src"/>
+       <classpath refid = "project.classpath"/>
+       <classpath>
+         <pathelement location = "${annotation.classes}"/>
+         <pathelement location = "${component.classes}"/>
+         <pathelement location = "${changelib.classes}"/>
+         <pathelement location = "${util.classes}"/>
+       </classpath>
+     </javac>
+
    </target>
 
-   <target name = "jar" depends = "compile">
-     <copy todir="${build}" 
-           file="${tab.src}/META-INF/MANIFEST.MF" overwrite="true"/>
-     <manifest file="${build}/MANIFEST.MF" 
+   <target name = "manifests">
+     <copy tofile="${plugin.manifest}" 
+           file="changesTab/src/META-INF/MANIFEST.MF" 
+           overwrite="true"/>
+     <manifest file="${plugin.manifest}"
                mode = "update">
         <attribute name="Built-By" value = "${user.name}"/>
         <attribute name="Build-Date" value = "${build.time}"/>
      </manifest>
-     <jar jarfile = "${plugins}/${plugin_dist}/${model.jar}" 
-          basedir = "${model.classes}" />
-     <jar jarfile = "${plugins}/${plugin_dist}/${pluginName}.jar" 
-          basedir = "${classes}" 
-          manifest = "${build}/MANIFEST.MF"/>
-     <copy file = "${lib}/icu4j.jar"
-           todir = "${plugins}/${plugin_dist}"/>
-     <copy file = "plugin.properties"
-           todir = "${plugins}/${plugin_dist}"/>
-     <copy todir = "${plugins}/${plugin_dist}/projects">
-        <fileset dir="projects"/>
-     </copy>
+     <manifest file="${lib.manifest}">
+        <attribute name="Built-By" value = "${user.name}"/>
+        <attribute name="Build-Date" value = "${build.time}"/>
+     </manifest>
+   </target>
+
+   <target name = "jar" depends = "compile,manifests">
+     <mkdir dir="${plugin.dir}"/>
+     <jar destfile = "${annotation.jar}"
+          manifest = "${lib.manifest}"
+          basedir = "${annotation.classes}"/>
+
+     <jar destfile = "${component.jar}"
+          manifest = "${lib.manifest}"
+          basedir = "${component.classes}"/>
+
+     <jar destfile = "${changelib.jar}"
+          manifest = "${lib.manifest}"
+          basedir = "${changelib.classes}"/>
+
+     <jar destfile = "${util.jar}"
+          manifest = "${lib.manifest}"
+          basedir = "${util.classes}"/>
+
+     <jar destfile = "${plugin.jar}"
+          manifest = "${plugin.manifest}"
+          basedir  = "${plugin.classes}"/>
    </target>
 
    <target name = "dist" depends = "jar">
-     <zip basedir = "${plugins}"
-          includes = "${plugin_dist}/**"
-          destfile = "${build}/${pluginName}.zip"/>
+     <copy file = "${lib}/icu4j.jar" todir="${plugin.dir}"/>
+     <copy file = "plugin.properties" todir = "${plugin.dir}"/>
+     <copy todir = "${plugin.dir}/projects">
+       <fileset dir="projects"/>
+     </copy>
+     <zip basedir = "${build}/plugins"
+          destfile = "${distribution}"/>
    </target>
 
    <target name = "update" depends = "jar">
-      <fail message = "set the protege.home variable to do an install">
-         <condition>
-            <not>
-              <isset property="protege.home"/>
-            </not>
-         </condition>
-      </fail>
-      <copy file="${plugins}/${plugin_dist}/${pluginName}.jar"
-            todir="${protege.home}/plugins/${plugin_dist}"/>
-   	  <copy file="${plugins}/${plugin_dist}/${model.jar}"
-    		todir="${protege.home}/plugins/${plugin_dist}"/>
+     <copy todir="${protege.home}/plugins/${plugin.dist}">
+       <fileset dir="${plugin.dir}"
+                includes="*.jar"/>
+     </copy>
    </target>
 
    <target name = "install" depends = "dist">
-      <fail message = "set the protege.home variable to do an install">
-         <condition>
-            <not>
-              <isset property="protege.home"/>
-            </not>
-         </condition>
-      </fail>
-      <unzip src="${build}/${pluginName}.zip" 
-             dest = "${protege.home}/plugins"
-             overwrite = "true"/>
+     <unzip src="${distribution}"
+            dest = "${protege.home}/plugins"
+            overwrite = "true"/>
    </target>
 
    <target name = "clean">
