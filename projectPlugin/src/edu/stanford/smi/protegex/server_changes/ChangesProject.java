@@ -31,7 +31,7 @@ import edu.stanford.smi.protegex.server_changes.util.Util;
 
 public class ChangesProject extends ProjectPluginAdapter {
 
-    private static Map<KnowledgeBase, PostProcessorManager> changesDbMap = new HashMap<KnowledgeBase, PostProcessorManager>();
+    private static Map<KnowledgeBase, PostProcessorManager> postProcessorManagerMap = new HashMap<KnowledgeBase, PostProcessorManager>();
 
     /* ---------------------------- Project Plugin Interfaces ---------------------------- */
 	@Override
@@ -62,7 +62,7 @@ public class ChangesProject extends ProjectPluginAdapter {
             	//FIXME: don't dispose for now. The ChAOKBManager should handle this.
                 //changesDb.getChangesKb().dispose();
             }
-            changesDbMap.remove(kb);
+            postProcessorManagerMap.remove(kb);
         }
     }
 
@@ -88,7 +88,7 @@ public class ChangesProject extends ProjectPluginAdapter {
     }
 
     public static boolean isInitialized(Project p) {
-        return changesDbMap.get(p.getKnowledgeBase()) != null;
+        return postProcessorManagerMap.get(p.getKnowledgeBase()) != null;
     }
 
 	public static void initialize(Project p) {
@@ -98,9 +98,9 @@ public class ChangesProject extends ProjectPluginAdapter {
 		Project currentProj = p;
 		KnowledgeBase currentKB = currentProj.getKnowledgeBase();
 
-		createChangeProject(currentKB);
+		installPostProcessors(currentKB);
 
-        PostProcessorManager changesDb = changesDbMap.get(currentKB);
+        PostProcessorManager changesDb = postProcessorManagerMap.get(currentKB);
         KnowledgeBase changesKb = changesDb.getChangesKb();
         Project changesProj = changesDb.getChangesProject();
 		if (changesKb == null) {
@@ -111,18 +111,17 @@ public class ChangesProject extends ProjectPluginAdapter {
 		//Check to see if the project is an OWL one
 		boolean isOwlProject = Util.kbInOwl(currentKB);
 
+		if (p.isMultiUserServer()) {
+		    ServerFrameStore.requestEventDispatch(currentKB);
+		    ((DefaultKnowledgeBase) changesKb).setCacheMachine(new ChangeOntStateMachine(changesKb));
+		}
+		
 		// Register listeners
 		if (isOwlProject) {
 			ChangesProjectOWL.registerOwlListeners(currentKB);
 		} else {
 			registerKBListeners(currentKB);
 		}
-
-		if (changesProj.isMultiUserServer()) {
-			ServerFrameStore.requestEventDispatch(currentKB);
-            ((DefaultKnowledgeBase) changesKb).setCacheMachine(new ChangeOntStateMachine(changesKb));
-		}
-
 	}
 
 	private static void registerKBListeners(KnowledgeBase currentKB) {
@@ -135,14 +134,14 @@ public class ChangesProject extends ProjectPluginAdapter {
 	}
 
 
-	private static void createChangeProject(KnowledgeBase currentKB) {
-        PostProcessorManager changesDb = changesDbMap.get(currentKB);
-        if (changesDb == null) {
-            changesDb = new PostProcessorManager(currentKB);
-            changesDb.addPostProcessor(new AnnotationCombiner());
-            changesDb.addPostProcessor(new JoinCreateAndNameChange());
-            changesDb.addPostProcessor(new JoinInstanceCreateAndAdd());
-            changesDbMap.put(currentKB, changesDb);
+	private static void installPostProcessors(KnowledgeBase currentKB) {
+        PostProcessorManager ppm = postProcessorManagerMap.get(currentKB);
+        if (ppm == null) {
+            ppm = new PostProcessorManager(currentKB);
+            ppm.addPostProcessor(new AnnotationCombiner());
+            ppm.addPostProcessor(new JoinCreateAndNameChange());
+            ppm.addPostProcessor(new JoinInstanceCreateAndAdd());
+            postProcessorManagerMap.put(currentKB, ppm);
         }
 	}
 
@@ -152,16 +151,16 @@ public class ChangesProject extends ProjectPluginAdapter {
 	}
 
     public static PostProcessorManager getChangesDb(KnowledgeBase kb) {
-        return changesDbMap.get(kb);
+        return postProcessorManagerMap.get(kb);
     }
 
 	public static KnowledgeBase getChangesKB(KnowledgeBase kb) {
-        PostProcessorManager changesDb = changesDbMap.get(kb);
-		return changesDb == null ? null: changesDb.getChangesKb();
+        PostProcessorManager ppm = postProcessorManagerMap.get(kb);
+		return ppm == null ? null: ppm.getChangesKb();
 	}
 
 	public static Project getChangesProj(KnowledgeBase kb) {
-        PostProcessorManager changesDb = changesDbMap.get(kb);
+        PostProcessorManager changesDb = postProcessorManagerMap.get(kb);
         if (changesDb == null) {
         		return null;
         }
