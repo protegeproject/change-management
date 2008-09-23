@@ -87,8 +87,14 @@ public class ChangesProject extends ProjectPluginAdapter {
         return false;
     }
 
+    public static boolean isInitialized(Project p) {
+        return changesDbMap.get(p.getKnowledgeBase()) != null;
+    }
 
-	public void initialize(Project p) {
+	public static void initialize(Project p) {
+	    if (p.isMultiUserClient()) {
+	        return;
+	    }
 		Project currentProj = p;
 		KnowledgeBase currentKB = currentProj.getKnowledgeBase();
 
