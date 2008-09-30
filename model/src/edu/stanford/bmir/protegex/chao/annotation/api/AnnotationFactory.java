@@ -685,5 +685,17 @@ public class AnnotationFactory {
     	}
     	return null;
     }
+    
+    public Instance getWrappedProtegeInstance(AnnotatableThing thing) {
+    	if (thing instanceof AbstractWrappedInstance) {
+    		return ((AbstractWrappedInstance) thing).getWrappedProtegeInstance();
+    	}
+    	return null;
+    }
+    
+    public String getAnnotationType(Annotation annotation) {
+    	Instance protegeInst = getWrappedProtegeInstance(annotation);
+    	return protegeInst == null ? null : protegeInst.getDirectType().getBrowserText();
+    }
 
 }
