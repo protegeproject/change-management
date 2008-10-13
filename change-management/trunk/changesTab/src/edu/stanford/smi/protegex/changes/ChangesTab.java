@@ -49,6 +49,7 @@ import edu.stanford.smi.protege.ui.HeaderComponent;
 import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.LabeledComponent;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protege.util.ModalDialog;
 import edu.stanford.smi.protege.util.SelectableTable;
 import edu.stanford.smi.protege.util.ViewAction;
 import edu.stanford.smi.protege.widget.AbstractTabWidget;
@@ -137,13 +138,23 @@ public class ChangesTab extends AbstractTabWidget {
 	public void initialize() {
 		setLabel(CHANGES_TAB_NAME);
 
-		if (!ChangesProject.isInitialized(getProject())) {
-		    ChangesProject.initialize(getProject());
-		}
-		
 		currentKB = getKnowledgeBase();
 		changes_kb = ChAOKbManager.getChAOKb(currentKB);
 
+		if (changes_kb == null) {
+			int retValue = ModalDialog.showMessageDialog(this,
+					"The Changes Tab is active, but there is no associated\n" +
+					"changes and annotation ontology (ChAO) needed by the Changes Tab.\n" +
+					"Do you want to create the ChAO ontology now?\n", ModalDialog.MODE_YES_NO);
+			if (retValue == ModalDialog.OPTION_YES) {
+				changes_kb = ChAOKbManager.createRDFFileChAOKb(getKnowledgeBase(), ChAOKbManager.getChAOProjectURI(getKnowledgeBase()));
+			}
+		}
+
+		if (!ChangesProject.isInitialized(getProject())) {
+		    ChangesProject.initialize(getProject());
+		}
+		changes_kb = ChAOKbManager.getChAOKb(currentKB);
 
 		initTables();
 		loadExistingData();
