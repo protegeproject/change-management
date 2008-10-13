@@ -16,7 +16,7 @@ import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 
 public class JoinInstanceCreateAndAdd implements PostProcessor {
 
-    private PostProcessorManager changes_db;
+    private PostProcessorManager postProcessorManager;
 
     private boolean owl;
 
@@ -27,7 +27,7 @@ public class JoinInstanceCreateAndAdd implements PostProcessor {
 			return;
 		}
 
-        RemoteSession session = changes_db.getCurrentSession();
+        RemoteSession session = postProcessorManager.getCurrentSession();
         if (change instanceof Individual_Created) {
             lastCreateBySession.put(session, (Individual_Created) change);
             return;
@@ -43,16 +43,16 @@ public class JoinInstanceCreateAndAdd implements PostProcessor {
             subChanges.add(create_op);
             subChanges.add(change);
 
-            Composite_Change transaction = new ChangeFactory(changes_db.getChangesKb()).createComposite_Change(null);
+            Composite_Change transaction = new ChangeFactory(postProcessorManager.getChangesKb()).createComposite_Change(null);
             transaction.setSubChanges(subChanges);
-            changes_db.finalizeChange(transaction, create_op.getApplyTo(),
+            postProcessorManager.finalizeChange(transaction, create_op.getApplyTo(),
                                       "Created Instance " + created.getCurrentName());
         }
     }
 
-    public void initialize(PostProcessorManager changes_db) {
-        this.changes_db = changes_db;
-        owl = changes_db.isOwl();
+    public void initialize(PostProcessorManager postProcessorManager) {
+        this.postProcessorManager = postProcessorManager;
+        owl = postProcessorManager.isOwl();
     }
 
 }
