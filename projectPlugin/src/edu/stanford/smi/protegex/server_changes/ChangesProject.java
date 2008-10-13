@@ -100,9 +100,7 @@ public class ChangesProject extends ProjectPluginAdapter {
 
 		installPostProcessors(currentKB);
 
-        PostProcessorManager changesDb = postProcessorManagerMap.get(currentKB);
-        KnowledgeBase changesKb = changesDb.getChangesKb();
-        Project changesProj = changesDb.getChangesProject();
+        KnowledgeBase changesKb = ChAOKbManager.getChAOKb(currentKB);
 		if (changesKb == null) {
 			Log.getLogger().warning("Could not initialize the annotations ontology. ChangesTab will probably not work");
 			return;
@@ -115,7 +113,7 @@ public class ChangesProject extends ProjectPluginAdapter {
 		    ServerFrameStore.requestEventDispatch(currentKB);
 		    ((DefaultKnowledgeBase) changesKb).setCacheMachine(new ChangeOntStateMachine(changesKb));
 		}
-		
+
 		// Register listeners
 		if (isOwlProject) {
 			ChangesProjectOWL.registerOwlListeners(currentKB);
