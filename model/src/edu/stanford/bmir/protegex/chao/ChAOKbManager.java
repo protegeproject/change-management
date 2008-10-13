@@ -25,8 +25,8 @@ import edu.stanford.smi.protege.server.Server;
 import edu.stanford.smi.protege.server.framestore.RemoteClientFrameStore;
 import edu.stanford.smi.protege.server.metaproject.MetaProject;
 import edu.stanford.smi.protege.server.metaproject.ProjectInstance;
-import edu.stanford.smi.protege.storage.database.DatabaseKnowledgeBaseFactory;
 import edu.stanford.smi.protege.ui.ProjectManager;
+import edu.stanford.smi.protege.util.FileUtilities;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.PropertyList;
 import edu.stanford.smi.protege.util.URIUtilities;
@@ -55,22 +55,33 @@ public class ChAOKbManager {
 	 */
 	private static ProjectListener kbListener = new ProjectAdapter() {
 		/*
-		 * TODO: not clear that we should remove from map if a project is closed.
-		 * We should have a counter, that is increased when somebody gets a reference to the ChAO kb,
-		 * and decreased when the corresponding project is closed.
-		 * We should only remove the kb from the map, if the counter is 0.
-		 * Or maybe use a WeakHashMap?
+		 * TODO: Find a better solution.
+		 * The current implementation will remove from the map
+		 * the kb - changes kb association, if the domain kb is closed.
+		 * This should work for most cases. A better solution can be found,
+		 * for other cases.
 		 */
 		@Override
 		public void projectClosed(ProjectEvent event) {
 			Project project = (Project) event.getSource();
-			//FIXME:
-			Log.getLogger().info(project + " closed. ChAO KB is still active.");
-			//removeFromMap(project.getKnowledgeBase());
+			removeFromMap(project.getKnowledgeBase());
 		};
 	};
 
 
+	/**
+	 * Returns the annotations and changes KB (ChAO KB) associated to the domain kb given as argument.
+	 * This method handles the cases when the caller is:<br/>
+	 * <ol>
+	 *  <li> A standalone Protege application, </li>
+	 *	<li> A Protege multi-user client connected to a protege server.
+	 *   In this case, it will return the annotations/changes ontology associated on the server </li>
+	 *   <li> A Protege multi-user server, in which case it will
+	 *   get the CHAO kb as configured in the metaproject. </li>
+	 * </ol>
+	 * @param kb - the domain kb
+	 * @return - the associated ChAO KB, if one exists, or null otherwise
+	 */
 	public static KnowledgeBase getChAOKb(KnowledgeBase kb) {
 		KnowledgeBase changesKb = kb2chaoKb.get(kb);
 		if (changesKb != null || kb2chaoKb.containsKey(kb)) {
@@ -105,7 +116,7 @@ public class ChAOKbManager {
 		URI changeOntURI = null;
 		try {
 			changeOntURI = ChAOKbManager.class.getResource(CHAO_PRJ_INTERNAL_PATH).toURI();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			Log.getLogger().log(Level.WARNING,
 					"Could not find annotation/changes ontology in the plugins directory.", e);
 			return null;
@@ -113,7 +124,10 @@ public class ChAOKbManager {
 		ArrayList errors = new ArrayList();
 		Project chaoPrj = Project.loadProjectFromURI(changeOntURI, errors);
 		chaoPrj.setProjectURI(chaoURI);
-		setChAOProjectURI(kb, chaoURI);
+		//don't set the property, if the project was not saved
+		if (kb.getProject().getProjectDirectoryURI() != null) {
+			setChAOProjectURI(kb, chaoURI);
+		}
 
 		RDFBackend.setSourceFiles(chaoPrj.getSources(),
 				CHAO_PROJECT_NAME_PREFIX + kb.getProject().getName() + ".rdfs",
@@ -133,7 +147,7 @@ public class ChAOKbManager {
 	}
 
 	private static KnowledgeBase getChAOKbFromServer(KnowledgeBase kb) {
-		String annotationName = (String) new GetAnnotationProjectName(kb).execute();
+		String annotationName = new GetAnnotationProjectName(kb).execute();
 		if (annotationName == null) {
 			Log.getLogger().warning("Annotation/Change project not configured on server (use " +
 					GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT +
@@ -154,7 +168,7 @@ public class ChAOKbManager {
 		Project changes_project = project_manager.connectToProject(server, session, annotationName);
 		return changes_project == null ? null: changes_project.getKnowledgeBase();
 	}
-	
+
 	private static KnowledgeBase getChAOKbOnServer(KnowledgeBase kb) {
 	    Server server = Server.getInstance();
 	    String serverProjectName = null;
@@ -194,10 +208,11 @@ public class ChAOKbManager {
 		}
 		else {
 		    /*
-		     * ToDo Tania - this originally returned null.  Caused trouble with the first time the 
+		     * ToDo Tania - this originally returned null.  Caused trouble with the first time the
 		     * changes tab was opened.  Is there any reason not to create it here?
 		     */
-		    return createRDFFileChAOKb(kb, annotationProjURI);
+		    //return createRDFFileChAOKb(kb, annotationProjURI);
+			return null;
 		}
 	}
 
@@ -240,42 +255,43 @@ public class ChAOKbManager {
 		//removeFromMap(kb); //TODO - check this
 	}
 
-	public static void saveChAOProject(KnowledgeBase kb) {
+	public static int saveChAOProject(KnowledgeBase kb) {
 		KnowledgeBase changesKb = kb2chaoKb.get(kb);
-		if (changesKb == null) { return; }
+		if (changesKb == null) { return -1; }
 		Project changesProject = changesKb.getProject();
 
-		if (changesProject.isMultiUserClient()) { return; }
+		if (changesProject.isMultiUserClient()) { return -1; }
 
-		if (changesKb.getKnowledgeBaseFactory() instanceof DatabaseKnowledgeBaseFactory) {
-			return; //don't save if in DB mode
-		}
-
-		/*
-		 * FIXME: right now it does not take into account, if there
-		 * is a project client set with the chao URI. To be fixed very soon.
-		 * (This is the old way it used to work..)
-		 */
 		if (changesKb.getKnowledgeBaseFactory() instanceof RDFBackend) {
-			RDFBackend.setSourceFiles(changesProject.getSources(),
-					CHAO_PROJECT_NAME_PREFIX + kb.getProject().getName() + ".rdfs",
-					CHAO_PROJECT_NAME_PREFIX + kb.getProject().getName() + ".rdf",
-					PROTEGE_NAMESPACE);
-			changesProject.setProjectURI(ChAOKbManager.getChAOProjectURI(kb));
+			URI savePprjURI = getChAOProjectURI(kb);
+			if (savePprjURI == null) {
+				Log.getLogger().warning("Could not save associated ChAO knowledge base. Could not retrieve the save location.");
+				return -1;
+			}
+			String saveRDFSURI = FileUtilities.replaceExtension(URIUtilities.getName(savePprjURI), ".rdfs");
+			String saveRDFURI = FileUtilities.replaceExtension(URIUtilities.getName(savePprjURI), ".rdf");
+
+			RDFBackend.setSourceFiles(changesProject.getSources(), saveRDFSURI, saveRDFURI, PROTEGE_NAMESPACE);
+			changesProject.setProjectURI(savePprjURI);
+
 			ArrayList errors = new ArrayList();
 			changesProject.save(errors);
 			ProjectManager.getProjectManager().displayErrors("Errors at saving annotations/changes project", errors);
-			return;
+			return 0;
 		}
 
 		//for all other case, simply save
 		ArrayList errors = new ArrayList();
 		kb.getProject().save(errors);
 		ProjectManager.getProjectManager().displayErrors("Errors at saving annotations/changes project", errors);
+		return 0;
 	}
 
 	private static void putInMap(KnowledgeBase kb, KnowledgeBase chaoKb) {
-		if (kb2chaoKb.put(kb, chaoKb) == null) {
+		boolean alreadyInMap = kb2chaoKb.keySet().contains(kb);
+		KnowledgeBase existingChaoKb = kb2chaoKb.put(kb, chaoKb);
+		//TODO: check condition..
+		if (!alreadyInMap) {
 		    kb.getProject().addProjectListener(kbListener);
 		}
 	}
