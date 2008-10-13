@@ -25,22 +25,19 @@ import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class JoinCreateAndNameChange implements PostProcessor {
-    private PostProcessorManager changes_db;
+    private PostProcessorManager postProcessorManager;
     /*
      * When a component has just been created this map determines the change that caused the change.
      * This is used in the slightly tricky code that creates a transaction around sequential create +
      * name change operations.
      */
     private Map<RemoteSession, Created_Change> lastCreateBySession = new HashMap<RemoteSession, Created_Change>();
-
     private Set<RemoteSession> instanceAddedSeen = new HashSet<RemoteSession>();
-
     private Set<RemoteSession> subclassAddedSeen = new HashSet<RemoteSession>();
-
     private Set<RemoteSession> templateClassAddedSeen = new HashSet<RemoteSession>();
 
-    public void initialize(PostProcessorManager changes_db) {
-        this.changes_db = changes_db;
+    public void initialize(PostProcessorManager postProcessorManager) {
+        this.postProcessorManager = postProcessorManager;
     }
 
     /*
@@ -78,7 +75,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
      * chance to not try to create a session.
      */
     public void addChange(Change aChange) {
-        RemoteSession session = changes_db.getCurrentSession();
+        RemoteSession session = postProcessorManager.getCurrentSession();
         if (aChange instanceof Created_Change
                 && !(aChange instanceof Individual_Created)
                 && aChange.getApplyTo() != null) {
@@ -86,7 +83,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
             lastCreateBySession.put(session, (Created_Change) aChange);
             return;
         }
-        if (!changes_db.getTransactionState().inTransaction()) {
+        if (!postProcessorManager.getTransactionState().inTransaction()) {
             Created_Change previous_change = lastCreateBySession.get(session);
             if (previous_change == null) {
 				return;
@@ -114,21 +111,21 @@ public class JoinCreateAndNameChange implements PostProcessor {
                 removeLastCreate(session);
                 return;
             }
-            else if (!changes_db.isOwl() && aChange instanceof Subclass_Added) {
+            else if (!postProcessorManager.isOwl() && aChange instanceof Subclass_Added) {
                 if (!subclassAddedSeen.contains(session)) {
                     subclassAddedSeen.add(session);
                     combineInTransaction(previous_change, aChange);
                     return;
                 }
             }
-            else if (!changes_db.isOwl() && aChange instanceof Individual_Added) {
+            else if (!postProcessorManager.isOwl() && aChange instanceof Individual_Added) {
                 if (!instanceAddedSeen.contains(session)) {
                     instanceAddedSeen.add(session);
                     combineInTransaction(previous_change, aChange);
                     return;
                 }
             }
-            else if (!changes_db.isOwl() && aChange instanceof TemplateSlot_Added &&
+            else if (!postProcessorManager.isOwl() && aChange instanceof TemplateSlot_Added &&
                      created instanceof Ontology_Property) {
                 if (!templateClassAddedSeen.contains(session)) {
                     templateClassAddedSeen.add(session);
@@ -156,7 +153,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
             List<Change> changes = new ArrayList<Change>();
             changes.add(change1);
             changes.add(change2);
-            transaction = ServerChangesUtil.createTransactionChange(changes_db,
+            transaction = ServerChangesUtil.createTransactionChange(postProcessorManager,
                                                                     created,
                                                                     "Created " +
                                                                     created.getComponentType() + " "
@@ -170,7 +167,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
             transaction.setSubChanges(subChanges);
             //fishy
             ((AbstractWrappedInstance)transaction.getTimestamp()).getWrappedProtegeInstance().delete();
-            transaction.setTimestamp(DefaultTimestamp.getTimestamp(changes_db.getChangesKb()));
+            transaction.setTimestamp(DefaultTimestamp.getTimestamp(postProcessorManager.getChangesKb()));
             return transaction;
         }
     }
@@ -185,7 +182,7 @@ public class JoinCreateAndNameChange implements PostProcessor {
         sub_changes.add(first_change);
         sub_changes.add(change2);
 
-        Composite_Change transaction = ServerChangesUtil.createTransactionChange(changes_db,
+        Composite_Change transaction = ServerChangesUtil.createTransactionChange(postProcessorManager,
                                                                                  created,
                                                                                  "Created " +
                                                                                  created.getComponentType() + " " +

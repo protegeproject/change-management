@@ -16,19 +16,19 @@ import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 
 public class AnnotationCombiner implements PostProcessor {
-    private PostProcessorManager changes_db;
+    private PostProcessorManager postProcessorManager;
     private Map<RemoteSession, List<Annotation_Change>> lastAnnotationsBySession
                                     = new HashMap<RemoteSession, List<Annotation_Change>>();
 
-    public void initialize(PostProcessorManager changes_db) {
-        this.changes_db = changes_db;
+    public void initialize(PostProcessorManager postProcessorManager) {
+        this.postProcessorManager = postProcessorManager;
     }
 
     /*
      * Combine Annotations.
      */
     public void addChange(Change aChange) {
-        RemoteSession session = changes_db.getCurrentSession();
+        RemoteSession session = postProcessorManager.getCurrentSession();
         List<Annotation_Change> previous_annotations = lastAnnotationsBySession.get(session);
 
         if (aChange instanceof Annotation_Change) {
@@ -65,14 +65,14 @@ public class AnnotationCombiner implements PostProcessor {
     }
 
     private void combineAnnotations(List<Annotation_Change> annotations) {
-        lastAnnotationsBySession.remove(changes_db.getCurrentSession());
+        lastAnnotationsBySession.remove(postProcessorManager.getCurrentSession());
         if (annotations.size() <= 1) {
 			return;
 		}
         Ontology_Component applyTo = annotations.get(0).getApplyTo();
-        Composite_Change transaction = new ChangeFactory(changes_db.getChangesKb()).createComposite_Change(null);
+        Composite_Change transaction = new ChangeFactory(postProcessorManager.getChangesKb()).createComposite_Change(null);
         transaction.setSubChanges(annotations);
-        changes_db.finalizeChange(transaction, applyTo, getContextForAnnotations(annotations));
+        postProcessorManager.finalizeChange(transaction, applyTo, getContextForAnnotations(annotations));
     }
 
     private String getContextForAnnotations(Collection<Annotation_Change> annotations) {
