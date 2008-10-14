@@ -56,8 +56,8 @@ public class ChangesProject extends ProjectPluginAdapter {
             return;
         }
         KnowledgeBase kb = p.getKnowledgeBase();
-        PostProcessorManager changesDb  = getChangesDb(kb);
-        if (changesDb != null) {
+        PostProcessorManager postProcessorManager  = getPostProcessorManager(kb);
+        if (postProcessorManager != null) {
             if (!p.isMultiUserServer()) {
             	//FIXME: don't dispose for now. The ChAOKBManager should handle this.
                 //changesDb.getChangesKb().dispose();
@@ -148,21 +148,17 @@ public class ChangesProject extends ProjectPluginAdapter {
 		return currentKB.getUserName();
 	}
 
-    public static PostProcessorManager getChangesDb(KnowledgeBase kb) {
+    public static PostProcessorManager getPostProcessorManager(KnowledgeBase kb) {
         return postProcessorManagerMap.get(kb);
     }
 
 	public static KnowledgeBase getChangesKB(KnowledgeBase kb) {
-        PostProcessorManager ppm = postProcessorManagerMap.get(kb);
-		return ppm == null ? null: ppm.getChangesKb();
+        return ChAOKbManager.getChAOKb(kb);
 	}
 
 	public static Project getChangesProj(KnowledgeBase kb) {
-        PostProcessorManager changesDb = postProcessorManagerMap.get(kb);
-        if (changesDb == null) {
-        		return null;
-        }
-        return changesDb.getChangesProject();
+		KnowledgeBase chaoKb = getChangesKB(kb);
+		return chaoKb == null ? null : chaoKb.getProject();
 	}
 
 	@Override
