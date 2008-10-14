@@ -4,10 +4,9 @@ import java.io.File;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
-
-import javax.naming.OperationNotSupportedException;
 
 import edu.stanford.bmir.protegex.chao.util.GetAnnotationProjectName;
 import edu.stanford.smi.protege.event.ProjectAdapter;
@@ -15,7 +14,6 @@ import edu.stanford.smi.protege.event.ProjectEvent;
 import edu.stanford.smi.protege.event.ProjectListener;
 import edu.stanford.smi.protege.model.DefaultKnowledgeBase;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protege.model.KnowledgeBaseFactory;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.model.framestore.FrameStoreManager;
 import edu.stanford.smi.protege.server.RemoteProjectManager;
@@ -25,6 +23,7 @@ import edu.stanford.smi.protege.server.Server;
 import edu.stanford.smi.protege.server.framestore.RemoteClientFrameStore;
 import edu.stanford.smi.protege.server.metaproject.MetaProject;
 import edu.stanford.smi.protege.server.metaproject.ProjectInstance;
+import edu.stanford.smi.protege.storage.database.DatabaseKnowledgeBaseFactory;
 import edu.stanford.smi.protege.ui.ProjectManager;
 import edu.stanford.smi.protege.util.FileUtilities;
 import edu.stanford.smi.protege.util.Log;
@@ -44,7 +43,7 @@ public class ChAOKbManager {
 
 	private static final String CHAO_PRJ_INTERNAL_PATH = "/projects/changes.pprj";
 	public static final String CHAO_PROJECT_NAME_PREFIX = "annotation_";
-	public static final String CHAO_PROJECT_CLIENT_INFO_KEY = "annotationProject";
+	public static final String CHAO_PROJECT_CLIENT_INFO_KEY = "chaoProject";
 	public static final String PROTEGE_NAMESPACE = "http://protege.stanford.edu/kb#";
 
 	private static HashMap<KnowledgeBase, KnowledgeBase> kb2chaoKb = new HashMap<KnowledgeBase, KnowledgeBase>();
@@ -61,6 +60,7 @@ public class ChAOKbManager {
 		 * This should work for most cases. A better solution can be found,
 		 * for other cases.
 		 */
+		//TODO: Is it better to use another listener?
 		@Override
 		public void projectClosed(ProjectEvent event) {
 			Project project = (Project) event.getSource();
@@ -107,12 +107,7 @@ public class ChAOKbManager {
 	}
 
 
-	public static KnowledgeBase createRDFFileChAOKb(KnowledgeBase kb, URI chaoURI) {
-		KnowledgeBase changesKb = kb2chaoKb.get(kb);
-		if (changesKb != null) {
-			return changesKb;
-		}
-
+	private static Project getChangesProject(Collection errors) {
 		URI changeOntURI = null;
 		try {
 			changeOntURI = ChAOKbManager.class.getResource(CHAO_PRJ_INTERNAL_PATH).toURI();
@@ -121,18 +116,31 @@ public class ChAOKbManager {
 					"Could not find annotation/changes ontology in the plugins directory.", e);
 			return null;
 		}
-		ArrayList errors = new ArrayList();
 		Project chaoPrj = Project.loadProjectFromURI(changeOntURI, errors);
+		return chaoPrj;
+	}
+
+
+	public static KnowledgeBase createRDFFileChAOKb(KnowledgeBase kb, URI chaoURI) {
+		KnowledgeBase changesKb = kb2chaoKb.get(kb);
+		if (changesKb != null) {
+			return changesKb;
+		}
+
+		Collection errors = new ArrayList();
+		Project chaoPrj = getChangesProject(errors);
+		if (chaoPrj == null) {
+			return null;
+		}
 		chaoPrj.setProjectURI(chaoURI);
 		//don't set the property, if the project was not saved
 		if (kb.getProject().getProjectDirectoryURI() != null) {
 			setChAOProjectURI(kb, chaoURI);
 		}
 
-		RDFBackend.setSourceFiles(chaoPrj.getSources(),
-				CHAO_PROJECT_NAME_PREFIX + kb.getProject().getName() + ".rdfs",
-				CHAO_PROJECT_NAME_PREFIX + kb.getProject().getName() + ".rdf",
-				PROTEGE_NAMESPACE);
+		String rdfsFileName = FileUtilities.replaceExtension(URIUtilities.getName(chaoURI), ".rdfs");
+		String rdfFileName = FileUtilities.replaceExtension(URIUtilities.getName(chaoURI), ".rdf");
+		RDFBackend.setSourceFiles(chaoPrj.getSources(),	rdfsFileName, rdfFileName, PROTEGE_NAMESPACE);
 		chaoPrj.setProjectURI(getChAOProjectURI(kb));
 
 		putInMap(kb, chaoPrj.getKnowledgeBase());
@@ -140,18 +148,45 @@ public class ChAOKbManager {
 	}
 
 
-	//TODO: Not implemented yet
-	public static KnowledgeBase createDBChAOKb(KnowledgeBase kb, KnowledgeBaseFactory factory,
-			PropertyList sources, URI chaoURI) {
-		throw new RuntimeException(new OperationNotSupportedException());
+	public static KnowledgeBase createDbChAOKb(KnowledgeBase kb, URI chaoURI,
+				String dbDriver, String dbUrl, String dbTable, String dbUser, String dbPassword) {
+		KnowledgeBase changesKb = kb2chaoKb.get(kb);
+		if (changesKb != null) {
+			return changesKb;
+		}
+
+		Collection errors = new ArrayList();
+		Project fileChaoPrj = getChangesProject(errors);
+		if (fileChaoPrj == null) {
+			return null;
+		}
+
+		DatabaseKnowledgeBaseFactory factory = new DatabaseKnowledgeBaseFactory();
+		PropertyList sources = PropertyList.create(fileChaoPrj.getInternalProjectKnowledgeBase());
+		DatabaseKnowledgeBaseFactory.setSources(sources, dbDriver, dbUrl, dbTable, dbUser, dbPassword);
+		factory.saveKnowledgeBase(fileChaoPrj.getKnowledgeBase(), sources, errors);
+		fileChaoPrj.dispose();
+
+		Project dbChaoPrj = Project.createNewProject(factory, errors);
+		DatabaseKnowledgeBaseFactory.setSources(dbChaoPrj.getSources(),
+				dbDriver, dbUrl, dbTable, dbUser, dbPassword);
+		dbChaoPrj.setProjectURI(chaoURI);
+		//don't set the property, if the project was not saved
+		if (kb.getProject().getProjectDirectoryURI() != null) {
+			setChAOProjectURI(kb, chaoURI);
+		}
+		dbChaoPrj.createDomainKnowledgeBase(factory, errors, true);
+		dbChaoPrj.save(errors);
+
+		putInMap(kb, dbChaoPrj.getKnowledgeBase());
+		return dbChaoPrj.getKnowledgeBase();
 	}
 
 	private static KnowledgeBase getChAOKbFromServer(KnowledgeBase kb) {
 		String annotationName = new GetAnnotationProjectName(kb).execute();
 		if (annotationName == null) {
 			Log.getLogger().warning("Annotation/Change project not configured on server (use " +
-					GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT +
-			" slot)");
+					GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT + " slot)");
 			return null;
 		}
 		RemoteProjectManager project_manager = RemoteProjectManager.getInstance();
@@ -207,11 +242,6 @@ public class ChAOKbManager {
 			return chaoPrj != null ? chaoPrj.getKnowledgeBase() : null;
 		}
 		else {
-		    /*
-		     * ToDo Tania - this originally returned null.  Caused trouble with the first time the
-		     * changes tab was opened.  Is there any reason not to create it here?
-		     */
-		    //return createRDFFileChAOKb(kb, annotationProjURI);
 			return null;
 		}
 	}
@@ -297,8 +327,13 @@ public class ChAOKbManager {
 	}
 
 	private static void removeFromMap(KnowledgeBase kb) {
+		KnowledgeBase chaoKb = kb2chaoKb.get(kb);
 		kb2chaoKb.remove(kb);
 		kb.getProject().removeProjectListener(kbListener);
+		//TODO: check how this is working
+		if (chaoKb != null && !kb.getProject().isMultiUserServer()) {
+			chaoKb.dispose();
+		}
 	}
 
 	public void dispose() {
