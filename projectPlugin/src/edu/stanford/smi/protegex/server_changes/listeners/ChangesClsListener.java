@@ -15,7 +15,7 @@ public class ChangesClsListener extends ClsAdapter{
     private ChangeFactory factory;
 
     public ChangesClsListener(KnowledgeBase kb) {
-        changes_db = ChangesProject.getChangesDb(kb);
+        changes_db = ChangesProject.getPostProcessorManager(kb);
         factory = new ChangeFactory(changes_db.getChangesKb());
     }
 

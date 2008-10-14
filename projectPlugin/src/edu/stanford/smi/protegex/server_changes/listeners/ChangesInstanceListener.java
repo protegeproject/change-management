@@ -14,7 +14,7 @@ public class ChangesInstanceListener implements InstanceListener{
     private ChangeFactory factory;
 
     public ChangesInstanceListener(KnowledgeBase kb) {
-        changes_db = ChangesProject.getChangesDb(kb);
+        changes_db = ChangesProject.getPostProcessorManager(kb);
         factory = new ChangeFactory(changes_db.getChangesKb());
     }
     /* (non-Javadoc)

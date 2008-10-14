@@ -16,7 +16,7 @@ public class ChangesSlotListener extends SlotAdapter{
     private ChangeFactory factory;
 
     public ChangesSlotListener(KnowledgeBase kb) {
-        changes_db = ChangesProject.getChangesDb(kb);
+        changes_db = ChangesProject.getPostProcessorManager(kb);
         factory = new ChangeFactory(changes_db.getChangesKb());
     }
 

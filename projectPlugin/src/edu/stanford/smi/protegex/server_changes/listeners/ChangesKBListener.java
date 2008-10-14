@@ -22,7 +22,7 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
     private ChangeFactory factory;
 
     public ChangesKBListener(KnowledgeBase kb) {
-        changes_db = ChangesProject.getChangesDb(kb);
+        changes_db = ChangesProject.getPostProcessorManager(kb);
         factory = new ChangeFactory(changes_db.getChangesKb());
     }
 	/* (non-Javadoc)
