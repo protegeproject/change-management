@@ -123,7 +123,7 @@ public class AnnotationTableModel extends AbstractTableModel{
         }
 		switch(Column.values()[col]) {
         case ANNOTATE_COLNAME_TYPE:
-            return aInst.getClass().getSimpleName();
+            return ((AbstractWrappedInstance)aInst).getWrappedProtegeInstance().getDirectType().getBrowserText();
         case ANNOTATE_COLNAME_COMMENTS:
             return aInst.getBody();
 		case ANNOTATE_COLNAME_AUTHOR:
