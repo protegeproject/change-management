@@ -11,7 +11,7 @@ public class ChangesTransListener implements TransactionListener {
     private PostProcessorManager changes_db;
     
     public ChangesTransListener(KnowledgeBase currentKB) {
-        changes_db = ChangesProject.getChangesDb(currentKB);
+        changes_db = ChangesProject.getPostProcessorManager(currentKB);
     }
 	
 	public void transactionBegin(TransactionEvent arg0) {
