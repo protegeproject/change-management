@@ -36,13 +36,13 @@ public class AuthorManagement {
 
     protected AuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
         this.kb = kb2;
-        changes_db = ChangesProject.getChangesDb(kb);
+        changes_db = ChangesProject.getPostProcessorManager(kb);
         evaluateConflicts();
         setFilters(AuthorManagement.DEFAULT_FILTERS);
     }
 
     public static AuthorManagement getAuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
-        if (ChangesProject.getChangesDb(kb2) != null) {
+        if (ChangesProject.getPostProcessorManager(kb2) != null) {
             return new AuthorManagement(kb1, kb2);
         }
         else {
