@@ -14,7 +14,7 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
     private ChangeFactory factory;
 
     public OwlChangesPropertyListener(OWLModel om) {
-        changes_db = ChangesProject.getChangesDb(om);
+        changes_db = ChangesProject.getPostProcessorManager(om);
         factory = new ChangeFactory(changes_db.getChangesKb());
     }
 

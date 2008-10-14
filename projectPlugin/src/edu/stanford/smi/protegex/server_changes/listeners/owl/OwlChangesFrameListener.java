@@ -26,7 +26,7 @@ public class OwlChangesFrameListener implements FrameListener {
     private ChangeFactory factory;
 
     public OwlChangesFrameListener(OWLModel kb) {
-        changes_db = ChangesProject.getChangesDb(kb);
+        changes_db = ChangesProject.getPostProcessorManager(kb);
         factory = new ChangeFactory(changes_db.getChangesKb());
     }
     public void browserTextChanged(FrameEvent event) {

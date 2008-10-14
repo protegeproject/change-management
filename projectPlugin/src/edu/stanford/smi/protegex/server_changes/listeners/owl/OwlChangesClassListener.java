@@ -17,7 +17,7 @@ public class OwlChangesClassListener extends ClassAdapter {
 
     public OwlChangesClassListener(OWLModel om) {
         this.om = om;
-        changes_db = ChangesProject.getChangesDb(om);
+        changes_db = ChangesProject.getPostProcessorManager(om);
         factory = new ChangeFactory(changes_db.getChangesKb());
     }
 
@@ -37,7 +37,7 @@ public class OwlChangesClassListener extends ClassAdapter {
 
 	@Override
 	public void instanceRemoved(RDFSClass arg0, RDFResource arg1) {
-            PostProcessorManager changesDb = ChangesProject.getChangesDb(om);
+            PostProcessorManager changesDb = ChangesProject.getPostProcessorManager(om);
             //String instText = changesDb.getPossiblyDeletedBrowserText(arg1);
             String instText = arg1.getName();
             StringBuffer context = new StringBuffer();
