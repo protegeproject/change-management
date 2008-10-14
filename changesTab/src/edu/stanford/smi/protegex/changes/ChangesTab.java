@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -142,13 +143,29 @@ public class ChangesTab extends AbstractTabWidget {
 		changes_kb = ChAOKbManager.getChAOKb(currentKB);
 
 		if (changes_kb == null) {
-			int retValue = ModalDialog.showMessageDialog(this,
-					"The Changes Tab is active, but there is no associated\n" +
-					"changes and annotation ontology (ChAO) needed by the Changes Tab.\n" +
-					"Do you want to create the ChAO ontology now?\n", ModalDialog.MODE_YES_NO);
-			if (retValue == ModalDialog.OPTION_YES) {
-				changes_kb = ChAOKbManager.createRDFFileChAOKb(getKnowledgeBase(), ChAOKbManager.getChAOProjectURI(getKnowledgeBase()));
+			if (currentKB.getProject().isMultiUserClient()) {
+				ModalDialog.showMessageDialog(this,
+						"The Changes Tab could not find the annotation/changes knowledge base\n" +
+						"associated to this project. One possible reason is that the\n" +
+						"annotations/changes knowledge base was not configured on the server.\n" +
+						"Please check the configuration of the project on the server side.\n" +
+						"Changes Tab will not work at the current time.",
+						"No annotation/changes knowledge base", ModalDialog.MODE_CLOSE);
+				return;
 			}
+
+			URI chaoUri = ChAOKbManager.getChAOProjectURI(currentKB);
+			/*
+			ModalDialog.showMessageDialog(this,
+					"The Changes Tab will create now the annotations/changes" +
+					"knowledge base and will associate it to this project.\n" +
+					"The annotations/changes knowledge base will be automatically" +
+					"saved in the same directory as this project, when the latter " +
+					"will be saved.",
+					"Create annotations/changes knowledge base", ModalDialog.MODE_CLOSE);
+			 */
+			changes_kb = ChAOKbManager.createRDFFileChAOKb(getKnowledgeBase(), chaoUri);
+
 		}
 
 		if (!ChangesProject.isInitialized(getProject())) {
