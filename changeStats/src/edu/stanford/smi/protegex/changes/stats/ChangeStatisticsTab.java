@@ -18,6 +18,7 @@ import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.DefaultRenderer;
 import edu.stanford.smi.protege.util.LabeledComponent;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protege.util.ModalDialog;
 import edu.stanford.smi.protege.util.SelectableTable;
 import edu.stanford.smi.protege.widget.AbstractTabWidget;
 
@@ -29,8 +30,14 @@ public class ChangeStatisticsTab extends AbstractTabWidget {
 
 	public void initialize() {
 		setLabel("Change Statistics");
-
 		changesKb = ChAOKbManager.getChAOKb(getKnowledgeBase());
+
+		if (changesKb == null) {
+				ModalDialog.showMessageDialog(this,
+						"No change statistics available.",
+						"No statistics.");
+				return;
+		}
 
 		statsTableModel = new StatsTableModel(changesKb);
 		statsTableModel.generateStatsTable();
