@@ -23,7 +23,7 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
     private ChangeFactory factory;
 
     public ChangesOwlKBListener(OWLModel om) {
-        changes_db = ChangesProject.getChangesDb(om);
+        changes_db = ChangesProject.getPostProcessorManager(om);
         factory = new ChangeFactory(changes_db.getChangesKb());
     }
 
