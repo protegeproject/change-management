@@ -13,6 +13,7 @@ import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Class;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Individual;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Property;
+import edu.stanford.smi.protege.code.generator.wrapping.OntologyJavaMappingUtil;
 
 public class FilterPanel extends JPanel {
     private Map<ComponentFilter, JCheckBox> buttons = new EnumMap<ComponentFilter, JCheckBox>(ComponentFilter.class);
@@ -78,11 +79,11 @@ public class FilterPanel extends JPanel {
         public boolean allow(Ontology_Component frame) {
             switch (this) {
             case CLASS:
-                return frame instanceof Ontology_Class;
+                return OntologyJavaMappingUtil.canAs(frame, Ontology_Class.class);
             case PROPERTY:
-                return frame instanceof Ontology_Property;
+                return OntologyJavaMappingUtil.canAs(frame, Ontology_Property.class);
             case INDIVIDUAL:
-                return frame instanceof Ontology_Individual;
+            	return OntologyJavaMappingUtil.canAs(frame, Ontology_Individual.class);
             case ANONYMOUS:
                 return true;
             default:
