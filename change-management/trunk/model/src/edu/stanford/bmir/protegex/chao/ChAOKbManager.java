@@ -8,12 +8,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
 
+import edu.stanford.bmir.protegex.chao.annotation.api.AnnotationFactory;
+import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyComponentFactory;
 import edu.stanford.bmir.protegex.chao.util.GetAnnotationProjectName;
 import edu.stanford.smi.protege.event.ProjectAdapter;
 import edu.stanford.smi.protege.event.ProjectEvent;
 import edu.stanford.smi.protege.event.ProjectListener;
 import edu.stanford.smi.protege.model.DefaultKnowledgeBase;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.KnowledgeBaseFactory;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.model.framestore.FrameStoreManager;
 import edu.stanford.smi.protege.server.RemoteProjectManager;
@@ -48,6 +52,16 @@ public class ChAOKbManager {
 
 	private static HashMap<KnowledgeBase, KnowledgeBase> kb2chaoKb = new HashMap<KnowledgeBase, KnowledgeBase>();
 
+	static {
+		initializeFactories();
+	}
+
+	private static void initializeFactories() {
+		//make sure that the Java class - Ontology class mappings are initialized
+		new OntologyComponentFactory(null);
+		new AnnotationFactory(null);
+		new ChangeFactory(null);
+	}
 
 	/**
 	 * Attach this listener to all kb-s, so that we can remove them from the map.
@@ -56,11 +70,11 @@ public class ChAOKbManager {
 		/*
 		 * TODO: Find a better solution.
 		 * The current implementation will remove from the map
-		 * the kb - changes kb association, if the domain kb is closed.
-		 * This should work for most cases. A better solution can be found,
+		 * the kb - chao kb association, if the domain kb is closed.
+		 * This should work for most cases. A better solution should be found,
 		 * for other cases.
+		 * TODO: Is it better to use another listener?
 		 */
-		//TODO: Is it better to use another listener?
 		@Override
 		public void projectClosed(ProjectEvent event) {
 			Project project = (Project) event.getSource();
@@ -92,7 +106,7 @@ public class ChAOKbManager {
 				changesKb = getChAOKbFromServer(kb);
 			}
 			else if (kb.getProject().isMultiUserServer()) {
-			    changesKb = getChAOKbOnServer(kb);
+				changesKb = getChAOKbOnServer(kb);
 			}
 			else {
 				changesKb = getFileBasedChAOKb(kb);
@@ -122,6 +136,13 @@ public class ChAOKbManager {
 
 
 	public static KnowledgeBase createRDFFileChAOKb(KnowledgeBase kb, URI chaoURI) {
+		String rdfsFileName = FileUtilities.replaceExtension(URIUtilities.getName(chaoURI), ".rdfs");
+		String rdfFileName = FileUtilities.replaceExtension(URIUtilities.getName(chaoURI), ".rdf");
+		return createRDFFileChAOKb(kb, chaoURI, rdfsFileName, rdfFileName, PROTEGE_NAMESPACE);
+	}
+
+	public static KnowledgeBase createRDFFileChAOKb(KnowledgeBase kb,
+			URI chaoURI, String rdfsFile, String rdfFile, String namespace) {
 		KnowledgeBase changesKb = kb2chaoKb.get(kb);
 		if (changesKb != null) {
 			return changesKb;
@@ -133,14 +154,13 @@ public class ChAOKbManager {
 			return null;
 		}
 		chaoPrj.setProjectURI(chaoURI);
-		//don't set the property, if the project was not saved
+
+		//don't set the property, if this is a new project
 		if (kb.getProject().getProjectDirectoryURI() != null) {
 			setChAOProjectURI(kb, chaoURI);
 		}
 
-		String rdfsFileName = FileUtilities.replaceExtension(URIUtilities.getName(chaoURI), ".rdfs");
-		String rdfFileName = FileUtilities.replaceExtension(URIUtilities.getName(chaoURI), ".rdf");
-		RDFBackend.setSourceFiles(chaoPrj.getSources(),	rdfsFileName, rdfFileName, PROTEGE_NAMESPACE);
+		RDFBackend.setSourceFiles(chaoPrj.getSources(),	rdfsFile, rdfFile, namespace);
 		chaoPrj.setProjectURI(getChAOProjectURI(kb));
 
 		putInMap(kb, chaoPrj.getKnowledgeBase());
@@ -149,38 +169,37 @@ public class ChAOKbManager {
 
 
 	public static KnowledgeBase createDbChAOKb(KnowledgeBase kb, URI chaoURI,
-				String dbDriver, String dbUrl, String dbTable, String dbUser, String dbPassword) {
+			String dbDriver, String dbUrl, String dbTable, String dbUser, String dbPassword) {
 		KnowledgeBase changesKb = kb2chaoKb.get(kb);
 		if (changesKb != null) {
 			return changesKb;
 		}
 
 		Collection errors = new ArrayList();
-		Project fileChaoPrj = getChangesProject(errors);
-		if (fileChaoPrj == null) {
+		Project chaoPrj = getChangesProject(errors);
+		if (chaoPrj == null) {
 			return null;
 		}
 
-		DatabaseKnowledgeBaseFactory factory = new DatabaseKnowledgeBaseFactory();
-		PropertyList sources = PropertyList.create(fileChaoPrj.getInternalProjectKnowledgeBase());
-		DatabaseKnowledgeBaseFactory.setSources(sources, dbDriver, dbUrl, dbTable, dbUser, dbPassword);
-		factory.saveKnowledgeBase(fileChaoPrj.getKnowledgeBase(), sources, errors);
-		fileChaoPrj.dispose();
+		chaoPrj.setProjectURI(chaoURI);
 
-		Project dbChaoPrj = Project.createNewProject(factory, errors);
-		DatabaseKnowledgeBaseFactory.setSources(dbChaoPrj.getSources(),
-				dbDriver, dbUrl, dbTable, dbUser, dbPassword);
-		dbChaoPrj.setProjectURI(chaoURI);
-		//don't set the property, if the project was not saved
+		PropertyList sources = chaoPrj.getSources();
+		DatabaseKnowledgeBaseFactory.setSources(sources, dbDriver, dbUrl, dbTable, dbUser, dbPassword);
+		sources.setString(KnowledgeBaseFactory.FACTORY_CLASS_NAME, DatabaseKnowledgeBaseFactory.class.getName());
+		chaoPrj.save(errors);
+		chaoPrj.dispose();
+
 		if (kb.getProject().getProjectDirectoryURI() != null) {
 			setChAOProjectURI(kb, chaoURI);
 		}
-		dbChaoPrj.createDomainKnowledgeBase(factory, errors, true);
-		dbChaoPrj.save(errors);
 
-		putInMap(kb, dbChaoPrj.getKnowledgeBase());
-		return dbChaoPrj.getKnowledgeBase();
+		chaoPrj = Project.loadProjectFromURI(chaoURI, errors);
+		ProjectManager.getProjectManager().displayErrors("Errors at creating ChAO in database", errors);
+
+		putInMap(kb, chaoPrj.getKnowledgeBase());
+		return chaoPrj.getKnowledgeBase();
 	}
+
 
 	private static KnowledgeBase getChAOKbFromServer(KnowledgeBase kb) {
 		String annotationName = new GetAnnotationProjectName(kb).execute();
@@ -205,22 +224,22 @@ public class ChAOKbManager {
 	}
 
 	private static KnowledgeBase getChAOKbOnServer(KnowledgeBase kb) {
-	    Server server = Server.getInstance();
-	    String serverProjectName = null;
-	    // ToDo - this is very awkward and inefficient (each call involves io)
-	    for (String name : server.getAvailableProjectNames(null)) {
-	        if (server.getProject(name).equals(kb.getProject())) {
-	            serverProjectName = name;
-	            break;
-	        }
-	    }
-	    if (serverProjectName != null) {
-	        MetaProject mp = server.getMetaProjectNew();
-	        ProjectInstance pi = mp.getProject(serverProjectName);
-	        String chaoProjectName = pi.getAnnotationProject().getName();
-	        return server.getProject(chaoProjectName).getKnowledgeBase();
-	    }
-	    return null;
+		Server server = Server.getInstance();
+		String serverProjectName = null;
+		// ToDo - this is very awkward and inefficient (each call involves io)
+		for (String name : server.getAvailableProjectNames(null)) {
+			if (server.getProject(name).equals(kb.getProject())) {
+				serverProjectName = name;
+				break;
+			}
+		}
+		if (serverProjectName != null) {
+			MetaProject mp = server.getMetaProjectNew();
+			ProjectInstance pi = mp.getProject(serverProjectName);
+			String chaoProjectName = pi.getAnnotationProject().getName();
+			return server.getProject(chaoProjectName).getKnowledgeBase();
+		}
+		return null;
 	}
 
 	private static KnowledgeBase getFileBasedChAOKb(KnowledgeBase kb) {
@@ -276,13 +295,17 @@ public class ChAOKbManager {
 	 * @param uri - the new URI of the annotation/change project
 	 */
 	public static void setChAOProjectURI(KnowledgeBase kb, URI uri) {
-		URI relativeURI = URIUtilities.relativize(kb.getProject().getProjectURI(), uri);
-		if (relativeURI == null) {
-			Log.getLogger().warning("Could not set annotation/change project URI to " + uri);
-			return;
+		if (uri == null) {
+			kb.getProject().setClientInformation(CHAO_PROJECT_CLIENT_INFO_KEY, null);
+		} else {
+			URI relativeURI = URIUtilities.relativize(kb.getProject().getProjectURI(), uri);
+			if (relativeURI == null) {
+				Log.getLogger().warning("Could not set annotation/change project URI to " + uri);
+				return;
+			}
+			kb.getProject().setClientInformation(CHAO_PROJECT_CLIENT_INFO_KEY, relativeURI.toString());
 		}
-		kb.getProject().setClientInformation(CHAO_PROJECT_CLIENT_INFO_KEY, relativeURI.toString());
-		//removeFromMap(kb); //TODO - check this
+		removeFromMap(kb);
 	}
 
 	public static int saveChAOProject(KnowledgeBase kb) {
@@ -317,12 +340,16 @@ public class ChAOKbManager {
 		return 0;
 	}
 
+	public static void detachChAO(KnowledgeBase kb) {
+		setChAOProjectURI(kb, null);
+		putInMap(kb, null);
+	}
+
 	private static void putInMap(KnowledgeBase kb, KnowledgeBase chaoKb) {
 		boolean alreadyInMap = kb2chaoKb.keySet().contains(kb);
 		KnowledgeBase existingChaoKb = kb2chaoKb.put(kb, chaoKb);
-		//TODO: check condition..
 		if (!alreadyInMap) {
-		    kb.getProject().addProjectListener(kbListener);
+			kb.getProject().addProjectListener(kbListener);
 		}
 	}
 
@@ -335,6 +362,39 @@ public class ChAOKbManager {
 			chaoKb.dispose();
 		}
 	}
+
+
+	public static boolean isValidChAOKb(URI prjUri) {
+		if (prjUri == null) {
+			return false;
+		}
+
+		boolean validProject = false;
+		ArrayList errors = new ArrayList();
+		try {
+			Project chaoPrj = Project.loadProjectFromURI(prjUri, errors);
+			if (errors.size() == 0) {
+				KnowledgeBase chaoKb = chaoPrj.getKnowledgeBase();
+				validProject = isValidChAOKb(chaoKb);
+			}
+			try {
+				chaoPrj.dispose();
+			} catch (Throwable t) {
+				Log.emptyCatchBlock(t);
+			}
+		} catch (Throwable t) {
+			Log.getLogger().log(Level.WARNING, "Error at trying to open ChAO file from: " + prjUri, t);
+		}
+		return validProject;
+	}
+
+	public static boolean isValidChAOKb(KnowledgeBase chaoKb) {
+		return
+			new AnnotationFactory(chaoKb).getAnnotatableThingClass() != null &&
+			new AnnotationFactory(chaoKb).getAnnotationClass() != null &&
+			new ChangeFactory(chaoKb).getChangeClass() != null;
+	}
+
 
 	public void dispose() {
 		for (KnowledgeBase kb : kb2chaoKb.keySet()) {
