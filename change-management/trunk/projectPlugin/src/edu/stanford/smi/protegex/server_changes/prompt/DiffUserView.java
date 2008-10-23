@@ -89,6 +89,7 @@ public class DiffUserView extends JPanel {
     private void reinitialize() {
         authorManagement.reinitialize();
         userTable.setModel(createTableModel());
+        userConceptLists.updateChangeTable(null);
     }
 
     @SuppressWarnings("unused")
