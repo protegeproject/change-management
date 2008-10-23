@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
+import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.DefaultRenderer;
 import edu.stanford.smi.protege.util.Log;
@@ -97,7 +98,10 @@ public class ChangeTabRenderer extends DefaultRenderer {
             name = ontoComp.getCurrentName();
             if (new_kb != null) {
                 try {
-                    name = new_kb.getFrame(name).getBrowserText();
+                	Frame frame = new_kb.getFrame(name);
+                	if (frame != null) {
+                		name = frame.getBrowserText();
+                	}
                 }
                 catch (Throwable t) {
                     Log.getLogger().warning("Could not get browser text for new frame " + name + ", " + t);
@@ -108,7 +112,10 @@ public class ChangeTabRenderer extends DefaultRenderer {
             name = ontoComp.getInitialName();
             if (old_kb != null) {
                 try {
-                    name = old_kb.getFrame(name).getBrowserText();
+                	Frame frame = old_kb.getFrame(name);
+                	if (frame != null) {
+                		name = frame.getBrowserText();
+                	}
                 }
                 catch(Throwable t) {
                     Log.getLogger().warning("Could not get browser text for old frame " + name + ", " + t);
