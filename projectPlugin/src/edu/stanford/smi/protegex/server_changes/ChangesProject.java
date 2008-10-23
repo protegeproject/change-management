@@ -98,13 +98,13 @@ public class ChangesProject extends ProjectPluginAdapter {
 		Project currentProj = p;
 		KnowledgeBase currentKB = currentProj.getKnowledgeBase();
 
-		installPostProcessors(currentKB);
-
         KnowledgeBase changesKb = ChAOKbManager.getChAOKb(currentKB);
 		if (changesKb == null) {
-			Log.getLogger().warning("Could not initialize the annotations ontology. ChangesTab will probably not work");
+			Log.getLogger().warning("Could not find the ChAO KB.");
 			return;
 		}
+
+		installPostProcessors(currentKB);
 
 		//Check to see if the project is an OWL one
 		boolean isOwlProject = Util.kbInOwl(currentKB);
