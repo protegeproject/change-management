@@ -24,4 +24,8 @@ public interface AnnotatableThing extends Serializable {
     void setAssociatedAnnotations(Collection<? extends Annotation> newAssociatedAnnotations);
 
     void delete();
+
+    boolean canAs(Class<?> javaInterface);
+
+	<X> X as(Class<? extends X> javaInterface);
 }
