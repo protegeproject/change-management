@@ -255,4 +255,26 @@ public class DefaultAnnotation extends DefaultAnnotatableThing
     public void setRelated(String newRelated) {
         setSlotValue(getRelatedSlot(), newRelated);
     }
+
+    // Slot subject
+
+    public String getSubject() {
+        return (String) getWrappedProtegeInstance().getOwnSlotValue(getSubjectSlot());
+    }
+
+
+    public Slot getSubjectSlot() {
+        final String name = "subject";
+        return getKnowledgeBase().getSlot(name);
+    }
+
+
+    public boolean hasSubject() {
+        return hasSlotValues(getSubjectSlot());
+    }
+
+
+    public void setSubject(String newSubject) {
+        setSlotValue(getSubjectSlot(), newSubject);
+    }
 }
