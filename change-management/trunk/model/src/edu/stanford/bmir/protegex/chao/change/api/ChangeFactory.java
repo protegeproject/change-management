@@ -1431,16 +1431,6 @@ public class ChangeFactory {
         return kb.getSlot(name);
     }
 
-    public Slot getChanges_Slot_0Slot() {
-        final String name = "changes_Slot_0";
-        return kb.getSlot(name);
-    }
-
-    public Slot getChanges_Slot_1Slot() {
-        final String name = "changes_Slot_1";
-        return kb.getSlot(name);
-    }
-
     public Slot getCommentSlot() {
         final String name = "comment";
         return kb.getSlot(name);
