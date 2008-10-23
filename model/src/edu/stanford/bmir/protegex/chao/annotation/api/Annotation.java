@@ -91,5 +91,16 @@ public interface Annotation extends AnnotatableThing {
 
     void setRelated(String newRelated);
 
+
+    // Slot subject
+
+    String getSubject();
+
+    boolean hasSubject();
+
+    void setSubject(String newSubject);
+
     void delete();
+
+
 }
