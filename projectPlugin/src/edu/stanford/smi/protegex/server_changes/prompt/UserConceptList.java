@@ -88,7 +88,7 @@ public class UserConceptList extends AbstractSelectableComponent implements Sele
         });
     }
 
-    protected void updateChangeTable(Ontology_Component ontologyComponent) {
+    public void updateChangeTable(Ontology_Component ontologyComponent) {
 		((ChangesTableModel)changesTable.getModel()).setOntologyComponent(ontologyComponent);
 	}
 
