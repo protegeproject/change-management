@@ -24,23 +24,31 @@ import edu.stanford.smi.protege.exception.ProtegeException;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
+import edu.stanford.smi.protege.model.WidgetDescriptor;
 import edu.stanford.smi.protege.ui.ProjectManager;
 import edu.stanford.smi.protege.ui.ProjectView;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.MessageError;
+import edu.stanford.smi.protege.util.ModalDialog;
 import edu.stanford.smi.protege.util.ProtegeJob;
 import edu.stanford.smi.protege.widget.TabWidget;
 import edu.stanford.smi.protegex.changes.ChangeProjectUtil;
 import edu.stanford.smi.protegex.changes.ChangesTab;
+import edu.stanford.smi.protegex.changes.action.ChangeChAOAction;
 import edu.stanford.smi.protegex.changes.action.CleanUpChangesOntAction;
+import edu.stanford.smi.protegex.changes.action.ShowChAODetails;
+import edu.stanford.smi.protegex.changes.changesKBViewTab.ChangesKBViewTab;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.prompt.UsersTab;
 
 public class ChangeMenu extends JMenu {
 
 	public static final String MENU_TITLE = "Change";
 	public static final String MENU_ITEM_ANNOTATE_LAST = "Annotate Last Change";
 	public static final String MENU_ITEM_CHANGE_INFO = "Selected Change Info";
-	public static final String MENU_ITEM_SAVE_CHANGE_PRJ = "Save Changes ontology";
+	public static final String MENU_ITEM_SAVE_CHANGE_PRJ = "Save Changes Ontology";
+	public static final String MENU_ITEM_BROWSE_CHANGE_PRJ = "Browse Changes Ontology";
+	public static final String MENU_ITEM_STATS_CONFL_PRJ = "View Change Statistics and Conflicts";
 
 	protected AnnotateLastChange lastChange = new AnnotateLastChange();
 	protected SelectedChangeInfo selChangeInfo = new SelectedChangeInfo();
@@ -62,7 +70,13 @@ public class ChangeMenu extends JMenu {
 		JMenuItem annotate = new JMenuItem(MENU_ITEM_ANNOTATE_LAST);
 		JMenuItem changeInfo = new JMenuItem(MENU_ITEM_CHANGE_INFO);
 		JMenuItem saveChangesPrj = new JMenuItem(MENU_ITEM_SAVE_CHANGE_PRJ);
+		JMenuItem browseChangesPrj = new JMenuItem(MENU_ITEM_BROWSE_CHANGE_PRJ);
+		JMenuItem statsPrj = new JMenuItem(MENU_ITEM_STATS_CONFL_PRJ);
 		JMenuItem extract = new JMenuItem(new CleanUpChangesOntAction(change_kb));
+		JMenuItem details = new JMenuItem(new ShowChAODetails(changeKb));
+		JMenuItem change = new JMenuItem(new ChangeChAOAction(kb));
+
+		change.setEnabled(!kb.getProject().isMultiUserClient());
 
 		annotate.setAction(lastChange);
 		annotate.setMnemonic(KeyEvent.VK_A);
@@ -73,16 +87,86 @@ public class ChangeMenu extends JMenu {
 		changeInfo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K,ActionEvent.CTRL_MASK));
 
 		saveChangesPrj.setAction(getSaveChangesPrjAction());
+		browseChangesPrj.setAction(getBrowseChangePrjAction());
+		statsPrj.setAction(getViewStatsAndConflictsPrjAction());
 
 		add(annotate);
 		add(changeInfo);
 		addSeparator();
+		add(details);
+		add(browseChangesPrj);
+		add(statsPrj);
+		addSeparator();
+		add(change);
 		add(extract);
 		add(saveChangesPrj);
 
 		lastChange.setEnabled(false);
 		selChangeInfo.setEnabled(true);
 		//saveChangesPrj.setEnabled(true);
+	}
+
+	protected Action getViewStatsAndConflictsPrjAction() {
+		return new AbstractAction(MENU_ITEM_STATS_CONFL_PRJ) {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					String changesKbViewTabClassName = UsersTab.class.getName();
+
+					ProjectView prjView = ProjectManager.getProjectManager().getCurrentProjectView();
+					TabWidget tabWidget = prjView.getTabByClassName(changesKbViewTabClassName);
+
+					if (tabWidget != null) {
+						prjView.setSelectedTab(tabWidget);
+						return;
+					}
+
+					WidgetDescriptor d = kb.getProject().getTabWidgetDescriptor(changesKbViewTabClassName);
+					d.setVisible(true);
+
+					prjView.addTab(d);
+					tabWidget = prjView.getTabByClassName(changesKbViewTabClassName);
+					prjView.setSelectedTab(tabWidget);
+
+				} catch (Exception e) {
+					Log.getLogger().log(Level.WARNING, "Cannot enable the Users Tab", e);
+					ModalDialog.showMessageDialog(ProjectManager.getProjectManager().getCurrentProjectView(),
+							"Cannot enable the Users Tab to show the\n" +
+							"change statistics and conflicts.\n" +
+							"See console for more details.", "Warning");
+				}
+			}
+		};
+	}
+
+
+	protected Action getBrowseChangePrjAction() {
+		return new AbstractAction(MENU_ITEM_BROWSE_CHANGE_PRJ) {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					String changesKbViewTabClassName = ChangesKBViewTab.class.getName();
+
+					ProjectView prjView = ProjectManager.getProjectManager().getCurrentProjectView();
+					TabWidget tabWidget = prjView.getTabByClassName(changesKbViewTabClassName);
+
+					if (tabWidget != null) {
+						prjView.setSelectedTab(tabWidget);
+						return;
+					}
+
+					WidgetDescriptor d = kb.getProject().getTabWidgetDescriptor(changesKbViewTabClassName);
+					d.setVisible(true);
+
+					prjView.addTab(d);
+					tabWidget = prjView.getTabByClassName(changesKbViewTabClassName);
+					prjView.setSelectedTab(tabWidget);
+
+				} catch (Exception e) {
+					Log.getLogger().log(Level.WARNING, "Cannot enable the ChangesKBView Tab", e);
+					ModalDialog.showMessageDialog(ProjectManager.getProjectManager().getCurrentProjectView(),
+							"Cannot enable the ChangesKbView Tab.\nSee console for more details.", "Warning");
+				}
+			}
+		};
 	}
 
 	public class AnnotateLastChange extends AbstractAction {
