@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +42,6 @@ import edu.stanford.bmir.protegex.chao.util.AnnotationCreationComparator;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.resource.Icons;
 import edu.stanford.smi.protege.ui.HeaderComponent;
@@ -60,6 +58,7 @@ import edu.stanford.smi.protegex.changes.action.ChangesSearchExecute;
 import edu.stanford.smi.protegex.changes.listeners.ChangesListener;
 import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
 import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
+import edu.stanford.smi.protegex.changes.ui.CreateChAOProjectDialog;
 import edu.stanford.smi.protegex.changes.ui.JTreeTable;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 
@@ -154,18 +153,16 @@ public class ChangesTab extends AbstractTabWidget {
 				return;
 			}
 
-			URI chaoUri = ChAOKbManager.getChAOProjectURI(currentKB);
-			/*
-			ModalDialog.showMessageDialog(this,
-					"The Changes Tab will create now the annotations/changes" +
-					"knowledge base and will associate it to this project.\n" +
-					"The annotations/changes knowledge base will be automatically" +
-					"saved in the same directory as this project, when the latter " +
-					"will be saved.",
-					"Create annotations/changes knowledge base", ModalDialog.MODE_CLOSE);
-			 */
-			changes_kb = ChAOKbManager.createRDFFileChAOKb(getKnowledgeBase(), chaoUri);
+			CreateChAOProjectDialog dialog = new CreateChAOProjectDialog(currentKB);
+			dialog.showDialog();
+			changes_kb = dialog.getChangesKb();
 
+			if (changes_kb == null) {
+				ModalDialog.showMessageDialog(this,
+						"Could not find or create the changes and annotations\n" +
+						"ontology. Changes Tab will not work in this session.", "No ChAO");
+				return;
+			}
 		}
 
 		if (!ChangesProject.isInitialized(getProject())) {
@@ -546,26 +543,15 @@ public class ChangesTab extends AbstractTabWidget {
 
 		//remove the menu item
 		JMenuBar menuBar = getMainWindowMenuBar();
-		menuBar.remove(changesMenu);
+		if (changesMenu != null) {
+			menuBar.remove(changesMenu);
+		}
 
-		if (changes_kb != null) {
+		if (changes_kb != null && changes_kb.getFrameStoreManager() != null) {
 			changes_kb.removeFrameListener(changesListener);
 		}
 
-		//TODO: remove other listeners
-
-		if (getProject().isMultiUserClient()) {
-
-			if (changes_kb != null) {
-				Project changesProject = changes_kb.getProject();
-
-				try {
-					changesProject.dispose();
-				} catch (Exception e) {
-					Log.getLogger().warning("Errors at disposing changes project " + changesProject + " of project " + changes_kb);
-				}
-			}
-		}
+		//changes project will be disposed in the ChAOKbManager
 
 		super.dispose();
 	}
