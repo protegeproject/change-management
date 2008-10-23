@@ -1,5 +1,6 @@
 package edu.stanford.smi.protegex.changes.stats;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +11,6 @@ import edu.stanford.bmir.protegex.chao.annotation.api.Annotation;
 import edu.stanford.bmir.protegex.chao.annotation.api.AnnotationFactory;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
-import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.Log;
 
@@ -40,14 +40,12 @@ public class StatsTableModel extends AbstractTableModel {
 
 	public StatsTableModel(KnowledgeBase changesKb) {
 		this.changesKb = changesKb;
-
 		fillStatsTable();
 	}
 
 	public void generateStatsTable() {
 		clearMaps();
 		fillStatsTable();
-
 		fireTableDataChanged();
 	}
 
@@ -62,13 +60,9 @@ public class StatsTableModel extends AbstractTableModel {
 			return;
 		}
 
-		Cls changeCls = new ChangeFactory(changesKb).getChangeClass();
-
-		for (Object element : changeCls.getInstances()) {
-			Change change = (Change) element;
-
+		Collection<Change> changes = new ChangeFactory(changesKb).getAllChangeObjects(true);
+		for (Change change : changes) {
 			String user = change.getAuthor();
-
 			if (user != null) {
 				if (!users.contains(user)) {
 					users.add(user);
@@ -77,13 +71,9 @@ public class StatsTableModel extends AbstractTableModel {
 			}
 		}
 
-		Cls annotationCls = new AnnotationFactory(changesKb).getAnnotationClass();
-
-		for (Object element : annotationCls.getInstances()) {
-			Annotation annotation = (Annotation) element;
-
+		Collection<Annotation> annotations = new AnnotationFactory(changesKb).getAllAnnotationObjects(true);
+		for (Annotation annotation : annotations) {
 			String user = annotation.getAuthor();
-
 			if (user != null) {
 				if (!users.contains(user)) {
 					users.add(user);
@@ -91,35 +81,29 @@ public class StatsTableModel extends AbstractTableModel {
 				increaseItemValueByOne(user2Annotations, user);
 			}
 		}
-
 		Collections.sort(users);
 	}
 
 
 	private int getItemCount(HashMap<String, String> map, String user) {
 		String itemCount = map.get(user);
-
 		if (itemCount == null) {
 			return 0;
 		}
 
 		int count = 0;
-
 		try {
 			count = Integer.parseInt(itemCount);
 		} catch (Exception e) {
 			Log.getLogger().warning("Error at parsing interger from string " + itemCount);
 		}
-
 		return count;
 	}
 
 
 	private void increaseItemValueByOne(HashMap<String, String> map, String user) {
 		int itemCount = getItemCount(map, user);
-
 		itemCount++;
-
 		map.put(user, itemCount + "");
 	}
 
