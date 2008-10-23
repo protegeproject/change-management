@@ -2,6 +2,7 @@ package edu.stanford.smi.protegex.changes.stats;
 
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -17,10 +18,10 @@ import edu.stanford.smi.protege.util.ComponentFactory;
 import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.DefaultRenderer;
 import edu.stanford.smi.protege.util.LabeledComponent;
-import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.ModalDialog;
 import edu.stanford.smi.protege.util.SelectableTable;
 import edu.stanford.smi.protege.widget.AbstractTabWidget;
+import edu.stanford.smi.protegex.server_changes.ChangesProject;
 
 public class ChangeStatisticsTab extends AbstractTabWidget {
 
@@ -46,7 +47,6 @@ public class ChangeStatisticsTab extends AbstractTabWidget {
 	}
 
 	private void buildGUI() {
-
 		statsTable = ComponentFactory.createSelectableTable(null);
 		//statsTable = new SelectableTable();
 		statsTable.setModel(statsTableModel);
@@ -72,31 +72,24 @@ public class ChangeStatisticsTab extends AbstractTabWidget {
 
 	private AllowableAction getGenerateStatsButton() {
 		return new AllowableAction(new ResourceKey("Generate change statistics")) {
-
 			public void actionPerformed(ActionEvent arg0) {
 				statsTableModel.generateStatsTable();
 			}
-
 		};
 	}
 
-
-	@Override
-	public void dispose() {
-		if (getProject().isMultiUserClient()) {
-			if (changesKb != null) {
-				Project changesProject = changesKb.getProject();
-
-				try {
-					//FIXME: This should be handled by the ChAOKbManager
-					//changesProject.dispose();
-				} catch (Exception e) {
-					Log.getLogger().warning("Errors at disposing changes project " + changesProject + " of project " + changesKb);
-				}
+	public static boolean isSuitable(Project p, Collection errors) {
+		try {
+			KnowledgeBase kb = ChangesProject.getChangesKB(p.getKnowledgeBase());
+			if (kb == null) {
+				errors.add("Needs Changes ontology");
+				return false;
 			}
+			return true;
+		} catch (Exception e) {
+			errors.add("Needs Changes ontology");
+			return false;
 		}
-
-		super.dispose();
 	}
 
 }
