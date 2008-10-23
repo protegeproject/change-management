@@ -9,17 +9,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import edu.stanford.bmir.protegex.chao.ChAOKbManager;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protegex.changes.ChangeProjectUtil;
-import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
-import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.server_changes.prompt.FilterPanel.ComponentFilter;
 
 public class AuthorManagement {
     private KnowledgeBase kb;
-    private PostProcessorManager changes_db;
 
     private Map<String, Set<String>> userConflictsMap = new HashMap<String, Set<String>>();
     private Map<String, Set<Ontology_Component>> conflictingFrameMap = new HashMap<String, Set<Ontology_Component>>();
@@ -36,18 +35,16 @@ public class AuthorManagement {
 
     protected AuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
         this.kb = kb2;
-        changes_db = ChangesProject.getPostProcessorManager(kb);
         evaluateConflicts();
         setFilters(AuthorManagement.DEFAULT_FILTERS);
     }
 
     public static AuthorManagement getAuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
-        if (ChangesProject.getPostProcessorManager(kb2) != null) {
-            return new AuthorManagement(kb1, kb2);
-        }
-        else {
-            return null;
-        }
+    	if (ChAOKbManager.getChAOKb(kb2) == null) {
+    		return null;
+    	}
+
+    	return new AuthorManagement(kb1, kb2);
     }
 
     public void reinitialize() {
@@ -64,7 +61,7 @@ public class AuthorManagement {
 
         Map<Ontology_Component, Set<String>> whoChangedMeMap = new HashMap<Ontology_Component, Set<String>>();
 
-        for (Object o : ChangeProjectUtil.getSortedChanges(changes_db.getChangesKb())) {
+        for (Object o : ChangeProjectUtil.getSortedChanges(ChAOKbManager.getChAOKb(kb))) {
             Change change = (Change) o;
             Ontology_Component frame = change.getApplyTo();
             Set<String> users = whoChangedMeMap.get(frame);
@@ -160,9 +157,10 @@ public class AuthorManagement {
     }
 
     public Set<String> getEditorsByFrameName(String name, boolean oldName) {
+    	KnowledgeBase changesKb = ChAOKbManager.getChAOKb(kb);
         Ontology_Component component = oldName ?
-        		ChangeProjectUtil.getOntologyComponentByInitialName(changes_db.getChangesKb(), name) :
-                ChangeProjectUtil.getOntologyComponentByFinalName(changes_db.getChangesKb(), name);
+        		ChangeProjectUtil.getOntologyComponentByInitialName(changesKb, name) :
+                ChangeProjectUtil.getOntologyComponentByFinalName(changesKb, name);
         Set<String> editors  = new HashSet<String>();
         if (component == null) {
 			return editors;
@@ -212,7 +210,7 @@ public class AuthorManagement {
 
     public void setFilters(Set<ComponentFilter> filters) {
         this.filters = filters;
-        filter_anonymous_guys = changes_db.isOwl() && !filters.contains(ComponentFilter.ANONYMOUS);
+        filter_anonymous_guys = kb instanceof OWLModel && !filters.contains(ComponentFilter.ANONYMOUS);
         nothing_to_filter = nothingToFilter();
     }
 
