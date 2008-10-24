@@ -194,7 +194,10 @@ public class ServerChangesUtil {
     	Collection<Frame> ocFrames = changes_kb.getMatchingFrames(factory.getCurrentNameSlot(), null, false, name, -1);
     	if (ocFrames.size() > 0) {
     		Frame ocFrame = CollectionUtilities.getFirstItem(ocFrames);
-    		return OntologyJavaMappingUtil.getSpecificObject(changes_kb, (Instance)ocFrame, Ontology_Component.class);
+    		//get matching frames can be case insensitive, so make sure you got the right frame..
+    		if (ocFrame.getOwnSlotValue(factory.getCurrentNameSlot()).equals(name)) {
+    			return OntologyJavaMappingUtil.getSpecificObject(changes_kb, (Instance)ocFrame, Ontology_Component.class);
+    		}
     	}
     	return null;
     }
