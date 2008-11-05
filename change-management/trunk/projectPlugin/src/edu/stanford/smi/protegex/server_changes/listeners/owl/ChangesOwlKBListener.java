@@ -31,6 +31,9 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#clsCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void clsCreated(KnowledgeBaseEvent event) {
+	    if (event.isReplacementEvent()) {
+	        return;
+	    }
         Cls cls = event.getCls();
         ServerChangesUtil.createCreatedChange(changes_db, factory.createClass_Created(null), cls, cls.getName());
 	}
@@ -41,6 +44,9 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
     public void clsDeleted(KnowledgeBaseEvent event) {
         if (log.isLoggable(Level.FINE)) {
             log.fine("In deleted class listener");
+        }
+        if (event.isReplacementEvent()) {
+            return;
         }
         String deletedClsName = event.getOldName();
         Frame deletedFrame = event.getCls();
