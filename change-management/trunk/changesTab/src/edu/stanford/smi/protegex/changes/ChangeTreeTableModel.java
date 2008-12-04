@@ -95,7 +95,7 @@ public void setValueAt(Object aValue, Object node, int column) {
        ChangeProjectUtil.logAnnotatableThing("adding change to ui model", log, Level.FINE, changeInst);
        if (ChangeProjectUtil.isRoot(changeInst)) {
 		return;
-	}
+       }
 
        ChangeTreeTableNode node = new ChangeTreeTableNode(root, changeInst);
        TreeTableNode parent = node.getParent();
