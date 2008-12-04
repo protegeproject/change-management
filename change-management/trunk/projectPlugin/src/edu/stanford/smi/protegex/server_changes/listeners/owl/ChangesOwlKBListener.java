@@ -101,6 +101,9 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
         if (log.isLoggable(Level.FINE)) {
             log.fine("In created instance listener");
         }
+        if (event.isReplacementEvent()) {
+            return;
+        }
         Frame frame = event.getFrame();
         ServerChangesUtil.createCreatedChange(changes_db, factory.createIndividual_Created(null), frame, frame.getName());
 	}
@@ -112,6 +115,9 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
         if (log.isLoggable(Level.FINE)) {
             log.fine("In deleted instance listener");
         }
+        if (event.isReplacementEvent()) {
+            return;
+        }
         String name = event.getOldName();
         Frame frame = event.getFrame();
         ServerChangesUtil.createDeletedChange(changes_db, factory.createIndividual_Deleted(null), frame, name);
@@ -121,6 +127,9 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#slotCreated(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	public void slotCreated(KnowledgeBaseEvent event) {
+        if (event.isReplacementEvent()) {
+            return;
+        }
         Frame prop = event.getFrame();
         String propName = prop.getName();
         ServerChangesUtil.createCreatedChange(changes_db, factory.createProperty_Created(null), prop, prop.getName());
@@ -132,6 +141,9 @@ public class ChangesOwlKBListener implements KnowledgeBaseListener {
 	public void slotDeleted(KnowledgeBaseEvent event) {
         if (log.isLoggable(Level.FINE)) {
             log.fine("In deleted slot listener");
+        }
+        if (event.isReplacementEvent()) {
+            return;
         }
         String propName = event.getOldName();
         Frame frame = event.getSlot();
