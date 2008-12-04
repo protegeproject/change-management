@@ -92,12 +92,23 @@ public class DefaultTimestamp extends AbstractWrappedInstance
 	        date = new Date();
 	        counter = sequence++;
 	    }
+	    return getTimestamp(changesKb, date, counter);
+	}
+
+	public static Timestamp getTimestamp(KnowledgeBase changesKb, Date date) {
+	    int counter;
+	    synchronized (Timestamp.class) {
+	        counter = sequence++;
+	    }
+	    return getTimestamp(changesKb, date, counter);
+	}
+	
+	private static Timestamp getTimestamp(KnowledgeBase changesKb, Date date, int counter) {
 	    Timestamp ts = new OntologyComponentFactory(changesKb).createTimestamp(null);
 	    ts.setDate(DATE_FORMAT.format(date));
 	    ts.setSequence(counter);
-        return ts;
+	    return ts;
 	}
-
 
 	public long getTimeMillis() {
 	    return time.getTime();
