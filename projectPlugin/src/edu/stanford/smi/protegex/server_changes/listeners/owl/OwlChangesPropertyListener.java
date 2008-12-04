@@ -1,6 +1,7 @@
 package edu.stanford.smi.protegex.server_changes.listeners.owl;
 
 import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
+import edu.stanford.smi.protege.event.SlotEvent;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.owl.model.RDFSClass;
@@ -19,6 +20,15 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
     }
 
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public final void directSubslotAdded(SlotEvent event) {
+        if (event.isReplacementEvent()) {
+            return;
+        }
+        super.directSubslotAdded(event);
+    }
+    
 	@Override
 	public void subpropertyAdded(RDFProperty arg0, RDFProperty arg1) {
 		StringBuffer context = new StringBuffer();
@@ -29,6 +39,15 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(")");
 
         ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Added(null), arg0, context.toString());
+	}
+	
+	@SuppressWarnings("deprecation")
+    @Override
+	public void directSubslotRemoved(SlotEvent event) {
+        if (event.isReplacementEvent()) {
+            return;
+        }
+	    super.directSubslotRemoved(event);
 	}
 
 	@Override
@@ -46,6 +65,16 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 
 	}
 
+
+	@SuppressWarnings("deprecation")
+    @Override
+	public void directSuperslotAdded(SlotEvent event) {
+        if (event.isReplacementEvent()) {
+            return;
+        }
+	    super.directSuperslotAdded(event);
+	}
+	
 	@Override
 	public void superpropertyAdded(RDFProperty arg0, RDFProperty arg1) {
 		StringBuffer context = new StringBuffer();
@@ -56,6 +85,15 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 		context.append(")");
 
         ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Added(null), arg0, context.toString());
+	}
+	
+	@SuppressWarnings("deprecation")
+    @Override
+	public void directSuperslotRemoved(SlotEvent event) {
+        if (event.isReplacementEvent()) {
+            return;
+        }
+	    super.directSuperslotRemoved(event);
 	}
 
 	@Override
