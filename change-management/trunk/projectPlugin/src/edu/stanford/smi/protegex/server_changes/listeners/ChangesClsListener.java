@@ -24,6 +24,9 @@ public class ChangesClsListener extends ClsAdapter{
 	 */
 	@Override
 	public void directInstanceAdded(ClsEvent event) {
+	    if (event.isReplacementEvent()) {
+	        return;
+	    }
 		Instance addedInst = event.getInstance();
 		Cls clsOfInst = event.getCls();
 
@@ -42,6 +45,9 @@ public class ChangesClsListener extends ClsAdapter{
 	 */
 	@Override
 	public void directInstanceRemoved(ClsEvent event) {
+	    if (event.isReplacementEvent()) {
+	        return;
+	    }
 		Instance removedInst = event.getInstance();
 		Cls clsOfInst = event.getCls();
 
@@ -60,6 +66,9 @@ public class ChangesClsListener extends ClsAdapter{
 	 */
 	@Override
 	public void directSubclassAdded(ClsEvent event) {
+	    if (event.isReplacementEvent()) {
+	        return;
+	    }
 		Cls subClass = event.getSubclass();
 		Cls superClass = event.getCls();
 
@@ -79,6 +88,9 @@ public class ChangesClsListener extends ClsAdapter{
 	 */
 	@Override
 	public void directSubclassRemoved(ClsEvent event) {
+	    if (event.isReplacementEvent()) {
+	        return;
+	    }
 		Cls subClass = event.getSubclass();
 		Cls superClass = event.getCls();
 
@@ -97,6 +109,9 @@ public class ChangesClsListener extends ClsAdapter{
 	 */
 	@Override
 	public void directSuperclassAdded(ClsEvent event) {
+	    if (event.isReplacementEvent()) {
+	        return;
+	    }
 		Cls subClass = event.getSubclass();
 		Cls superClass = event.getCls();
 
@@ -115,6 +130,9 @@ public class ChangesClsListener extends ClsAdapter{
 	 */
 	@Override
 	public void directSuperclassRemoved(ClsEvent event) {
+	    if (event.isReplacementEvent()) {
+	        return;
+	    }
 		Cls subClass = event.getSubclass();
 		Cls superClass = event.getCls();
 

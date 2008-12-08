@@ -30,6 +30,9 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	 */
     @Override
 	public void clsCreated(KnowledgeBaseEvent event) {
+        if (event.isReplacementEvent()) {
+            return;
+        }
         Cls createdCls = event.getCls();
         ServerChangesUtil.createCreatedChange(changes_db, factory.createClass_Created(null), createdCls, createdCls.getName());
     }
@@ -41,6 +44,9 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	public void clsDeleted(KnowledgeBaseEvent event) {
             if (log.isLoggable(Level.FINE)) {
                 log.fine("In class deleted listener");
+            }
+            if (event.isReplacementEvent()) {
+                return;
             }
             String oldName = event.getOldName();
             Frame frame = event.getCls();
