@@ -60,7 +60,7 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	public void frameNameChanged(KnowledgeBaseEvent event) {
 	    String oldName = event.getOldName();
         Frame frame = event.getFrame();
-	    String newName = frame.getName();
+	    String newName = event.getNewFrame().getName();
 
         ServerChangesUtil.createNameChange(changes_db, frame, oldName, newName);
 	}
@@ -70,6 +70,9 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	 */
 	@Override
 	public void instanceCreated(KnowledgeBaseEvent event) {
+	    if (event.isReplacementEvent()) {
+	        return;
+	    }
 	    if (log.isLoggable(Level.FINE)) {
 	        log.fine("In created instance listener");
 	    }
@@ -82,6 +85,9 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	 */
 	@Override
 	public void instanceDeleted(KnowledgeBaseEvent event) {
+	    if (event.isReplacementEvent()) {
+	        return;
+	    }
         if (log.isLoggable(Level.FINE)) {
             log.fine("In deleted instance listener");
         }
@@ -95,6 +101,9 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	 */
 	@Override
 	public void slotCreated(KnowledgeBaseEvent event) {
+	    if (event.isReplacementEvent()) {
+	        return;
+	    }
 		Slot createdSlot = event.getSlot();
 		ServerChangesUtil.createCreatedChange(changes_db, factory.createProperty_Created(null), createdSlot, createdSlot.getName());
 	}
@@ -104,6 +113,9 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	 */
 	@Override
 	public void slotDeleted(KnowledgeBaseEvent event) {
+	    if (event.isReplacementEvent()) {
+	        return;
+	    }
         String oldName = event.getOldName();
         Frame frame = event.getSlot();
         ServerChangesUtil.createDeletedChange(changes_db, factory.createProperty_Deleted(null), frame, oldName);
