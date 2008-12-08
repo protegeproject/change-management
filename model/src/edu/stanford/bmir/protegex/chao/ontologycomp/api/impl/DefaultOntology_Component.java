@@ -157,9 +157,8 @@ implements Ontology_Component {
 	private String initialName = null;
 
 	public Status getStatus() {
-		Collection changes = getChanges();
 		List<Change> nameChanges = getSortedNameChanges();
-		if (changes == null || changes.isEmpty()) {
+		if (nameChanges == null || nameChanges.isEmpty()) {
 			return Status.UNCHANGED;
 		}
 		else {
@@ -168,10 +167,10 @@ implements Ontology_Component {
 			// Can't assume that the deleted change is last
 			//     - there might be a composite change following
 			for (Change change : nameChanges) {
-				if (change instanceof Created_Change) {
+				if (change.canAs(Created_Change.class)) {
 					created = true;
 				}
-				if (change instanceof Deleted_Change) {
+				if (change.canAs(Deleted_Change.class)) {
 					deleted = true;
 					break;
 				}
@@ -201,22 +200,22 @@ implements Ontology_Component {
 		if (nameChanges.isEmpty()) {
 			return getCurrentName();
 		}
-		if (nameChanges.get(0) instanceof Created_Change) {
+		if (nameChanges.get(0).canAs(Created_Change.class)) {
 			return null;
 		}
 		Collections.reverse(nameChanges);
 		String name = getCurrentName();
 		for (Change i : nameChanges) {
-			if (i instanceof Deleted_Change) {
-				Deleted_Change change = (Deleted_Change) i;
+			if (i.canAs(Deleted_Change.class)) {
+				Deleted_Change change = i.as(Deleted_Change.class);
 				name = change.getDeletionName();
 			}
-			else if (i instanceof Name_Changed) {
-				Name_Changed change = (Name_Changed) i;
+			else if (i.canAs(Name_Changed.class)) {
+				Name_Changed change = i.as(Name_Changed.class);
 				name = change.getOldName();
 			}
-			else if (i instanceof Created_Change) {
-				Created_Change change = (Created_Change) i;
+			else if (i.canAs(Created_Change.class)) {
+				Created_Change change = i.as(Created_Change.class);
 				return null;
 			}
 		}
