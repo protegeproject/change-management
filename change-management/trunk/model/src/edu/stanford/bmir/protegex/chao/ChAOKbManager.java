@@ -202,7 +202,12 @@ public class ChAOKbManager {
 
 
 	private static KnowledgeBase getChAOKbFromServer(KnowledgeBase kb) {
-		String annotationName = new GetAnnotationProjectName(kb).execute();
+		String annotationName = null;
+		try {
+			annotationName = new GetAnnotationProjectName(kb).execute();
+		} catch (Throwable t) {
+			Log.getLogger().log(Level.WARNING, "Error at getting annotation project from server for " + kb, t);
+		}		
 		if (annotationName == null) {
 			Log.getLogger().warning("Annotation/Change project not configured on server (use " +
 					GetAnnotationProjectName.METAPROJECT_ANNOTATION_PROJECT_SLOT + " slot)");
