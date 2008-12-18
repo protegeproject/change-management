@@ -2,10 +2,7 @@ package edu.stanford.bmir.protegex.chao.util;
 
 import edu.stanford.smi.protege.exception.ProtegeException;
 import edu.stanford.smi.protege.model.KnowledgeBase;
-import edu.stanford.smi.protege.model.Project;
-import edu.stanford.smi.protege.model.SimpleInstance;
-import edu.stanford.smi.protege.model.Slot;
-import edu.stanford.smi.protege.server.Server;
+import edu.stanford.smi.protege.server.metaproject.ProjectInstance;
 import edu.stanford.smi.protege.util.ProtegeJob;
 
 public class GetAnnotationProjectName extends ProtegeJob {
@@ -17,8 +14,9 @@ public class GetAnnotationProjectName extends ProtegeJob {
     }
 
     @Override
-    public String run() throws ProtegeException {
-        return getMetaProjectInstance().getAnnotationProject().getName();
+    public String run() throws ProtegeException {    	
+        ProjectInstance annotationProject = getMetaProjectInstance().getAnnotationProject();
+		return annotationProject == null ? null : annotationProject.getName();
     }
 
     public String execute() {
