@@ -233,7 +233,7 @@ public class ChAOKbManager {
 		String serverProjectName = null;
 		// ToDo - this is very awkward and inefficient (each call involves io)
 		for (String name : server.getAvailableProjectNames(null)) {
-			if (server.getProject(name).equals(kb.getProject())) {
+			if (server.getProject(name) != null && server.getProject(name).equals(kb.getProject())) {
 				serverProjectName = name;
 				break;
 			}
@@ -241,6 +241,9 @@ public class ChAOKbManager {
 		if (serverProjectName != null) {
 			MetaProject mp = server.getMetaProjectNew();
 			ProjectInstance pi = mp.getProject(serverProjectName);
+			if (pi.getAnnotationProject() == null) {
+			    return null;
+			}
 			String chaoProjectName = pi.getAnnotationProject().getName();
 			return server.getProject(chaoProjectName).getKnowledgeBase();
 		}
