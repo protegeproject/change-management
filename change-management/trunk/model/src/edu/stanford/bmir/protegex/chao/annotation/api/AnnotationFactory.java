@@ -6,6 +6,7 @@ import java.util.Collection;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultAdvice;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultAgreeDisagreeVote;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultAgreeDisagreeVoteProposal;
+import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultAnnotation;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultComment;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultExample;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultExplanation;
@@ -696,6 +697,10 @@ public class AnnotationFactory {
     public String getAnnotationType(Annotation annotation) {
     	Instance protegeInst = getWrappedProtegeInstance(annotation);
     	return protegeInst == null ? null : protegeInst.getDirectType().getBrowserText();
+    }
+    
+    public static Annotation getGenericAnnotation(Instance wrappedAnnotationInstance) {
+    	return new DefaultAnnotation(wrappedAnnotationInstance);
     }
 
 }
