@@ -2,6 +2,7 @@ package edu.stanford.smi.protegex.changes.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.net.URI;
 import java.util.ArrayList;
@@ -181,8 +182,8 @@ public class CreateChAOProjectDialog {
 		}
 
 		protected void buildUI() {
-			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-			setPreferredSize(new Dimension(280, 110));
+			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));		
+			//setPreferredSize(new Dimension(390, 110));
 			add(getTextComponent());
 			addRadioBoxOptions();
 		}
@@ -190,10 +191,17 @@ public class CreateChAOProjectDialog {
 		protected JTextArea getTextComponent() {
 			JTextArea textArea = new JTextArea();
 			textArea.setLineWrap(true);
-			textArea.setWrapStyleWord(true);
+			textArea.setWrapStyleWord(true);		
 			textArea.setEditable(false);
-			textArea.setText("Changes Tab needs a Changes and Annotations ontology (ChAO)" +
-			" for its functioning.\nPlease choose one of the following options:");
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.append("Some Protege feature (e.g., the collaboration panel or the Changes Tab)\n");
+			Font font = textArea.getFont();
+			int width = textArea.getFontMetrics(font).stringWidth(stringBuilder.toString());
+			int height = textArea.getFontMetrics(font).getHeight();
+			setPreferredSize(new Dimension(width + 20, height * 8));
+			stringBuilder.append("needs a Changes and Annotations ontology (ChAO) for its functioning.\n");
+			stringBuilder.append("Please choose one of the following options:");
+			textArea.setText(stringBuilder.toString());			
 			return textArea;
 		}
 
