@@ -367,7 +367,7 @@ public class ChAOKbManager {
 		kb.getProject().removeProjectListener(kbListener);
 		//TODO: check how this is working
 		if (chaoKb != null && !kb.getProject().isMultiUserServer()) {
-			chaoKb.dispose();
+			chaoKb.getProject().dispose();
 		}
 	}
 
