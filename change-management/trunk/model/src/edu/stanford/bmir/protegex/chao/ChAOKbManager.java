@@ -25,7 +25,6 @@ import edu.stanford.smi.protege.server.RemoteServer;
 import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protege.server.Server;
 import edu.stanford.smi.protege.server.framestore.RemoteClientFrameStore;
-import edu.stanford.smi.protege.server.metaproject.MetaProject;
 import edu.stanford.smi.protege.server.metaproject.ProjectInstance;
 import edu.stanford.smi.protege.storage.database.DatabaseKnowledgeBaseFactory;
 import edu.stanford.smi.protege.ui.ProjectManager;
@@ -66,7 +65,7 @@ public class ChAOKbManager {
 	/**
 	 * Attach this listener to all kb-s, so that we can remove them from the map.
 	 */
-	private static ProjectListener kbListener = new ProjectAdapter() {
+	private static ProjectListener domainKbListener = new ProjectAdapter() {
 		/*
 		 * TODO: Find a better solution.
 		 * The current implementation will remove from the map
@@ -230,23 +229,19 @@ public class ChAOKbManager {
 
 	private static KnowledgeBase getChAOKbOnServer(KnowledgeBase kb) {
 		Server server = Server.getInstance();
-		String serverProjectName = null;
-		// ToDo - this is very awkward and inefficient (each call involves io)
-		for (String name : server.getAvailableProjectNames(null)) {
-			if (server.getProject(name) != null && server.getProject(name).equals(kb.getProject())) {
-				serverProjectName = name;
-				break;
-			}
-		}
-		if (serverProjectName != null) {
-			MetaProject mp = server.getMetaProjectNew();
-			ProjectInstance pi = mp.getProject(serverProjectName);
-			if (pi.getAnnotationProject() == null) {
-			    return null;
-			}
-			String chaoProjectName = pi.getAnnotationProject().getName();
-			return server.getProject(chaoProjectName).getKnowledgeBase();
-		}
+		URI projectURI = kb.getProject().getProjectURI();
+		for (ProjectInstance p : server.getMetaProjectNew().getProjects()){			
+			String location = p.getLocation();
+			if (location != null) {
+				URI uri = URIUtilities.createURI(location);	 		
+				if (uri.equals(projectURI)) {
+					ProjectInstance chaoPrjInst = p.getAnnotationProject();
+					if (chaoPrjInst == null) { return null;}					
+					Project chaoPrj = server.getOrCreateProject(chaoPrjInst.getName());
+					return chaoPrj == null ? null : chaoPrj.getKnowledgeBase();
+				}
+			}	 		
+		}	
 		return null;
 	}
 
@@ -357,20 +352,20 @@ public class ChAOKbManager {
 		boolean alreadyInMap = kb2chaoKb.keySet().contains(kb);
 		KnowledgeBase existingChaoKb = kb2chaoKb.put(kb, chaoKb);
 		if (!alreadyInMap) {
-			kb.getProject().addProjectListener(kbListener);
-		}
+			kb.getProject().addProjectListener(domainKbListener);
+		}		
 	}
 
 	private static void removeFromMap(KnowledgeBase kb) {
 		KnowledgeBase chaoKb = kb2chaoKb.get(kb);
 		kb2chaoKb.remove(kb);
-		kb.getProject().removeProjectListener(kbListener);
+		kb.getProject().removeProjectListener(domainKbListener);
 		//TODO: check how this is working
 		if (chaoKb != null && !kb.getProject().isMultiUserServer()) {
 			chaoKb.getProject().dispose();
 		}
 	}
-
+		
 
 	public static boolean isValidChAOKb(URI prjUri) {
 		if (prjUri == null) {
