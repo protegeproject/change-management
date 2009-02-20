@@ -2,13 +2,14 @@ package edu.stanford.smi.protegex.server_changes.listeners.owl;
 
 import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
 import edu.stanford.smi.protege.event.ClsEvent;
+import edu.stanford.smi.protegex.owl.model.NamespaceUtil;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.owl.model.RDFResource;
 import edu.stanford.smi.protegex.owl.model.RDFSClass;
 import edu.stanford.smi.protegex.owl.model.event.ClassAdapter;
-import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class OwlChangesClassListener extends ClassAdapter {
@@ -28,7 +29,6 @@ public class OwlChangesClassListener extends ClassAdapter {
 	        return;
 	    }
 		String instText = inst.getBrowserText();
-		String instName = inst.getName();
 		StringBuffer context = new StringBuffer();
 		context.append("Instance Added: ");
 		context.append(instText);
@@ -45,11 +45,10 @@ public class OwlChangesClassListener extends ClassAdapter {
 	            return;
 	        }
             PostProcessorManager changesDb = ChangesProject.getPostProcessorManager(om);
-            //String instText = changesDb.getPossiblyDeletedBrowserText(arg1);
-            String instText = inst.getName();
+            //String instText = changesDb.getPossiblyDeletedBrowserText(arg1);            
             StringBuffer context = new StringBuffer();
             context.append("Instance Removed: ");
-            context.append(instText);
+            context.append(NamespaceUtil.getLocalName(inst.getName()));
             context.append(" (instance of: ");
             context.append(clz.getBrowserText());
             context.append(")");
@@ -66,62 +65,58 @@ public class OwlChangesClassListener extends ClassAdapter {
 	}
 
 	@Override
-	public void subclassAdded(RDFSClass arg0, RDFSClass arg1, ClsEvent event) {
+	public void subclassAdded(RDFSClass cls, RDFSClass subcls, ClsEvent event) {
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-		String clsName = arg1.getName();
-		String clsText = arg1.getBrowserText();
 		StringBuffer context = new StringBuffer();
 		context.append("Subclass Added: ");
-		context.append(clsName);
+		context.append(subcls.getBrowserText());
 		context.append(" (added to: ");
-		context.append(arg0.getBrowserText());
+		context.append(cls.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Added(null), arg1, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Added(null), subcls, context.toString());
 	}
 
 	@Override
-	public void subclassRemoved(RDFSClass clz, RDFSClass inst, ClsEvent event) {
+	public void subclassRemoved(RDFSClass supercls, RDFSClass cls, ClsEvent event) {
 	       if (event.isReplacementEvent()) {
 	            return;
 	        }
             //String clsName = changes_db.getPossiblyDeletedBrowserText(arg1);
             StringBuffer context = new StringBuffer();
             context.append("Subclass Removed: ");
-            context.append(inst.getName());
+            context.append(cls.getBrowserText());
             context.append(" (removed from: ");
-            context.append(clz.getBrowserText());
+            context.append(supercls.getBrowserText());
             context.append(")");
 
-            ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Removed(null), inst, context.toString());
+            ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Removed(null), cls, context.toString());
 	}
 
 	@Override
-	public void superclassAdded(RDFSClass arg0, RDFSClass arg1) {
-		String clsName = arg1.getName();
-		String clsText = arg1.getBrowserText();
+	public void superclassAdded(RDFSClass cls, RDFSClass supercls) {		
 		StringBuffer context = new StringBuffer();
 		context.append("Superclass Added: ");
-		context.append(clsText);
+		context.append(supercls.getBrowserText());
 		context.append(" (added to: ");
-		context.append(arg0.getBrowserText());
+		context.append(cls.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperclass_Added(null), arg1, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperclass_Added(null), supercls, context.toString());
 	}
 
 	@Override
-	public void superclassRemoved(RDFSClass arg0, RDFSClass arg1) {
+	public void superclassRemoved(RDFSClass cls, RDFSClass supercls) {
 		//String clsName = changes_db.getPossiblyDeletedBrowserText(arg1);
 		StringBuffer context = new StringBuffer();
 		context.append("Superclass Removed: ");
-		context.append(arg1.getName());
+		context.append(supercls.getBrowserText());
 		context.append(" (removed from: ");
-		context.append(arg0.getBrowserText());
+		context.append(cls.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperclass_Removed(null), arg1, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperclass_Removed(null), supercls, context.toString());
 	}
 }
