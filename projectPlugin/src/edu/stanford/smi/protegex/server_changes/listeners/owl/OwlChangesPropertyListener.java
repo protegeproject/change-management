@@ -6,8 +6,8 @@ import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
 import edu.stanford.smi.protegex.owl.model.RDFSClass;
 import edu.stanford.smi.protegex.owl.model.event.PropertyAdapter;
-import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class OwlChangesPropertyListener extends PropertyAdapter{
@@ -30,15 +30,14 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
     }
     
 	@Override
-	public void subpropertyAdded(RDFProperty arg0, RDFProperty arg1) {
+	public void subpropertyAdded(RDFProperty subProp, RDFProperty prop) {
 		StringBuffer context = new StringBuffer();
 		context.append("Subproperty Added: ");
-		context.append(arg0.getBrowserText());
+		context.append(subProp.getBrowserText());
 		context.append(" (added to: ");
-		context.append(arg1.getBrowserText());
+		context.append(prop.getBrowserText());
 		context.append(")");
-
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Added(null), arg0, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Added(null), subProp, context.toString());
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -51,18 +50,15 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 	}
 
 	@Override
-	public void subpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
-            //String browserText0 = changes_db.getPossiblyDeletedBrowserText(arg0);
-
+	public void subpropertyRemoved(RDFProperty subProp, RDFProperty prop) {
+			//String browserText0 = changes_db.getPossiblyDeletedBrowserText(arg0);
             StringBuffer context = new StringBuffer();
             context.append("Subproperty Removed: ");
-            context.append(arg0.getName());
+            context.append(subProp.getBrowserText());
             context.append(" (removed from: ");
-            context.append(arg1.getBrowserText());
+            context.append(prop.getBrowserText());
             context.append(")");
-
-            ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Removed(null), arg0, context.toString());
-
+            ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Removed(null), subProp, context.toString());
 	}
 
 
@@ -76,15 +72,14 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 	}
 	
 	@Override
-	public void superpropertyAdded(RDFProperty arg0, RDFProperty arg1) {
+	public void superpropertyAdded(RDFProperty superProp, RDFProperty prop) {
 		StringBuffer context = new StringBuffer();
 		context.append("Superproperty Added: ");
-		context.append(arg0.getBrowserText());
+		context.append(superProp.getBrowserText());
 		context.append(" (added to: ");
-		context.append(arg1.getBrowserText());
+		context.append(prop.getBrowserText());
 		context.append(")");
-
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Added(null), arg0, context.toString());
+        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Added(null), superProp, context.toString());
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -97,52 +92,42 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 	}
 
 	@Override
-	public void superpropertyRemoved(RDFProperty arg0, RDFProperty arg1) {
+	public void superpropertyRemoved(RDFProperty superProp, RDFProperty prop) {
         //String browserText0 = changes_db.getPossiblyDeletedBrowserText(arg0);
         //String browserText1 = changes_db.getPossiblyDeletedBrowserText(arg1);
 		StringBuffer context = new StringBuffer();
 		context.append("Superproperty Removed: ");
-		context.append(arg0.getName());
+		context.append(superProp.getBrowserText());
 		context.append(" (removed from: " );
-		context.append(arg1.getName());
+		context.append(prop.getBrowserText());
 		context.append(")");
-
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Added(null), arg0, context.toString());
-
+        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Added(null), superProp, context.toString());
 	}
 
 	@Override
-	public void unionDomainClassAdded(RDFProperty arg0, RDFSClass arg1) {
-		String propText = arg0.getBrowserText();
-		String propName = arg0.getName();
-		String clsName = arg1.getName();
-		String clsText = arg1.getBrowserText();
-
+	public void unionDomainClassAdded(RDFProperty prop, RDFSClass cls) {
+		String propText = prop.getBrowserText();		
+		String clsText = cls.getBrowserText();
 		StringBuffer context = new StringBuffer();
 		context.append("Domain Property Added: ");
 		context.append(propText);
 		context.append("(added to: ");
 		context.append(clsText);
 		context.append(")");
-
-        ServerChangesUtil.createChangeStd(changes_db, factory.createDomainProperty_Added(null), arg0, context.toString());
-
+        ServerChangesUtil.createChangeStd(changes_db, factory.createDomainProperty_Added(null), prop, context.toString());
 	}
 
 	@Override
-	public void unionDomainClassRemoved(RDFProperty arg0, RDFSClass arg1) {
+	public void unionDomainClassRemoved(RDFProperty prop, RDFSClass cls) {
 		//String propText = changes_db.getPossiblyDeletedBrowserText(arg0);
 		//String clsText = changes_db.getPossiblyDeletedBrowserText(arg1);
-
 		StringBuffer context = new StringBuffer();
 		context.append("Domain Property Removed: ");
-		context.append(arg0.getName());
+		context.append(prop.getBrowserText());
 		context.append("(removed from: ");
-		context.append(arg1.getName());
+		context.append(cls.getBrowserText());
 		context.append(")");
-
-        ServerChangesUtil.createChangeStd(changes_db, factory.createDomainProperty_Removed(null), arg0, context.toString());
-
+        ServerChangesUtil.createChangeStd(changes_db, factory.createDomainProperty_Removed(null), prop, context.toString());
 	}
 
 }
