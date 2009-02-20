@@ -64,6 +64,7 @@ public class JTreeTable extends SelectableTable {
     
 	//Abhita: adding this because we want to change the icons of the nodes
 	TreeCellRenderer treeCellRenderer = new DefaultTreeCellRenderer() {
+		@Override
 		public Component getTreeCellRendererComponent(
 			JTree tree,
 			Object value,
@@ -117,6 +118,7 @@ public class JTreeTable extends SelectableTable {
 
 		// No intercell spacing
 		setIntercellSpacing(new Dimension(0, 0));
+		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 		// And update the height of the trees row to match that of
 		// the table.
@@ -133,6 +135,7 @@ public class JTreeTable extends SelectableTable {
 	 * tree is not actually in the component hieachy it will never receive this
 	 * unless we forward it in this manner.
 	 */
+	@Override
 	public void updateUI() {
 		super.updateUI();
 		if (tree != null) {
@@ -155,6 +158,7 @@ public class JTreeTable extends SelectableTable {
 	 * right thing to do for an editor. Returning -1 for the editing row in this
 	 * case, ensures the editor is never painted.
 	 */
+	@Override
 	public int getEditingRow() {
 		return (getColumnClass(editingColumn) == TreeTableModel.class) ? -1
 				: editingRow;
@@ -175,6 +179,7 @@ public class JTreeTable extends SelectableTable {
 	 * being edited, as <code>getEditingRow</code> returns -1, and therefore
 	 * doesn't automaticly resize the editor for us.
 	 */
+	@Override
 	public void sizeColumnsToFit(int resizingColumn) {
 		super.sizeColumnsToFit(resizingColumn);
 		if (getEditingColumn() != -1
@@ -190,6 +195,7 @@ public class JTreeTable extends SelectableTable {
 	/**
 	 * Overridden to pass the new rowHeight to the tree.
 	 */
+	@Override
 	public void setRowHeight(int rowHeight) {
 		super.setRowHeight(rowHeight);
 		if (tree != null && tree.getRowHeight() != rowHeight) {
@@ -210,6 +216,7 @@ public class JTreeTable extends SelectableTable {
 	 * bounds of the cell, we need the renderer to paint the tree in the
 	 * background, and then draw the editor over it.
 	 */
+	@Override
 	public boolean editCellAt(int row, int column, EventObject e) {
 		boolean retValue = super.editCellAt(row, column, e);
 		if (retValue && getColumnClass(column) == TreeTableModel.class) {
@@ -240,6 +247,7 @@ public class JTreeTable extends SelectableTable {
 		 * updateUI is overridden to set the colors of the Tree's renderer to
 		 * match that of the table.
 		 */
+		@Override
 		public void updateUI() {
 			super.updateUI();
 			// Make the tree's cell renderer use the table's cell selection
@@ -262,6 +270,7 @@ public class JTreeTable extends SelectableTable {
 		 * Sets the row height of the tree, and forwards the row height to the
 		 * table.
 		 */
+		@Override
 		public void setRowHeight(int rowHeight) {
 			if (rowHeight > 0) {
 				super.setRowHeight(rowHeight);
@@ -275,6 +284,7 @@ public class JTreeTable extends SelectableTable {
 		/**
 		 * This is overridden to set the height to match that of the JTable.
 		 */
+		@Override
 		public void setBounds(int x, int y, int w, int h) {
 			super.setBounds(x, 0, w, JTreeTable.this.getHeight());
 		}
@@ -283,6 +293,7 @@ public class JTreeTable extends SelectableTable {
 		 * Sublcassed to translate the graphics such that the last visible row
 		 * will be drawn at 0,0.
 		 */
+		@Override
 		public void paint(Graphics g) {
 			
 			g.translate(0, -visibleRow * getRowHeight());
@@ -405,6 +416,7 @@ public class JTreeTable extends SelectableTable {
 		 * The offset is then set on the TreeTableTextField component created in
 		 * the constructor, and returned.
 		 */
+		@Override
 		public Component getTableCellEditorComponent(JTable table,
 				Object value, boolean isSelected, int r, int c) {
 			Component component = super.getTableCellEditorComponent(table,
@@ -442,6 +454,7 @@ public class JTreeTable extends SelectableTable {
 		 * This is overriden to forward the event to the tree. This will return
 		 * true if the click count >= 3, or the event is null.
 		 */
+		@Override
 		public boolean isCellEditable(EventObject e) {
 			if (e instanceof MouseEvent) {
 				MouseEvent me = (MouseEvent) e;
@@ -487,6 +500,7 @@ public class JTreeTable extends SelectableTable {
 	static class TreeTableTextField extends JTextField {
 		public int offset;
 
+		@Override
 		public void reshape(int x, int y, int w, int h) {
 			int newX = Math.max(x, offset);
 			super.reshape(newX, y, w - (newX - x), h);
@@ -523,6 +537,7 @@ public class JTreeTable extends SelectableTable {
 		 * and message super. This is the only place DefaultTreeSelectionModel
 		 * alters the ListSelectionModel.
 		 */
+		@Override
 		public void resetRowSelection() {
 			if (!updatingListSelectionModel) {
 				updatingListSelectionModel = true;
