@@ -13,6 +13,7 @@ import edu.stanford.bmir.protegex.chao.change.api.Name_Changed;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
 import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protege.util.CollectionUtilities;
+import edu.stanford.smi.protegex.owl.model.NamespaceUtil;
 import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
@@ -78,10 +79,10 @@ public class JoinCreateAndNameChange implements PostProcessor {
             List<Change> changes = new ArrayList<Change>();
             changes.add(lastCompositeCreate);
             changes.add(nameChange);
-            StringBuffer sb = new StringBuffer("Created ");
+            StringBuffer sb = new StringBuffer("Create ");
             sb.append(created.getComponentType());
             sb.append(" ");
-            sb.append(newName);
+            sb.append(NamespaceUtil.getLocalName(newName));
             ServerChangesUtil.createTransactionChange(postProcessorManager,
                                                       created,
                                                       sb.toString(),
