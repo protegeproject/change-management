@@ -28,6 +28,7 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.CollectionUtilities;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protegex.owl.model.NamespaceUtil;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
 
 public class ServerChangesUtil {
@@ -38,7 +39,9 @@ public class ServerChangesUtil {
                                          Frame applyTo,
                                          String context) {
         Ontology_Component frame = changes_db.getOntologyComponent(applyTo, true);
-        change.setAction(((AbstractWrappedInstance)change).getWrappedProtegeInstance().getDirectType().getName());
+        if (change.getAction() == null) {
+        	change.setAction(((AbstractWrappedInstance)change).getWrappedProtegeInstance().getDirectType().getName());
+        }
         changes_db.finalizeChange(change, frame, context);
         return change;
     }
@@ -49,7 +52,6 @@ public class ServerChangesUtil {
                                                      Frame applyTo,
                                                      String name) {
         String context = "";
-        //TT: Is this important??
         if (change instanceof Class_Created) {
         	context =  "Class";
         } else if (change instanceof Property_Created) {
@@ -58,7 +60,7 @@ public class ServerChangesUtil {
         	context = "Individual";
         }
 
-        context = context + " Created: " + name;
+        context = context + " Create: " + NamespaceUtil.getLocalName(name);
         change.setAction(((AbstractWrappedInstance)change).getWrappedProtegeInstance().getDirectType().getName());
 
         Ontology_Component oc = changes_db.getOntologyComponent(applyTo, true);
@@ -72,17 +74,16 @@ public class ServerChangesUtil {
                                                      Deleted_Change change,
                                                      Frame frame,
                                                      String name) {
-        String context = "";
-        //TT: Is this important??
+        String context = "";       
         if (change instanceof Class_Deleted) {
         	context =  "Class";
         } else if (change instanceof Property_Deleted) {
         	context = "Property";
         } else if (change instanceof Individual_Deleted) {
         	context = "Individual";
-        }
-
-        context = context + " Deleted: " + name;
+        }       
+        
+        context = context + " Delete: " + NamespaceUtil.getLocalName(name);
 
         change.setAction(((AbstractWrappedInstance)change).getWrappedProtegeInstance().getDirectType().getName());
         Ontology_Component applyTo = changes_db.getOntologyComponent(frame, true);
@@ -100,9 +101,9 @@ public class ServerChangesUtil {
 
         StringBuffer context = new StringBuffer();
         context.append("Name change from '");
-        context.append(oldName);
+        context.append(NamespaceUtil.getLocalName(oldName));
         context.append("' to '");
-        context.append(newName);
+        context.append(NamespaceUtil.getLocalName(newName));
         context.append("'");
 
         Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
@@ -166,6 +167,7 @@ public class ServerChangesUtil {
     }
 
     public static Ontology_Component getOntologyComponent(KnowledgeBase changes_kb, Frame frame, boolean create) {
+    	if (changes_kb == null) { return null; };
     	Ontology_Component oc = getOntologyComponent(changes_kb, frame.getName());
     	if (oc != null) {
     		return oc;
