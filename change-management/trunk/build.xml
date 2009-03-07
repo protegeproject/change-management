@@ -3,20 +3,14 @@
    <property environment="env"/>
    <property name="protege.home" value="${env.PROTEGE_HOME}"/>
 
-   <property name = "build"              value = "./build"/>
-   <property name = "annotation.classes" value = "${build}/classes/chao-annotation"/>
-   <property name = "component.classes"  value = "${build}/classes/chao-component"/>
-   <property name = "changelib.classes"  value = "${build}/classes/chao-changes"/>
-   <property name = "util.classes"       value = "${build}/classes/chao-util"/>
-   <property name = "plugin.classes"     value = "${build}/classes/plugin"/>
+   <property name = "build"           location = "./build"/>
+   <property name = "model.classes"   location = "${build}/classes/model"/>
+   <property name = "manage.classes"  location = "${build}/classes/management"/>
 
    <property name = "plugin.dist"     value = "edu.stanford.smi.protegex.changes"/>
    <property name = "plugin.dir"      location = "${build}/plugins/${plugin.dist}"/>
-   <property name = "annotation.jar"  location = "${plugin.dir}/chao-annotation.jar"/>
-   <property name = "component.jar"   location = "${plugin.dir}/chao-component.jar"/>
-   <property name = "changelib.jar"   location = "${plugin.dir}/chao-changes.jar"/>
-   <property name = "util.jar"        location = "${plugin.dir}/chao-util.jar"/>
-   <property name = "plugin.jar"      location = "${plugin.dir}/change-management.jar"/>
+   <property name = "model.jar"       location = "${plugin.dir}/change-model.jar"/>
+   <property name = "manage.jar"      location = "${plugin.dir}/change-management.jar"/>
 
    <property name = "distribution"    location = "${build}/change-management.zip"/>
 
@@ -100,50 +94,15 @@
    </target>  
 
    <target name = "compile" depends = "init, checkProtegeLibsAndReport">
-     <mkdir dir="${annotation.classes}"/>
+     <mkdir dir="${model.classes}"/>
      <javac srcdir="model/src" 
-            destdir="${annotation.classes}"
+            destdir="${model.classes}"
             debug="${debug}">
-       <include name = "edu/stanford/bmir/protegex/chao/annotation/api/**/*.java"/>
        <classpath refid = "project.classpath"/>
      </javac>
 
-     <mkdir dir="${component.classes}"/>
-     <javac srcdir="model/src"
-            destdir="${component.classes}"
-            debug="${debug}">
-       <include name = "edu/stanford/bmir/protegex/chao/ontologycomp/api/**/*.java"/>
-       <classpath refid = "project.classpath"/>
-     </javac>
-
-     <mkdir dir="${changelib.classes}"/>
-     <javac srcdir="model/src"
-            destdir="${changelib.classes}"
-            debug="${debug}">
-       <include name = "edu/stanford/bmir/protegex/chao/change/api/**/*.java"/>
-       <classpath refid = "project.classpath"/>
-       <classpath>
-         <pathelement location = "${annotation.classes}"/>
-         <pathelement location = "${component.classes}"/>
-       </classpath>
-     </javac>
-
-     <mkdir dir="${util.classes}"/>
-     <javac srcdir="model/src"
-            destdir="${util.classes}"
-            debug="${debug}">
-       <include name = "edu/stanford/bmir/protegex/chao/*.java"/>
-       <include name = "edu/stanford/bmir/protegex/chao/util/**/*.java"/>
-       <classpath refid = "project.classpath"/>
-       <classpath>
-         <pathelement location = "${annotation.classes}"/>
-         <pathelement location = "${component.classes}"/>
-         <pathelement location = "${changelib.classes}"/>
-       </classpath>
-     </javac>
-
-     <mkdir dir="${plugin.classes}"/>
-     <javac destdir="${plugin.classes}"
+     <mkdir dir="${manage.classes}"/>
+     <javac destdir="${manage.classes}"
             debug="${debug}">
        <src path = "changesKbViewTab/src"/>
        <src path = "changesTab/src"/>
@@ -151,10 +110,7 @@
        <src path = "projectPlugin/src"/>
        <classpath refid = "project.classpath"/>
        <classpath>
-         <pathelement location = "${annotation.classes}"/>
-         <pathelement location = "${component.classes}"/>
-         <pathelement location = "${changelib.classes}"/>
-         <pathelement location = "${util.classes}"/>
+         <pathelement location = "${model.classes}"/>
        </classpath>
      </javac>
 
@@ -177,25 +133,13 @@
 
    <target name = "jar" depends = "compile,manifests">
      <mkdir dir="${plugin.dir}"/>
-     <jar destfile = "${annotation.jar}"
+     <jar destfile = "${model.jar}"
           manifest = "${lib.manifest}"
-          basedir = "${annotation.classes}"/>
+          basedir = "${model.classes}"/>
 
-     <jar destfile = "${component.jar}"
+     <jar destfile = "${manage.jar}"
           manifest = "${lib.manifest}"
-          basedir = "${component.classes}"/>
-
-     <jar destfile = "${changelib.jar}"
-          manifest = "${lib.manifest}"
-          basedir = "${changelib.classes}"/>
-
-     <jar destfile = "${util.jar}"
-          manifest = "${lib.manifest}"
-          basedir = "${util.classes}"/>
-
-     <jar destfile = "${plugin.jar}"
-          manifest = "${plugin.manifest}"
-          basedir  = "${plugin.classes}"/>
+          basedir = "${manage.classes}"/>
    </target>
 
    <target name = "dist" depends = "jar">
@@ -203,6 +147,9 @@
      <copy file = "plugin.properties" todir = "${plugin.dir}"/>
      <copy todir = "${plugin.dir}/projects">
        <fileset dir="projects"/>
+     </copy>
+     <copy todir = "${plugin.dir}/doc">
+         <fileset dir="./docs"/>
      </copy>
      <zip basedir = "${build}/plugins"
           destfile = "${distribution}"/>
