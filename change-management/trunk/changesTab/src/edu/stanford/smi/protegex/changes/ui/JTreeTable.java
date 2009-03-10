@@ -209,7 +209,8 @@ public class JTreeTable extends SelectableTable {
 	public JTree getTree() {
 		return tree;
 	}
-
+	
+	
 	/**
 	 * Overriden to invoke repaint for the particular location if the column
 	 * contains the tree. This is done as the tree editor does not fill the
@@ -218,11 +219,13 @@ public class JTreeTable extends SelectableTable {
 	 */
 	@Override
 	public boolean editCellAt(int row, int column, EventObject e) {
+		//return false;
 		boolean retValue = super.editCellAt(row, column, e);
 		if (retValue && getColumnClass(column) == TreeTableModel.class) {
 			repaint(getCellRect(row, column, false));
 		}
 		return retValue;
+		
 	}
 
 	/**
@@ -481,12 +484,12 @@ public class JTreeTable extends SelectableTable {
 					}
 				}
 				if (me.getClickCount() >= 3) {
-					return true;
+					return false; //return true;
 				}
 				return false;
 			}
 			if (e == null) {
-				return true;
+				return false; //return true;
 			}
 			return false;
 		}
