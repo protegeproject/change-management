@@ -139,7 +139,7 @@ public class AnnotationTableModel extends AbstractTableModel{
 	}
 
 	public Object getObjInRow(int row) {
-		Instance aInst = (Instance) data.get(row);
+		Instance aInst = ((AbstractWrappedInstance)data.get(row)).getWrappedProtegeInstance();
 		return aInst;
 	}
 
