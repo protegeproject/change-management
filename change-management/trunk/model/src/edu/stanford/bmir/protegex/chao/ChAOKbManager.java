@@ -32,6 +32,7 @@ import edu.stanford.smi.protege.util.FileUtilities;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.PropertyList;
 import edu.stanford.smi.protege.util.URIUtilities;
+import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
 /**
@@ -135,13 +136,22 @@ public class ChAOKbManager {
 
 
 	public static KnowledgeBase createRDFFileChAOKb(KnowledgeBase kb, URI chaoURI) {
+		return createRDFFileChAOKb(kb, chaoURI, true);
+	}
+	
+	public static KnowledgeBase createRDFFileChAOKb(KnowledgeBase kb, URI chaoURI, boolean enableChangeTracking) {
 		String rdfsFileName = FileUtilities.replaceExtension(URIUtilities.getName(chaoURI), ".rdfs");
 		String rdfFileName = FileUtilities.replaceExtension(URIUtilities.getName(chaoURI), ".rdf");
-		return createRDFFileChAOKb(kb, chaoURI, rdfsFileName, rdfFileName, PROTEGE_NAMESPACE);
+		return createRDFFileChAOKb(kb, chaoURI, rdfsFileName, rdfFileName, PROTEGE_NAMESPACE, enableChangeTracking);
+	}
+	
+	public static KnowledgeBase createRDFFileChAOKb(KnowledgeBase kb,
+			URI chaoURI, String rdfsFile, String rdfFile, String namespace) {
+		return createRDFFileChAOKb(kb, chaoURI, rdfsFile, rdfFile, namespace, true);
 	}
 
 	public static KnowledgeBase createRDFFileChAOKb(KnowledgeBase kb,
-			URI chaoURI, String rdfsFile, String rdfFile, String namespace) {
+			URI chaoURI, String rdfsFile, String rdfFile, String namespace, boolean enableChangeTracking) {
 		KnowledgeBase changesKb = kb2chaoKb.get(kb);
 		if (changesKb != null) {
 			return changesKb;
@@ -161,14 +171,26 @@ public class ChAOKbManager {
 
 		RDFBackend.setSourceFiles(chaoPrj.getSources(),	rdfsFile, rdfFile, namespace);
 		chaoPrj.setProjectURI(getChAOProjectURI(kb));
-
 		putInMap(kb, chaoPrj.getKnowledgeBase());
+		
+		if (enableChangeTracking) {
+			if (!ChangesProject.isInitialized(kb.getProject())) {
+			    ChangesProject.initialize(kb.getProject());			 
+			}
+			kb.getProject().setChangeTrackingActive(true);
+		}
+		
 		return chaoPrj.getKnowledgeBase();
 	}
 
 
 	public static KnowledgeBase createDbChAOKb(KnowledgeBase kb, URI chaoURI,
 			String dbDriver, String dbUrl, String dbTable, String dbUser, String dbPassword) {
+		return createDbChAOKb(kb, chaoURI, dbDriver, dbUrl, dbTable, dbUser, dbPassword, true);
+	}
+	
+	public static KnowledgeBase createDbChAOKb(KnowledgeBase kb, URI chaoURI,
+			String dbDriver, String dbUrl, String dbTable, String dbUser, String dbPassword, boolean enableChangeTracking) {
 		KnowledgeBase changesKb = kb2chaoKb.get(kb);
 		if (changesKb != null) {
 			return changesKb;
@@ -196,6 +218,14 @@ public class ChAOKbManager {
 		ProjectManager.getProjectManager().displayErrors("Errors at creating ChAO in database", errors);
 
 		putInMap(kb, chaoPrj.getKnowledgeBase());
+		
+		if (enableChangeTracking) {
+			if (!ChangesProject.isInitialized(kb.getProject())) {
+			    ChangesProject.initialize(kb.getProject());			    
+			}
+			kb.getProject().setChangeTrackingActive(true);
+		}		
+		
 		return chaoPrj.getKnowledgeBase();
 	}
 
