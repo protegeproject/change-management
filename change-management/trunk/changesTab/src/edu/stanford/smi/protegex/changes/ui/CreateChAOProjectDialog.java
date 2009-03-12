@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
@@ -77,7 +78,7 @@ public class CreateChAOProjectDialog {
 	protected boolean onFileProjectOption() {
 		//new project - no path
 		if (kb.getProject().getProjectDirectoryURI() == null) {
-			changesKb = ChAOKbManager.createRDFFileChAOKb(kb, ChAOKbManager.getChAOProjectURI(kb));
+			changesKb = ChAOKbManager.createRDFFileChAOKb(kb, ChAOKbManager.getChAOProjectURI(kb), panel.isChangeTrackingEnabled());
 			return true;
 		}
 
@@ -101,7 +102,7 @@ public class CreateChAOProjectDialog {
 			try {
 				changesKb = ChAOKbManager.createRDFFileChAOKb(kb, URIUtilities.createURI(editor.getProjectPath()),
 						RDFBackend.getClsesFileName(newSources), RDFBackend.getInstancesFileName(newSources),
-						RDFBackend.getNamespace(newSources));
+						RDFBackend.getNamespace(newSources), panel.isChangeTrackingEnabled());
 			} catch (Throwable t) {
 				Log.getLogger().log(Level.WARNING, "Errors at creating the ChAO KB", t);
 			}
@@ -113,6 +114,11 @@ public class CreateChAOProjectDialog {
 	}
 
 	protected boolean onDBProjectOption() {
+		if (kb.getProject().getProjectDirectoryURI() == null) {
+			ModalDialog.showMessageDialog(panel, "Please save first the main project.", "New project, please save");
+			return false;
+		}
+		
 		//existing projects that have a path
 		Project tmpPrj = Project.createNewProject(null, new ArrayList());
 		PropertyList sources = PropertyList.create(tmpPrj.getInternalProjectKnowledgeBase());
@@ -134,7 +140,8 @@ public class CreateChAOProjectDialog {
 						DatabaseKnowledgeBaseFactory.getURL(newSources),
 						DatabaseKnowledgeBaseFactory.getTableName(newSources),
 						DatabaseKnowledgeBaseFactory.getUsername(newSources),
-						DatabaseKnowledgeBaseFactory.getPassword(newSources));
+						DatabaseKnowledgeBaseFactory.getPassword(newSources), 
+						panel.isChangeTrackingEnabled());
 			} catch (Throwable t) {
 				Log.getLogger().log(Level.WARNING, "Errors at creating the ChAO KB", t);
 			}
@@ -170,11 +177,13 @@ public class CreateChAOProjectDialog {
 
 
 	class CreateChAOProjectPanel extends JPanel {
-
+		private static final long serialVersionUID = 5569432370041174566L;
+		
 		private KnowledgeBase kb;
 		private JRadioButton fileRadioButton;
 		private JRadioButton dbRadioButton;
 		private JRadioButton existingRadioButton;
+		private JCheckBox enableChangeTrackingCheckBox;
 
 		public CreateChAOProjectPanel(KnowledgeBase kb) {
 			this.kb = kb;
@@ -182,10 +191,9 @@ public class CreateChAOProjectDialog {
 		}
 
 		protected void buildUI() {
-			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));		
-			//setPreferredSize(new Dimension(390, 110));
+			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 			add(getTextComponent());
-			addRadioBoxOptions();
+			addRadioBoxOptions();			
 		}
 
 		protected JTextArea getTextComponent() {
@@ -198,7 +206,7 @@ public class CreateChAOProjectDialog {
 			Font font = textArea.getFont();
 			int width = textArea.getFontMetrics(font).stringWidth(stringBuilder.toString());
 			int height = textArea.getFontMetrics(font).getHeight();
-			setPreferredSize(new Dimension(width + 20, height * 8));
+			setPreferredSize(new Dimension(width + 20, height * 10));
 			stringBuilder.append("needs a Changes and Annotations ontology (ChAO) for its functioning.\n");
 			stringBuilder.append("Please choose one of the following options:");
 			textArea.setText(stringBuilder.toString());			
@@ -207,7 +215,7 @@ public class CreateChAOProjectDialog {
 
 		protected void addRadioBoxOptions() {
 			fileRadioButton = new JRadioButton("Create ChAO as RDF(S) files.", true);
-			dbRadioButton = new JRadioButton("Create ChAO stored in a database.", false);
+			dbRadioButton = new JRadioButton("Create ChAO stored in a database (if new project, please save first).", false);
 			existingRadioButton = new JRadioButton("Use existing ChAO from your file system.", false);
 
 			fileRadioButton.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -219,14 +227,21 @@ public class CreateChAOProjectDialog {
 			group.add(dbRadioButton);
 			group.add(existingRadioButton);
 
-			JPanel gridPanel = new JPanel(new GridLayout(3,1));
+			JPanel gridPanel = new JPanel(new GridLayout(5,1));
 			gridPanel.add(fileRadioButton);
 			gridPanel.add(dbRadioButton);
 			gridPanel.add(existingRadioButton);
-
-			add(Box.createRigidArea(new Dimension(0, 10)));
+			gridPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+			
+			enableChangeTrackingCheckBox = new JCheckBox("Enable change tracking");
+			enableChangeTrackingCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+			enableChangeTrackingCheckBox.setSelected(true);
+			gridPanel.add(enableChangeTrackingCheckBox);
+			
+			add(Box.createRigidArea(new Dimension(0, 5)));
+			
 			add(gridPanel);
-		}
+		}				
 
 		public ChaoType getSelection() {
 			if (fileRadioButton.isSelected()) {
@@ -238,6 +253,10 @@ public class CreateChAOProjectDialog {
 			}
 			return ChaoType.FILE;
 		}
-	}
+		
+		public boolean isChangeTrackingEnabled() {
+			return enableChangeTrackingCheckBox.isSelected();
+		}
+	}	
 
 }
