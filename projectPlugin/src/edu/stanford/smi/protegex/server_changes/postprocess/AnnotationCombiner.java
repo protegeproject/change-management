@@ -15,11 +15,12 @@ import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultTimestamp;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.server.RemoteSession;
 import edu.stanford.smi.protegex.owl.model.NamespaceUtil;
+import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 public class AnnotationCombiner implements PostProcessor {
-    public static String COMPOSITE_ANNOTATION_CHANGE = "Composite Annotation Change";
+    public static String COMPOSITE_ANNOTATION_CHANGE = "Annotation change";
     
     private PostProcessorManager postProcessorManager;
     private Map<RemoteSession, Annotation_Change> lastAnnotationBySession
@@ -65,12 +66,12 @@ public class AnnotationCombiner implements PostProcessor {
                     List<Change> annotations = new ArrayList<Change>();
                     annotations.add(previous_annotation);
                     annotations.add(annotation);
-                    String applyToName = NamespaceUtil.getLocalName(applyTo.getCurrentName());
-                    String propertyName = NamespaceUtil.getLocalName(property.getCurrentName());
+                    String applyToName = NamespaceUtil.getPrefixedName((OWLModel)postProcessorManager.getKb(), applyTo.getCurrentName());
+                    String propertyName = NamespaceUtil.getPrefixedName((OWLModel)postProcessorManager.getKb(), property.getCurrentName());
                     transaction = ServerChangesUtil.createTransactionChange(postProcessorManager, 
                                                                             applyTo, 
                                                                             COMPOSITE_ANNOTATION_CHANGE +
-                                                                                " to " + applyToName + " property = " + propertyName, 
+                                                                                " for " + applyToName + ", property: " + propertyName, 
                                                                             annotations);
                 }
                 else {
