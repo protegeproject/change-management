@@ -10,10 +10,7 @@
 	<property name = "build.src.model" value = "${build.dir}/model/src"/>
 	<property name = "build.src.pplugin" value = "${build.dir}/projectPlugin/src"/>
 	<property name = "build.src.tab" value = "${build.dir}/changesTab/src"/>
-
-	<!-- need two output directories because this build file will create two separate jar files for the change management tab -->
 	<property name = "build.dest" value = "${build.dir}/classes"/>
-	<property name = "build.dest.model" value = "${build.dir}/classes-model"/>
 
 	<property name = "lib.dir" value = "./lib"/>
 	<property name = "docs.dir" value = "./docs"/>
@@ -31,7 +28,6 @@
 	<!-- =================================================================== -->
 	<target name = "prepare-src" depends = "init">
 		<mkdir dir = "${build.dest}"/>
-		<mkdir dir = "${build.dest.model}"/>
 		<mkdir dir = "${dist.dir}"/>
 
 		<!-- get source code from subversion repository -->
@@ -93,34 +89,16 @@
 		</exec>
 	</target>
 
-	<!-- ============================================================================================== -->
-	<!-- COMPILE-MODEL -->
-	<!-- Compile the model source directory (doing this separately because we need to make a separate jar file for this portion of the tree).  -->
-	<!-- ============================================================================================== -->
-	<target name = "compile-model" depends = "prepare-src">
-		<javac srcdir = "${build.src.model}" destdir = "${build.dest.model}" debug = "true" debuglevel = "lines" includeAntRuntime = "no">
-			<classpath>
-				<pathelement path = "${protege.jar}"/>
-				<pathelement path = "${protege-owl.jar}"/>
-				<pathelement path = "${rdf-backend.jar}"/>
-				<fileset dir = "${lib.dir}">
-					<include name = "**/*.jar"/>
-				</fileset>
-			</classpath>
-		</javac>
-	</target>
-
 	<!-- =================================================================== -->
 	<!-- COMPILE -->
 	<!-- Compile the source directory. -->
 	<!-- =================================================================== -->
-	<target name = "compile" depends = "compile-model">
-		<javac srcdir = "${build.src.tab}:${build.src.pplugin}:${build.src.kbviewtab}:${build.src.changestats}" destdir = "${build.dest}" deprecation = "on" debug = "true" debuglevel = "lines" optimize = "on" includeAntRuntime = "no">
+	<target name = "compile" depends = "prepare-src">
+		<javac srcdir = "${build.src.tab}:${build.src.pplugin}:${build.src.kbviewtab}:${build.src.changestats}:${build.src.model}" destdir = "${build.dest}" deprecation = "on" debug = "true" debuglevel = "lines" includeAntRuntime = "no">
 			<classpath>
 				<pathelement path = "${protege.jar}"/>
 				<pathelement path = "${protege-owl.jar}"/>
 				<pathelement path = "${rdf-backend.jar}"/>
-				<pathelement path = "${build.dest.model}"/>
 				<fileset dir = "${lib.dir}">
 					<include name = "**/*.jar"/>
 				</fileset>
@@ -134,7 +112,6 @@
 	<!-- =================================================================== -->
 	<target name = "jar" depends = "compile">
 		<jar jarfile = "${dist.dir}/${project.name}.jar" basedir = "${build.dest}" manifest = "${build.src.tab}/META-INF/MANIFEST.MF"/>
-		<jar jarfile = "${dist.dir}/change-model.jar" basedir = "${build.dest.model}"/>
 	</target>
 
 	<!-- =================================================================== -->
@@ -146,6 +123,10 @@
 		<delete dir = "${docs.dir}"/>
 		<delete dir = "${dist.dir}"/>
 		<delete dir = "${lib.dir}"/>
+		<delete dir = "./projects"/>
+		<delete file = "plugin.properties"/>
+		<delete file = "README"/>
+		<delete file = "jsave.cfg"/>
 	</target>
 	
 	<!-- =================================================================== -->
