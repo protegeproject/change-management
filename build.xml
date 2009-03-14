@@ -4,18 +4,15 @@
    <property name="protege.home" value="${env.PROTEGE_HOME}"/>
 
    <property name = "build"           location = "./build"/>
-   <property name = "model.classes"   location = "${build}/classes/model"/>
-   <property name = "manage.classes"  location = "${build}/classes/management"/>
+   <property name = "manage.classes"  location = "${build}/classes"/>
 
    <property name = "plugin.dist"     value = "edu.stanford.smi.protegex.changes"/>
    <property name = "plugin.dir"      location = "${build}/plugins/${plugin.dist}"/>
-   <property name = "model.jar"       location = "${plugin.dir}/change-model.jar"/>
    <property name = "manage.jar"      location = "${plugin.dir}/change-management.jar"/>
 
    <property name = "distribution"    location = "${build}/change-management.zip"/>
 
-   <property name = "plugin.manifest" location = "${build}/plugin-manifest.mf"/>
-   <property name = "lib.manifest"    location = "${build}/lib-manifest.mf"/>
+   <property name = "plugin.manifest" location = "${build}/manifest.mf"/>
 
    <property name = "lib"             value = "./lib"/>
    <property name = "junit"           value = "./junit"/>
@@ -94,24 +91,15 @@
    </target>  
 
    <target name = "compile" depends = "init, checkProtegeLibsAndReport">
-     <mkdir dir="${model.classes}"/>
-     <javac srcdir="model/src" 
-            destdir="${model.classes}"
-            debug="${debug}">
-       <classpath refid = "project.classpath"/>
-     </javac>
-
      <mkdir dir="${manage.classes}"/>
      <javac destdir="${manage.classes}"
             debug="${debug}">
+       <src path = "model/src"/>
        <src path = "changesKbViewTab/src"/>
        <src path = "changesTab/src"/>
        <src path = "changeStats/src"/>
        <src path = "projectPlugin/src"/>
        <classpath refid = "project.classpath"/>
-       <classpath>
-         <pathelement location = "${model.classes}"/>
-       </classpath>
      </javac>
 
    </target>
@@ -125,20 +113,12 @@
         <attribute name="Built-By" value = "${user.name}"/>
         <attribute name="Build-Date" value = "${build.time}"/>
      </manifest>
-     <manifest file="${lib.manifest}">
-        <attribute name="Built-By" value = "${user.name}"/>
-        <attribute name="Build-Date" value = "${build.time}"/>
-     </manifest>
    </target>
 
    <target name = "jar" depends = "compile,manifests">
      <mkdir dir="${plugin.dir}"/>
-     <jar destfile = "${model.jar}"
-          manifest = "${lib.manifest}"
-          basedir = "${model.classes}"/>
-
      <jar destfile = "${manage.jar}"
-          manifest = "${lib.manifest}"
+          manifest = "${plugin.manifest}"
           basedir = "${manage.classes}"/>
    </target>
 
