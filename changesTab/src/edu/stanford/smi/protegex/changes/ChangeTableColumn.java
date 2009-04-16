@@ -34,4 +34,13 @@ public enum ChangeTableColumn {
     public String getSearchSlotName() {
         return search_slotName;
     }
+    
+    public static ChangeTableColumn getColumnFromName(String name) {
+    	for (ChangeTableColumn col : ChangeTableColumn.values()) {
+    		if (col.getName().equals(name)) {
+    			return col;
+    		}
+    	}
+    	throw new IllegalArgumentException("No such field");
+    }
 }
