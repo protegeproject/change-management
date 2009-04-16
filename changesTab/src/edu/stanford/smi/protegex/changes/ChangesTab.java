@@ -1,11 +1,16 @@
 package edu.stanford.smi.protegex.changes;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.FocusTraversalPolicy;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -28,6 +33,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
@@ -53,13 +59,14 @@ import edu.stanford.smi.protege.util.SelectableTable;
 import edu.stanford.smi.protege.util.ViewAction;
 import edu.stanford.smi.protege.widget.AbstractTabWidget;
 import edu.stanford.smi.protegex.changes.action.AnnotationShowAction;
-import edu.stanford.smi.protegex.changes.action.ChangesSearchClear;
-import edu.stanford.smi.protegex.changes.action.ChangesSearchExecute;
 import edu.stanford.smi.protegex.changes.listeners.ChangesListener;
 import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
 import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
 import edu.stanford.smi.protegex.changes.ui.CreateChAOProjectDialog;
+import edu.stanford.smi.protegex.changes.ui.Filter;
 import edu.stanford.smi.protegex.changes.ui.JTreeTable;
+import edu.stanford.smi.protegex.changes.ui.TreeTableModelAdapter;
+import edu.stanford.smi.protegex.changes.ui.JTreeTable.TreeTableCellRenderer;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 
 /**
@@ -115,16 +122,10 @@ public class ChangesTab extends AbstractTabWidget {
 
 	private LabeledComponent changesLabledComponent;
 
-	private boolean inRemoveAnnotation = false;
 
+	private JComboBox columnSearchComboBox;
+	private JTextField searchTextField;
 
-	public boolean getInRemoveAnnotation() {
-		return inRemoveAnnotation;
-	}
-
-	public void setInRemoveAnnotation(boolean val) {
-		inRemoveAnnotation = val;
-	}
 
 	public boolean kbInOwl(KnowledgeBase kb) {
 		int index = kb.getClass().getName().indexOf(OWL_KB_INDICATOR);
@@ -187,7 +188,6 @@ public class ChangesTab extends AbstractTabWidget {
 
 		annotationsTable.addMouseListener(new AnnotationShowAction(annotationsTable, annotationsTableModel, changes_kb.getProject()));
 		JScrollPane scroll = ComponentFactory.createScrollPane(changesTreeTable);
-
 		JScrollPane scroll2 = ComponentFactory.createScrollPane(annotationsTable);
 		JScrollPane scroll3 = ComponentFactory.createScrollPane(annotationChangesTable);
 
@@ -267,7 +267,6 @@ public class ChangesTab extends AbstractTabWidget {
 		add(splitPanelBig);
 
 		changesTreeTable.getTree().expandPath(changesTreeTableModel.getRootPath());
-
 	}
 
 	private JPanel initAnnotPanel() {
@@ -299,29 +298,50 @@ public class ChangesTab extends AbstractTabWidget {
 				ChangeTableColumn.CHANGE_COLNAME_CREATED.getName()
 		};
 
-		JComboBox cbox = new JComboBox(searchFields);
-		cbox.setSelectedIndex(0);
+		columnSearchComboBox = new JComboBox(searchFields);
+		columnSearchComboBox.setSelectedIndex(0);
 
-		JTextField searchText = new JTextField(25);
+		searchTextField = new JTextField(40);
+		searchTextField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					onSearch();
+				}
+			}
+		});
+		//does not work
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				searchTextField.requestFocusInWindow();				
+			}			
+		});		
+		
 		JButton searchButton = new JButton(SEARCH_PANEL_BUTTON_GO);
-
-		ActionListener searchExecute = new ChangesSearchExecute(cbox, searchText, changesTreeTableModel);
+		searchButton.setMnemonic(KeyEvent.VK_G);
+		ActionListener searchExecute = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				onSearch();
+			}	
+		};
 		searchButton.addActionListener(searchExecute);
 
 		JButton clearButton = new JButton(SEARCH_PANEL_BUTTON_CLEAR);
-
-		ActionListener searchClear = new ChangesSearchClear(changesTreeTableModel);
+		clearButton.setMnemonic(KeyEvent.VK_L);
+		ActionListener searchClear = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {				
+				changesTreeTableModel.setFilter(null);
+				refreshTables(null);
+				columnSearchComboBox.setSelectedIndex(0);
+				searchTextField.setText("");
+				searchTextField.setBackground(Color.WHITE);
+			}	
+		};
 		clearButton.addActionListener(searchClear);
 
-		//FIXME: The following lines should be deleted when the search is implemented
-		searchButton.setEnabled(false);
-		clearButton.setEnabled(false);
-		searchButton.setToolTipText("Search functionality not implemented yet");
-		clearButton.setToolTipText("Search functionality not implemented yet");
-
 		searchPanel.add(searchLabel);
-		searchPanel.add(cbox);
-		searchPanel.add(searchText);
+		searchPanel.add(columnSearchComboBox);
+		searchPanel.add(searchTextField);
 		searchPanel.add(searchButton);
 		searchPanel.add(clearButton);
 
@@ -331,6 +351,24 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 
 
+	protected void onSearch() {
+		String text = searchTextField.getText();
+		if (text != null && text.length() == 0) { 
+			text = null; 
+			searchTextField.setBackground(Color.WHITE);
+		} else {
+			searchTextField.setBackground(Color.YELLOW);
+			text = text.trim();
+			if (!text.endsWith("*")) {
+				text = text + "*";
+			}
+		}		
+		String selectedItem = (String)columnSearchComboBox.getSelectedItem();		
+		Filter filter = text == null ? null : new Filter(ChangeTableColumn.getColumnFromName(selectedItem), text);
+		changesTreeTableModel.setFilter(filter);
+		refreshTables(filter);
+	}
+	
 	private void initTables() {
 		// Create Tables
 		annotationChangesTableModel = new ChangeTableModel(changes_kb);
@@ -343,6 +381,7 @@ public class ChangesTab extends AbstractTabWidget {
 		annotationsTable = new SelectableTable();
 		annotationsTable.setModel(annotationsTableModel);
 		changesTreeTable = new JTreeTable(changesTreeTableModel);
+		changesTreeTable.addNotify();
 
 		ComponentFactory.configureTable(annotationsTable);
 		ComponentFactory.configureTable(annotationChangesTable);
@@ -406,19 +445,21 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 
 
-	public void refreshTables() {
-		annotationChangesTableModel = new ChangeTableModel(changes_kb);
-		annotationsTableModel = new AnnotationTableModel(changes_kb);
+	public void refreshTables(Filter filter) {	
 		changesTreeTableModel = new ChangeTreeTableModel(changes_kb);
-
-		annotationChangesTable.setModel(annotationChangesTableModel);
-		annotationsTable.setModel(annotationsTableModel);
+		changesTreeTableModel.setFilter(filter);
 		changesTreeTable = new JTreeTable(changesTreeTableModel);
+		changesTreeTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		changesTreeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);				
+		changesLabledComponent.setCenterComponent(ComponentFactory.createScrollPane(changesTreeTable));
 
-		changesLabledComponent.setCenterComponent(changesTreeTable);
+		annotationChangesTableModel = new ChangeTableModel(changes_kb);
+		annotationChangesTable.setModel(annotationChangesTableModel);
+		
+		annotationsTableModel = new AnnotationTableModel(changes_kb);
+		annotationsTable.setModel(annotationsTableModel);	
 
 		loadExistingData();
-
 	}
 
 	private void loadExistingData() {
