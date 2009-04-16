@@ -1,5 +1,7 @@
 package edu.stanford.smi.protegex.changes;
 
+import edu.stanford.smi.protegex.changes.ui.Filter;
+
 public interface TreeTableNode {
 
     boolean isRoot();
@@ -15,4 +17,6 @@ public interface TreeTableNode {
     Object getValueAt(int col);
     
     void setValueAt(Object v, int col);
+    
+    void setFilter(Filter filter);
 }
