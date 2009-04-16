@@ -3,11 +3,11 @@ package edu.stanford.smi.protegex.changes;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RootTreeTableNode implements TreeTableNode {
+public class RootTreeTableNode extends AbstractChangeTreeTableNode {
     List<TreeTableNode> children = new ArrayList<TreeTableNode>(); // Actually TreeTableNode
 
     public RootTreeTableNode() {
-
+    	super(null);
     }
 
     public boolean isRoot() {
