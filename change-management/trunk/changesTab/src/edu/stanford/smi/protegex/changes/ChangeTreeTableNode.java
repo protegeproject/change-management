@@ -4,14 +4,16 @@ import java.util.Collection;
 
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.change.api.Composite_Change;
+import edu.stanford.smi.protegex.changes.ui.Filter;
 
 
-public class ChangeTreeTableNode implements TreeTableNode {
+public class ChangeTreeTableNode extends AbstractChangeTreeTableNode {
     protected RootTreeTableNode root;
     private Change changeInst;
 
 
-    public ChangeTreeTableNode(RootTreeTableNode root, Change changeInst) {
+    public ChangeTreeTableNode(RootTreeTableNode root, Change changeInst, Filter filter) {
+    	super(filter);
 		this.changeInst = changeInst;
         this.root = root;
     }
@@ -51,23 +53,18 @@ public class ChangeTreeTableNode implements TreeTableNode {
     }
 
 	public int getChildCount() {
-        if (changeInst instanceof Composite_Change) {
-            return ((Composite_Change) changeInst).getSubChanges().size();
-        }
-        else {
-            return 0;
-        }
+		return getChildren().length;		
 	}
 
 	public TreeTableNode[] getChildren(){
-        if (changeInst instanceof Composite_Change) {
-            Collection<Change> children = ((Composite_Change) changeInst).getSubChanges();
+        if (changeInst.canAs(Composite_Change.class)) {
+            Collection<Change> children = (changeInst.as(Composite_Change.class)).getSubChanges();
             TreeTableNode childArray[] = new TreeTableNode[children.size()];
             int index = 0;
             for (Object o : children) {
-                childArray[index++] = new ChangeTreeTableNode(root, (Change) o);
+                childArray[index++] = new ChangeTreeTableNode(root, (Change) o, filter);
             }
-            return childArray;
+            return filter(childArray);
         } else {
 			return new TreeTableNode[0];
 		}
@@ -87,7 +84,7 @@ public class ChangeTreeTableNode implements TreeTableNode {
 	        return root;
 	    }
 	    else {
-	        return new ChangeTreeTableNode(root, i);
+	        return new ChangeTreeTableNode(root, i, filter);
 	    }
 	}
 
