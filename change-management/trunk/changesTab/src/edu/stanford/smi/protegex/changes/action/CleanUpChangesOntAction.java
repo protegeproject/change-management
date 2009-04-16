@@ -91,7 +91,7 @@ public class CleanUpChangesOntAction extends AbstractAction {
 				ChangesTab changesTab = (ChangesTab) projectView.getTabByClassName(ChangesTab.class.getName());
 				
 				if (changesTab != null) {
-					changesTab.refreshTables();
+					changesTab.refreshTables(null);
 				}
 				
 			} catch (Exception e) {
