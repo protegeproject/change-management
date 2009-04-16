@@ -10,17 +10,17 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.changes.ui.AbstractTreeTableModel;
+import edu.stanford.smi.protegex.changes.ui.Filter;
 import edu.stanford.smi.protegex.changes.ui.TreeTableModel;
 
 public class ChangeTreeTableModel extends AbstractTreeTableModel implements TreeTableModel{
     private static final transient Logger log = Log.getLogger(ChangeTreeTableModel.class);
 
 	private String[] colNames;
-
     private RootTreeTableNode root;
-
     private Slot partOfCompositeChangeSlot;
     private Slot subChangesSlot;
+    private Filter filter;
 
 
 	public ChangeTreeTableModel(KnowledgeBase changesKb) {
@@ -87,7 +87,7 @@ public void setValueAt(Object aValue, Object node, int column) {
    }
 
 
-   public void addChangeData(Change changeInst) {
+   public void addChangeData(Change changeInst) {	   
        addChangeData(changeInst, true);
    }
 
@@ -97,7 +97,10 @@ public void setValueAt(Object aValue, Object node, int column) {
 		return;
        }
 
-       ChangeTreeTableNode node = new ChangeTreeTableNode(root, changeInst);
+       ChangeTreeTableNode node = new ChangeTreeTableNode(root, changeInst, filter);
+       
+       if (filter != null && !filter.matches(node)) {return; }
+       
        TreeTableNode parent = node.getParent();
        if (parent.isRoot()) {
            int index = root.addChild(node);
@@ -126,7 +129,7 @@ public void setValueAt(Object aValue, Object node, int column) {
            removeFromParent(changeInst, oldValues);
        }
        else if (slot.equals(subChangesSlot)) {
-           updateChildren(new ChangeTreeTableNode(root, changeInst));
+           updateChildren(new ChangeTreeTableNode(root, changeInst, filter));
        }
    }
 
@@ -134,7 +137,7 @@ public void setValueAt(Object aValue, Object node, int column) {
        TreeTableNode parent;
        if (oldValues == null || oldValues.isEmpty()) {
            parent = root;
-           ChangeTreeTableNode node = new ChangeTreeTableNode(root, change);
+           ChangeTreeTableNode node = new ChangeTreeTableNode(root, change, filter);
            int index = root.removeChild(node);
            if (index >= 0) {
                int childIndices[] = { index };
@@ -147,7 +150,7 @@ public void setValueAt(Object aValue, Object node, int column) {
            if (parentChange == null || parentChange.getApplyTo() == null) {
                return;
            }
-           parent = new ChangeTreeTableNode(root, parentChange);
+           parent = new ChangeTreeTableNode(root, parentChange, filter);
            updateChildren(parent);
        }
    }
@@ -163,16 +166,11 @@ public void setValueAt(Object aValue, Object node, int column) {
 
 
 	public void cancelQuery() {
-		setNewFilter();
+		setFilter(null);
 	}
 
-	public void setSearchQuery(String field, String text) {
-		setNewSearch(field, text);
-	}
-
-
-	private void setNewSearch(String field, String text) {
-	    throw new UnsupportedOperationException("fix me");
+	public void setFilter(Filter filter) {
+		this.filter = filter;
 	}
 
 
@@ -181,11 +179,7 @@ public void setValueAt(Object aValue, Object node, int column) {
 		Change aInst = ((ChangeTreeTableNode) root.getChildAt(row)).getChange();
 		return aInst;
 	}
-
-	private void setNewFilter() {
-	    throw new UnsupportedOperationException("fix me");
-	}
-
+	
     private Object[] makePath(TreeTableNode node) {
         int len = 1;
         for (TreeTableNode climber = node; !climber.isRoot(); climber = climber.getParent()) {
@@ -199,5 +193,11 @@ public void setValueAt(Object aValue, Object node, int column) {
         }
         return path;
     }
+
+
+	public void clear() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
