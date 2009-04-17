@@ -3,10 +3,9 @@ package edu.stanford.smi.protegex.changes;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.FocusTraversalPolicy;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -65,8 +64,6 @@ import edu.stanford.smi.protegex.changes.ui.ColoredTableCellRenderer;
 import edu.stanford.smi.protegex.changes.ui.CreateChAOProjectDialog;
 import edu.stanford.smi.protegex.changes.ui.Filter;
 import edu.stanford.smi.protegex.changes.ui.JTreeTable;
-import edu.stanford.smi.protegex.changes.ui.TreeTableModelAdapter;
-import edu.stanford.smi.protegex.changes.ui.JTreeTable.TreeTableCellRenderer;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 
 /**
@@ -445,21 +442,31 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 
 
-	public void refreshTables(Filter filter) {	
-		changesTreeTableModel = new ChangeTreeTableModel(changes_kb);
-		changesTreeTableModel.setFilter(filter);
-		changesTreeTable = new JTreeTable(changesTreeTableModel);
-		changesTreeTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		changesTreeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);				
-		changesLabledComponent.setCenterComponent(ComponentFactory.createScrollPane(changesTreeTable));
+	public void refreshTables(Filter filter) {
+		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		String searchText = searchTextField.getText();
+		searchTextField.setText(searchText + " (searching...)");
+		searchTextField.revalidate(); searchTextField.repaint();
+		try {
+			changesTreeTableModel = new ChangeTreeTableModel(changes_kb);
+			changesTreeTableModel.setFilter(filter);
+			changesTreeTable = new JTreeTable(changesTreeTableModel);
+			changesTreeTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+			changesTreeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);				
+			changesLabledComponent.setCenterComponent(ComponentFactory.createScrollPane(changesTreeTable));
 
-		annotationChangesTableModel = new ChangeTableModel(changes_kb);
-		annotationChangesTable.setModel(annotationChangesTableModel);
-		
-		annotationsTableModel = new AnnotationTableModel(changes_kb);
-		annotationsTable.setModel(annotationsTableModel);	
+			annotationChangesTableModel = new ChangeTableModel(changes_kb);
+			annotationChangesTable.setModel(annotationChangesTableModel);
 
-		loadExistingData();
+			annotationsTableModel = new AnnotationTableModel(changes_kb);
+			annotationsTable.setModel(annotationsTableModel);	
+
+			loadExistingData();
+		} finally {		
+			setCursor(Cursor.getDefaultCursor());
+			searchTextField.setText(searchText);
+			searchTextField.revalidate(); searchTextField.repaint();
+		}
 	}
 
 	private void loadExistingData() {
