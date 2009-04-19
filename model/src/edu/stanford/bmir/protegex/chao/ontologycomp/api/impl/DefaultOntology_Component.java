@@ -157,8 +157,9 @@ implements Ontology_Component {
 	private String initialName = null;
 
 	public Status getStatus() {
+		Collection<Change> allChanges = getChanges();
 		List<Change> nameChanges = getSortedNameChanges();
-		if (nameChanges == null || nameChanges.isEmpty()) {
+		if (allChanges == null || allChanges.isEmpty()) {
 			return Status.UNCHANGED;
 		}
 		else {
