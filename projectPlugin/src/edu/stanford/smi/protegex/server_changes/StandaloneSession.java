@@ -13,17 +13,33 @@ public class StandaloneSession implements RemoteSession {
 	}
 	
 	private StandaloneSession() {}
+	
+	public int getId() {
+	    return -1;
+	}
 
-	public String getUserName() {
+	public boolean allowDelegation() {
+        return false;
+    }
+
+    public RemoteSession makeDelegate(String delegateUserName) {
+        throw new IllegalAccessError("delegation not allowed");
+    }
+
+    public String getUserName() {
 		return null;
 	}
 
-	public String getUserIpAddress() {
+	public String getRealUserName() {
+        return null;
+    }
+
+    public String getUserIpAddress() {
 		return null;
 	}
 
-        public int getSessionGroup() {
-            return 0;
-        }
+    public long getStartTime() {
+        return 0;
+    }
 
 }
