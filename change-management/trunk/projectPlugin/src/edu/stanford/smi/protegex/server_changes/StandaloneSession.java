@@ -22,7 +22,7 @@ public class StandaloneSession implements RemoteSession {
         return false;
     }
 
-    public RemoteSession makeDelegate(String delegateUserName) {
+    public void setDelegate(String delegateUserName) {
         throw new IllegalAccessError("delegation not allowed");
     }
 
