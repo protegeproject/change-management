@@ -1,7 +1,7 @@
-; Tue Aug 25 12:27:52 PDT 2009
+; Wed Aug 26 10:25:29 PDT 2009
 ; 
-;+ (version "3.4.1")
-;+ (build "Build 538")
+;+ (version "3.4.2")
+;+ (build "Build 541")
 
 ([metaproject_Class0] of  User
 
@@ -17,7 +17,7 @@
 
 	(annotationProject [metaproject_Class20001])
 	(description "A project  for some changes junits.")
-	(location "junit/projects/scratch.pprj")
+	(location "build/projects/scratch.pprj")
 	(name "Scratch")
 	(owner [metaproject_Instance_10007]))
 
@@ -29,7 +29,7 @@
 ([metaproject_Class20001] of  Project
 
 	(description "A changes project  for some changes junits.")
-	(location "junit/projects/annotation_scratch.pprj")
+	(location "build/projects/annotation_scratch.pprj")
 	(name "Scratch Changes Project")
 	(owner [metaproject_Instance_10007]))
 
