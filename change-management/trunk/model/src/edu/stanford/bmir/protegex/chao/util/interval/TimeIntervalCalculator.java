@@ -15,7 +15,7 @@ import edu.stanford.smi.protege.event.ProjectEvent;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 
-public class TimeIntervalUtilities {
+public class TimeIntervalCalculator implements RemoteTimeIntervalCalculator {
     private static ProjectAdapter projectListener = new ProjectAdapter() {
         public void projectClosed(ProjectEvent event) {
             Project changesProject = (Project) event.getSource();
@@ -26,28 +26,27 @@ public class TimeIntervalUtilities {
     };
     
     private static Map<KnowledgeBase, TreeMap<Time, Change>> sortedChangesMap = new HashMap<KnowledgeBase, TreeMap<Time, Change>>();
+    private KnowledgeBase changesKb;
     
-    public static void initialize(KnowledgeBase changesKb) {
+    public TimeIntervalCalculator(KnowledgeBase changesKb) {
+        this.changesKb = changesKb;
         if (sortedChangesMap.get(changesKb)  == null) {
             changesKb.getProject().addProjectListener(projectListener);
             sortedChangesMap.put(changesKb, (new GetTopLevelChangesTreeMapJob(changesKb)).execute());
         }
     }
    
-    public static Collection<Change> getTopLevelChangesBefore(KnowledgeBase changesKb, Date d) {
-        initialize(changesKb);
+    public Collection<Change> getTopLevelChangesBefore(Date d) {
         TreeMap<Time, Change> changeMap = sortedChangesMap.get(changesKb);
         return Collections.unmodifiableCollection(changeMap.headMap(new Time(d)).values());
     }
     
-    public static Collection<Change> getTopLevelChangesAfter(KnowledgeBase changesKb, Date d) {
-        initialize(changesKb);
+    public Collection<Change> getTopLevelChangesAfter(Date d) {
         TreeMap<Time, Change> changeMap = sortedChangesMap.get(changesKb);
         return Collections.unmodifiableCollection(changeMap.tailMap(new Time(d)).values());
     }
 
-    public static Collection<Change> getTopLevelChanges(KnowledgeBase changesKb, Date start, Date end) {
-        initialize(changesKb);
+    public Collection<Change> getTopLevelChanges(Date start, Date end) {
         TreeMap<Time, Change> changeMap = sortedChangesMap.get(changesKb);
         List<Change> changes = new ArrayList<Change>();
         Time endTime = new Time(end);
@@ -58,5 +57,11 @@ public class TimeIntervalUtilities {
             changes.add(change);
         }
         return changes;
+    }
+    
+    public void dispose() {
+        Project changesProject = changesKb.getProject();
+        changesProject.removeProjectListener(projectListener);
+        sortedChangesMap.remove(changesKb);
     }
 }
