@@ -16,15 +16,20 @@ public class GetSortedChangesJob extends ProtegeJob {
         super(changes_kb);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Object run() throws ProtegeException {
+    public List<Change> run() throws ProtegeException {
         KnowledgeBase changes_kb = getKnowledgeBase();
         ChangeFactory factory = new ChangeFactory(changes_kb);
         List<Change> changes = (List<Change>) factory.getAllChangeObjects(true);
         ChangeProjectUtil.removeRoots(changes);
         Collections.sort(changes, new ChangeDateComparator(changes_kb));
         return changes;
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Change> execute() throws ProtegeException {
+        return (List) super.execute();
     }
 
 }

@@ -142,6 +142,13 @@
      </copy>
    </target>
 
+   <target name = "junit">
+     <mkdir dir="${build}/projects"/>
+   	 <copy todir="${build}/projects">
+   		<fileset dir="./junit/projects"/>
+   	 </copy>
+   </target>
+
    <target name = "install" depends = "dist">
      <unzip src="${distribution}"
             dest = "${protege.home}/plugins"
