@@ -111,7 +111,7 @@ public class DefaultTimestamp extends AbstractWrappedInstance
 	}
 
 	public long getTimeMillis() {
-	    return time.getTime();
+	    return getDateParsed().getTime();
 	}
 
 	public Date getDateParsed() {

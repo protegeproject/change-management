@@ -12,13 +12,14 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.ProtegeJob;
 
 public class GetSortedTopLevelChangesJob extends ProtegeJob {
+    private static final long serialVersionUID = -1146361145804033402L;
+
     public GetSortedTopLevelChangesJob(KnowledgeBase changes_kb) {
         super(changes_kb);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Object run() throws ProtegeException {
+    public List<Change> run() throws ProtegeException {
         KnowledgeBase changes_kb = getKnowledgeBase();
         ChangeFactory factory = new ChangeFactory(changes_kb);
         List<Change> changes = (List<Change>) factory.getAllChangeObjects(true);
@@ -31,5 +32,11 @@ public class GetSortedTopLevelChangesJob extends ProtegeJob {
         }
         Collections.sort(top_level_changes, new ChangeDateComparator(changes_kb));
         return top_level_changes;
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Change> execute() throws ProtegeException {
+        return (List) super.execute();
     }
 }
