@@ -1,6 +1,7 @@
 package edu.stanford.smi.protegex.changes;
 
 import java.io.IOException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,8 +11,6 @@ import java.util.List;
 import junit.framework.TestCase;
 import edu.stanford.bmir.protegex.chao.ChAOKbManager;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
-import edu.stanford.bmir.protegex.chao.util.interval.GetTimeIntervalCalculator;
-import edu.stanford.bmir.protegex.chao.util.interval.RemoteTimeIntervalCalculator;
 import edu.stanford.bmir.protegex.chao.util.interval.TimeIntervalCalculator;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
@@ -39,25 +38,34 @@ public class TimeUtilitiesTest extends TestCase {
         ChangesProject.initialize(p);
     }
     
-    public void testBeforeAndAfter() throws InterruptedException, RemoteException {
+    public void testServer1() throws IOException, InterruptedException, NotBoundException {
+        JunitUtilities.startServer();
+        model = JunitUtilities.connectToServer();
         makeChanges();
-        TimeIntervalCalculator t = new TimeIntervalCalculator(ChAOKbManager.getChAOKb(model));
+        TimeIntervalCalculator t = TimeIntervalCalculator.get(ChAOKbManager.getChAOKb(model));
+        checkChanges(t);
+    }
+
+    public void testServer2() throws IOException, InterruptedException, NotBoundException {
+        JunitUtilities.startServer();
+        model = JunitUtilities.connectToServer();
+        KnowledgeBase changesKb = ChAOKbManager.getChAOKb(model);
+        TimeIntervalCalculator t = TimeIntervalCalculator.get(changesKb);
+        makeChanges();
+        JunitUtilities.flushChanges(changesKb);
+        checkChanges(t);
+    }
+
+    public void testBeforeAndAfter1() throws InterruptedException, RemoteException {
+        makeChanges();
+        TimeIntervalCalculator t = TimeIntervalCalculator.get(ChAOKbManager.getChAOKb(model));
         checkChanges(t);
     }
     
-
-    
-    public void testServer() throws IOException, InterruptedException {
-        JunitUtilities.startServer();
-        try {
-            model = JunitUtilities.connectToServer();
-            makeChanges();
-            RemoteTimeIntervalCalculator t = GetTimeIntervalCalculator.get(model);
-            checkChanges(t);
-        }
-        finally {
-            JunitUtilities.stopServer();
-        }
+    public void testBeforeAndAfter2() throws InterruptedException, RemoteException {
+        TimeIntervalCalculator t = TimeIntervalCalculator.get(ChAOKbManager.getChAOKb(model));
+        makeChanges();
+        checkChanges(t);
     }
     
     private void makeChanges() throws InterruptedException {
@@ -76,7 +84,7 @@ public class TimeUtilitiesTest extends TestCase {
         c = model.createOWLNamedClass("C");
     }
     
-    private void checkChanges(RemoteTimeIntervalCalculator t) throws RemoteException {
+    private void checkChanges(TimeIntervalCalculator t) throws RemoteException {
         boolean foundA;
         boolean foundB;
         boolean foundC;

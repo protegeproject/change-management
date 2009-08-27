@@ -18,16 +18,16 @@ public class GetTopLevelChangesTreeMapJob extends ProtegeJob {
     }
 
     @Override
-    public TreeMap<Time, Change> run() throws ProtegeException {
+    public TreeMap<SimpleTime, Change> run() throws ProtegeException {
         KnowledgeBase changes_kb = getKnowledgeBase();
         ChangeFactory factory = new ChangeFactory(changes_kb);
         List<Change> changes = (List<Change>) factory.getAllChangeObjects(true);
-        TreeMap<Time, Change> changeMap = new TreeMap<Time, Change>();
+        TreeMap<SimpleTime, Change> changeMap = new TreeMap<SimpleTime, Change>();
         for (Object o : changes) {
             Change change = (Change) o;
             if (!ChangeProjectUtil.isRoot(change) && change.getPartOfCompositeChange() == null
                     && change.getTimestamp().hasDate()) {
-                changeMap.put(new Time(change.getTimestamp()), change);
+                changeMap.put(new SimpleTime(change.getTimestamp()), change);
             }
         }
         return changeMap;
@@ -35,8 +35,8 @@ public class GetTopLevelChangesTreeMapJob extends ProtegeJob {
     
     @SuppressWarnings("unchecked")
     @Override
-    public TreeMap<Time, Change> execute() throws ProtegeException {
+    public TreeMap<SimpleTime, Change> execute() throws ProtegeException {
         return (TreeMap) super.execute();
     }
-
+    
 }
