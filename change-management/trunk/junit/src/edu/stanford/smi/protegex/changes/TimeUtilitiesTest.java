@@ -41,7 +41,7 @@ public class TimeUtilitiesTest extends TestCase {
     
     public void testBeforeAndAfter() throws InterruptedException, RemoteException {
         makeChanges();
-        TimeIntervalCalculator t = (TimeIntervalCalculator) GetTimeIntervalCalculator.get(model);
+        TimeIntervalCalculator t = new TimeIntervalCalculator(ChAOKbManager.getChAOKb(model));
         checkChanges(t);
     }
     
