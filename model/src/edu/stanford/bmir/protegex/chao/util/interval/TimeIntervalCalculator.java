@@ -50,6 +50,10 @@ public class TimeIntervalCalculator {
         }
         return t;
     }
+    
+    public Collection<Change> getTopLevelChanges() {
+        return Collections.unmodifiableCollection(sortedChangesMap.values());
+    }
    
     public Collection<Change> getTopLevelChangesBefore(Date d) {
         return Collections.unmodifiableCollection(sortedChangesMap.headMap(new SimpleTime(d)).values());
