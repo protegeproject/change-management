@@ -42,7 +42,7 @@ public class TimeIntervalCalculator {
         }
     }
     
-    public static TimeIntervalCalculator get(KnowledgeBase changesKb) {
+    public static synchronized TimeIntervalCalculator get(KnowledgeBase changesKb) {
         TimeIntervalCalculator t = instanceMap.get(changesKb);
         if (t == null) {
             t = new TimeIntervalCalculator(changesKb);
@@ -75,10 +75,11 @@ public class TimeIntervalCalculator {
     }
     
     public void dispose() {
-        changesKb.getProject().removeProjectListener(projectListener);
-        changesKb.removeFrameListener(changeListener);
-        
-        instanceMap.remove(changesKb);
+        synchronized (TimeIntervalCalculator.class) {
+            changesKb.getProject().removeProjectListener(projectListener);
+            changesKb.removeFrameListener(changeListener);
+            instanceMap.remove(changesKb);
+        }
     }
     
     private static class CleanupListener extends ProjectAdapter {
@@ -86,9 +87,11 @@ public class TimeIntervalCalculator {
         public void projectClosed(ProjectEvent event) {
             Project changesProject = (Project) event.getSource();
             KnowledgeBase changesKb = changesProject.getKnowledgeBase();
-            TimeIntervalCalculator  t = instanceMap.get(changesKb);
-            if (t != null) {
-                t.dispose();
+            synchronized (TimeIntervalCalculator.class) {
+                TimeIntervalCalculator  t = instanceMap.get(changesKb);
+                if (t != null) {
+                    t.dispose();
+                }
             }
         }
     }
