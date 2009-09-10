@@ -224,6 +224,10 @@
 	<rdfs:comment>A class of Annotations representing questions about the content</rdfs:comment>
 	<rdfs:subClassOf rdf:resource="&kb;Annotation"/>
 </rdfs:Class>
+<rdfs:Class rdf:about="&kb;Reviewer"
+	 rdfs:label="Reviewer">
+	<rdfs:subClassOf rdf:resource="&kb;User"/>
+</rdfs:Class>
 <rdfs:Class rdf:about="&kb;SeeAlso"
 	 rdfs:label="SeeAlso">
 	<rdfs:comment>A class of Annotations representing a reference to another resource</rdfs:comment>
@@ -275,6 +279,10 @@
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Timestamp"
 	 rdfs:label="Timestamp">
+	<rdfs:subClassOf rdf:resource="&rdfs;Resource"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="&kb;User"
+	 rdfs:label="User">
 	<rdfs:subClassOf rdf:resource="&rdfs;Resource"/>
 </rdfs:Class>
 <rdfs:Class rdf:about="&kb;Vote"
@@ -393,6 +401,11 @@
 	<rdfs:domain rdf:resource="&kb;Deleted_Change"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
+<rdf:Property rdf:about="&kb;domainOfInterest"
+	 rdfs:label="domainOfInterest">
+	<rdfs:range rdf:resource="&kb;Ontology_Component"/>
+	<rdfs:domain rdf:resource="&kb;User"/>
+</rdf:Property>
 <rdf:Property rdf:about="&kb;inverse_of_annotates"
 	 rdfs:label="inverse_of_annotates">
 	<rdfs:range rdf:resource="&kb;Annotation"/>
@@ -406,6 +419,7 @@
 <rdf:Property rdf:about="&kb;name"
 	 a:maxCardinality="1"
 	 rdfs:label="name">
+	<rdfs:domain rdf:resource="&kb;User"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
 </rdf:Property>
 <rdf:Property rdf:about="&kb;newName"
@@ -469,6 +483,18 @@
 	 rdfs:label="voteValue">
 	<rdfs:domain rdf:resource="&kb;Vote"/>
 	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;watchedBy"
+	 rdfs:label="watchedBy">
+	<rdfs:domain rdf:resource="&kb;Ontology_Component"/>
+	<rdfs:range rdf:resource="&kb;User"/>
+	<a:inverseProperty rdf:resource="&kb;watchedEntity"/>
+</rdf:Property>
+<rdf:Property rdf:about="&kb;watchedEntity"
+	 rdfs:label="watchedEntity">
+	<rdfs:range rdf:resource="&kb;Ontology_Component"/>
+	<rdfs:domain rdf:resource="&kb;User"/>
+	<a:inverseProperty rdf:resource="&kb;watchedBy"/>
 </rdf:Property>
 <a:OverridingProperty rdf:about="&a;AgreeDisagreeVote_voteValue"
 	 a:allowedValues="I_don't_know"
