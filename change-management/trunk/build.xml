@@ -3,8 +3,10 @@
    <property environment="env"/>
    <property name="protege.home" value="${env.PROTEGE_HOME}"/>
 
+   <property name = "junit.src"       location = "./junit/src"/>
    <property name = "build"           location = "./build"/>
    <property name = "manage.classes"  location = "${build}/classes"/>
+   <property name = "junit.classes"   location = "${build}/junit.classes"/>
 
    <property name = "plugin.dist"     value = "edu.stanford.smi.protegex.changes"/>
    <property name = "plugin.dir"      location = "${build}/plugins/${plugin.dist}"/>
@@ -27,30 +29,16 @@
        #  whether to hand copy the needed jars into the lib directory or
        #  to point them to a protege installation.
       -->
-    <target name="checkProtegeHome">
-      <condition property="protege.home.set">
-        <available file="${protege.home}/protege.jar" type="file"/>
-      </condition>
-    </target>
     
-    <target name="useProtegeHome" depends="checkProtegeHome" 
-            if="protege.home.set">
+    <target name="useProtegeHome">
       <echo message="Using Protege Home = ${protege.home} to find protege jars"/>
       <property name="protege.lib" value="${protege.home}/protege.jar"/>
       <property name="owl.lib"     value="${protege.home}/plugins/edu.stanford.smi.protegex.owl/protege-owl.jar"/>
       <property name="rdf.lib"     value="${protege.home}/plugins/edu.stanford.smi.protegex.rdf_backend/rdf-backend.jar"/>
     </target>
-    
-    <target name="useLibDir" depends="checkProtegeHome" 
-            unless="protege.home.set">
-       <echo message="Using lib dir to find protege jars"/>
-      <property name="protege.lib" value="${lib}/protege.jar"/>
-      <property name="owl.lib" value="${lib}/protege-owl.jar"/>
-      <property name="rdf.lib" value="${lib}/rdf-backend.jar"/>
-    </target>
 
 
-    <target name = "checkProtegeLibs" depends="useProtegeHome, useLibDir">
+    <target name = "checkProtegeLibs" depends="useProtegeHome">
       <condition property="libs.found">
         <and>
           <available file="${protege.lib}" type = "file"/>
@@ -142,11 +130,43 @@
      </copy>
    </target>
 
-   <target name = "junit">
+	<target name="compile.junit" depends="compile">
+		<mkdir dir="${junit.classes}"/>
+		<javac srcdir="${junit.src}" destdir="${junit.classes}" debug="${debug}">
+			<classpath>
+				<path refid="project.classpath"/>
+				<pathelement location="${manage.classes}"/>
+				<pathelement location="./lib/junit.jar"/>
+			</classpath>
+		</javac>
+	</target>
+	
+   <target name = "junit"  depends="compile.junit">
      <mkdir dir="${build}/projects"/>
    	 <copy todir="${build}/projects">
    		<fileset dir="./junit/projects"/>
    	 </copy>
+   	 <junit fork="true" haltonerror="true" haltonfailure="true"
+   	 	    filtertrace="false"
+   	        printsummary="true" showoutput="true">
+   	    <jvmarg value="-agentlib:jdwp=transport=dt_socket,address=8100,server=y,suspend=y"/>
+   	 	<jvmarg value="-Xmx800M"/>
+		<classpath>
+			<path refid="project.classpath"/>
+			<pathelement location="${manage.classes}"/>
+			<pathelement location="${junit.classes}"/>
+			<pathelement location="./lib/junit.jar"/>
+			<fileset  dir="${protege.home}/plugins/edu.stanford.smi.protegex.owl">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset  dir="${protege.home}/plugins/edu.stanford.smi.protegex.rdf_backend">
+				<include name="*.jar"/>
+			</fileset>
+			
+		</classpath>
+   	 	<test name="edu.stanford.smi.protegex.changes.TimeUtilitiesTest"/>
+   	 	<test name="edu.stanford.smi.protegex.changes.UserTest"/>
+   	 </junit>
    </target>
 
    <target name = "install" depends = "dist">
