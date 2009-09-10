@@ -1,4 +1,4 @@
-; Wed Sep 09 18:38:23 PDT 2009
+; Thu Sep 10 15:02:55 PDT 2009
 ; 
 ;+ (version "3.4.2")
 ;+ (build "Build 541")
@@ -105,21 +105,389 @@
 ([BROWSER_SLOT_NAMES] of  Property_List
 
 	(properties
-		[changes_ProjectKB_Class5]
-		[changes_ProjectKB_Class6]
-		[changes_ProjectKB_Class7]
-		[changes_ProjectKB_Class8]
-		[changes_ProjectKB_Class9]
-		[changes_ProjectKB_Class10]
-		[changes_ProjectKB_Class11]
-		[changes_ProjectKB_Class12]
-		[changes_ProjectKB_Class13]
-		[changes_ProjectKB_Class14]))
+		[changes_ProjectKB_Class10103]
+		[changes_ProjectKB_Class10104]
+		[changes_ProjectKB_Class10105]
+		[changes_ProjectKB_Class10106]
+		[changes_ProjectKB_Class10107]
+		[changes_ProjectKB_Class10108]
+		[changes_ProjectKB_Class10109]
+		[changes_ProjectKB_Class10110]
+		[changes_ProjectKB_Class10111]
+		[changes_ProjectKB_Class10112]))
 
-([changes_ProjectKB_Class10] of  String
+([changes_ProjectKB_Class10005] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10006])
+	(widget_class_name "TGViztab.TGVizTab"))
+
+([changes_ProjectKB_Class10006] of  Property_List
+)
+
+([changes_ProjectKB_Class10007] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10008])
+	(widget_class_name "dfki.protege.ontoviz_tab.OntovizTab"))
+
+([changes_ProjectKB_Class10008] of  Property_List
+)
+
+([changes_ProjectKB_Class10009] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10010])
+	(widget_class_name "edu.stanford.smi.protegex.evaluation.MetaAnalysis"))
+
+([changes_ProjectKB_Class10010] of  Property_List
+)
+
+([changes_ProjectKB_Class10011] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10012])
+	(widget_class_name "edu.stanford.smi.protege.keywordsearch.StringSearch"))
+
+([changes_ProjectKB_Class10012] of  Property_List
+)
+
+([changes_ProjectKB_Class10013] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10014])
+	(widget_class_name "edu.stanford.smi.RemoteKBTab.WordNetTab"))
+
+([changes_ProjectKB_Class10014] of  Property_List
+)
+
+([changes_ProjectKB_Class10015] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10016])
+	(widget_class_name "ezpal.EZPalTab"))
+
+([changes_ProjectKB_Class10016] of  Property_List
+)
+
+([changes_ProjectKB_Class10017] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10018])
+	(widget_class_name "edu.stanford.smi.protegex.fctab.FacetConstraintsTab"))
+
+([changes_ProjectKB_Class10018] of  Property_List
+)
+
+([changes_ProjectKB_Class10019] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10020])
+	(widget_class_name "edu.stanford.smi.protegex.xml.tab.XMLTab"))
+
+([changes_ProjectKB_Class10020] of  Property_List
+)
+
+([changes_ProjectKB_Class10021] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10022])
+	(widget_class_name "edu.stanford.smi.protegex.widget.pal.PalConstraintsTab"))
+
+([changes_ProjectKB_Class10022] of  Property_List
+)
+
+([changes_ProjectKB_Class10023] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10024])
+	(widget_class_name "edu.stanford.smi.protege.widget.instance_tree.KnowledgeTreeTab"))
+
+([changes_ProjectKB_Class10024] of  Property_List
+)
+
+([changes_ProjectKB_Class10025] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10026])
+	(widget_class_name "edu.stanford.smi.protege.widget.instance_tree.InstanceTreeTab"))
+
+([changes_ProjectKB_Class10026] of  Property_List
+)
+
+([changes_ProjectKB_Class10027] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10028])
+	(widget_class_name "se.liu.ida.JessTab.JessTab"))
+
+([changes_ProjectKB_Class10028] of  Property_List
+)
+
+([changes_ProjectKB_Class10029] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10030])
+	(widget_class_name "ca.uvic.csr.shrimp.jambalaya.JambalayaTab"))
+
+([changes_ProjectKB_Class10030] of  Property_List
+)
+
+([changes_ProjectKB_Class10031] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10032])
+	(widget_class_name "edu.stanford.smi.protegex.datamaster.DataMasterTab"))
+
+([changes_ProjectKB_Class10032] of  Property_List
+)
+
+([changes_ProjectKB_Class10033] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10034])
+	(widget_class_name "uk.ac.man.cs.mig.coode.debugger.test.DebuggerTestTab"))
+
+([changes_ProjectKB_Class10034] of  Property_List
+)
+
+([changes_ProjectKB_Class10035] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10036])
+	(widget_class_name "edu.stanford.smi.protegex.widget.pal.PalQueriesTab"))
+
+([changes_ProjectKB_Class10036] of  Property_List
+)
+
+([changes_ProjectKB_Class10037] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10038])
+	(widget_class_name "org.algernon.kb.okbc.protege.plugins.AlgernonTab"))
+
+([changes_ProjectKB_Class10038] of  Property_List
+)
+
+([changes_ProjectKB_Class10039] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10040])
+	(widget_class_name "edu.stanford.smi.RemoteKBTab.UMLSTab"))
+
+([changes_ProjectKB_Class10040] of  Property_List
+)
+
+([changes_ProjectKB_Class10041] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10042])
+	(widget_class_name "uk.ac.man.ac.mig.coode.individuals.ui.OWLDLIndividualsTab"))
+
+([changes_ProjectKB_Class10042] of  Property_List
+)
+
+([changes_ProjectKB_Class10043] of  Widget
+
+	(is_hidden TRUE)
+	(property_list [changes_ProjectKB_Class10044])
+	(widget_class_name "uk.ac.man.cs.mig.coode.owlviz.ui.OWLVizTab"))
+
+([changes_ProjectKB_Class10044] of  Property_List
+)
+
+([changes_ProjectKB_Class10086] of  Widget
+
+	(is_hidden FALSE)
+	(name "Reviewer")
+	(property_list [changes_ProjectKB_Class10087])
+	(widget_class_name "edu.stanford.smi.protege.widget.FormWidget"))
+
+([changes_ProjectKB_Class10087] of  Property_List
+
+	(properties
+		[changes_ProjectKB_Class10088]
+		[changes_ProjectKB_Class10089]
+		[changes_ProjectKB_Class10093]
+		[changes_ProjectKB_Class10097]
+		[changes_ProjectKB_Class10101]))
+
+([changes_ProjectKB_Class10088] of  Property_List
+
+	(name "layout properties"))
+
+([changes_ProjectKB_Class10089] of  Widget
+
+	(height 120)
+	(is_hidden FALSE)
+	(name "domainOfInterest")
+	(property_list [changes_ProjectKB_Class10090])
+	(widget_class_name "edu.stanford.smi.protege.widget.InstanceListWidget")
+	(width 200)
+	(x 0)
+	(y 60))
+
+([changes_ProjectKB_Class10090] of  Property_List
+
+	(properties
+		[changes_ProjectKB_Class10091]
+		[changes_ProjectKB_Class10092]))
+
+([changes_ProjectKB_Class10091] of  Boolean
+
+	(boolean_value FALSE)
+	(name "ButtonDisplayed-View References to Value"))
+
+([changes_ProjectKB_Class10092] of  Boolean
+
+	(boolean_value FALSE)
+	(name "ButtonDisplayed-Delete Instance"))
+
+([changes_ProjectKB_Class10093] of  Widget
+
+	(height 120)
+	(is_hidden FALSE)
+	(name "pendingReview")
+	(property_list [changes_ProjectKB_Class10094])
+	(widget_class_name "edu.stanford.smi.protege.widget.InstanceListWidget")
+	(width 400)
+	(x 0)
+	(y 180))
+
+([changes_ProjectKB_Class10094] of  Property_List
+
+	(properties
+		[changes_ProjectKB_Class10095]
+		[changes_ProjectKB_Class10096]))
+
+([changes_ProjectKB_Class10095] of  Boolean
+
+	(boolean_value FALSE)
+	(name "ButtonDisplayed-View References to Value"))
+
+([changes_ProjectKB_Class10096] of  Boolean
+
+	(boolean_value FALSE)
+	(name "ButtonDisplayed-Delete Instance"))
+
+([changes_ProjectKB_Class10097] of  Widget
+
+	(height 180)
+	(is_hidden FALSE)
+	(name "watchedEntity")
+	(property_list [changes_ProjectKB_Class10098])
+	(widget_class_name "edu.stanford.smi.protege.widget.InstanceListWidget")
+	(width 200)
+	(x 200)
+	(y 0))
+
+([changes_ProjectKB_Class10098] of  Property_List
+
+	(properties
+		[changes_ProjectKB_Class10099]
+		[changes_ProjectKB_Class10100]))
+
+([changes_ProjectKB_Class10099] of  Boolean
+
+	(boolean_value FALSE)
+	(name "ButtonDisplayed-View References to Value"))
+
+([changes_ProjectKB_Class10100] of  Boolean
+
+	(boolean_value FALSE)
+	(name "ButtonDisplayed-Delete Instance"))
+
+([changes_ProjectKB_Class10101] of  Widget
+
+	(height 60)
+	(is_hidden FALSE)
+	(name "name")
+	(property_list [changes_ProjectKB_Class10102])
+	(widget_class_name "edu.stanford.smi.protege.widget.TextFieldWidget")
+	(width 200)
+	(x 0)
+	(y 0))
+
+([changes_ProjectKB_Class10102] of  Property_List
+)
+
+([changes_ProjectKB_Class10103] of  String
+
+	(name ":INSTANCE-ANNOTATION")
+	(string_value "%3AANNOTATION-TEXT"))
+
+([changes_ProjectKB_Class10104] of  String
+
+	(name ":META-CLASS")
+	(string_value "%3ANAME"))
+
+([changes_ProjectKB_Class10105] of  String
+
+	(name "Change")
+	(string_value "context"))
+
+([changes_ProjectKB_Class10106] of  String
+
+	(name "Timestamp")
+	(string_value "date"))
+
+([changes_ProjectKB_Class10107] of  String
+
+	(name "Ontology_Component")
+	(string_value "currentName"))
+
+([changes_ProjectKB_Class10108] of  String
 
 	(name "User")
 	(string_value "name"))
+
+([changes_ProjectKB_Class10109] of  String
+
+	(name "Vote")
+	(string_value "subject"))
+
+([changes_ProjectKB_Class10110] of  String
+
+	(name "Proposal")
+	(string_value "subject"))
+
+([changes_ProjectKB_Class10111] of  String
+
+	(name "Annotation")
+	(string_value "subject"))
+
+([changes_ProjectKB_Class10112] of  String
+
+	(name ":PAL-CONSTRAINT")
+	(string_value "%3APAL-NAME"))
+
+([changes_ProjectKB_Class10113] of  Map_Entry
+
+	(key "annotation_proj_exists")
+	(key_class "java.lang.String")
+	(value "yes")
+	(value_class "java.lang.String"))
+
+([changes_ProjectKB_Class10114] of  Map_Entry
+
+	(key "suppress_instance_counting")
+	(key_class "java.lang.String")
+	(value "false")
+	(value_class "java.lang.String"))
+
+([changes_ProjectKB_Class10115] of  Map_Entry
+
+	(key "change_tracking_active")
+	(key_class "java.lang.String")
+	(value "false")
+	(value_class "java.lang.String"))
+
+([changes_ProjectKB_Class10116] of  Map_Entry
+
+	(key "add_name_on_instance_form")
+	(key_class "java.lang.String")
+	(value "false")
+	(value_class "java.lang.String"))
 
 ([changes_ProjectKB_Class10177] of  Property_List
 
@@ -379,54 +747,6 @@
 		[changes_ProjectKB_Class25]
 		[changes_ProjectKB_Class26]))
 
-([changes_ProjectKB_Class11] of  String
-
-	(name "Proposal")
-	(string_value "subject"))
-
-([changes_ProjectKB_Class12] of  String
-
-	(name "Vote")
-	(string_value "subject"))
-
-([changes_ProjectKB_Class13] of  String
-
-	(name "Annotation")
-	(string_value "subject"))
-
-([changes_ProjectKB_Class14] of  String
-
-	(name ":PAL-CONSTRAINT")
-	(string_value "%3APAL-NAME"))
-
-([changes_ProjectKB_Class15] of  Map_Entry
-
-	(key "annotation_proj_exists")
-	(key_class "java.lang.String")
-	(value "yes")
-	(value_class "java.lang.String"))
-
-([changes_ProjectKB_Class16] of  Map_Entry
-
-	(key "suppress_instance_counting")
-	(key_class "java.lang.String")
-	(value "false")
-	(value_class "java.lang.String"))
-
-([changes_ProjectKB_Class17] of  Map_Entry
-
-	(key "change_tracking_active")
-	(key_class "java.lang.String")
-	(value "false")
-	(value_class "java.lang.String"))
-
-([changes_ProjectKB_Class18] of  Map_Entry
-
-	(key "add_name_on_instance_form")
-	(key_class "java.lang.String")
-	(value "false")
-	(value_class "java.lang.String"))
-
 ([changes_ProjectKB_Class25] of  String
 
 	(name "tooltip_text"))
@@ -444,16 +764,6 @@
 
 	(boolean_value FALSE)
 	(name "readOnly_configured"))
-
-([changes_ProjectKB_Class5] of  String
-
-	(name ":INSTANCE-ANNOTATION")
-	(string_value "%3AANNOTATION-TEXT"))
-
-([changes_ProjectKB_Class6] of  String
-
-	(name ":META-CLASS")
-	(string_value "%3ANAME"))
 
 ([changes_ProjectKB_Class660] of  Property_List
 
@@ -714,11 +1024,6 @@
 		[changes_ProjectKB_Class258]
 		[changes_ProjectKB_Class259]))
 
-([changes_ProjectKB_Class7] of  String
-
-	(name "Change")
-	(string_value "context"))
-
 ([changes_ProjectKB_Class700] of  Widget
 
 	(height 60)
@@ -732,16 +1037,6 @@
 
 ([changes_ProjectKB_Class701] of  Property_List
 )
-
-([changes_ProjectKB_Class8] of  String
-
-	(name "Ontology_Component")
-	(string_value "currentName"))
-
-([changes_ProjectKB_Class9] of  String
-
-	(name "Timestamp")
-	(string_value "date"))
 
 ([changes_ProjectKB_Instance_10053] of  Property_List
 
@@ -824,10 +1119,10 @@
 ([changes_ProjectKB_Instance_10131] of  Map
 
 	(entries
-		[changes_ProjectKB_Class15]
-		[changes_ProjectKB_Class16]
-		[changes_ProjectKB_Class17]
-		[changes_ProjectKB_Class18]))
+		[changes_ProjectKB_Class10113]
+		[changes_ProjectKB_Class10114]
+		[changes_ProjectKB_Class10115]
+		[changes_ProjectKB_Class10116]))
 
 ([changes_ProjectKB_Instance_120] of  Property_List
 
@@ -3622,7 +3917,7 @@
 	(is_hidden FALSE)
 	(widget_class_name "edu.stanford.smi.protege.widget.InstancesTab"))
 
-([KB_245661_Class4] of  Map
+([KB_061197_Class4] of  Map
 )
 
 ([KB_690954_Instance_0] of  String
@@ -4075,8 +4370,9 @@
 		[changes_ProjectKB_Instance_81267]
 		[changes_ProjectKB_Instance_51393]
 		[changes_ProjectKB_Instance_51020]
+		[changes_ProjectKB_Instance_16]
 		[changes_ProjectKB_Instance_50854]
-		[changes_ProjectKB_Instance_16])
+		[changes_ProjectKB_Class10086])
 	(default_cls_metaclass ":STANDARD-CLASS")
 	(default_facet_metaclass ":STANDARD-FACET")
 	(default_instance_widget_class_name "edu.stanford.smi.protege.widget.FormWidget")
