@@ -7,7 +7,9 @@ import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology_Cla
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology_Component;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology_Individual;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology_Property;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultReviewer;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultTimestamp;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultUser;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.code.generator.wrapping.OntologyJavaMappingUtil;
 import edu.stanford.smi.protege.model.Cls;
@@ -157,6 +159,36 @@ public class OntologyComponentFactory {
         return result;
     }
 
+    // ***** Class Reviewer *****
+
+    public Cls getReviewerClass() {
+        final String name = "Reviewer";
+        return kb.getCls(name);
+    }
+
+    public Reviewer createReviewer(String name) {
+        Cls cls = getReviewerClass();
+        Instance inst = cls.createDirectInstance(name);
+        return new DefaultReviewer(inst);
+    }
+
+    public Reviewer getReviewer(String name) {
+        return OntologyJavaMappingUtil.getSpecificObject(kb, kb.getInstance(name), Reviewer.class);
+    }
+
+    public Collection<Reviewer> getAllReviewerObjects() {
+        return getAllReviewerObjects(false);
+    }
+
+    public Collection<Reviewer> getAllReviewerObjects(boolean transitive) {
+        Collection<Reviewer> result = new ArrayList<Reviewer>();
+        final Cls cls = getReviewerClass();
+        for (Object element : transitive ? cls.getInstances() : cls.getDirectInstances()) {
+            Instance inst = (Instance) element;
+            result.add(OntologyJavaMappingUtil.getSpecificObject(kb, inst, Reviewer.class));
+        }
+        return result;
+    }
 
     // ***** Class Timestamp *****
 
@@ -189,6 +221,36 @@ public class OntologyComponentFactory {
         return result;
     }
 
+    // ***** Class User *****
+
+    public Cls getUserClass() {
+        final String name = "User";
+        return kb.getCls(name);
+    }
+
+    public User createUser(String name) {
+        Cls cls = getUserClass();
+        Instance inst = cls.createDirectInstance(name);
+        return new DefaultUser(inst);
+    }
+
+    public User getUser(String name) {
+        return OntologyJavaMappingUtil.getSpecificObject(kb, kb.getInstance(name), User.class);
+    }
+
+    public Collection<User> getAllUserObjects() {
+        return getAllUserObjects(false);
+    }
+
+    public Collection<User> getAllUserObjects(boolean transitive) {
+        Collection<User> result = new ArrayList<User>();
+        final Cls cls = getUserClass();
+        for (Object element : transitive ? cls.getInstances() : cls.getDirectInstances()) {
+            Instance inst = (Instance) element;
+            result.add(OntologyJavaMappingUtil.getSpecificObject(kb, inst, User.class));
+        }
+        return result;
+    }
 
     // ***** Getter methods for slots *****
 
@@ -276,6 +338,11 @@ public class OntologyComponentFactory {
         final String name = "deletionName";
         return kb.getSlot(name);
     }
+    
+    public Slot getDomainOfInterestSlot() {
+        final String name = "domainOfInterest";
+        return kb.getSlot(name);
+    }
 
     public Slot getInverse_of_annotatesSlot() {
         final String name = "inverse_of_annotates";
@@ -339,6 +406,16 @@ public class OntologyComponentFactory {
 
     public Slot getVoteValueSlot() {
         final String name = "voteValue";
+        return kb.getSlot(name);
+    }
+    
+    public Slot getWatchedBySlot() {
+        final String name = "watchedBy";
+        return kb.getSlot(name);
+    }
+
+    public Slot getWatchedEntitySlot() {
+        final String name = "watchedEntity";
         return kb.getSlot(name);
     }
 
