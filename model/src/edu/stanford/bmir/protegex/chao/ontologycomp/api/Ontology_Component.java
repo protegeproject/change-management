@@ -47,6 +47,18 @@ public interface Ontology_Component extends AnnotatableThing {
     boolean hasCurrentName();
 
     void setCurrentName(String newCurrentName);
+    
+    // Slot watchedBy
+
+    Collection<User> getWatchedBy();
+
+    boolean hasWatchedBy();
+
+    void addWatchedBy(User newWatchedBy);
+
+    void removeWatchedBy(User oldWatchedBy);
+
+    void setWatchedBy(Collection<? extends User> newWatchedBy);
 
     void delete();
 
