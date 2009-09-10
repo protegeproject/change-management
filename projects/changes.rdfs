@@ -441,6 +441,11 @@
 	<rdfs:range rdf:resource="&kb;Composite_Change"/>
 	<a:inverseProperty rdf:resource="&kb;subChanges"/>
 </rdf:Property>
+<rdf:Property rdf:about="&kb;pendingReview"
+	 rdfs:label="pendingReview">
+	<rdfs:range rdf:resource="&kb;Ontology_Component"/>
+	<rdfs:domain rdf:resource="&kb;Reviewer"/>
+</rdf:Property>
 <rdf:Property rdf:about="&kb;related"
 	 a:maxCardinality="1"
 	 rdfs:label="related">
