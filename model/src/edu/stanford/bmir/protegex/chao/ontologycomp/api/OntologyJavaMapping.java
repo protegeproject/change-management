@@ -4,7 +4,9 @@ import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology_Cla
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology_Component;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology_Individual;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology_Property;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultReviewer;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultTimestamp;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultUser;
 import edu.stanford.smi.protege.code.generator.wrapping.OntologyJavaMappingUtil;
 
 /**
@@ -19,6 +21,8 @@ public class OntologyJavaMapping {
         OntologyJavaMappingUtil.add("Ontology_Component", Ontology_Component.class, DefaultOntology_Component.class);
         OntologyJavaMappingUtil.add("Ontology_Individual", Ontology_Individual.class, DefaultOntology_Individual.class);
         OntologyJavaMappingUtil.add("Ontology_Property", Ontology_Property.class, DefaultOntology_Property.class);
+        OntologyJavaMappingUtil.add("Reviewer", Reviewer.class, DefaultReviewer.class);
         OntologyJavaMappingUtil.add("Timestamp", Timestamp.class, DefaultTimestamp.class);
+        OntologyJavaMappingUtil.add("User", User.class, DefaultUser.class);
     }
 }
