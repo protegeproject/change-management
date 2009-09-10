@@ -17,6 +17,7 @@ import edu.stanford.bmir.protegex.chao.change.api.impl.DefaultChange;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyComponentFactory;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Status;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.User;
 import edu.stanford.bmir.protegex.chao.util.ChangeDateComparator;
 import edu.stanford.smi.protege.code.generator.wrapping.OntologyJavaMappingUtil;
 import edu.stanford.smi.protege.model.Cls;
@@ -148,7 +149,46 @@ implements Ontology_Component {
 	public void setCurrentName(String newCurrentName) {
 		setSlotValue(getCurrentNameSlot(), newCurrentName);
 	}
+	
+    // Slot watchedBy
 
+    public Collection<User> getWatchedBy() {
+        Collection protegeValues = getWrappedProtegeInstance().getOwnSlotValues(getWatchedBySlot());
+        Collection<User> values = new ArrayList<User>();
+        Cls cls = getKnowledgeBase().getCls("User");
+        for (Object object : protegeValues) {
+            if (object instanceof Instance && ((Instance)object).hasType(cls)) {
+                values.add(new DefaultUser((Instance)object));
+            }
+        }
+        return values;
+    }
+
+
+    public Slot getWatchedBySlot() {
+        final String name = "watchedBy";
+        return getKnowledgeBase().getSlot(name);
+    }
+
+
+    public boolean hasWatchedBy() {
+        return hasSlotValues(getWatchedBySlot());
+    }
+
+
+    public void addWatchedBy(User newWatchedBy) {
+        addSlotValue(getWatchedBySlot(), newWatchedBy);
+    }
+
+
+    public void removeWatchedBy(User oldWatchedBy) {
+        removeSlotValue(getWatchedBySlot(), oldWatchedBy);
+    }
+
+
+    public void setWatchedBy(Collection<? extends User> newWatchedBy) {
+        setSlotValues(getWatchedBySlot(), newWatchedBy);
+    }
 
 	// __Code above is automatically generated. Do not change
 
