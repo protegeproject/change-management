@@ -19,6 +19,7 @@ import edu.stanford.bmir.protegex.chao.change.api.Property_Deleted;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyComponentFactory;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Property;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.User;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.code.generator.wrapping.OntologyJavaMappingUtil;
 import edu.stanford.smi.protege.model.Cls;
@@ -45,7 +46,6 @@ public class ServerChangesUtil {
         changes_db.finalizeChange(change, frame, context);
         return change;
     }
-
 
     public static Created_Change createCreatedChange(PostProcessorManager changes_db,
                                                      Created_Change change,
@@ -189,7 +189,6 @@ public class ServerChangesUtil {
         return oc;
     }
 
-
     public static Ontology_Component getOntologyComponent(KnowledgeBase changes_kb, String name) {
     	OntologyComponentFactory factory = new OntologyComponentFactory(changes_kb);
     	//could search also just for the prefixed name - if in compatibility mode..
@@ -203,5 +202,14 @@ public class ServerChangesUtil {
     	}
     	return null;
     }
-
+    
+    public static User getUser(KnowledgeBase changes_kb, String name) {
+    	OntologyComponentFactory factory = new OntologyComponentFactory(changes_kb);
+    	for (Frame frame : changes_kb.getMatchingFrames(factory.getNameSlot(), null, false, name, -1)) {
+    		if (frame.getOwnSlotValue(factory.getNameSlot()).equals(name)) {
+    			return OntologyJavaMappingUtil.getSpecificObject(changes_kb, (Instance) frame, User.class);
+    		}
+    	}
+    	return null;
+    }
  }
