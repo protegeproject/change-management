@@ -35,42 +35,44 @@ public class OwlChangesFrameListener extends FrameAdapter {
     public void ownSlotValueChanged(FrameEvent event) {
         Frame f = event.getFrame();
         Slot slot = event.getSlot();
-        OWLModel owlModel = (OWLModel)f.getKnowledgeBase();        
+        OWLModel owlModel = (OWLModel) f.getKnowledgeBase();
         if (f instanceof Cls) {
-            Cls c = (Cls)f;
+            Cls c = (Cls) f;
             if (slot instanceof RDFProperty && ((RDFProperty) slot).isAnnotationProperty()) {
                 handleAnnotation(c, (RDFProperty) slot, event);
             } else if (slot.equals(owlModel.getSystemFrames().getOwlDisjointWithProperty())) {
                 handleOwlDisjoint(c, slot, event);
-            } 
-        } else if (f instanceof Instance){
+            } else if (!isFramesSystemSlot(slot) && !slot.equals(owlModel.getSystemFrames().getRdfTypeProperty())) {
+                handleInstanceSlotValueChange((Instance) f, slot, event);
+            }
+        } else if (f instanceof Instance) {
             if (!isFramesSystemSlot(slot) && !slot.equals(owlModel.getSystemFrames().getRdfTypeProperty())) {
                 handleInstanceSlotValueChange((Instance) f, slot, event);
             }
         }
     }
 
-    
     private boolean isFramesSystemSlot(Slot slot) {
-    	if (!slot.isSystem()) { return false;}
-    	return !slot.getName().startsWith("http://"); //not a very good test, but it should work    			
+        if (!slot.isSystem()) {
+            return false;
+        }
+        return !slot.getName().startsWith("http://"); //not a very good test, but it should work    			
     }
-    
 
     private void handleAnnotation(Cls c, RDFProperty prop, FrameEvent event) {
-        String cText = c.getBrowserText();        
+        String cText = c.getBrowserText();
         Slot s = event.getSlot();
         String sName = s.getBrowserText();
-        ArrayList oldSlotValues = (ArrayList) event.getOldValues(); 
+        ArrayList oldSlotValues = (ArrayList) event.getOldValues();
         Collection newSlotValues = c.getOwnSlotValues(prop);
         StringBuffer context = new StringBuffer();
-        if (newSlotValues == null && oldSlotValues  == null || newSlotValues.equals(oldSlotValues)) {
+        if (newSlotValues == null && oldSlotValues == null || newSlotValues.equals(oldSlotValues)) {
             return;
         }
         Ontology_Component applyTo = postProcessorManager.getOntologyComponent(c, true);
         Ontology_Property ontologyAnnotation = (Ontology_Property) postProcessorManager.getOntologyComponent(s, true);
-        
-        if (newSlotValues == null || newSlotValues.isEmpty()){
+
+        if (newSlotValues == null || newSlotValues.isEmpty()) {
             context.append("Annotation removed: ");
             context.append(sName);
             context.append(" from class: ");
@@ -92,12 +94,11 @@ public class OwlChangesFrameListener extends FrameAdapter {
             context.append("'");
             context.append(" to class: ");
             context.append(cText);
-            Annotation_Change change =  factory.createAnnotation_Added(null);
+            Annotation_Change change = factory.createAnnotation_Added(null);
             change.setAssociatedProperty(ontologyAnnotation);
             change.setAction("Annotation Added");
             postProcessorManager.finalizeChange(change, applyTo, context.toString());
-        }
-        else {
+        } else {
             context.append("Annotation modified: ");
             context.append("annotation ");
             context.append(sName);
@@ -113,7 +114,7 @@ public class OwlChangesFrameListener extends FrameAdapter {
     }
 
     private void handleOwlDisjoint(Cls c, Slot slot, FrameEvent event) {
-        String cText = c.getBrowserText();        
+        String cText = c.getBrowserText();
         ArrayList oldSlotValues = (ArrayList) event.getOldValues();
         StringBuffer context = new StringBuffer();
         Collection newSlotValues = c.getOwnSlotValues(slot);
@@ -135,14 +136,15 @@ public class OwlChangesFrameListener extends FrameAdapter {
         context.append(" to: ");
         context.append(cText);
 
-        ServerChangesUtil.createChangeStd(postProcessorManager, factory.createDisjointClass_Added(null), c, context.toString());
+        ServerChangesUtil.createChangeStd(postProcessorManager, factory.createDisjointClass_Added(null), c, context
+                .toString());
     }
 
-    private void handleInstanceSlotValueChange(Instance i, Slot slot, FrameEvent event) {     
+    private void handleInstanceSlotValueChange(Instance i, Slot slot, FrameEvent event) {
         String iText = i.getBrowserText();
         String ownSName = slot.getBrowserText();
         String newSlotValue = CollectionUtilities.toString(i.getOwnSlotValues(event.getSlot()));
-        ArrayList oldValues = (ArrayList)event.getArgument2();
+        ArrayList oldValues = (ArrayList) event.getArgument2();
         StringBuffer context = new StringBuffer();
         context.append("Property: ");
         context.append(ownSName);
@@ -155,7 +157,7 @@ public class OwlChangesFrameListener extends FrameAdapter {
         context.append(")");
         Property_Value change = factory.createProperty_Value(null);
         change.setAction("Property Value Changed");
-		ServerChangesUtil.createChangeStd(postProcessorManager, change, i, context.toString());
+        ServerChangesUtil.createChangeStd(postProcessorManager, change, i, context.toString());
     }
 
 }
