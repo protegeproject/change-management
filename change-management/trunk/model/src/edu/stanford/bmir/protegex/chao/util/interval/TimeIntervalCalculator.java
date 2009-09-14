@@ -2,7 +2,6 @@ package edu.stanford.bmir.protegex.chao.util.interval;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,11 +20,12 @@ import edu.stanford.smi.protegex.changes.ChangeProjectUtil;
 import edu.stanford.smi.protegex.server_changes.model.AbstractChangeListener;
 
 public class TimeIntervalCalculator {
-    private static ProjectAdapter projectListener = new CleanupListener();
     private static Map<KnowledgeBase, TimeIntervalCalculator> instanceMap = new HashMap<KnowledgeBase, TimeIntervalCalculator>();
 
-    private KnowledgeBase changesKb;
+    private ProjectAdapter projectListener = new CleanupListener();
     private AbstractChangeListener changeListener;
+    
+    private KnowledgeBase changesKb;
     private TreeMap<SimpleTime, Change> sortedChangesMap = new TreeMap<SimpleTime, Change>();
     
     private TimeIntervalCalculator(KnowledgeBase changesKb) {
@@ -42,30 +42,49 @@ public class TimeIntervalCalculator {
         }
     }
     
-    public static synchronized TimeIntervalCalculator get(KnowledgeBase changesKb) {
-        TimeIntervalCalculator t = instanceMap.get(changesKb);
+    public static TimeIntervalCalculator get(KnowledgeBase changesKb) {
+        TimeIntervalCalculator t;
+        synchronized (TimeIntervalCalculator.class) {
+            t = instanceMap.get(changesKb);
+        }
         if (t == null) {
             t = new TimeIntervalCalculator(changesKb);
-            instanceMap.put(changesKb, t);
+            TimeIntervalCalculator existingCalculator;
+            synchronized (TimeIntervalCalculator.class) {
+                existingCalculator = instanceMap.get(changesKb);
+                if (existingCalculator == null) {
+                    instanceMap.put(changesKb, t);
+                }
+            }
+            if (existingCalculator != null) {
+                t.dispose();
+                t = existingCalculator;
+            }
         }
         return t;
     }
     
     public Collection<Change> getTopLevelChanges() {
-        return Collections.unmodifiableCollection(sortedChangesMap.values());
+        synchronized (changesKb) {
+            return new ArrayList<Change>(sortedChangesMap.values());
+        }
     }
    
     public Collection<Change> getTopLevelChangesBefore(Date d) {
-        return Collections.unmodifiableCollection(sortedChangesMap.headMap(new SimpleTime(d)).values());
+        synchronized (changesKb) {
+            return new ArrayList<Change>(sortedChangesMap.headMap(new SimpleTime(d)).values());
+        }
     }
     
     public Collection<Change> getTopLevelChangesAfter(Date d) {
-        return Collections.unmodifiableCollection(sortedChangesMap.tailMap(new SimpleTime(d)).values());
+        synchronized (changesKb) {
+            return new ArrayList<Change>(sortedChangesMap.tailMap(new SimpleTime(d)).values());
+        }
     }
 
     public Collection<Change> getTopLevelChanges(Date start, Date end) {
         List<Change> changes = new ArrayList<Change>();
-        for (Change change : sortedChangesMap.tailMap(new SimpleTime(start)).values()) {
+        for (Change change : getTopLevelChangesAfter(start)) {
             if (change.getTimestamp().getDateParsed().compareTo(end) >= 0) {
                 break;
             }
@@ -76,10 +95,10 @@ public class TimeIntervalCalculator {
     
     public void dispose() {
         synchronized (TimeIntervalCalculator.class) {
-            changesKb.getProject().removeProjectListener(projectListener);
-            changesKb.removeFrameListener(changeListener);
             instanceMap.remove(changesKb);
         }
+        changesKb.getProject().removeProjectListener(projectListener);
+        changesKb.removeFrameListener(changeListener);
     }
     
     private static class CleanupListener extends ProjectAdapter {
@@ -87,11 +106,12 @@ public class TimeIntervalCalculator {
         public void projectClosed(ProjectEvent event) {
             Project changesProject = (Project) event.getSource();
             KnowledgeBase changesKb = changesProject.getKnowledgeBase();
+            TimeIntervalCalculator  t;
             synchronized (TimeIntervalCalculator.class) {
-                TimeIntervalCalculator  t = instanceMap.get(changesKb);
-                if (t != null) {
-                    t.dispose();
-                }
+                t = instanceMap.get(changesKb);
+            }
+            if (t != null) {
+                t.dispose();
             }
         }
     }
