@@ -12,6 +12,7 @@ import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultFiveStarsVote;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultFiveStarsVoteProposal;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultProposal;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultQuestion;
+import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultReview;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultSeeAlso;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultSimpleProposal;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultVote;
@@ -38,6 +39,7 @@ public class OntologyJavaMapping {
         OntologyJavaMappingUtil.add("FiveStarsVoteProposal", FiveStarsVoteProposal.class, DefaultFiveStarsVoteProposal.class);
         OntologyJavaMappingUtil.add("Proposal", Proposal.class, DefaultProposal.class);
         OntologyJavaMappingUtil.add("Question", Question.class, DefaultQuestion.class);
+        OntologyJavaMappingUtil.add("Review", Review.class, DefaultReview.class);
         OntologyJavaMappingUtil.add("SeeAlso", SeeAlso.class, DefaultSeeAlso.class);
         OntologyJavaMappingUtil.add("SimpleProposal", SimpleProposal.class, DefaultSimpleProposal.class);
         OntologyJavaMappingUtil.add("Vote", Vote.class, DefaultVote.class);
