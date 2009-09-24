@@ -105,8 +105,15 @@ public class DefaultTimestamp extends AbstractWrappedInstance
 	
 	private static Timestamp getTimestamp(KnowledgeBase changesKb, Date date, int counter) {
 	    Timestamp ts = new OntologyComponentFactory(changesKb).createTimestamp(null);
-	    ts.setDate(DATE_FORMAT.format(date));
+	    String formattedDate;
+	    synchronized (DATE_FORMAT) {
+	        formattedDate = DATE_FORMAT.format(date);
+	    }
+	    ts.setDate(formattedDate);
 	    ts.setSequence(counter);
+	    if (ts instanceof DefaultTimestamp) {
+	        ((DefaultTimestamp) ts).time = date;
+	    }
 	    return ts;
 	}
 
@@ -118,7 +125,9 @@ public class DefaultTimestamp extends AbstractWrappedInstance
 	    if (time == null) {
 	        String date = getDate();
 	        try {
-	            time = DATE_FORMAT.parse(date);
+	            synchronized (DATE_FORMAT) {
+	                time = DATE_FORMAT.parse(date);
+	            }
 	        } catch (ParseException e) {
 	            Log.getLogger().severe("Exception caught parsing the changes ontology - it is probably corrupted" + e);
 	        }
