@@ -18,6 +18,7 @@ import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.util.CollectionUtilities;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.RDFProperty;
+import edu.stanford.smi.protegex.owl.model.framestore.LocalClassificationFrameStore;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
@@ -35,6 +36,9 @@ public class OwlChangesFrameListener extends FrameAdapter {
     public void ownSlotValueChanged(FrameEvent event) {
         Frame f = event.getFrame();
         Slot slot = event.getSlot();
+        if (LocalClassificationFrameStore.isLocalClassificationProperty(slot)) {
+        	return;
+        }
         OWLModel owlModel = (OWLModel) f.getKnowledgeBase();
         if (f instanceof Cls) {
             Cls c = (Cls) f;
