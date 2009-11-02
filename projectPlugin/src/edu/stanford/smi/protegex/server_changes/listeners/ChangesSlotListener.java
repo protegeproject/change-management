@@ -20,97 +20,121 @@ public class ChangesSlotListener extends SlotAdapter{
         factory = new ChangeFactory(changes_db.getChangesKb());
     }
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.SlotListener#templateSlotClsAdded(edu.stanford.smi.protege.event.SlotEvent)
-	 */
-	@Override
-	public void templateSlotClsAdded(SlotEvent event) {
-		if (event.getArgument() instanceof Cls) {
-			Cls theCls = event.getCls();
-            Slot theSlot = event.getSlot();
+    /* (non-Javadoc)
+     * @see edu.stanford.smi.protege.event.SlotListener#templateSlotClsAdded(edu.stanford.smi.protege.event.SlotEvent)
+     */
+    @Override
+    public void templateSlotClsAdded(SlotEvent event) {
+        if (event.getArgument() instanceof Cls) {
+            final Cls theCls = event.getCls();
+            final Slot theSlot = event.getSlot();
 
-			StringBuffer context = new StringBuffer();
-			context.append("Added template slot: ");
-			context.append(theSlot.getBrowserText());
-			context.append(" to: ");
-			context.append(theCls.getBrowserText());
+            final StringBuffer context = new StringBuffer();
+            context.append("Added template slot: ");
+            context.append(theSlot.getBrowserText());
+            context.append(" to: ");
+            context.append(theCls.getBrowserText());
 
-            ServerChangesUtil.createChangeWithSlot(changes_db, factory.createTemplateSlot_Added(null), theCls, context.toString(), theSlot);
-		}
-	}
+            changes_db.submitChangeListenerJob(new Runnable() {
+                    public void run() {
+                        ServerChangesUtil.createChangeWithSlot(changes_db, factory.createTemplateSlot_Added(null), theCls, context.toString(), theSlot);
+                    }
+                });
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.SlotListener#templateSlotClsRemoved(edu.stanford.smi.protege.event.SlotEvent)
-	 */
-	@Override
-	public void templateSlotClsRemoved(SlotEvent event) {
-		if (event.getArgument() instanceof Cls) {
-			Cls theCls = event.getCls();
-            Slot theSlot = event.getSlot();
+    /* (non-Javadoc)
+     * @see edu.stanford.smi.protege.event.SlotListener#templateSlotClsRemoved(edu.stanford.smi.protege.event.SlotEvent)
+     */
+    @Override
+    public void templateSlotClsRemoved(SlotEvent event) {
+        if (event.getArgument() instanceof Cls) {
+            final Cls theCls = event.getCls();
+            final Slot theSlot = event.getSlot();
             //String name = changes_db.getPossiblyDeletedBrowserText(theCls);
-            String name = theCls.getName();
-			StringBuffer context = new StringBuffer();
-			context.append("Removed template slot: ");
-			context.append(theSlot.getBrowserText());
-			context.append(" from: ");
-			context.append(name);
+            final String name = theCls.getName();
+            final StringBuffer context = new StringBuffer();
+            context.append("Removed template slot: ");
+            context.append(theSlot.getBrowserText());
+            context.append(" from: ");
+            context.append(name);
 
-            ServerChangesUtil.createChangeWithSlot(changes_db, factory.createTemplateSlot_Removed(null), theCls, context.toString(), theSlot);
-		}
-	}
+            changes_db.submitChangeListenerJob(new Runnable() {
+                    public void run() {
+                        ServerChangesUtil.createChangeWithSlot(changes_db, factory.createTemplateSlot_Removed(null), theCls, context.toString(), theSlot);
+                    }
+                });
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.SlotListener#directSubslotAdded(edu.stanford.smi.protege.event.SlotEvent)
-	 */
-	@Override
-	public void directSubslotAdded(SlotEvent event) {
-		if (event.getArgument() instanceof Slot) {
-			Slot eventSlot = (Slot) event.getArgument();
-			String context = "Direct Subslot Added: " + eventSlot.getBrowserText();
+    /* (non-Javadoc)
+     * @see edu.stanford.smi.protege.event.SlotListener#directSubslotAdded(edu.stanford.smi.protege.event.SlotEvent)
+     */
+    @Override
+    public void directSubslotAdded(SlotEvent event) {
+        if (event.getArgument() instanceof Slot) {
+            final Slot eventSlot = (Slot) event.getArgument();
+            final String context = "Direct Subslot Added: " + eventSlot.getBrowserText();
 
-            ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Added(null), eventSlot, context);
-		}
-	}
+            changes_db.submitChangeListenerJob(new Runnable() {
+                    public void run() {
+                        ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Added(null), eventSlot, context);
+                    }
+                });
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.SlotListener#directSubslotRemoved(edu.stanford.smi.protege.event.SlotEvent)
-	 */
-	@Override
-	public void directSubslotRemoved(SlotEvent event) {
-		if (event.getArgument() instanceof Slot) {
-			Slot eventSlot = (Slot) event.getArgument();
+    /* (non-Javadoc)
+     * @see edu.stanford.smi.protege.event.SlotListener#directSubslotRemoved(edu.stanford.smi.protege.event.SlotEvent)
+     */
+    @Override
+    public void directSubslotRemoved(SlotEvent event) {
+        if (event.getArgument() instanceof Slot) {
+            final Slot eventSlot = (Slot) event.getArgument();
             //String name = changes_db.getPossiblyDeletedBrowserText(eventSlot);
-			String name = event.getSubslot().getName(); //TT -maybe null pointer
-			String context = "Direct Subslot Removed: " + name;
+            final String name = event.getSubslot().getName(); //TT -maybe null pointer
+            final String context = "Direct Subslot Removed: " + name;
 
-            ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Removed(null), eventSlot, context);
-		}
-	}
+            changes_db.submitChangeListenerJob(new Runnable() {
+                    public void run() {
+                        ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Removed(null), eventSlot, context);
+                    }
+                });
+        }
+    }
 
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.SlotListener#directSuperslotAdded(edu.stanford.smi.protege.event.SlotEvent)
-	 */
-	@Override
-	public void directSuperslotAdded(SlotEvent event) {
-		if (event.getArgument() instanceof Slot) {
-			Slot eventSlot = (Slot) event.getArgument();
-			String context = "Direct Superslot Added: " + eventSlot.getBrowserText();
+    /* (non-Javadoc)
+     * @see edu.stanford.smi.protege.event.SlotListener#directSuperslotAdded(edu.stanford.smi.protege.event.SlotEvent)
+     */
+    @Override
+    public void directSuperslotAdded(SlotEvent event) {
+        if (event.getArgument() instanceof Slot) {
+            final Slot eventSlot = (Slot) event.getArgument();
+            final String context = "Direct Superslot Added: " + eventSlot.getBrowserText();
 
-            ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Added(null), eventSlot, context);
-		}
-	}
+            changes_db.submitChangeListenerJob(new Runnable() {
+                    public void run() {
+                        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Added(null), eventSlot, context);
+                    }
+                });
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.smi.protege.event.SlotListener#directSuperslotRemoved(edu.stanford.smi.protege.event.SlotEvent)
-	 */
-	@Override
-	public void directSuperslotRemoved(SlotEvent event) {
-		if (event.getArgument() instanceof Slot) {
-			Slot eventSlot = (Slot) event.getArgument();
-			String context = "Direct Superslot Removed: " + eventSlot.getBrowserText();
+    /* (non-Javadoc)
+     * @see edu.stanford.smi.protege.event.SlotListener#directSuperslotRemoved(edu.stanford.smi.protege.event.SlotEvent)
+     */
+    @Override
+    public void directSuperslotRemoved(SlotEvent event) {
+        if (event.getArgument() instanceof Slot) {
+            final Slot eventSlot = (Slot) event.getArgument();
+            final String context = "Direct Superslot Removed: " + eventSlot.getBrowserText();
 
-            ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Removed(null), eventSlot, context);
-		}
-	}
+            changes_db.submitChangeListenerJob(new Runnable() {
+                    public void run() {
+                        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Removed(null), eventSlot, context);
+                    }
+                });
+        }
+    }
 }

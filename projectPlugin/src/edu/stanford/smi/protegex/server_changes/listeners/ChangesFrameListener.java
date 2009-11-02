@@ -26,22 +26,26 @@ public class ChangesFrameListener extends FrameAdapter {
 	@Override
 	public void ownSlotValueChanged(FrameEvent event) {
 
-		Frame frame = event.getFrame();
-		String frameName = frame.getBrowserText();
-		KnowledgeBase kb = frame.getKnowledgeBase();
-		SystemFrames systemFrames = kb.getSystemFrames();
+		final Frame frame = event.getFrame();
+		final String frameName = frame.getBrowserText();
+		final KnowledgeBase kb = frame.getKnowledgeBase();
+		final SystemFrames systemFrames = kb.getSystemFrames();
 
-		Slot ownSlot = event.getSlot();
-		String newSlotValue = CollectionUtilities.toString(frame.getOwnSlotValues(event.getSlot()));
+		final Slot ownSlot = event.getSlot();
+		final String newSlotValue = CollectionUtilities.toString(frame.getOwnSlotValues(event.getSlot()));
 
-		StringBuffer context = new StringBuffer();
+		final StringBuffer context = new StringBuffer();
 
 		if(ownSlot.equals(systemFrames.getDocumentationSlot())) {
 
 			if(newSlotValue.equals("")) {
 				context.append("Removed documentation from ");
 				context.append(frameName);
-				ServerChangesUtil.createChangeStd(changes_db, factory.createDocumentation_Removed(null), frame, context.toString());
+                changes_db.submitChangeListenerJob(new Runnable() {
+                        public void run() {
+                            ServerChangesUtil.createChangeStd(changes_db, factory.createDocumentation_Removed(null), frame, context.toString());
+                        }
+                    });
 			}
 			else {
 				context.append("Added documentation: ");
@@ -49,7 +53,11 @@ public class ChangesFrameListener extends FrameAdapter {
 				context.append(" to: ");
 				context.append(frameName);
 
-				ServerChangesUtil.createChangeStd(changes_db, factory.createDocumentation_Added(null), frame, context.toString());
+                changes_db.submitChangeListenerJob(new Runnable() {
+                        public void run() {
+                            ServerChangesUtil.createChangeStd(changes_db, factory.createDocumentation_Added(null), frame, context.toString());
+                        }
+                    });
 			}
 
 		} else if (ownSlot.equals(systemFrames.getMaximumValueSlot())) {
@@ -59,8 +67,12 @@ public class ChangesFrameListener extends FrameAdapter {
 			context.append(" set to: ");
 			context.append(newSlotValue);
 
-			ServerChangesUtil.createChangeStd(changes_db, factory.createMaximum_Value(null), frame, context.toString());
-
+            changes_db.submitChangeListenerJob(new Runnable() {
+                    public void run() {
+                        ServerChangesUtil.createChangeStd(changes_db, factory.createMaximum_Value(null), frame, context.toString());
+                    }
+                });
+        
 		} else if (ownSlot.equals(systemFrames.getMinimumValueSlot())){
 
 			context.append("Minimum value for: ");
@@ -68,7 +80,11 @@ public class ChangesFrameListener extends FrameAdapter {
 			context.append(" set to: ");
 			context.append(newSlotValue);
 
-			ServerChangesUtil.createChangeStd(changes_db, factory.createMinimum_Value(null), frame, context.toString());
+            changes_db.submitChangeListenerJob(new Runnable() {
+                    public void run() {
+                        ServerChangesUtil.createChangeStd(changes_db, factory.createMinimum_Value(null), frame, context.toString());
+                    }
+                });
 
 		} else if (ownSlot.equals(systemFrames.getMinimumCardinalitySlot())){
 
@@ -78,7 +94,11 @@ public class ChangesFrameListener extends FrameAdapter {
 				context.append(" set to: ");
 				context.append(newSlotValue);
 
-				ServerChangesUtil.createChangeStd(changes_db, factory.createMinimum_Cardinality(null), frame, context.toString());
+                changes_db.submitChangeListenerJob(new Runnable() {
+                        public void run() {
+                            ServerChangesUtil.createChangeStd(changes_db, factory.createMinimum_Cardinality(null), frame, context.toString());
+                        }
+                    });
 			}
 		} else if (ownSlot.equals(systemFrames.getMaximumCardinalitySlot())){
 
@@ -86,7 +106,12 @@ public class ChangesFrameListener extends FrameAdapter {
 				context.append(frameName);
 				context.append(" can take multiple values");
 
-				ServerChangesUtil.createChangeStd(changes_db, factory.createMaximum_Cardinality(null), frame, context.toString());
+                changes_db.submitChangeListenerJob(new Runnable() {
+                        public void run() {
+                            ServerChangesUtil.createChangeStd(changes_db, factory.createMaximum_Cardinality(null), frame, context.toString());
+                        }
+                    });
+
 			}
 			else {
 				context.append("Maximum cardinality for: ");
@@ -94,7 +119,11 @@ public class ChangesFrameListener extends FrameAdapter {
 				context.append(" set to: ");
 				context.append(newSlotValue);
 
-				ServerChangesUtil.createChangeStd(changes_db, factory.createMaximum_Cardinality(null), frame, context.toString());
+                changes_db.submitChangeListenerJob(new Runnable() {
+                        public void run() {
+                            ServerChangesUtil.createChangeStd(changes_db, factory.createMaximum_Cardinality(null), frame, context.toString());
+                        }
+                    });
 			}
 		} else if (ownSlot.isSystem()) {
 			//TT: do nothing, it is handled somewhere else (hopefully!)
@@ -107,7 +136,11 @@ public class ChangesFrameListener extends FrameAdapter {
 			context.append(" to: ");
 			context.append(newSlotValue);
 
-			ServerChangesUtil.createChangeStd(changes_db, factory.createProperty_Value(null), frame, context.toString());
+            changes_db.submitChangeListenerJob(new Runnable() {
+                    public void run() {
+                        ServerChangesUtil.createChangeStd(changes_db, factory.createProperty_Value(null), frame, context.toString());
+                    }
+                });
 		}
 	}
 

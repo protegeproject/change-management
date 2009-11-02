@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import edu.stanford.smi.protege.util.Log;
 
 import edu.stanford.bmir.protegex.chao.ChAOKbManager;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
@@ -18,9 +24,12 @@ import edu.stanford.smi.protegex.server_changes.postprocess.PostProcessor;
 import edu.stanford.smi.protegex.server_changes.util.Util;
 
 public class PostProcessorManager {
+    private Logger log = Log.getLogger(PostProcessorManager.class);
 
     private KnowledgeBase kb;
     private KnowledgeBase changes_kb;
+    
+    private ExecutorService sequentialExecutor;
 
     /*
      * This map allows the ChangesDb manage transactions.  The map maintains transaction information
@@ -37,6 +46,12 @@ public class PostProcessorManager {
     public PostProcessorManager(KnowledgeBase kb) {
         this.kb = kb;
         this.changes_kb = ChAOKbManager.getChAOKb(kb);
+        if (kb.getProject().isMultiUserServer()) {
+            sequentialExecutor = Executors.newSingleThreadExecutor();
+        }
+        else {
+            sequentialExecutor = null;
+        }
         DefaultTimestamp.initialize();
     }
 
@@ -75,6 +90,24 @@ public class PostProcessorManager {
 
     public Project getChangesProject() {
         return changes_kb.getProject();
+    }
+    
+    public void submitChangeListenerJob(final Runnable r) {
+        if (sequentialExecutor == null) {
+            r.run();
+        }
+        else {
+            sequentialExecutor.submit(new Runnable() {
+                    public void run() {
+                        try {
+                            r.run();
+                        }
+                        catch (Throwable t) {
+                            log.log(Level.WARNING, "Exception caught in change management listener", t);
+                        }
+                    }
+                });
+        }
     }
 
     public String getCurrentUser() {
