@@ -35,8 +35,12 @@ public class ChangesOwlKBListener extends KnowledgeBaseAdapter {
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-        Cls cls = event.getCls();
-        ServerChangesUtil.createCreatedChange(changes_db, factory.createClass_Created(null), cls, cls.getName());
+        final Cls cls = event.getCls();
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createCreatedChange(changes_db, factory.createClass_Created(null), cls, cls.getName());
+            }
+        });
 	}
 
     /* (non-Javadoc)
@@ -50,9 +54,13 @@ public class ChangesOwlKBListener extends KnowledgeBaseAdapter {
         if (event.isReplacementEvent()) {
             return;
         }
-        String deletedClsName = event.getOldName();
-        Frame deletedFrame = event.getCls();
-        ServerChangesUtil.createDeletedChange(changes_db, factory.createClass_Deleted(null), deletedFrame, deletedClsName);
+        final String deletedClsName = event.getOldName();
+        final Frame deletedFrame = event.getCls();
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createDeletedChange(changes_db, factory.createClass_Deleted(null), deletedFrame, deletedClsName);
+            }
+         });
     }
 
 
@@ -60,11 +68,14 @@ public class ChangesOwlKBListener extends KnowledgeBaseAdapter {
 	 * @see edu.stanford.smi.protege.event.KnowledgeBaseListener#frameNameChanged(edu.stanford.smi.protege.event.KnowledgeBaseEvent)
 	 */
 	@Override
-	public void frameNameChanged(KnowledgeBaseEvent event) {
-        String oldName = event.getOldName();
+	public void frameNameChanged(final KnowledgeBaseEvent event) {
+        final String oldName = event.getOldName();
 
-        ServerChangesUtil.createNameChange(changes_db, event.getFrame(), oldName, event.getNewFrame().getName());
-
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createNameChange(changes_db, event.getFrame(), oldName, event.getNewFrame().getName());
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -78,8 +89,12 @@ public class ChangesOwlKBListener extends KnowledgeBaseAdapter {
         if (event.isReplacementEvent()) {
             return;
         }
-        Frame frame = event.getFrame();
-        ServerChangesUtil.createCreatedChange(changes_db, factory.createIndividual_Created(null), frame, frame.getName());
+        final Frame frame = event.getFrame();
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createCreatedChange(changes_db, factory.createIndividual_Created(null), frame, frame.getName());
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -93,9 +108,13 @@ public class ChangesOwlKBListener extends KnowledgeBaseAdapter {
         if (event.isReplacementEvent()) {
             return;
         }
-        String name = event.getOldName();
-        Frame frame = event.getFrame();
-        ServerChangesUtil.createDeletedChange(changes_db, factory.createIndividual_Deleted(null), frame, name);
+        final String name = event.getOldName();
+        final Frame frame = event.getFrame();
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createDeletedChange(changes_db, factory.createIndividual_Deleted(null), frame, name);
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -106,9 +125,13 @@ public class ChangesOwlKBListener extends KnowledgeBaseAdapter {
         if (event.isReplacementEvent()) {
             return;
         }
-        Frame prop = event.getFrame();
-        String propName = prop.getName();
-        ServerChangesUtil.createCreatedChange(changes_db, factory.createProperty_Created(null), prop, prop.getName());
+        final Frame prop = event.getFrame();
+        final String propName = prop.getName();
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createCreatedChange(changes_db, factory.createProperty_Created(null), prop, prop.getName());
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -122,13 +145,18 @@ public class ChangesOwlKBListener extends KnowledgeBaseAdapter {
         if (event.isReplacementEvent()) {
             return;
         }
-        String propName = event.getOldName();
-        Frame frame = event.getSlot();
+        final String propName = event.getOldName();
+        final Frame frame = event.getSlot();
         if (event.getSlot() instanceof RDFProperty) {
-            ServerChangesUtil.createDeletedChange(changes_db,
-                                                  factory.createProperty_Deleted(null),
-                                                  frame,
-                                                  propName);
+            changes_db.submitChangeListenerJob(new Runnable() {
+                    public void run() {
+                        ServerChangesUtil.createDeletedChange(changes_db,
+                                                              factory.createProperty_Deleted(null),
+                                                              frame,
+                                                              propName);
+                    }
+                });
+
         }
 	}
 

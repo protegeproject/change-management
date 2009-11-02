@@ -27,17 +27,21 @@ public class ChangesClsListener extends ClsAdapter{
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-		Instance addedInst = event.getInstance();
-		Cls clsOfInst = event.getCls();
+		final Instance addedInst = event.getInstance();
+		final Cls clsOfInst = event.getCls();
 
-		StringBuffer context = new StringBuffer();
+		final StringBuffer context = new StringBuffer();
 		context.append("Added Instance: ");
 		context.append(addedInst.getBrowserText());
 		context.append(" (instance of ");
 		context.append(clsOfInst.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createIndividual_Added(null), addedInst, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createIndividual_Added(null), addedInst, context.toString());
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -48,17 +52,21 @@ public class ChangesClsListener extends ClsAdapter{
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-		Instance removedInst = event.getInstance();
-		Cls clsOfInst = event.getCls();
+		final Instance removedInst = event.getInstance();
+		final Cls clsOfInst = event.getCls();
 
-		StringBuffer context = new StringBuffer();
+		final StringBuffer context = new StringBuffer();
 		context.append("Removed Instance: ");
 		context.append(removedInst.getBrowserText());
 		context.append(" (instance of ");
 		context.append(clsOfInst.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createIndividual_Removed(null), removedInst, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createIndividual_Removed(null), removedInst, context.toString());
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -69,17 +77,21 @@ public class ChangesClsListener extends ClsAdapter{
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-		Cls subClass = event.getSubclass();
-		Cls superClass = event.getCls();
+		final Cls subClass = event.getSubclass();
+		final Cls superClass = event.getCls();
 
-		StringBuffer context = new StringBuffer();
+		final StringBuffer context = new StringBuffer();
 		context.append("Added subclass: ");
 		context.append(subClass.getBrowserText());
 		context.append(" (subclass of ");
 		context.append(superClass.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Added(null), subClass, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Added(null), subClass, context.toString());
+            }
+         });
 	}
 
 
@@ -91,17 +103,21 @@ public class ChangesClsListener extends ClsAdapter{
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-		Cls subClass = event.getSubclass();
-		Cls superClass = event.getCls();
+		final Cls subClass = event.getSubclass();
+		final Cls superClass = event.getCls();
 
-		StringBuffer context = new StringBuffer();
+		final StringBuffer context = new StringBuffer();
 		context.append("Removed subclass: ");
 		context.append(subClass.getBrowserText());
 		context.append(" (subclass of ");
 		context.append(superClass.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Removed(null), subClass, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Removed(null), subClass, context.toString());
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -112,17 +128,21 @@ public class ChangesClsListener extends ClsAdapter{
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-		Cls subClass = event.getSubclass();
-		Cls superClass = event.getCls();
+		final Cls subClass = event.getSubclass();
+		final Cls superClass = event.getCls();
 
-		StringBuffer context = new StringBuffer();
+		final StringBuffer context = new StringBuffer();
 		context.append("Added superclass: ");
 		context.append(subClass.getBrowserText());
 		context.append(" (subclass of ");
 		context.append( superClass.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperclass_Added(null), subClass, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSuperclass_Added(null), subClass, context.toString());
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -133,17 +153,21 @@ public class ChangesClsListener extends ClsAdapter{
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-		Cls subClass = event.getSubclass();
-		Cls superClass = event.getCls();
+		final Cls subClass = event.getSubclass();
+		final Cls superClass = event.getCls();
 
-		StringBuffer context = new StringBuffer();
+		final StringBuffer context = new StringBuffer();
 		context.append("Removed superclass: ");
 		context.append(subClass.getBrowserText());
 		context.append(" (subclass of ");
 		context.append(superClass.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Removed(null), subClass, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Removed(null), subClass, context.toString());
+            }
+         });
 	}
 
 }

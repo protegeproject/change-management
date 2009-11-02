@@ -33,8 +33,12 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
         if (event.isReplacementEvent()) {
             return;
         }
-        Cls createdCls = event.getCls();
-        ServerChangesUtil.createCreatedChange(changes_db, factory.createClass_Created(null), createdCls, createdCls.getName());
+        final Cls createdCls = event.getCls();
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createCreatedChange(changes_db, factory.createClass_Created(null), createdCls, createdCls.getName());
+            }
+         });
     }
 
 	/* (non-Javadoc)
@@ -42,15 +46,19 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	 */
 	@Override
 	public void clsDeleted(KnowledgeBaseEvent event) {
-            if (log.isLoggable(Level.FINE)) {
-                log.fine("In class deleted listener");
-            }
-            if (event.isReplacementEvent()) {
-                return;
-            }
-            String oldName = event.getOldName();
-            Frame frame = event.getCls();
-            ServerChangesUtil.createDeletedChange(changes_db, factory.createClass_Deleted(null), frame, oldName);
+        if (log.isLoggable(Level.FINE)) {
+            log.fine("In class deleted listener");
+        }
+        if (event.isReplacementEvent()) {
+            return;
+        }
+        final String oldName = event.getOldName();
+        final Frame frame = event.getCls();
+        changes_db.submitChangeListenerJob(new Runnable() {
+                public void run() {
+                    ServerChangesUtil.createDeletedChange(changes_db, factory.createClass_Deleted(null), frame, oldName);
+                }
+            });
 	}
 
 	/* (non-Javadoc)
@@ -58,11 +66,15 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	 */
 	@Override
 	public void frameNameChanged(KnowledgeBaseEvent event) {
-	    String oldName = event.getOldName();
-        Frame frame = event.getFrame();
-	    String newName = event.getNewFrame().getName();
+	    final String oldName = event.getOldName();
+        final Frame frame = event.getFrame();
+	    final String newName = event.getNewFrame().getName();
 
-        ServerChangesUtil.createNameChange(changes_db, frame, oldName, newName);
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createNameChange(changes_db, frame, oldName, newName);
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -76,8 +88,12 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	    if (log.isLoggable(Level.FINE)) {
 	        log.fine("In created instance listener");
 	    }
-	    Frame frame = event.getFrame();
-	    ServerChangesUtil.createCreatedChange(changes_db, factory.createIndividual_Created(null), frame, frame.getName());
+	    final Frame frame = event.getFrame();
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createCreatedChange(changes_db, factory.createIndividual_Created(null), frame, frame.getName());
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -91,9 +107,13 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
         if (log.isLoggable(Level.FINE)) {
             log.fine("In deleted instance listener");
         }
-        Frame frame = event.getFrame();
-        String name = event.getOldName();
-        ServerChangesUtil.createDeletedChange(changes_db, factory.createIndividual_Deleted(null), frame, name);
+        final Frame frame = event.getFrame();
+        final String name = event.getOldName();
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createDeletedChange(changes_db, factory.createIndividual_Deleted(null), frame, name);
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -104,8 +124,12 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-		Slot createdSlot = event.getSlot();
-		ServerChangesUtil.createCreatedChange(changes_db, factory.createProperty_Created(null), createdSlot, createdSlot.getName());
+		final Slot createdSlot = event.getSlot();
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createCreatedChange(changes_db, factory.createProperty_Created(null), createdSlot, createdSlot.getName());
+            }
+         });
 	}
 
 	/* (non-Javadoc)
@@ -116,8 +140,12 @@ public class ChangesKBListener extends KnowledgeBaseAdapter {
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-        String oldName = event.getOldName();
-        Frame frame = event.getSlot();
-        ServerChangesUtil.createDeletedChange(changes_db, factory.createProperty_Deleted(null), frame, oldName);
+        final String oldName = event.getOldName();
+        final Frame frame = event.getSlot();
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createDeletedChange(changes_db, factory.createProperty_Deleted(null), frame, oldName);
+            }
+         });
 	}
 }

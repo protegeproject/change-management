@@ -22,35 +22,43 @@ public class ChangesInstanceListener implements InstanceListener{
      */
     public void directTypeAdded(InstanceEvent event) {
 
-        String directType = event.getInstance().getDirectType().getBrowserText();
+        final String directType = event.getInstance().getDirectType().getBrowserText();
 
-        Instance inst = event.getInstance();
-        String instName = inst.getBrowserText();
+        final Instance inst = event.getInstance();
+        final String instName = inst.getBrowserText();
 
-        StringBuffer context = new StringBuffer();
+        final StringBuffer context = new StringBuffer();
         context.append("Direct Type Added: ");
         context.append(directType);
         context.append(" (added to: ");
         context.append(instName);
         context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createDirectType_Added(null), inst, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createDirectType_Added(null), inst, context.toString());
+            }
+         });
     }
 
     /* (non-Javadoc)
      * @see edu.stanford.smi.protege.event.InstanceListener#directTypeRemoved(edu.stanford.smi.protege.event.InstanceEvent)
      */
-    public void directTypeRemoved(InstanceEvent event) {
-        String directTypeText = event.getInstance().getDirectType().getBrowserText();
-        String instText = event.getInstance().getBrowserText();
+    public void directTypeRemoved(final InstanceEvent event) {
+        final String directTypeText = event.getInstance().getDirectType().getBrowserText();
+        final String instText = event.getInstance().getBrowserText();
 
-        StringBuffer context = new StringBuffer();
+        final StringBuffer context = new StringBuffer();
         context.append("Direct Type Removed: ");
         context.append(directTypeText);
         context.append(" (removed from: ");
         context.append(instText);
         context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createDirectType_Removed(null), event.getInstance(), context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createDirectType_Removed(null), event.getInstance(), context.toString());
+            }
+         });
     }
 }

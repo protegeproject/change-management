@@ -33,27 +33,31 @@ public class OwlChangesFrameListener extends FrameAdapter {
     }
 
     @Override
-    public void ownSlotValueChanged(FrameEvent event) {
-        Frame f = event.getFrame();
-        Slot slot = event.getSlot();
+    public void ownSlotValueChanged(final FrameEvent event) {
+        final Frame f = event.getFrame();
+        final Slot slot = event.getSlot();
         if (LocalClassificationFrameStore.isLocalClassificationProperty(slot)) {
         	return;
         }
-        OWLModel owlModel = (OWLModel) f.getKnowledgeBase();
-        if (f instanceof Cls) {
-            Cls c = (Cls) f;
-            if (slot instanceof RDFProperty && ((RDFProperty) slot).isAnnotationProperty()) {
-                handleAnnotation(c, (RDFProperty) slot, event);
-            } else if (slot.equals(owlModel.getSystemFrames().getOwlDisjointWithProperty())) {
-                handleOwlDisjoint(c, slot, event);
-            } else if (!isFramesSystemSlot(slot) && !slot.equals(owlModel.getSystemFrames().getRdfTypeProperty())) {
-                handleInstanceSlotValueChange((Instance) f, slot, event);
+        postProcessorManager.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                OWLModel owlModel = (OWLModel) f.getKnowledgeBase();
+                if (f instanceof Cls) {
+                    Cls c = (Cls) f;
+                    if (slot instanceof RDFProperty && ((RDFProperty) slot).isAnnotationProperty()) {
+                        handleAnnotation(c, (RDFProperty) slot, event);
+                    } else if (slot.equals(owlModel.getSystemFrames().getOwlDisjointWithProperty())) {
+                        handleOwlDisjoint(c, slot, event);
+                    } else if (!isFramesSystemSlot(slot) && !slot.equals(owlModel.getSystemFrames().getRdfTypeProperty())) {
+                        handleInstanceSlotValueChange((Instance) f, slot, event);
+                    }
+                } else if (f instanceof Instance) {
+                    if (!isFramesSystemSlot(slot) && !slot.equals(owlModel.getSystemFrames().getRdfTypeProperty())) {
+                        handleInstanceSlotValueChange((Instance) f, slot, event);
+                    }
+                }
             }
-        } else if (f instanceof Instance) {
-            if (!isFramesSystemSlot(slot) && !slot.equals(owlModel.getSystemFrames().getRdfTypeProperty())) {
-                handleInstanceSlotValueChange((Instance) f, slot, event);
-            }
-        }
+         });
     }
 
     private boolean isFramesSystemSlot(Slot slot) {

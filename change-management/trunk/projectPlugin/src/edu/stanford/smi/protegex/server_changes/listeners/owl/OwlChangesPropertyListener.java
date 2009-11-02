@@ -30,14 +30,18 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
     }
     
 	@Override
-	public void subpropertyAdded(RDFProperty subProp, RDFProperty prop) {
-		StringBuffer context = new StringBuffer();
+	public void subpropertyAdded(final RDFProperty subProp, final RDFProperty prop) {
+		final StringBuffer context = new StringBuffer();
 		context.append("Subproperty Added: ");
 		context.append(subProp.getBrowserText());
 		context.append(" (added to: ");
 		context.append(prop.getBrowserText());
 		context.append(")");
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Added(null), subProp, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Added(null), subProp, context.toString());
+            }
+         });
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -50,15 +54,19 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 	}
 
 	@Override
-	public void subpropertyRemoved(RDFProperty subProp, RDFProperty prop) {
+	public void subpropertyRemoved(final RDFProperty subProp, RDFProperty prop) {
 			//String browserText0 = changes_db.getPossiblyDeletedBrowserText(arg0);
-            StringBuffer context = new StringBuffer();
+            final StringBuffer context = new StringBuffer();
             context.append("Subproperty Removed: ");
             context.append(subProp.getBrowserText());
             context.append(" (removed from: ");
             context.append(prop.getBrowserText());
             context.append(")");
-            ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Removed(null), subProp, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSubproperty_Removed(null), subProp, context.toString());
+            }
+         });
 	}
 
 
@@ -72,14 +80,18 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 	}
 	
 	@Override
-	public void superpropertyAdded(RDFProperty superProp, RDFProperty prop) {
-		StringBuffer context = new StringBuffer();
+	public void superpropertyAdded(final RDFProperty superProp, final RDFProperty prop) {
+		final StringBuffer context = new StringBuffer();
 		context.append("Superproperty Added: ");
 		context.append(superProp.getBrowserText());
 		context.append(" (added to: ");
 		context.append(prop.getBrowserText());
 		context.append(")");
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Added(null), superProp, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Added(null), superProp, context.toString());
+            }
+         });
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -92,42 +104,54 @@ public class OwlChangesPropertyListener extends PropertyAdapter{
 	}
 
 	@Override
-	public void superpropertyRemoved(RDFProperty superProp, RDFProperty prop) {
+	public void superpropertyRemoved(final RDFProperty superProp, RDFProperty prop) {
         //String browserText0 = changes_db.getPossiblyDeletedBrowserText(arg0);
         //String browserText1 = changes_db.getPossiblyDeletedBrowserText(arg1);
-		StringBuffer context = new StringBuffer();
+		final StringBuffer context = new StringBuffer();
 		context.append("Superproperty Removed: ");
 		context.append(superProp.getBrowserText());
 		context.append(" (removed from: " );
 		context.append(prop.getBrowserText());
 		context.append(")");
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Added(null), superProp, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSuperproperty_Added(null), superProp, context.toString());
+            }
+         });
 	}
 
 	@Override
-	public void unionDomainClassAdded(RDFProperty prop, RDFSClass cls) {
-		String propText = prop.getBrowserText();		
-		String clsText = cls.getBrowserText();
-		StringBuffer context = new StringBuffer();
+	public void unionDomainClassAdded(final RDFProperty prop, RDFSClass cls) {
+		final String propText = prop.getBrowserText();		
+		final String clsText = cls.getBrowserText();
+		final StringBuffer context = new StringBuffer();
 		context.append("Domain Property Added: ");
 		context.append(propText);
 		context.append("(added to: ");
 		context.append(clsText);
 		context.append(")");
-        ServerChangesUtil.createChangeStd(changes_db, factory.createDomainProperty_Added(null), prop, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createDomainProperty_Added(null), prop, context.toString());
+            }
+         });
 	}
 
 	@Override
-	public void unionDomainClassRemoved(RDFProperty prop, RDFSClass cls) {
+	public void unionDomainClassRemoved(final RDFProperty prop, RDFSClass cls) {
 		//String propText = changes_db.getPossiblyDeletedBrowserText(arg0);
 		//String clsText = changes_db.getPossiblyDeletedBrowserText(arg1);
-		StringBuffer context = new StringBuffer();
+		final StringBuffer context = new StringBuffer();
 		context.append("Domain Property Removed: ");
 		context.append(prop.getBrowserText());
 		context.append("(removed from: ");
 		context.append(cls.getBrowserText());
 		context.append(")");
-        ServerChangesUtil.createChangeStd(changes_db, factory.createDomainProperty_Removed(null), prop, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createDomainProperty_Removed(null), prop, context.toString());
+            }
+         });
 	}
 
 }

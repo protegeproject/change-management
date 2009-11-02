@@ -24,36 +24,43 @@ public class OwlChangesClassListener extends ClassAdapter {
     }
 
 	@Override
-	public void instanceAdded(RDFSClass clz, RDFResource inst, ClsEvent event) {
+	public void instanceAdded(RDFSClass clz, final RDFResource inst, ClsEvent event) {
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-		String instText = inst.getBrowserText();
-		StringBuffer context = new StringBuffer();
+		final String instText = inst.getBrowserText();
+		final StringBuffer context = new StringBuffer();
 		context.append("Instance Added: ");
 		context.append(instText);
 		context.append(" (instance of: " );
 		context.append(clz.getBrowserText() );
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createIndividual_Added(null), inst, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createIndividual_Added(null), inst, context.toString());
+            }
+         });
 	}
 
 	@Override
-	public void instanceRemoved(RDFSClass clz, RDFResource inst, ClsEvent event) {
-	        if (event.isReplacementEvent()) {
-	            return;
-	        }
-            PostProcessorManager changesDb = ChangesProject.getPostProcessorManager(om);
-            //String instText = changesDb.getPossiblyDeletedBrowserText(arg1);            
-            StringBuffer context = new StringBuffer();
-            context.append("Instance Removed: ");
-            context.append(NamespaceUtil.getLocalName(inst.getName()));
-            context.append(" (instance of: ");
-            context.append(clz.getBrowserText());
-            context.append(")");
+	public void instanceRemoved(RDFSClass clz, final RDFResource inst, ClsEvent event) {
+        if (event.isReplacementEvent()) {
+            return;
+        }
+        //String instText = changesDb.getPossiblyDeletedBrowserText(arg1);            
+        final StringBuffer context = new StringBuffer();
+        context.append("Instance Removed: ");
+        context.append(NamespaceUtil.getLocalName(inst.getName()));
+        context.append(" (instance of: ");
+        context.append(clz.getBrowserText());
+        context.append(")");
 
-            ServerChangesUtil.createChangeStd(changesDb, factory.createIndividual_Removed(null), inst, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createIndividual_Removed(null), inst, context.toString());
+            }
+         });
 	}
 
 	@Override
@@ -65,58 +72,74 @@ public class OwlChangesClassListener extends ClassAdapter {
 	}
 
 	@Override
-	public void subclassAdded(RDFSClass cls, RDFSClass subcls, ClsEvent event) {
+	public void subclassAdded(RDFSClass cls, final RDFSClass subcls, ClsEvent event) {
 	    if (event.isReplacementEvent()) {
 	        return;
 	    }
-		StringBuffer context = new StringBuffer();
+		final StringBuffer context = new StringBuffer();
 		context.append("Subclass Added: ");
 		context.append(subcls.getBrowserText());
 		context.append(" (added to: ");
 		context.append(cls.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Added(null), subcls, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Added(null), subcls, context.toString());
+            }
+         });
 	}
 
 	@Override
-	public void subclassRemoved(RDFSClass supercls, RDFSClass cls, ClsEvent event) {
-	       if (event.isReplacementEvent()) {
-	            return;
-	        }
-            //String clsName = changes_db.getPossiblyDeletedBrowserText(arg1);
-            StringBuffer context = new StringBuffer();
-            context.append("Subclass Removed: ");
-            context.append(cls.getBrowserText());
-            context.append(" (removed from: ");
-            context.append(supercls.getBrowserText());
-            context.append(")");
+	public void subclassRemoved(RDFSClass supercls, final RDFSClass cls, ClsEvent event) {
+        if (event.isReplacementEvent()) {
+            return;
+        }
+        //String clsName = changes_db.getPossiblyDeletedBrowserText(arg1);
+        final StringBuffer context = new StringBuffer();
+        context.append("Subclass Removed: ");
+        context.append(cls.getBrowserText());
+        context.append(" (removed from: ");
+        context.append(supercls.getBrowserText());
+        context.append(")");
 
-            ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Removed(null), cls, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSubclass_Removed(null), cls, context.toString());
+            }
+         });
 	}
 
 	@Override
-	public void superclassAdded(RDFSClass cls, RDFSClass supercls) {		
-		StringBuffer context = new StringBuffer();
+	public void superclassAdded(RDFSClass cls, final RDFSClass supercls) {		
+		final StringBuffer context = new StringBuffer();
 		context.append("Superclass Added: ");
 		context.append(supercls.getBrowserText());
 		context.append(" (added to: ");
 		context.append(cls.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperclass_Added(null), supercls, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSuperclass_Added(null), supercls, context.toString());
+            }
+         });
 	}
 
 	@Override
-	public void superclassRemoved(RDFSClass cls, RDFSClass supercls) {
+	public void superclassRemoved(RDFSClass cls, final RDFSClass supercls) {
 		//String clsName = changes_db.getPossiblyDeletedBrowserText(arg1);
-		StringBuffer context = new StringBuffer();
+		final StringBuffer context = new StringBuffer();
 		context.append("Superclass Removed: ");
 		context.append(supercls.getBrowserText());
 		context.append(" (removed from: ");
 		context.append(cls.getBrowserText());
 		context.append(")");
 
-        ServerChangesUtil.createChangeStd(changes_db, factory.createSuperclass_Removed(null), supercls, context.toString());
+        changes_db.submitChangeListenerJob(new Runnable() {
+            public void run() {
+                ServerChangesUtil.createChangeStd(changes_db, factory.createSuperclass_Removed(null), supercls, context.toString());
+            }
+         });
 	}
 }
