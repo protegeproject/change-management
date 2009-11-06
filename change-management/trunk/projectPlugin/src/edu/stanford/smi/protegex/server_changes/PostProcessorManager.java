@@ -19,6 +19,7 @@ import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.server.RemoteSession;
+import edu.stanford.smi.protege.server.Session;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
 import edu.stanford.smi.protegex.server_changes.postprocess.PostProcessor;
 import edu.stanford.smi.protegex.server_changes.util.Util;
@@ -97,9 +98,11 @@ public class PostProcessorManager {
             r.run();
         }
         else {
+            final RemoteSession session = ServerFrameStore.getCurrentSession();
             sequentialExecutor.submit(new Runnable() {
                     public void run() {
                         try {
+                            ServerFrameStore.setCurrentSession(session);
                             r.run();
                         }
                         catch (Throwable t) {
