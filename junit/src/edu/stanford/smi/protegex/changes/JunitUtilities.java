@@ -67,7 +67,7 @@ public class JunitUtilities {
         }
     }
     
-    public static void startServer() throws IOException, NotBoundException  {
+    public static void startServer() throws IOException, NotBoundException   {
         if (!serverStarted) {
             File jar = new File(System.getenv("PROTEGE_HOME") + "/protege.jar");
             if (!jar.exists()) {
