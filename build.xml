@@ -140,7 +140,14 @@
             </classpath>
         </javac>
     </target>
-    
+
+    <!-- 
+         doesn't work - but not clear why.
+         the server starts but clients can't connect because of a
+         missing Server_Stub.class.  Started with PROTEGE_HOME set to
+         an absolute path - didn't work.  
+      -->
+
     <target name = "junit"  depends="compile.junit">
         <mkdir dir="${build}/projects"/>
         <copy todir="${build}/projects">
