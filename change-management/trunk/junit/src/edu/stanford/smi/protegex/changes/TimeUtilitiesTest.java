@@ -14,8 +14,10 @@ import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.util.interval.TimeIntervalCalculator;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
+import edu.stanford.smi.protege.model.Transaction;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
 import edu.stanford.smi.protegex.owl.model.OWLNamedClass;
+import edu.stanford.smi.protegex.owl.model.OWLObjectProperty;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 
 public class TimeUtilitiesTest extends TestCase {
@@ -38,7 +40,7 @@ public class TimeUtilitiesTest extends TestCase {
         ChangesProject.initialize(p);
     }
     
-    public void testServer1() throws IOException, InterruptedException, NotBoundException {
+    public void testServer1() throws Exception {
         JunitUtilities.startServer();
         model = JunitUtilities.connectToServer();
         makeChanges();
@@ -46,7 +48,7 @@ public class TimeUtilitiesTest extends TestCase {
         checkChanges(t);
     }
 
-    public void testServer2() throws IOException, InterruptedException, NotBoundException {
+    public void testServer2() throws Exception {
         JunitUtilities.startServer();
         model = JunitUtilities.connectToServer();
         KnowledgeBase changesKb = ChAOKbManager.getChAOKb(model);
@@ -54,18 +56,61 @@ public class TimeUtilitiesTest extends TestCase {
         makeChanges();
         JunitUtilities.flushChanges(changesKb);
         checkChanges(t);
+        t.dispose();
     }
 
     public void testBeforeAndAfter1() throws InterruptedException, RemoteException {
         makeChanges();
         TimeIntervalCalculator t = TimeIntervalCalculator.get(ChAOKbManager.getChAOKb(model));
         checkChanges(t);
+        t.dispose();
     }
     
     public void testBeforeAndAfter2() throws InterruptedException, RemoteException {
         TimeIntervalCalculator t = TimeIntervalCalculator.get(ChAOKbManager.getChAOKb(model));
         makeChanges();
         checkChanges(t);
+        t.dispose();
+    }
+    
+    public void testAddedCompositeChangeStandalone() throws Exception {
+        TimeIntervalCalculator t = TimeIntervalCalculator.get(ChAOKbManager.getChAOKb(model));
+        new Transaction<Boolean>(model, "Create class and add definition") {
+            
+            @Override
+            public boolean doOperations() {
+                OWLNamedClass a = model.createOWLNamedClass("A");
+                OWLNamedClass b = model.createOWLNamedClass("B");
+                OWLObjectProperty p = model.createOWLObjectProperty("p");
+                model.createOWLSomeValuesFrom(p, b);
+                return Boolean.TRUE;
+            }
+        }.execute();
+        for (Change change : t.getTopLevelChanges()) {
+            assertTrue(change.getPartOfCompositeChange() == null);
+        }
+        t.dispose();
+    }
+    
+    public void testAddedCompositeChangeServer() throws IOException, NotBoundException  {
+        JunitUtilities.startServer();
+        model = JunitUtilities.connectToServer();
+        TimeIntervalCalculator t = TimeIntervalCalculator.get(ChAOKbManager.getChAOKb(model));
+        new Transaction<Boolean>(model, "Create class and add definition") {
+            
+            @Override
+            public boolean doOperations() {
+                OWLNamedClass a = model.createOWLNamedClass("A");
+                OWLNamedClass b = model.createOWLNamedClass("B");
+                OWLObjectProperty p = model.createOWLObjectProperty("p");
+                model.createOWLSomeValuesFrom(p, b);
+                return Boolean.TRUE;
+            }
+        }.execute();
+        for (Change change : t.getTopLevelChanges()) {
+            assertTrue(change.getPartOfCompositeChange() == null);
+        }
+        t.dispose();
     }
     
     private void makeChanges() throws InterruptedException {
