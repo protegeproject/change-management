@@ -95,7 +95,8 @@ public class TimeUtilitiesTest extends TestCase {
     public void testAddedCompositeChangeServer() throws IOException, NotBoundException  {
         JunitUtilities.startServer();
         model = JunitUtilities.connectToServer();
-        TimeIntervalCalculator t = TimeIntervalCalculator.get(ChAOKbManager.getChAOKb(model));
+        KnowledgeBase changesKb = ChAOKbManager.getChAOKb(model);
+        TimeIntervalCalculator t = TimeIntervalCalculator.get(changesKb);
         new Transaction<Boolean>(model, "Create class and add definition") {
             
             @Override
@@ -107,6 +108,8 @@ public class TimeUtilitiesTest extends TestCase {
                 return Boolean.TRUE;
             }
         }.execute();
+        JunitUtilities.flushChanges(changesKb);
+        assertTrue(!t.getTopLevelChanges().isEmpty());
         for (Change change : t.getTopLevelChanges()) {
             assertTrue(change.getPartOfCompositeChange() == null);
         }

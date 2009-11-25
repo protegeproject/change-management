@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import edu.stanford.bmir.protegex.chao.annotation.api.Annotation;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
+import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
 import edu.stanford.smi.protege.event.ProjectAdapter;
 import edu.stanford.smi.protege.event.ProjectEvent;
 import edu.stanford.smi.protege.model.KnowledgeBase;
@@ -117,9 +118,11 @@ public class TimeIntervalCalculator {
     }
     
     private class UpdateChangesListener extends AbstractChangeListener {
+        private Slot partOfCompositeChangeSlot;
         
         public UpdateChangesListener() {
             super(changesKb);
+            partOfCompositeChangeSlot = new ChangeFactory(changesKb).getPartOfCompositeChangeSlot();
         }
         
         @Override
@@ -132,11 +135,11 @@ public class TimeIntervalCalculator {
 
         @Override
         public void modifyChange(Change change, Slot slot, List oldValues) {
-            if (slot.equals(change.getPartOfCompositeChange()) &&
+            if (slot.equals(partOfCompositeChangeSlot) &&
                     change.hasPartOfCompositeChange()) {
                 sortedChangesMap.remove(change.getTimestamp());
             }
-            else if (slot.equals(change.getPartOfCompositeChange())) {
+            else if (slot.equals(partOfCompositeChangeSlot)) {
                 sortedChangesMap.put(new SimpleTime(change.getTimestamp()), change);
             }
         }
