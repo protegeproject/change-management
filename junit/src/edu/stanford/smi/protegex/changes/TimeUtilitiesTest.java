@@ -45,7 +45,10 @@ public class TimeUtilitiesTest extends TestCase {
         model = JunitUtilities.connectToServer();
         makeChanges();
         TimeIntervalCalculator t = TimeIntervalCalculator.get(ChAOKbManager.getChAOKb(model));
+        JunitUtilities.flushChanges(model);
         checkChanges(t);
+        t.dispose();
+        model.getProject().dispose();
     }
 
     public void testServer2() throws Exception {
@@ -54,9 +57,10 @@ public class TimeUtilitiesTest extends TestCase {
         KnowledgeBase changesKb = ChAOKbManager.getChAOKb(model);
         TimeIntervalCalculator t = TimeIntervalCalculator.get(changesKb);
         makeChanges();
-        JunitUtilities.flushChanges(changesKb);
+        JunitUtilities.flushChanges(model);
         checkChanges(t);
         t.dispose();
+        model.getProject().dispose();
     }
 
     public void testBeforeAndAfter1() throws InterruptedException, RemoteException {
@@ -64,6 +68,7 @@ public class TimeUtilitiesTest extends TestCase {
         TimeIntervalCalculator t = TimeIntervalCalculator.get(ChAOKbManager.getChAOKb(model));
         checkChanges(t);
         t.dispose();
+        model.getProject().dispose();
     }
     
     public void testBeforeAndAfter2() throws InterruptedException, RemoteException {
@@ -71,6 +76,7 @@ public class TimeUtilitiesTest extends TestCase {
         makeChanges();
         checkChanges(t);
         t.dispose();
+        model.getProject().dispose();
     }
     
     public void testAddedCompositeChangeStandalone() throws Exception {
@@ -90,6 +96,7 @@ public class TimeUtilitiesTest extends TestCase {
             assertTrue(change.getPartOfCompositeChange() == null);
         }
         t.dispose();
+        model.getProject().dispose();
     }
     
     public void testAddedCompositeChangeServer() throws IOException, NotBoundException  {
@@ -108,12 +115,13 @@ public class TimeUtilitiesTest extends TestCase {
                 return Boolean.TRUE;
             }
         }.execute();
-        JunitUtilities.flushChanges(changesKb);
+        JunitUtilities.flushChanges(model);
         assertTrue(!t.getTopLevelChanges().isEmpty());
         for (Change change : t.getTopLevelChanges()) {
             assertTrue(change.getPartOfCompositeChange() == null);
         }
         t.dispose();
+        model.getProject().dispose();
     }
     
     private void makeChanges() throws InterruptedException {
