@@ -137,7 +137,7 @@ public class TimeIntervalCalculator {
         public void modifyChange(Change change, Slot slot, List oldValues) {
             if (slot.equals(partOfCompositeChangeSlot) &&
                     change.hasPartOfCompositeChange()) {
-                sortedChangesMap.remove(change.getTimestamp());
+                sortedChangesMap.remove(new SimpleTime(change.getTimestamp()));
             }
             else if (slot.equals(partOfCompositeChangeSlot)) {
                 sortedChangesMap.put(new SimpleTime(change.getTimestamp()), change);
