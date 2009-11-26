@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import edu.stanford.bmir.protegex.chao.ChAOKbManager;
 import edu.stanford.smi.protege.exception.OntologyLoadException;
+import edu.stanford.smi.protege.exception.ProtegeException;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.server.RemoteProjectManager;
@@ -20,8 +22,11 @@ import edu.stanford.smi.protege.server.RemoteServer;
 import edu.stanford.smi.protege.server.Server;
 import edu.stanford.smi.protege.server.Shutdown;
 import edu.stanford.smi.protege.util.Log;
+import edu.stanford.smi.protege.util.ProtegeJob;
 import edu.stanford.smi.protegex.owl.jena.creator.NewOwlProjectCreator;
 import edu.stanford.smi.protegex.owl.model.OWLModel;
+import edu.stanford.smi.protegex.server_changes.ChangesProject;
+import edu.stanford.smi.protegex.server_changes.PostProcessorManager;
 import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
 
 public class JunitUtilities {
@@ -102,9 +107,46 @@ public class JunitUtilities {
     }
     
     private static int counter = 0;
-    public static void flushChanges(KnowledgeBase kb) {
-        if (kb.getProject().isMultiUserClient()) {
-            kb.createCls("http://www.garbage.com/baz#X" + counter++, Collections.singleton(kb.getRootCls()));
+    public static void flushChanges(OWLModel model) {
+        if (model.getProject().isMultiUserClient()) {
+            new FlushChangesJob(model).execute();
+            KnowledgeBase changesKb = ChAOKbManager.getChAOKb(model);
+            if (changesKb.getProject().isMultiUserClient()) {
+                changesKb.createCls("http://www.garbage.com/baz#X" + counter++, Collections.singleton(changesKb.getRootCls()));
+            }
+        }
+    }
+    
+    private static class FlushChangesJob extends ProtegeJob {
+        private static final long serialVersionUID = -6472202181312971462L;
+        private boolean flushed = false;
+
+        public FlushChangesJob(OWLModel model) {
+            super(model);
+        }
+        
+        @Override
+        public Object run() throws ProtegeException {
+            PostProcessorManager ppm = ChangesProject.getPostProcessorManager(getKnowledgeBase());
+            ppm.submitChangeListenerJob(new Runnable() {
+               public void run() {
+                   synchronized (FlushChangesJob.this) {
+                       flushed = true;
+                       FlushChangesJob.this.notify();
+                   }
+                } 
+            });
+            synchronized (FlushChangesJob.this) {
+                while (!flushed) {
+                    try {
+                        FlushChangesJob.this.wait();
+                    }
+                    catch (InterruptedException ie) {
+                        throw  new RuntimeException("Whose there?  Stop fooling around! Show yourself!");
+                    }
+                }
+            }
+            return Boolean.TRUE;
         }
     }
     
