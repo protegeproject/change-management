@@ -141,26 +141,20 @@
         </javac>
     </target>
 
-    <!-- 
-         doesn't work - but not clear why.
-         the server starts but clients can't connect because of a
-         missing Server_Stub.class.  Started with PROTEGE_HOME set to
-         an absolute path - didn't work.  
-      -->
-
-    <target name = "junit"  depends="compile.junit">
+    <target name = "junit"  depends="compile.junit, jar">
         <mkdir dir="${build}/projects"/>
         <copy todir="${build}/projects">
             <fileset dir="./junit/projects"/>
         </copy>
         <junit fork="true" haltonerror="true" haltonfailure="true"
-               filtertrace="false"
-               printsummary="true" showoutput="true">
-            <jvmarg value="-agentlib:jdwp=transport=dt_socket,address=8100,server=y,suspend=y"/>
+               filtertrace="true"
+               printsummary="true" 
+        	   showoutput="false">
+            <!-- <jvmarg value="-agentlib:jdwp=transport=dt_socket,address=8100,server=y,suspend=y"/> -->
             <jvmarg value="-Xmx800M"/>
             <classpath>
                 <path refid="project.classpath"/>
-                <pathelement location="${manage.classes}"/>
+                <pathelement location="${manage.jar}"/>
                 <pathelement location="${junit.classes}"/>
                 <pathelement location="./lib/junit.jar"/>
                 <fileset  dir="${protege.home}/plugins/edu.stanford.smi.protegex.owl">
@@ -171,8 +165,11 @@
                 </fileset>
                 
             </classpath>
-            <test name="edu.stanford.smi.protegex.changes.TimeUtilitiesTest"/>
-            <test name="edu.stanford.smi.protegex.changes.UserTest"/>
+            <batchtest>
+              <fileset dir="${junit}/src">
+                <include name="**/*Test.java"/>
+              </fileset>
+            </batchtest>
         </junit>
     </target>
     
