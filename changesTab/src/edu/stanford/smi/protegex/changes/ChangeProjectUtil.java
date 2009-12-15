@@ -211,7 +211,7 @@ public class ChangeProjectUtil {
     }
 
     public static Ontology_Component getOntologyComponentByFinalName(KnowledgeBase changes_kb, String name) {
-    	return ServerChangesUtil.getOntologyComponent(changes_kb, name);
+    	return ServerChangesUtil.getOntologyComponentFromChao(changes_kb, name);
     }
 
 
