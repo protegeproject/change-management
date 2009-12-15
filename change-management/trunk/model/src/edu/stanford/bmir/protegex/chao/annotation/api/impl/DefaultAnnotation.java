@@ -114,6 +114,31 @@ public class DefaultAnnotation extends DefaultAnnotatableThing
         setSlotValues(getAssociatedAnnotationsSlot(), newAssociatedAnnotations);
     }
 
+    // Slot archived
+
+    public boolean getArchived() {
+        java.lang.Boolean value = (java.lang.Boolean) getWrappedProtegeInstance().getOwnSlotValue(getArchivedSlot());
+        return value == null ? null :
+            (java.lang.Boolean) value.booleanValue();
+    }
+
+
+    public Slot getArchivedSlot() {
+        final String name = "archived";
+        return getKnowledgeBase().getSlot(name);
+    }
+
+
+    public boolean hasArchived() {
+        return hasSlotValues(getArchivedSlot());
+    }
+
+
+    public void setArchived(boolean newArchived) {
+        setSlotValue(getArchivedSlot(), new java.lang.Boolean(newArchived));
+    }
+    
+    
     // Slot author
 
     public String getAuthor() {
