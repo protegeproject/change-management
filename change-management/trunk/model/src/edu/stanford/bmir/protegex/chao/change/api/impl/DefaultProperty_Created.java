@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import edu.stanford.bmir.protegex.chao.annotation.api.Annotation;
+import edu.stanford.bmir.protegex.chao.annotation.api.Status;
 import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultAnnotation;
+import edu.stanford.bmir.protegex.chao.annotation.api.impl.DefaultStatus;
 import edu.stanford.bmir.protegex.chao.change.api.Composite_Change;
 import edu.stanford.bmir.protegex.chao.change.api.Property_Created;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
@@ -215,6 +217,34 @@ public class DefaultProperty_Created extends AbstractWrappedInstance
         setSlotValue(getPartOfCompositeChangeSlot(), newPartOfCompositeChange);
     }
 
+    
+    // Slot hasStatus
+
+    public Status getHasStatus() {
+        Object object = getWrappedProtegeInstance().getOwnSlotValue(getHasStatusSlot());
+        Cls cls = getKnowledgeBase().getCls("Status");
+        if (object instanceof Instance && ((Instance)object).hasType(cls)) {
+            return new DefaultStatus((Instance)object);
+        }
+        return null;
+    }
+
+
+    public Slot getHasStatusSlot() {
+        final String name = "hasStatus";
+        return getKnowledgeBase().getSlot(name);
+    }
+
+
+    public boolean hasHasStatus() {
+        return hasSlotValues(getHasStatusSlot());
+    }
+
+
+    public void setHasStatus(Status newHasStatus) {
+        setSlotValue(getHasStatusSlot(), newHasStatus);
+    }
+    
     // Slot timestamp
 
     public Timestamp getTimestamp() {
