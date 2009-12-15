@@ -38,6 +38,15 @@ public interface Annotation extends AnnotatableThing {
     void setAssociatedAnnotations(Collection<? extends Annotation> newAssociatedAnnotations);
 
 
+    // Slot archived
+
+    boolean getArchived();
+
+    boolean hasArchived();
+
+    void setArchived(boolean newArchived);
+    
+    
     // Slot author
 
     String getAuthor();
