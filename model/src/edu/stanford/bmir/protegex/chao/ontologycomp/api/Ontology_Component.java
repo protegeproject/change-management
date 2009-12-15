@@ -68,7 +68,7 @@ public interface Ontology_Component extends AnnotatableThing {
 
     String getInitialName();
 
-    Status getStatus();
+    InternalStatus getInternalStatus();
 
     boolean isAnonymous();
 }
