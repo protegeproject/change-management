@@ -149,7 +149,7 @@ public class PostProcessorManager {
 
     //TODO: do we need to know the OC also for deleted frames?
     public Ontology_Component getOntologyComponent(Frame frame, boolean create) {
-    	return ServerChangesUtil.getOntologyComponent(changes_kb, frame, create);
+    	return ServerChangesUtil.getOntologyComponent(frame, create);
     }
 
 
