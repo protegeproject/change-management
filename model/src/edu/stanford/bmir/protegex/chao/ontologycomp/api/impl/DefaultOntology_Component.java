@@ -16,7 +16,7 @@ import edu.stanford.bmir.protegex.chao.change.api.Name_Changed;
 import edu.stanford.bmir.protegex.chao.change.api.impl.DefaultChange;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyComponentFactory;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
-import edu.stanford.bmir.protegex.chao.ontologycomp.api.Status;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.InternalStatus;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.User;
 import edu.stanford.bmir.protegex.chao.util.ChangeDateComparator;
 import edu.stanford.smi.protege.code.generator.wrapping.OntologyJavaMappingUtil;
@@ -196,11 +196,11 @@ implements Ontology_Component {
 
 	private String initialName = null;
 
-	public Status getStatus() {
+	public InternalStatus getInternalStatus() {
 		Collection<Change> allChanges = getChanges();
 		List<Change> nameChanges = getSortedNameChanges();
 		if (allChanges == null || allChanges.isEmpty()) {
-			return Status.UNCHANGED;
+			return InternalStatus.UNCHANGED;
 		}
 		else {
 			boolean created = false;
@@ -217,16 +217,16 @@ implements Ontology_Component {
 				}
 			}
 			if (created && deleted) {
-				return Status.CREATED_AND_DELETED;
+				return InternalStatus.CREATED_AND_DELETED;
 			}
 			else if (created) {
-				return Status.CREATED;
+				return InternalStatus.CREATED;
 			}
 			else if (deleted) {
-				return Status.DELETED;
+				return InternalStatus.DELETED;
 			}
 			else {
-				return Status.CHANGED;
+				return InternalStatus.CHANGED;
 			}
 		}
 
@@ -349,7 +349,7 @@ implements Ontology_Component {
 
 	@Override
 	public String toString() {
-		switch (getStatus()) {
+		switch (getInternalStatus()) {
 		case CHANGED:
 			return "Modified Object: " + getCurrentName();
 		case CREATED:
