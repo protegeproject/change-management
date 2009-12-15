@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import edu.stanford.bmir.protegex.chao.annotation.api.AnnotatableThing;
 import edu.stanford.bmir.protegex.chao.annotation.api.Annotation;
+import edu.stanford.bmir.protegex.chao.annotation.api.Status;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Timestamp;
 
@@ -81,5 +82,15 @@ public interface Change extends AnnotatableThing {
 
     void setTimestamp(Timestamp newTimestamp);
 
+    
+    // Slot hasStatus
+
+    Status getHasStatus();
+
+    boolean hasHasStatus();
+
+    void setHasStatus(Status newHasStatus);
+    
+    
     void delete();
 }
