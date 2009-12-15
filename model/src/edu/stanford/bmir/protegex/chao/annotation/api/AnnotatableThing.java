@@ -23,8 +23,19 @@ public interface AnnotatableThing extends Serializable {
 
     void setAssociatedAnnotations(Collection<? extends Annotation> newAssociatedAnnotations);
 
-    void delete();
+    
+    // Slot hasStatus
 
+    Status getHasStatus();
+
+    boolean hasHasStatus();
+
+    void setHasStatus(Status newHasStatus);
+
+    
+    void delete();
+    
+    
     boolean canAs(Class<?> javaInterface);
 
 	<X> X as(Class<? extends X> javaInterface);
