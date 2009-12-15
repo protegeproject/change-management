@@ -34,7 +34,7 @@ public class ChangeTabRenderer extends DefaultRenderer {
         _underline = false;
         _strikeOut = false;
 
-        switch (ontologyComp.getStatus()) {
+        switch (ontologyComp.getInternalStatus()) {
         case CREATED_AND_DELETED:
             return Color.ORANGE;
         case CREATED:
@@ -56,7 +56,7 @@ public class ChangeTabRenderer extends DefaultRenderer {
         _underline = false;
         _strikeOut = false;
 
-        switch(ontologyComp.getStatus()) {
+        switch(ontologyComp.getInternalStatus()) {
         case CREATED_AND_DELETED:
             result = result.deriveFont(Font.ITALIC);
             break;
@@ -91,7 +91,7 @@ public class ChangeTabRenderer extends DefaultRenderer {
 
     private String calculateValueString(Ontology_Component ontoComp) {
         String name = null;
-        switch (ontoComp.getStatus()) {
+        switch (ontoComp.getInternalStatus()) {
         case CHANGED:
         case UNCHANGED:
         case CREATED:
@@ -123,7 +123,7 @@ public class ChangeTabRenderer extends DefaultRenderer {
             }
             break;
         }
-        switch (ontoComp.getStatus()) {
+        switch (ontoComp.getInternalStatus()) {
         case UNCHANGED:
             return "Unchanged: " + name;
         case CHANGED:
