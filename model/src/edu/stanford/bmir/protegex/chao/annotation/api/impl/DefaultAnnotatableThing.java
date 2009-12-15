@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import edu.stanford.bmir.protegex.chao.annotation.api.AnnotatableThing;
 import edu.stanford.bmir.protegex.chao.annotation.api.Annotation;
+import edu.stanford.bmir.protegex.chao.annotation.api.Status;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.Instance;
@@ -65,5 +66,33 @@ public class DefaultAnnotatableThing extends AbstractWrappedInstance
 
     public void setAssociatedAnnotations(Collection<? extends Annotation> newAssociatedAnnotations) {
         setSlotValues(getAssociatedAnnotationsSlot(), newAssociatedAnnotations);
+    }
+    
+    
+    // Slot hasStatus
+
+    public Status getHasStatus() {
+        Object object = getWrappedProtegeInstance().getOwnSlotValue(getHasStatusSlot());
+        Cls cls = getKnowledgeBase().getCls("Status");
+        if (object instanceof Instance && ((Instance)object).hasType(cls)) {
+            return new DefaultStatus((Instance)object);
+        }
+        return null;
+    }
+
+
+    public Slot getHasStatusSlot() {
+        final String name = "hasStatus";
+        return getKnowledgeBase().getSlot(name);
+    }
+
+
+    public boolean hasHasStatus() {
+        return hasSlotValues(getHasStatusSlot());
+    }
+
+
+    public void setHasStatus(Status newHasStatus) {
+        setSlotValue(getHasStatusSlot(), newHasStatus);
     }
 }
