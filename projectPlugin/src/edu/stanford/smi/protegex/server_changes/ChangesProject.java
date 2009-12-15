@@ -52,6 +52,9 @@ public class ChangesProject extends ProjectPluginAdapter {
 
     @Override
     public void beforeClose(Project p) {
+    	//very conservative
+    	OntologyComponentCache.clearCache();
+    	
         if (p.isMultiUserClient()) {
             return;
         }
@@ -108,16 +111,13 @@ public class ChangesProject extends ProjectPluginAdapter {
 
         installPostProcessors(currentKB);
 
-        //Check to see if the project is an OWL one
-        boolean isOwlProject = Util.kbInOwl(currentKB);
-
         if (p.isMultiUserServer()) {
             ServerFrameStore.requestEventDispatch(currentKB);
             ((DefaultKnowledgeBase) changesKb).setCacheMachine(new ChangeOntStateMachine(changesKb));
         }
 
         // Register listeners
-        if (isOwlProject) {
+        if ( Util.kbInOwl(currentKB)) {
             ChangesProjectOWL.registerOwlListeners(currentKB);
         } else {
             registerKBListeners(currentKB);
