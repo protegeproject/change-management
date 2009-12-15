@@ -58,7 +58,7 @@ public class UserTest extends TestCase {
 
         OWLNamedClass cls1 = model.createOWLNamedClass("A");
         String originalName = cls1.getName();
-        Ontology_Class changesCls = (Ontology_Class) ServerChangesUtil.getOntologyComponent(chaoKb, originalName);
+        Ontology_Class changesCls = (Ontology_Class) ServerChangesUtil.getOntologyComponentFromChao(chaoKb, originalName);
         tr.addWatchedEntity(changesCls);
         assertTrue(tr.getWatchedEntity().size() == 1);
         assertTrue(tr.getWatchedEntity().contains(changesCls));
