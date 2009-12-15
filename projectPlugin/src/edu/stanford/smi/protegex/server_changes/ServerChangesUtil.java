@@ -2,6 +2,7 @@ package edu.stanford.smi.protegex.server_changes;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.stanford.bmir.protegex.chao.change.api.Change;
@@ -166,9 +167,18 @@ public class ServerChangesUtil {
         return change;
     }
 
-    public static Ontology_Component getOntologyComponent(KnowledgeBase changes_kb, Frame frame, boolean create) {
+    public static Ontology_Component getOntologyComponent(Frame frame) {
+        return OntologyComponentCache.getOntologyComponent(frame);
+    }
+
+    public static Ontology_Component getOntologyComponent(Frame frame, boolean create) {
+        return OntologyComponentCache.getOntologyComponent(frame, create);
+    }
+    
+    
+    public static Ontology_Component getOntologyComponentFromChao(KnowledgeBase changes_kb, Frame frame, boolean create) {
     	if (changes_kb == null) { return null; };
-    	Ontology_Component oc = getOntologyComponent(changes_kb, frame.getName());
+    	Ontology_Component oc = getOntologyComponentFromChao(changes_kb, frame.getName());
     	if (oc != null) {
     		return oc;
     	}
@@ -189,7 +199,10 @@ public class ServerChangesUtil {
         return oc;
     }
 
-    public static Ontology_Component getOntologyComponent(KnowledgeBase changes_kb, String name) {
+    public static Ontology_Component getOntologyComponentFromChao(KnowledgeBase changes_kb, String name) {
+    	if (log.isLoggable(Level.FINE)) {
+    		log.fine("Get Ontology Component from ChAO (expensive): " + name);
+    	}
     	OntologyComponentFactory factory = new OntologyComponentFactory(changes_kb);
     	//could search also just for the prefixed name - if in compatibility mode..
     	Collection<Frame> ocFrames = changes_kb.getMatchingFrames(factory.getCurrentNameSlot(), null, false, name, -1);
