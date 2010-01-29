@@ -205,7 +205,7 @@ public class ServerChangesUtil {
     	}
     	OntologyComponentFactory factory = new OntologyComponentFactory(changes_kb);
     	//could search also just for the prefixed name - if in compatibility mode..
-    	Collection<Frame> ocFrames = changes_kb.getMatchingFrames(factory.getCurrentNameSlot(), null, false, name, -1);
+    	Collection<Frame> ocFrames = changes_kb.getFramesWithValue(factory.getCurrentNameSlot(), null, false, name);
     	if (ocFrames.size() > 0) {
     		Frame ocFrame = CollectionUtilities.getFirstItem(ocFrames);
     		//get matching frames can be case insensitive, so make sure you got the right frame..
