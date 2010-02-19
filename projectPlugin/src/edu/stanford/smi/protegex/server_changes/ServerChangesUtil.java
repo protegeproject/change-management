@@ -1,10 +1,14 @@
 package edu.stanford.smi.protegex.server_changes;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import edu.stanford.bmir.protegex.chao.annotation.api.AnnotatableThing;
+import edu.stanford.bmir.protegex.chao.annotation.api.Annotation;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
 import edu.stanford.bmir.protegex.chao.change.api.Class_Created;
@@ -224,5 +228,25 @@ public class ServerChangesUtil {
     		}
     	}
     	return null;
+    }
+    
+    public static Collection<Ontology_Component> getAnnotatedOntologyComponents(Annotation annotation) {
+    	return getAnnotatedOntologyComponents(annotation, new HashSet<AnnotatableThing>());
+    }
+    
+    private static Collection<Ontology_Component> getAnnotatedOntologyComponents(Annotation annotation, Set<AnnotatableThing> visited) {
+    	Collection<AnnotatableThing> annotedThings = annotation.getAnnotates();
+        Set<Ontology_Component> annotatedOcs = new HashSet<Ontology_Component>();
+        if (!visited.contains(annotation)) {
+            visited.add(annotation);
+            for (AnnotatableThing annotatableThing : annotedThings) {
+                if (annotatableThing.canAs(Ontology_Component.class)) {
+                    annotatedOcs.add(annotatableThing.as(Ontology_Component.class));
+                } else if (annotatableThing.canAs(Annotation.class)) {
+                    annotatedOcs.addAll(getAnnotatedOntologyComponents(annotatableThing.as(Annotation.class), visited));
+                }
+            }
+        }
+        return annotatedOcs;
     }
  }
