@@ -112,6 +112,7 @@ public class ServerChangesUtil {
         context.append("'");
 
         Ontology_Component applyToOc = changes_db.getOntologyComponent(applyTo, true);
+        OntologyComponentCache.delete(applyTo);
         applyToOc.setCurrentName(newName);
 
         Name_Changed change = new ChangeFactory(changes_db.getChangesKb()).createName_Changed(null);

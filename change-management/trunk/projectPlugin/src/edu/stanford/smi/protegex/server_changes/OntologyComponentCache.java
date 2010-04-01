@@ -56,6 +56,10 @@ public class OntologyComponentCache {
 		if (frame == null) { return;}
 		frame2OntoCompMap.put(frame, ontComp);
 	}
+	
+	public static void delete(Frame frame) {
+	    frame2OntoCompMap.remove(frame);
+	}
 
 	public static void clearCache() {
 		frame2OntoCompMap.clear();
