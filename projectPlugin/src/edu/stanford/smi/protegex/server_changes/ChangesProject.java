@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+
 import edu.stanford.bmir.protegex.chao.ChAOKbManager;
 import edu.stanford.smi.protege.Application;
 import edu.stanford.smi.protege.model.DefaultKnowledgeBase;
@@ -14,9 +17,15 @@ import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.model.WidgetDescriptor;
 import edu.stanford.smi.protege.plugin.ProjectPluginAdapter;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
+import edu.stanford.smi.protege.ui.ProjectManager;
+import edu.stanford.smi.protege.ui.ProjectMenuBar;
+import edu.stanford.smi.protege.ui.ProjectToolBar;
+import edu.stanford.smi.protege.ui.ProjectView;
+import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.MessageError;
 import edu.stanford.smi.protegex.changes.ChangesTab;
+import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesClsListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesFrameListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesInstanceListener;
@@ -37,9 +46,18 @@ public class ChangesProject extends ProjectPluginAdapter {
     @Override
     public void afterLoad(Project p) {
         if (!isChangeTrackingEnabled(p) || p.isMultiUserClient()) {
-            return;
+           return;
         }
         initialize(p);
+    }
+
+    @Override
+    public void afterShow(ProjectView view, ProjectToolBar toolBar, ProjectMenuBar menuBar) {
+        Project project = view.getProject();
+        if (!project.isMultiUserServer()) {
+            insertChangeMenu(project.getKnowledgeBase());
+            return;
+        }
     }
 
     @Override
@@ -54,8 +72,9 @@ public class ChangesProject extends ProjectPluginAdapter {
     public void beforeClose(Project p) {
     	//very conservative
     	OntologyComponentCache.clearCache();
-    	
-        if (p.isMultiUserClient()) {
+
+        if (!p.isMultiUserServer()) {
+            removeChangeMenu();
             return;
         }
         KnowledgeBase kb = p.getKnowledgeBase();
@@ -121,6 +140,30 @@ public class ChangesProject extends ProjectPluginAdapter {
             ChangesProjectOWL.registerOwlListeners(currentKB);
         } else {
             registerKBListeners(currentKB);
+        }
+    }
+
+    private static void insertChangeMenu(KnowledgeBase kb) {
+        KnowledgeBase changesKb = ChAOKbManager.getChAOKb(kb);
+        if (changesKb == null) { return ; }
+        try {
+            ChangeMenu changesMenu = new ChangeMenu(kb, changesKb);
+            JMenuBar menuBar = ProjectManager.getProjectManager().getCurrentProjectMenuBar();
+            menuBar.add(changesMenu);
+        } catch (Exception e) {
+            Log.getLogger().log(Level.WARNING, "Could not add Changes menu in menu bar", e);
+        }
+    }
+
+    private static void removeChangeMenu() {
+        try {
+            JMenuBar menuBar = ProjectManager.getProjectManager().getCurrentProjectMenuBar();
+            JMenu changesMenu = ComponentUtilities.getMenu(menuBar, ChangeMenu.MENU_TITLE);
+            if (changesMenu != null) {
+                menuBar.remove(changesMenu);
+            }
+        } catch (Exception e) {
+            Log.getLogger().log(Level.WARNING, "Could not remove Changes menu", e);
         }
     }
 
