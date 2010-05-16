@@ -25,7 +25,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -51,6 +50,7 @@ import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.resource.Icons;
 import edu.stanford.smi.protege.ui.HeaderComponent;
 import edu.stanford.smi.protege.util.ComponentFactory;
+import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.LabeledComponent;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.ModalDialog;
@@ -178,10 +178,7 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 
 	private void buildGUI() {
-		// Create menu item
-		changesMenu = new ChangeMenu(getKnowledgeBase(), changes_kb);
-		JMenuBar menuBar = getMainWindowMenuBar();
-		menuBar.add (changesMenu);
+		changesMenu = (ChangeMenu) ComponentUtilities.getMenu(getMainWindowMenuBar(), ChangeMenu.MENU_TITLE);
 
 		annotationsTable.addMouseListener(new AnnotationShowAction(annotationsTable, annotationsTableModel, changes_kb.getProject()));
 		JScrollPane scroll = ComponentFactory.createScrollPane(changesTreeTable);
@@ -310,29 +307,29 @@ public class ChangesTab extends AbstractTabWidget {
 		//does not work
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				searchTextField.requestFocusInWindow();				
-			}			
-		});		
-		
+				searchTextField.requestFocusInWindow();
+			}
+		});
+
 		JButton searchButton = new JButton(SEARCH_PANEL_BUTTON_GO);
 		searchButton.setMnemonic(KeyEvent.VK_G);
 		ActionListener searchExecute = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				onSearch();
-			}	
+			}
 		};
 		searchButton.addActionListener(searchExecute);
 
 		JButton clearButton = new JButton(SEARCH_PANEL_BUTTON_CLEAR);
 		clearButton.setMnemonic(KeyEvent.VK_L);
 		ActionListener searchClear = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {				
+			public void actionPerformed(ActionEvent e) {
 				changesTreeTableModel.setFilter(null);
 				refreshTables(null);
 				columnSearchComboBox.setSelectedIndex(0);
 				searchTextField.setText("");
 				searchTextField.setBackground(Color.WHITE);
-			}	
+			}
 		};
 		clearButton.addActionListener(searchClear);
 
@@ -350,8 +347,8 @@ public class ChangesTab extends AbstractTabWidget {
 
 	protected void onSearch() {
 		String text = searchTextField.getText();
-		if (text != null && text.length() == 0) { 
-			text = null; 
+		if (text != null && text.length() == 0) {
+			text = null;
 			searchTextField.setBackground(Color.WHITE);
 		} else {
 			searchTextField.setBackground(Color.YELLOW);
@@ -359,13 +356,13 @@ public class ChangesTab extends AbstractTabWidget {
 			if (!text.endsWith("*")) {
 				text = text + "*";
 			}
-		}		
-		String selectedItem = (String)columnSearchComboBox.getSelectedItem();		
+		}
+		String selectedItem = (String)columnSearchComboBox.getSelectedItem();
 		Filter filter = text == null ? null : new Filter(ChangeTableColumn.getColumnFromName(selectedItem), text);
 		changesTreeTableModel.setFilter(filter);
 		refreshTables(filter);
 	}
-	
+
 	private void initTables() {
 		// Create Tables
 		annotationChangesTableModel = new ChangeTableModel(changes_kb);
@@ -452,17 +449,17 @@ public class ChangesTab extends AbstractTabWidget {
 			changesTreeTableModel.setFilter(filter);
 			changesTreeTable = new JTreeTable(changesTreeTableModel);
 			changesTreeTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-			changesTreeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);				
+			changesTreeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 			changesLabledComponent.setCenterComponent(ComponentFactory.createScrollPane(changesTreeTable));
 
 			annotationChangesTableModel = new ChangeTableModel(changes_kb);
 			annotationChangesTable.setModel(annotationChangesTableModel);
 
 			annotationsTableModel = new AnnotationTableModel(changes_kb);
-			annotationsTable.setModel(annotationsTableModel);	
+			annotationsTable.setModel(annotationsTableModel);
 
 			loadExistingData();
-		} finally {		
+		} finally {
 			setCursor(Cursor.getDefaultCursor());
 			searchTextField.setText(searchText);
 			searchTextField.revalidate(); searchTextField.repaint();
@@ -483,8 +480,10 @@ public class ChangesTab extends AbstractTabWidget {
 
 	public void createChange(Change aChange) {
 		changesTreeTableModel.addChangeData(aChange);
-		changesMenu.setEnabledLastChange(true);
-		changesMenu.setChange(aChange);
+		if (changesMenu != null) {
+		    changesMenu.setEnabledLastChange(true);
+		    changesMenu.setChange(aChange);
+		}
 	}
 
 	public void modifyChange(Change aChange, Slot slot, List oldValues) {
@@ -588,12 +587,6 @@ public class ChangesTab extends AbstractTabWidget {
 	public void dispose() {
 		//TODO: This will be reimplemented once we will have a start/stop model for the ChangesProject
 		// This is just a quick fix
-
-		//remove the menu item
-		JMenuBar menuBar = getMainWindowMenuBar();
-		if (changesMenu != null) {
-			menuBar.remove(changesMenu);
-		}
 
 		if (changes_kb != null && changes_kb.getFrameStoreManager() != null) {
 			changes_kb.removeFrameListener(changesListener);
