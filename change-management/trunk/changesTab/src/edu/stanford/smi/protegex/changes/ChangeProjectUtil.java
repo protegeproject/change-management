@@ -11,6 +11,7 @@ import edu.stanford.bmir.protegex.chao.annotation.api.Annotation;
 import edu.stanford.bmir.protegex.chao.annotation.api.AnnotationFactory;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
+import edu.stanford.bmir.protegex.chao.change.api.Composite_Change;
 import edu.stanford.bmir.protegex.chao.change.api.Deleted_Change;
 import edu.stanford.bmir.protegex.chao.change.api.Name_Changed;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyComponentFactory;
@@ -82,6 +83,53 @@ public class ChangeProjectUtil {
 			}
 		}
 	}
+
+	   /**
+     * Deletes all subchanges change instances from the Changes&Annotations kb
+     * @param changesKb - the Changes&Annotations kb
+     */
+	public static void deleteAllSubChanges(KnowledgeBase changesKb) {
+	    ChangeFactory factory = new ChangeFactory(changesKb);
+	    Cls changeCls = factory.getChangeClass();
+
+	    if (changeCls == null) {
+	        return;
+	    }
+
+        Collection<Composite_Change> compChanges = factory.getAllComposite_ChangeObjects(true);
+        for (Composite_Change change : compChanges) {
+            deleteAllSubchanges(change);
+
+            if (change.getPartOfCompositeChange() != null) {
+                deleteChange(change);
+            }
+        }
+
+	}
+
+	private static void deleteAllSubchanges(Composite_Change compChange) {
+	    Collection<Change> subChanges = compChange.getSubChanges();
+	    for (Change subchange : subChanges) {
+            if (subchange.canAs(Composite_Change.class)) {
+                Composite_Change compSubChange = subchange.as(Composite_Change.class);
+                Collection<Change> subChangesOfCompSubChange = compSubChange.getSubChanges();
+                if (subChangesOfCompSubChange != null && subChangesOfCompSubChange.size() > 0) {
+                    deleteAllSubchanges(compSubChange);
+                }
+            }
+            deleteChange(subchange);
+        }
+	}
+
+    private static void deleteChange(Change change) {
+        Timestamp timestamp = change.getTimestamp();
+
+        ((AbstractWrappedInstance) change).getWrappedProtegeInstance().delete();
+
+        if (timestamp != null) {
+            ((AbstractWrappedInstance) timestamp).getWrappedProtegeInstance().delete();
+        }
+    }
 
 	public static String getActionDisplay(Change aInst) {
 		String actionStr = aInst.getAction();
