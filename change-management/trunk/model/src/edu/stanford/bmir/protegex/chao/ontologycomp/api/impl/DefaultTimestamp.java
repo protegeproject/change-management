@@ -3,6 +3,7 @@ package edu.stanford.bmir.protegex.chao.ontologycomp.api.impl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyComponentFactory;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Timestamp;
@@ -77,7 +78,10 @@ public class DefaultTimestamp extends AbstractWrappedInstance
 
  // __Code above is automatically generated. Do not change
 
-	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss zzz");
+    //added the locale to make sure that the date is still readable when moving ChAO from a computer with a locale
+    //to a different computer with a different locale. Avoids problems with the timezones
+	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss zzz", Locale.US);
+
 	private static int sequence = 0;
 	private Date time;
 
@@ -102,7 +106,7 @@ public class DefaultTimestamp extends AbstractWrappedInstance
 	    }
 	    return getTimestamp(changesKb, date, counter);
 	}
-	
+
 	private static Timestamp getTimestamp(KnowledgeBase changesKb, Date date, int counter) {
 	    Timestamp ts = new OntologyComponentFactory(changesKb).createTimestamp(null);
 	    String formattedDate;
