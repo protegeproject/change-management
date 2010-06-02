@@ -1,5 +1,6 @@
 package edu.stanford.smi.protegex.server_changes;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,10 +11,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
 import edu.stanford.bmir.protegex.chao.ChAOKbManager;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyComponentFactory;
 import edu.stanford.smi.protege.Application;
+import edu.stanford.smi.protege.model.Cls;
 import edu.stanford.smi.protege.model.DefaultKnowledgeBase;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
+import edu.stanford.smi.protege.model.Slot;
+import edu.stanford.smi.protege.model.ValueType;
 import edu.stanford.smi.protege.model.WidgetDescriptor;
 import edu.stanford.smi.protege.plugin.ProjectPluginAdapter;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
@@ -21,11 +26,13 @@ import edu.stanford.smi.protege.ui.ProjectManager;
 import edu.stanford.smi.protege.ui.ProjectMenuBar;
 import edu.stanford.smi.protege.ui.ProjectToolBar;
 import edu.stanford.smi.protege.ui.ProjectView;
+import edu.stanford.smi.protege.util.CollectionUtilities;
 import edu.stanford.smi.protege.util.ComponentUtilities;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.MessageError;
 import edu.stanford.smi.protegex.changes.ChangesTab;
 import edu.stanford.smi.protegex.changes.ui.ChangeMenu;
+import edu.stanford.smi.protegex.changes.ui.ChangeMenu.SaveChangeProjectJob;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesClsListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesFrameListener;
 import edu.stanford.smi.protegex.server_changes.listeners.ChangesInstanceListener;
@@ -128,6 +135,8 @@ public class ChangesProject extends ProjectPluginAdapter {
             return;
         }
 
+        backwardsCompatibilityFix(changesKb, currentKB);
+
         installPostProcessors(currentKB);
 
         if (p.isMultiUserServer()) {
@@ -142,6 +151,81 @@ public class ChangesProject extends ProjectPluginAdapter {
             registerKBListeners(currentKB);
         }
     }
+
+    /***************** Backwards compatibility fixes *********************/
+
+    protected static void backwardsCompatibilityFix(KnowledgeBase chaoKb, KnowledgeBase kb) {
+        if (chaoKb == null) { return ; } //happens at initialization
+        boolean changed = false;
+
+        changed = fixWatchedBranches(chaoKb);
+        changed = changed || fixAddOntology(chaoKb);
+
+        if (changed) {
+            Log.getLogger().info("Backwards compatibility fix for ChAO for project: " + kb.getProject().getProjectName());
+            Collection errors = new ArrayList();
+            try {
+                errors = (Collection) new SaveChangeProjectJob(kb).execute();
+            } catch (Exception e) {
+                Log.getLogger().log(Level.WARNING, "Errors saving ChAO project", e);
+                errors.add(new MessageError(e));
+            }
+            if (errors.size() == 0) {
+                Log.getLogger().info("Changes and Annotation ontology (ChAO) saved successfully.");
+                return;
+            }
+        }
+    }
+
+    private static boolean fixWatchedBranches(KnowledgeBase chaoKb) {
+        boolean changed = false;
+        OntologyComponentFactory factory = new OntologyComponentFactory(chaoKb);
+        try {
+            Slot watchedBranches = factory.getWatchedBranchSlot();
+            if (watchedBranches == null) {
+                watchedBranches = chaoKb.createSlot("watchedBranch");
+                watchedBranches.setValueType(ValueType.INSTANCE);
+                watchedBranches.setAllowsMultipleValues(true);
+                watchedBranches.setAllowedClses(CollectionUtilities.createCollection(factory.getOntology_ComponentClass()));
+                factory.getUserClass().addDirectTemplateSlot(watchedBranches);
+                changed = true;
+            }
+            Slot watchedBranchesBy = factory.getWatchedBranchBySlot();
+            if (watchedBranchesBy == null) {
+                watchedBranchesBy = chaoKb.createSlot("watchedBranchBy");
+                watchedBranchesBy.setValueType(ValueType.INSTANCE);
+                watchedBranchesBy.setAllowsMultipleValues(true);
+                watchedBranchesBy.setAllowedClses(CollectionUtilities.createCollection(factory.getUserClass()));
+                factory.getOntology_ComponentClass().addDirectTemplateSlot(watchedBranchesBy);
+                changed = true;
+            }
+            if (changed) {
+                watchedBranches.setInverseSlot(watchedBranchesBy);
+            }
+        } catch (Exception e) {
+            Log.getLogger().log(Level.WARNING, "Errors at backwards compatibility fix at adding watchedBranch and watchedBranchBy slots", e);
+
+        }
+        return changed;
+    }
+
+    private static boolean fixAddOntology(KnowledgeBase chaoKb) {
+        boolean changed = false;
+        OntologyComponentFactory factory = new OntologyComponentFactory(chaoKb);
+        try {
+            Cls ontCls = factory.getOntologyClass();
+            if (ontCls == null) {
+                ontCls = chaoKb.createCls("Ontology", CollectionUtilities.createCollection(factory.getOntology_ComponentClass()));
+                changed = true;
+            }
+        } catch (Exception e) {
+            Log.getLogger().log(Level.WARNING, "Errors at backwards compatibility fix at adding class Ontology", e);
+
+        }
+        return changed;
+    }
+
+     /***************** Change menu *********************/
 
     private static void insertChangeMenu(KnowledgeBase kb) {
         KnowledgeBase changesKb = ChAOKbManager.getChAOKb(kb);
@@ -167,6 +251,9 @@ public class ChangesProject extends ProjectPluginAdapter {
         }
     }
 
+
+    /***************** Listeners *********************/
+
     private static void registerKBListeners(KnowledgeBase currentKB) {
         currentKB.addKnowledgeBaseListener(new ChangesKBListener(currentKB));
         currentKB.addClsListener(new ChangesClsListener(currentKB));
@@ -186,6 +273,9 @@ public class ChangesProject extends ProjectPluginAdapter {
             postProcessorManagerMap.put(currentKB, ppm);
         }
     }
+
+
+    /***************** Utils *********************/
 
     public static String getUserName(KnowledgeBase currentKB) {
         return currentKB.getUserName();
