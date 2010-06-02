@@ -47,7 +47,7 @@ public interface Ontology_Component extends AnnotatableThing {
     boolean hasCurrentName();
 
     void setCurrentName(String newCurrentName);
-    
+
     // Slot watchedBy
 
     Collection<User> getWatchedBy();
@@ -59,6 +59,20 @@ public interface Ontology_Component extends AnnotatableThing {
     void removeWatchedBy(User oldWatchedBy);
 
     void setWatchedBy(Collection<? extends User> newWatchedBy);
+
+
+    // Slot watchedBranchBy
+
+    Collection<User> getWatchedBranchBy();
+
+    boolean hasWatchedBranchBy();
+
+    void addWatchedBranchBy(User newWatchedBranchBy);
+
+    void removeWatchedBranchBy(User oldWatchedBranchBy);
+
+    void setWatchedBranchBy(Collection<? extends User> newWatchedBranchBy);
+
 
     void delete();
 
