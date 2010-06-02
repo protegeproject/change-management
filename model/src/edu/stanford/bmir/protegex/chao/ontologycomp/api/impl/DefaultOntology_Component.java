@@ -14,9 +14,9 @@ import edu.stanford.bmir.protegex.chao.change.api.Created_Change;
 import edu.stanford.bmir.protegex.chao.change.api.Deleted_Change;
 import edu.stanford.bmir.protegex.chao.change.api.Name_Changed;
 import edu.stanford.bmir.protegex.chao.change.api.impl.DefaultChange;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.InternalStatus;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyComponentFactory;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
-import edu.stanford.bmir.protegex.chao.ontologycomp.api.InternalStatus;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.User;
 import edu.stanford.bmir.protegex.chao.util.ChangeDateComparator;
 import edu.stanford.smi.protege.code.generator.wrapping.OntologyJavaMappingUtil;
@@ -149,7 +149,7 @@ implements Ontology_Component {
 	public void setCurrentName(String newCurrentName) {
 		setSlotValue(getCurrentNameSlot(), newCurrentName);
 	}
-	
+
     // Slot watchedBy
 
     public Collection<User> getWatchedBy() {
@@ -188,6 +188,46 @@ implements Ontology_Component {
 
     public void setWatchedBy(Collection<? extends User> newWatchedBy) {
         setSlotValues(getWatchedBySlot(), newWatchedBy);
+    }
+
+    // Slot watchedBranchBy
+
+    public Collection<User> getWatchedBranchBy() {
+        Collection protegeValues = getWrappedProtegeInstance().getOwnSlotValues(getWatchedBranchBySlot());
+        Collection<User> values = new ArrayList<User>();
+        Cls cls = getKnowledgeBase().getCls("User");
+        for (Object object : protegeValues) {
+            if (object instanceof Instance && ((Instance)object).hasType(cls)) {
+                values.add(new DefaultUser((Instance)object));
+            }
+        }
+        return values;
+    }
+
+
+    public Slot getWatchedBranchBySlot() {
+        final String name = "watchedBranchBy";
+        return getKnowledgeBase().getSlot(name);
+    }
+
+
+    public boolean hasWatchedBranchBy() {
+        return hasSlotValues(getWatchedBranchBySlot());
+    }
+
+
+    public void addWatchedBranchBy(User newWatchedBranchBy) {
+        addSlotValue(getWatchedBranchBySlot(), newWatchedBranchBy);
+    }
+
+
+    public void removeWatchedBranchBy(User oldWatchedBranchBy) {
+        removeSlotValue(getWatchedBranchBySlot(), oldWatchedBranchBy);
+    }
+
+
+    public void setWatchedBranchBy(Collection<? extends User> newWatchedBranchBy) {
+        setSlotValues(getWatchedBranchBySlot(), newWatchedBranchBy);
     }
 
 	// __Code above is automatically generated. Do not change
