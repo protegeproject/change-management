@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.logging.Level;
 
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyComponentFactory;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Timestamp;
@@ -133,11 +134,45 @@ public class DefaultTimestamp extends AbstractWrappedInstance
 	                time = DATE_FORMAT.parse(date);
 	            }
 	        } catch (ParseException e) {
-	            Log.getLogger().severe("Exception caught parsing the changes ontology - it is probably corrupted" + e);
+	            Log.getLogger().warning("Exception at parsing date " + date + ". Exception: " + e);
 	        }
 	    }
 	    return time;
 	}
+
+    public static Date getDateParsed(String date) {
+        if (date == null || date.trim().length() == 0) {
+            return null;
+        }
+        Date d = null;
+        try{
+            synchronized (DATE_FORMAT) {
+                d = DATE_FORMAT.parse(date.trim());
+            }
+        } catch (ParseException e) {
+           /*
+            * Backwards compatibility: some dates have already been stored with a different locale than US,
+            * and Java cannot parse it, if it uses a different locale.
+            * Partial solution: remove the timezone letters, and try again to parse
+            */
+            if (Log.getLogger().isLoggable(Level.FINE)) {
+                Log.getLogger().fine("Exception at parsing date " + date + ". Exception: " + e);
+            }
+            String pattern = DATE_FORMAT.toPattern();
+            pattern = pattern.replaceAll("[Zz]", "").trim();
+            date = date.replaceAll("[A-Za-z]", "").trim();
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.US);
+                synchronized (sdf) {
+                    d = sdf.parse(date);
+                }
+            } catch (ParseException e1) {
+                Log.getLogger().warning("Exception at parsing date " + date + ". Exception: " + e1);
+                d = null;
+            }
+        }
+        return d;
+    }
 
 
     /*
