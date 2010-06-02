@@ -128,14 +128,7 @@ public class DefaultTimestamp extends AbstractWrappedInstance
 
 	public Date getDateParsed() {
 	    if (time == null) {
-	        String date = getDate();
-	        try {
-	            synchronized (DATE_FORMAT) {
-	                time = DATE_FORMAT.parse(date);
-	            }
-	        } catch (ParseException e) {
-	            Log.getLogger().warning("Exception at parsing date " + date + ". Exception: " + e);
-	        }
+	        time = getDateParsed(getDate());
 	    }
 	    return time;
 	}
@@ -179,13 +172,17 @@ public class DefaultTimestamp extends AbstractWrappedInstance
      * Frames are comparable so it is better not to replicate/overwrite that interface.
      */
 	public int compareTimestamp(Timestamp other) {
-
-		if (other == null) {
-			return 1;
-		}
+		if (other == null) { return 1; }
 
 	    Date myDate = getDateParsed();
 	    Date otherDate = ((DefaultTimestamp)other).getDateParsed(); //fishy
+
+	    if (myDate == null) {
+	        return otherDate == null ? 0 : -1;
+	    }
+	    if (otherDate == null) {
+	        return myDate == null ? 0 : 1;
+	    }
 
 	    int date_compare = myDate.compareTo(otherDate);
 	    if (date_compare > 0) {
