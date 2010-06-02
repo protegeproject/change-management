@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protegex.chao.ontologycomp.api;
 
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology_Class;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology_Component;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultOntology_Individual;
@@ -17,6 +18,7 @@ import edu.stanford.smi.protege.code.generator.wrapping.OntologyJavaMappingUtil;
 public class OntologyJavaMapping {
 
     public static void initMap() {
+        OntologyJavaMappingUtil.add("Ontology", Ontology.class, DefaultOntology.class);
         OntologyJavaMappingUtil.add("Ontology_Class", Ontology_Class.class, DefaultOntology_Class.class);
         OntologyJavaMappingUtil.add("Ontology_Component", Ontology_Component.class, DefaultOntology_Component.class);
         OntologyJavaMappingUtil.add("Ontology_Individual", Ontology_Individual.class, DefaultOntology_Individual.class);
