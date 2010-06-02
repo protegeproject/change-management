@@ -158,8 +158,9 @@ public class ChangesProject extends ProjectPluginAdapter {
         if (chaoKb == null) { return ; } //happens at initialization
         boolean changed = false;
 
-        changed = fixWatchedBranches(chaoKb);
-        changed = changed || fixAddOntology(chaoKb);
+        changed = fixAddUser(chaoKb);
+        changed = fixWatchedBranches(chaoKb) || changed; //order is important
+        changed = fixAddOntology(chaoKb) || changed;
 
         if (changed) {
             Log.getLogger().info("Backwards compatibility fix for ChAO for project: " + kb.getProject().getProjectName());
@@ -175,6 +176,22 @@ public class ChangesProject extends ProjectPluginAdapter {
                 return;
             }
         }
+    }
+
+    private static boolean fixAddUser(KnowledgeBase chaoKb) {
+        boolean changed = false;
+        OntologyComponentFactory factory = new OntologyComponentFactory(chaoKb);
+        try {
+            Cls ontCls = factory.getUserClass();
+            if (ontCls == null) {
+                ontCls = chaoKb.createCls("User", chaoKb.getRootClses());
+                changed = true;
+            }
+        } catch (Exception e) {
+            Log.getLogger().log(Level.WARNING, "Errors at backwards compatibility fix at adding class User", e);
+
+        }
+        return changed;
     }
 
     private static boolean fixWatchedBranches(KnowledgeBase chaoKb) {
