@@ -153,17 +153,17 @@ public class DefaultUser extends AbstractWrappedInstance
 
 
     public boolean hasWatchedBranch() {
-        return hasSlotValues(getWatchedEntitySlot());
+        return hasSlotValues(getWatchedBranchSlot());
     }
 
 
     public void addWatchedBranch(Ontology_Component newWatchedBranch) {
-        addSlotValue(getWatchedEntitySlot(), newWatchedBranch);
+        addSlotValue(getWatchedBranchSlot(), newWatchedBranch);
     }
 
 
     public void removeWatchedBranch(Ontology_Component oldWatchedBranch) {
-        removeSlotValue(getWatchedEntitySlot(), oldWatchedBranch);
+        removeSlotValue(getWatchedBranchSlot(), oldWatchedBranch);
     }
 
 
