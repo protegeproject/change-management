@@ -10,24 +10,24 @@ import edu.stanford.smi.protege.model.Localizable;
 
 public class SimpleTime implements Comparable<SimpleTime>, Serializable, Localizable {
     private static final long serialVersionUID = 7660908078388682306L;
-    
+
     private Integer counter;
     private Date date;
 
     public SimpleTime() {
         this(new Date());
     }
-    
+
     public SimpleTime(Date d) {
         date = d;
         counter = -1;
     }
-    
+
     public SimpleTime(Timestamp time) {
         date = time.getDateParsed();
         counter = time.getSequence();
     }
-        
+
     public Integer getCounter() {
         return counter;
     }
@@ -37,9 +37,10 @@ public class SimpleTime implements Comparable<SimpleTime>, Serializable, Localiz
     }
 
     public int compareTo(SimpleTime o) {
-        int result = date.compareTo(o.getDate());
+        //using reverse time ordering
+        int result = o.getDate().compareTo(date);
         if (result == 0) {
-            result = counter.compareTo(o.getCounter());
+            result = o.getCounter().compareTo(counter);
         }
         return result;
     }
@@ -47,7 +48,7 @@ public class SimpleTime implements Comparable<SimpleTime>, Serializable, Localiz
     public void localize(KnowledgeBase kb) {
 
     }
-    
+
     @Override
     public String toString() {
         return "<" + date + " [" + counter + "]>";
