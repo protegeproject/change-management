@@ -25,16 +25,16 @@ public class TimeIntervalCalculator {
 
     private ProjectAdapter projectListener = new CleanupListener();
     private AbstractChangeListener changeListener;
-    
+
     private KnowledgeBase changesKb;
     private TreeMap<SimpleTime, Change> sortedChangesMap = new TreeMap<SimpleTime, Change>();
-    
+
     private TimeIntervalCalculator(KnowledgeBase changesKb) {
         this.changesKb = changesKb;
-        
+
         sortedChangesMap = new GetTopLevelChangesTreeMapJob(changesKb).execute();
 
-        changesKb.getProject().addProjectListener(projectListener); 
+        changesKb.getProject().addProjectListener(projectListener);
 
         changeListener = new UpdateChangesListener();
         changesKb.addFrameListener(changeListener);
@@ -42,7 +42,7 @@ public class TimeIntervalCalculator {
             ServerFrameStore.requestEventDispatch(changesKb);
         }
     }
-    
+
     public static TimeIntervalCalculator get(KnowledgeBase changesKb) {
         TimeIntervalCalculator t;
         synchronized (TimeIntervalCalculator.class) {
@@ -64,19 +64,19 @@ public class TimeIntervalCalculator {
         }
         return t;
     }
-    
+
     public Collection<Change> getTopLevelChanges() {
         synchronized (changesKb) {
             return new ArrayList<Change>(sortedChangesMap.values());
         }
     }
-   
+
     public Collection<Change> getTopLevelChangesBefore(Date d) {
         synchronized (changesKb) {
             return new ArrayList<Change>(sortedChangesMap.headMap(new SimpleTime(d)).values());
         }
     }
-    
+
     public Collection<Change> getTopLevelChangesAfter(Date d) {
         synchronized (changesKb) {
             return new ArrayList<Change>(sortedChangesMap.tailMap(new SimpleTime(d)).values());
@@ -84,16 +84,9 @@ public class TimeIntervalCalculator {
     }
 
     public Collection<Change> getTopLevelChanges(Date start, Date end) {
-        List<Change> changes = new ArrayList<Change>();
-        for (Change change : getTopLevelChangesAfter(start)) {
-            if (change.getTimestamp().getDateParsed().compareTo(end) >= 0) {
-                break;
-            }
-            changes.add(change);
-        }
-        return changes;
+        return new ArrayList<Change>(sortedChangesMap.subMap(new SimpleTime(end), new SimpleTime(start)).values());
     }
-    
+
     public void dispose() {
         synchronized (TimeIntervalCalculator.class) {
             instanceMap.remove(changesKb);
@@ -101,9 +94,10 @@ public class TimeIntervalCalculator {
         changesKb.getProject().removeProjectListener(projectListener);
         changesKb.removeFrameListener(changeListener);
     }
-    
+
     private static class CleanupListener extends ProjectAdapter {
-        
+
+        @Override
         public void projectClosed(ProjectEvent event) {
             Project changesProject = (Project) event.getSource();
             KnowledgeBase changesKb = changesProject.getKnowledgeBase();
@@ -116,15 +110,15 @@ public class TimeIntervalCalculator {
             }
         }
     }
-    
+
     private class UpdateChangesListener extends AbstractChangeListener {
         private Slot partOfCompositeChangeSlot;
-        
+
         public UpdateChangesListener() {
             super(changesKb);
             partOfCompositeChangeSlot = new ChangeFactory(changesKb).getPartOfCompositeChangeSlot();
         }
-        
+
         @Override
         public void addChange(Change change) {
             if (!ChangeProjectUtil.isRoot(change) && change.getPartOfCompositeChange() == null
@@ -143,7 +137,7 @@ public class TimeIntervalCalculator {
                 sortedChangesMap.put(new SimpleTime(change.getTimestamp()), change);
             }
         }
-        
+
         @Override
         public void addAnnotation(Annotation annotation) {
 
