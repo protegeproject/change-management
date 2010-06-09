@@ -4,18 +4,30 @@ import java.util.Collection;
 
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.change.api.Composite_Change;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
+import edu.stanford.smi.protege.model.Frame;
+import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protegex.changes.ui.Filter;
 
 
 public class ChangeTreeTableNode extends AbstractChangeTreeTableNode {
     protected RootTreeTableNode root;
     private Change changeInst;
+    private KnowledgeBase domainKb;
 
 
     public ChangeTreeTableNode(RootTreeTableNode root, Change changeInst, Filter filter) {
     	super(filter);
 		this.changeInst = changeInst;
         this.root = root;
+    }
+
+    public KnowledgeBase getDomainKb() {
+        return domainKb;
+    }
+
+    public void setDomainKb(KnowledgeBase domainKb) {
+        this.domainKb = domainKb;
     }
 
     public boolean isRoot() {
@@ -43,9 +55,46 @@ public class ChangeTreeTableNode extends AbstractChangeTreeTableNode {
 		    return ChangeProjectUtil.getActionDisplay(changeInst);
 		case CHANGE_COLNAME_DESCRIPTION:
 		    return changeInst.getContext();
+		case CHANGE_COLNAME_ENTITY:
+            return getEntityName(domainKb, changeInst);
 		default:
             throw new UnsupportedOperationException("Developer missed a case");
 		}
+    }
+
+    public static String getEntityName(KnowledgeBase domainKb, Change change) {
+        String entity = "(not specified)";
+        Ontology_Component oc = change.getApplyTo();
+        if (oc != null) {
+            String currentName = oc.getCurrentName();
+            if (currentName != null) {
+                if (domainKb != null) {
+                    Frame frame = domainKb.getFrame(currentName);
+                    return frame == null ? currentName : frame.getBrowserText();
+                } else {
+                    return getShortName(currentName);
+                }
+            } else {
+                String initialName = oc.getInitialName(); //TODO TT: should use mostRecentName - but it doesn't work properly
+                if (initialName != null) {
+                    return "[Deleted] " + getShortName(initialName);
+                }
+            }
+        }
+        return entity;
+    }
+
+    public static String getShortName(String fullName) {
+        int index = fullName.lastIndexOf("#");
+        if (index > -1) {
+            return fullName.substring(index + 1, fullName.length());
+        } else {
+            index = fullName.lastIndexOf("/");
+            if (index > -1) {
+                return fullName.substring(index + 1, fullName.length());
+            }
+        }
+        return fullName;
     }
 
     public void setValueAt(Object aValue, int i) {
@@ -53,7 +102,7 @@ public class ChangeTreeTableNode extends AbstractChangeTreeTableNode {
     }
 
 	public int getChildCount() {
-		return getChildren().length;		
+		return getChildren().length;
 	}
 
 	public TreeTableNode[] getChildren(){
@@ -62,7 +111,9 @@ public class ChangeTreeTableNode extends AbstractChangeTreeTableNode {
             TreeTableNode childArray[] = new TreeTableNode[children.size()];
             int index = 0;
             for (Object o : children) {
-                childArray[index++] = new ChangeTreeTableNode(root, (Change) o, filter);
+                ChangeTreeTableNode changeTreeTableNode = new ChangeTreeTableNode(root, (Change) o, filter);
+                changeTreeTableNode.setDomainKb(domainKb);
+                childArray[index++] = changeTreeTableNode;
             }
             return filter(childArray);
         } else {
@@ -84,7 +135,9 @@ public class ChangeTreeTableNode extends AbstractChangeTreeTableNode {
 	        return root;
 	    }
 	    else {
-	        return new ChangeTreeTableNode(root, i, filter);
+	        ChangeTreeTableNode changeTreeTableNode = new ChangeTreeTableNode(root, i, filter);
+	        changeTreeTableNode.setDomainKb(domainKb);
+            return changeTreeTableNode;
 	    }
 	}
 
