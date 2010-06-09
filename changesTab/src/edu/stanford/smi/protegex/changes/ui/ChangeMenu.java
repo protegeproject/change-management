@@ -25,6 +25,7 @@ import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.model.WidgetDescriptor;
+import edu.stanford.smi.protege.plugin.PluginUtilities;
 import edu.stanford.smi.protege.ui.ProjectManager;
 import edu.stanford.smi.protege.ui.ProjectView;
 import edu.stanford.smi.protege.util.Log;
@@ -43,12 +44,15 @@ import edu.stanford.smi.protegex.server_changes.prompt.UsersTab;
 
 public class ChangeMenu extends JMenu {
 
-	public static final String MENU_TITLE = "Change";
+	private static final String CHANGE_ANALYSIS_TAB_NAME = "edu.stanford.smi.protegex.changeanalysis.ChangeAnalysisTab";
+
+    public static final String MENU_TITLE = "Change";
 	public static final String MENU_ITEM_ANNOTATE_LAST = "Annotate Last Change";
 	public static final String MENU_ITEM_CHANGE_INFO = "Selected Change Info";
 	public static final String MENU_ITEM_SAVE_CHANGE_PRJ = "Save Changes Ontology";
 	public static final String MENU_ITEM_BROWSE_CHANGE_PRJ = "Browse Changes Ontology";
 	public static final String MENU_ITEM_STATS_CONFL_PRJ = "View Change Statistics and Conflicts";
+	public static final String MENU_ITEM_CHANGE_ANALYSIS = "View Change Analysis";
 
 	protected AnnotateLastChange lastChange = new AnnotateLastChange();
 	protected SelectedChangeInfo selChangeInfo = new SelectedChangeInfo();
@@ -70,11 +74,12 @@ public class ChangeMenu extends JMenu {
 		JMenuItem annotate = new JMenuItem(MENU_ITEM_ANNOTATE_LAST);
 		JMenuItem changeInfo = new JMenuItem(MENU_ITEM_CHANGE_INFO);
 		JMenuItem saveChangesPrj = new JMenuItem(MENU_ITEM_SAVE_CHANGE_PRJ);
-		JMenuItem browseChangesPrj = new JMenuItem(MENU_ITEM_BROWSE_CHANGE_PRJ);
 		JMenuItem statsPrj = new JMenuItem(MENU_ITEM_STATS_CONFL_PRJ);
+		JMenuItem browseChangesPrj = new JMenuItem(MENU_ITEM_BROWSE_CHANGE_PRJ);
 		JMenuItem extract = new JMenuItem(new CleanUpChangesOntAction(change_kb));
 		JMenuItem details = new JMenuItem(new ShowChAODetails(changeKb));
 		JMenuItem change = new JMenuItem(new ChangeChAOAction(kb));
+		JMenuItem changeAnalysis = new JMenuItem(MENU_ITEM_CHANGE_ANALYSIS);
 
 		change.setEnabled(!kb.getProject().isMultiUserClient());
 
@@ -89,17 +94,23 @@ public class ChangeMenu extends JMenu {
 		saveChangesPrj.setAction(getSaveChangesPrjAction());
 		browseChangesPrj.setAction(getBrowseChangePrjAction());
 		statsPrj.setAction(getViewStatsAndConflictsPrjAction());
+		changeAnalysis.setAction(getViewChangeAnalysisPrjAction());
 
 		add(annotate);
 		add(changeInfo);
 		addSeparator();
+		add(changeAnalysis);
+		add(statsPrj);
 		add(details);
 		add(browseChangesPrj);
-		add(statsPrj);
 		addSeparator();
 		add(change);
 		add(extract);
 		add(saveChangesPrj);
+
+		if (PluginUtilities.forName(CHANGE_ANALYSIS_TAB_NAME, true) == null) {
+		    changeAnalysis.setEnabled(false);
+		}
 
 		lastChange.setEnabled(false);
 		selChangeInfo.setEnabled(true);
@@ -137,6 +148,38 @@ public class ChangeMenu extends JMenu {
 			}
 		};
 	}
+
+	   protected Action getViewChangeAnalysisPrjAction() {
+	        return new AbstractAction(MENU_ITEM_CHANGE_ANALYSIS) {
+	            public void actionPerformed(ActionEvent arg0) {
+	                try {
+	                    String changeAnalysisTabName = CHANGE_ANALYSIS_TAB_NAME;
+
+	                    ProjectView prjView = ProjectManager.getProjectManager().getCurrentProjectView();
+	                    TabWidget tabWidget = prjView.getTabByClassName(changeAnalysisTabName);
+
+	                    if (tabWidget != null) {
+	                        prjView.setSelectedTab(tabWidget);
+	                        return;
+	                    }
+
+	                    WidgetDescriptor d = kb.getProject().getTabWidgetDescriptor(changeAnalysisTabName);
+	                    d.setVisible(true);
+
+	                    prjView.addTab(d);
+	                    tabWidget = prjView.getTabByClassName(changeAnalysisTabName);
+	                    prjView.setSelectedTab(tabWidget);
+
+	                } catch (Exception e) {
+	                    Log.getLogger().log(Level.WARNING, "Cannot enable the Change Analysis Tab", e);
+	                    ModalDialog.showMessageDialog(ProjectManager.getProjectManager().getCurrentProjectView(),
+	                            "Cannot enable the Change Analysis Tab to show the\n" +
+	                            "change statistics and conflicts.\n" +
+	                            "See console for more details.", "Warning");
+	                }
+	            }
+	        };
+	    }
 
 
 	protected Action getBrowseChangePrjAction() {
