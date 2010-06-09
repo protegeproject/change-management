@@ -29,7 +29,7 @@ public class ChangeTableModel extends AbstractTableModel {
 
 	private FilterMethod filterMethod = FilterMethod.FILTER_TRANS;
 	private KnowledgeBase changeKB;
-
+	private KnowledgeBase domainKb;
 
 	public ChangeTableModel(KnowledgeBase changeKB) {
 		this.changeKB = changeKB;
@@ -54,6 +54,15 @@ public class ChangeTableModel extends AbstractTableModel {
 		completeData = new ArrayList<Change>();
 		colorList = new ArrayList();
 	}
+
+	public KnowledgeBase getDomainKb() {
+        return domainKb;
+    }
+
+	public void setDomainKb(KnowledgeBase domainKb) {
+        this.domainKb = domainKb;
+    }
+
 
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableModel#getRowCount()
@@ -92,24 +101,26 @@ public class ChangeTableModel extends AbstractTableModel {
 
 		// This is the instance object,
 		// get the particular piece of info out of it.
-		Change aInst = workingData.get(row);
+		Change change = workingData.get(row);
 
 		if (col < 0 || col >= ChangeTableColumn.values().length) {
 		    return null;
         }
         ChangeTableColumn column = ChangeTableColumn.values()[col];
-        if (ChangeProjectUtil.isRoot(aInst)) {
+        if (ChangeProjectUtil.isRoot(change)) {
             return column.getHeading();
         }
 		switch(column) {
 		case CHANGE_COLNAME_AUTHOR:
-			return  aInst.getAuthor();
+			return  change.getAuthor();
 		case CHANGE_COLNAME_CREATED:
-            return aInst.getTimestamp().getDate();
+            return change.getTimestamp().getDate();
 		case CHANGE_COLNAME_ACTION:
-			return ChangeProjectUtil.getActionDisplay(aInst);
+			return ChangeProjectUtil.getActionDisplay(change);
 		case CHANGE_COLNAME_DESCRIPTION:
-		    return aInst.getContext();
+		    return change.getContext();
+		case CHANGE_COLNAME_ENTITY:
+		    return ChangeTreeTableNode.getEntityName(domainKb, change);
 		default:
 		    throw new UnsupportedOperationException("Developer missed a case");
 		}
