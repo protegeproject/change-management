@@ -10,6 +10,7 @@ public enum ChangeTableColumn {
 	CHANGE_COLNAME_ACTION("Action", "Type of Change", "action"),
     CHANGE_COLNAME_DESCRIPTION("Description", "Details of the action", "context"),
     CHANGE_COLNAME_AUTHOR("Author", "Person who made the change", "author"),
+    CHANGE_COLNAME_ENTITY("Entity", "Ontology entity on which the change occurred", "applyTo"),
     CHANGE_COLNAME_CREATED("Created", "Date and time the change was made", "timestamp");
 
     private String name;
@@ -34,7 +35,7 @@ public enum ChangeTableColumn {
     public String getSearchSlotName() {
         return search_slotName;
     }
-    
+
     public static ChangeTableColumn getColumnFromName(String name) {
     	for (ChangeTableColumn col : ChangeTableColumn.values()) {
     		if (col.getName().equals(name)) {
