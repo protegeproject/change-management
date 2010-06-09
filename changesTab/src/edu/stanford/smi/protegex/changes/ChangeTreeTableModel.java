@@ -22,6 +22,8 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
     private Slot subChangesSlot;
     private Filter filter;
 
+    private KnowledgeBase domainKb;
+
 
 	public ChangeTreeTableModel(KnowledgeBase changesKb) {
 		super(new RootTreeTableNode());
@@ -42,6 +44,13 @@ public class ChangeTreeTableModel extends AbstractTreeTableModel implements Tree
         }
 	}
 
+	public void setDomainKb(KnowledgeBase domainKb) {
+        this.domainKb = domainKb;
+    }
+
+	public KnowledgeBase getDomainKb() {
+        return domainKb;
+    }
 
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableModel#getColumnCount()
@@ -87,7 +96,7 @@ public void setValueAt(Object aValue, Object node, int column) {
    }
 
 
-   public void addChangeData(Change changeInst) {	   
+   public void addChangeData(Change changeInst) {
        addChangeData(changeInst, true);
    }
 
@@ -98,9 +107,10 @@ public void setValueAt(Object aValue, Object node, int column) {
        }
 
        ChangeTreeTableNode node = new ChangeTreeTableNode(root, changeInst, filter);
-       
+       node.setDomainKb(domainKb);
+
        if (filter != null && !filter.matches(node)) {return; }
-       
+
        TreeTableNode parent = node.getParent();
        if (parent.isRoot()) {
            int index = root.addChild(node);
@@ -129,7 +139,9 @@ public void setValueAt(Object aValue, Object node, int column) {
            removeFromParent(changeInst, oldValues);
        }
        else if (slot.equals(subChangesSlot)) {
-           updateChildren(new ChangeTreeTableNode(root, changeInst, filter));
+           ChangeTreeTableNode parent = new ChangeTreeTableNode(root, changeInst, filter);
+           parent.setDomainKb(domainKb);
+           updateChildren(parent);
        }
    }
 
@@ -138,6 +150,7 @@ public void setValueAt(Object aValue, Object node, int column) {
        if (oldValues == null || oldValues.isEmpty()) {
            parent = root;
            ChangeTreeTableNode node = new ChangeTreeTableNode(root, change, filter);
+           node.setDomainKb(domainKb);
            int index = root.removeChild(node);
            if (index >= 0) {
                int childIndices[] = { index };
@@ -179,7 +192,7 @@ public void setValueAt(Object aValue, Object node, int column) {
 		Change aInst = ((ChangeTreeTableNode) root.getChildAt(row)).getChange();
 		return aInst;
 	}
-	
+
     private Object[] makePath(TreeTableNode node) {
         int len = 1;
         for (TreeTableNode climber = node; !climber.isRoot(); climber = climber.getParent()) {
@@ -197,7 +210,7 @@ public void setValueAt(Object aValue, Object node, int column) {
 
 	public void clear() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
