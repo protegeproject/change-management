@@ -366,9 +366,11 @@ public class ChangesTab extends AbstractTabWidget {
 	private void initTables() {
 		// Create Tables
 		annotationChangesTableModel = new ChangeTableModel(changes_kb);
+		annotationChangesTableModel.setDomainKb(getKnowledgeBase());
 
 		annotationsTableModel = new AnnotationTableModel(changes_kb);
 		changesTreeTableModel = new ChangeTreeTableModel(changes_kb);
+		changesTreeTableModel.setDomainKb(getKnowledgeBase());
 
 		annotationChangesTable = new SelectableTable();
 		annotationChangesTable.setModel(annotationChangesTableModel);
@@ -446,6 +448,7 @@ public class ChangesTab extends AbstractTabWidget {
 		searchTextField.revalidate(); searchTextField.repaint();
 		try {
 			changesTreeTableModel = new ChangeTreeTableModel(changes_kb);
+			changesTreeTableModel.setDomainKb(getKnowledgeBase());
 			changesTreeTableModel.setFilter(filter);
 			changesTreeTable = new JTreeTable(changesTreeTableModel);
 			changesTreeTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -453,6 +456,7 @@ public class ChangesTab extends AbstractTabWidget {
 			changesLabledComponent.setCenterComponent(ComponentFactory.createScrollPane(changesTreeTable));
 
 			annotationChangesTableModel = new ChangeTableModel(changes_kb);
+			annotationChangesTableModel.setDomainKb(getKnowledgeBase());
 			annotationChangesTable.setModel(annotationChangesTableModel);
 
 			annotationsTableModel = new AnnotationTableModel(changes_kb);
