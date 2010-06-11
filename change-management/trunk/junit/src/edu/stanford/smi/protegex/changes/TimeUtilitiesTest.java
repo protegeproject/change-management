@@ -152,7 +152,7 @@ public class TimeUtilitiesTest extends TestCase {
         }
         
         foundB = foundC = false;
-        changes = t.getTopLevelChangesBefore(first);
+        changes = t.getTopLevelChangesAfter(first);
         for (Change change : changes) {
             if (change.getApplyTo().getCurrentName().equals(c.getName()) && !foundB) {
                 foundC = true;
@@ -167,7 +167,7 @@ public class TimeUtilitiesTest extends TestCase {
         assertTrue(foundB && foundC);
         
         foundA = foundB = false;
-        changes = t.getTopLevelChangesAfter(second);
+        changes = t.getTopLevelChangesBefore(second);
         for (Change change : changes) {
             if (change.getApplyTo().getCurrentName().equals(b.getName()) && !foundA) {
                 foundB = true;

@@ -71,13 +71,13 @@ public class TimeIntervalCalculator {
         }
     }
 
-    public Collection<Change> getTopLevelChangesBefore(Date d) {
+    public Collection<Change> getTopLevelChangesAfter(Date d) {
         synchronized (changesKb) {
             return new ArrayList<Change>(sortedChangesMap.headMap(new SimpleTime(d)).values());
         }
     }
 
-    public Collection<Change> getTopLevelChangesAfter(Date d) {
+    public Collection<Change> getTopLevelChangesBefore(Date d) {
         synchronized (changesKb) {
             return new ArrayList<Change>(sortedChangesMap.tailMap(new SimpleTime(d)).values());
         }
