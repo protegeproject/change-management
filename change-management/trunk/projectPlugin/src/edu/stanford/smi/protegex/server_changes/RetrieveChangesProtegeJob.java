@@ -41,8 +41,15 @@ public class RetrieveChangesProtegeJob extends ProtegeJob {
     public Object run() throws ProtegeException {
         logger.fine("Retrieving changes on the server.");
         final KnowledgeBase changesKb = ChAOKbManager.getChAOKb(getKnowledgeBase());
+        if (changesKb == null){
+            return new ArrayList();
+        }
 
         final PostProcessorManager processorManager = ChangesProject.getPostProcessorManager(getKnowledgeBase());
+
+        if (processorManager == null){
+            return new ArrayList();
+        }
         final TransactionState transactionState = processorManager.getTransactionState();
         if (!transactionState.inTransaction()) {
             TimeIntervalCalculator timeIntervalCalculator = TimeIntervalCalculator.get(changesKb);
