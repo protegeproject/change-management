@@ -1,5 +1,11 @@
 package edu.stanford.smi.protegex.server_changes;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import edu.stanford.bmir.protegex.chao.ChAOKbManager;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.util.interval.TimeIntervalCalculator;
@@ -8,16 +14,11 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protege.util.ProtegeJob;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.logging.Logger;
-
 public class RetrieveChangesProtegeJob extends ProtegeJob {
     private static final long serialVersionUID = 818316286562363577L;
     private static final Logger logger = Log.getLogger(RetrieveChangesProtegeJob.class);
-    private Date lastRunDate;
-    private Date end;
+    private final Date lastRunDate;
+    private final Date end;
 
     public RetrieveChangesProtegeJob(KnowledgeBase kb, Date lastRunDate, Date end) {
         super(kb);
@@ -38,8 +39,11 @@ public class RetrieveChangesProtegeJob extends ProtegeJob {
      * @return
      * @throws ProtegeException
      */
+    @Override
     public Object run() throws ProtegeException {
-        logger.fine("Retrieving changes on the server.");
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Retrieving changes on the server.");
+        }
         final KnowledgeBase changesKb = ChAOKbManager.getChAOKb(getKnowledgeBase());
         if (changesKb == null){
             return new ArrayList();
@@ -59,7 +63,9 @@ public class RetrieveChangesProtegeJob extends ProtegeJob {
             }
             return changes;
         }
-        logger.info("Transaction detected, returning control to client..");
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Transaction detected, returning control to client..");
+        }
         return null;
     }
 
