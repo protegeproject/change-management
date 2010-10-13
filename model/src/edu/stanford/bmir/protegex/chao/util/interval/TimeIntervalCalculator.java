@@ -84,7 +84,9 @@ public class TimeIntervalCalculator {
     }
 
     public Collection<Change> getTopLevelChanges(Date start, Date end) {
-        return new ArrayList<Change>(sortedChangesMap.subMap(new SimpleTime(end), new SimpleTime(start)).values());
+        synchronized (changesKb) {
+            return new ArrayList<Change>(sortedChangesMap.subMap(new SimpleTime(end), new SimpleTime(start)).values());
+        }
     }
 
     public void dispose() {
