@@ -54,19 +54,21 @@ public class RetrieveChangesProtegeJob extends ProtegeJob {
         if (processorManager == null){
             return new ArrayList();
         }
-        final TransactionState transactionState = processorManager.getTransactionState();
-        if (!transactionState.inTransaction()) {
-            TimeIntervalCalculator timeIntervalCalculator = TimeIntervalCalculator.get(changesKb);
-            Collection<Change> changes = timeIntervalCalculator.getTopLevelChanges(lastRunDate, end);
-            if (changes == null) {
-                changes = new ArrayList<Change>();
+        synchronized (changesKb) {
+            final TransactionState transactionState = processorManager.getTransactionState();
+            if (!transactionState.inTransaction()) {
+                TimeIntervalCalculator timeIntervalCalculator = TimeIntervalCalculator.get(changesKb);
+                Collection<Change> changes = timeIntervalCalculator.getTopLevelChanges(lastRunDate, end);
+                if (changes == null) {
+                    changes = new ArrayList<Change>();
+                }
+                return changes;
             }
-            return changes;
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Transaction detected, returning control to client..");
+            }
+            return null;
         }
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Transaction detected, returning control to client..");
-        }
-        return null;
     }
 
 }
