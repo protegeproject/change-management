@@ -66,26 +66,42 @@ public class TimeIntervalCalculator {
     }
 
     public Collection<Change> getTopLevelChanges() {
-        synchronized (changesKb) {
+        changesKb.getReaderLock().lock();
+        try {
             return new ArrayList<Change>(sortedChangesMap.values());
+        }
+        finally {
+            changesKb.getReaderLock().unlock();
         }
     }
 
     public Collection<Change> getTopLevelChangesAfter(Date d) {
-        synchronized (changesKb) {
+        changesKb.getReaderLock().lock();
+        try {
             return new ArrayList<Change>(sortedChangesMap.headMap(new SimpleTime(d)).values());
+        }
+        finally {
+            changesKb.getReaderLock().unlock();
         }
     }
 
     public Collection<Change> getTopLevelChangesBefore(Date d) {
-        synchronized (changesKb) {
+        changesKb.getReaderLock().lock();
+        try {
             return new ArrayList<Change>(sortedChangesMap.tailMap(new SimpleTime(d)).values());
+        }
+        finally {
+            changesKb.getReaderLock().unlock();
         }
     }
 
     public Collection<Change> getTopLevelChanges(Date start, Date end) {
-        synchronized (changesKb) {
+        changesKb.getReaderLock().lock();
+        try {
             return new ArrayList<Change>(sortedChangesMap.subMap(new SimpleTime(end), new SimpleTime(start)).values());
+        }
+        finally {
+            changesKb.getReaderLock().unlock();
         }
     }
 
