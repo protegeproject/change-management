@@ -40,21 +40,22 @@ public class RetrieveChangesProtegeJob extends ProtegeJob {
      * @throws ProtegeException
      */
     @Override
-    public Object run() throws ProtegeException {
+    public Collection<Change> run() throws ProtegeException {
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Retrieving changes on the server.");
         }
         final KnowledgeBase changesKb = ChAOKbManager.getChAOKb(getKnowledgeBase());
         if (changesKb == null){
-            return new ArrayList();
+            return new ArrayList<Change>();
         }
 
         final PostProcessorManager processorManager = ChangesProject.getPostProcessorManager(getKnowledgeBase());
 
         if (processorManager == null){
-            return new ArrayList();
+            return new ArrayList<Change>();
         }
-        synchronized (changesKb) {
+        changesKb.getReaderLock().lock();
+        try {
             final TransactionState transactionState = processorManager.getTransactionState();
             if (!transactionState.inTransaction()) {
                 TimeIntervalCalculator timeIntervalCalculator = TimeIntervalCalculator.get(changesKb);
@@ -69,6 +70,15 @@ public class RetrieveChangesProtegeJob extends ProtegeJob {
             }
             return null;
         }
+        finally {
+            changesKb.getReaderLock().unlock();
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Override
+    public Collection<Change> execute() throws ProtegeException {
+    	return (Collection<Change>) super.execute();
     }
 
 }
