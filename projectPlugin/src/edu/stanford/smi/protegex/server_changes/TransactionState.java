@@ -1,22 +1,21 @@
 package edu.stanford.smi.protegex.server_changes;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
 import edu.stanford.bmir.protegex.chao.change.api.Change;
-import edu.stanford.bmir.protegex.chao.change.api.Composite_Change;
-import edu.stanford.bmir.protegex.chao.change.api.Deleted_Change;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
-import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.Transaction;
-import edu.stanford.smi.protegex.owl.model.RDFResource;
 
 
 public class TransactionState {
 	private PostProcessorManager changesDb;
+	
+	// Synchronization: these two variables are protected by TransactionState.this.
+	//                  there is no threat of deadlock because the lock is only held for
+	//                  the duration of java library calls.
 	private Stack<List<Change>> changeStack = new Stack<List<Change>>();
 	private Stack<String> transactionNameStack = new Stack<String>();
 
@@ -25,39 +24,47 @@ public class TransactionState {
 		this.changesDb = changesDb;
 	}
 
-	public int getTransactionDepth() {
+	public synchronized int getTransactionDepth() {
 		return changeStack.size();
 	}
 
-	public boolean inTransaction() {
+	public synchronized boolean inTransaction() {
 		return changeStack.size() != 0;
 	}
 
-	public void addToTransaction(Change change) {
+	public synchronized void addToTransaction(Change change) {
 		changeStack.peek().add(change);
 	}
 
-	public void beginTransaction(String name) {
+	public synchronized void beginTransaction(String name) {
 		changeStack.push(new ArrayList<Change>());
 		transactionNameStack.push(name);
 	}
 
 	public void commitTransaction() {
-		List<Change> changes = changeStack.pop();
-		String name = transactionNameStack.pop();
-		createTransactionChange(changes, name);
+	    synchronized (changesDb.getChangesKb()) {
+	        List<Change> changes;
+	        String name;
+	        synchronized (this) {
+	            changes = changeStack.pop();
+	            name = transactionNameStack.pop();
+	        }
+	        createTransactionChange(changes, name);
+	    }
 	}
 
-	public void rollbackTransaction() {
+	public synchronized void rollbackTransaction() {
 		changeStack.pop();
 		transactionNameStack.pop();
 	}
 
 
 	public void createTransactionChange(List<Change> changes, String context) {
-		if (changes.size() == 0) {
-			return;
-		}
+	    synchronized (this) { // I don't believe synchronization is necessary but this is easier to explain
+	        if (changes.size() == 0) {
+	            return;
+	        }
+	    }
 
 		Ontology_Component applyTo = getApplyToFromContext(context);
 
@@ -117,56 +124,6 @@ public class TransactionState {
 		Representative r = new Representative(name, named != null ? named : first);
 		return r;
 	}
-	/*
-	{
-        boolean isOwl = changesDb.isOwl();
-        Representative r = null;
-		if (isOwl) {
-            if ((r = guessFirstNonAnonymousAction(actions, name)) != null) return r;
-            if ((r = guessFirstOrDelete(actions, name)) != null) return r;
-        }
-        else {
-            if ((r = guessFirstOrDelete(actions, name)) != null) return r;
-        }
-        return null;
-	}
-	 */
-
-	private Representative guessFirstNonAnonymousAction(List<Change> actions, String name) {
-		for (Change change : actions) {
-			if (!((RDFResource)((AbstractWrappedInstance)change.getApplyTo()).getWrappedProtegeInstance()).isAnonymous()) {
-				return new Representative(change.getAction(),
-						change.getApplyTo());
-			}
-		}
-		return null;
-	}
-
-
-	private Representative guessFirstOrDelete(Collection<Change> transActions, String name) {
-		boolean firstInfoInst = false;
-		boolean firstDeleted = false;
-		Change firstInst = null;
-
-		for (Change change : transActions) {
-			if (!(change instanceof Composite_Change) && !firstInfoInst) {
-				firstInst = change;
-				firstInfoInst = true;
-			}
-
-			if (change instanceof Deleted_Change && !firstDeleted) {
-				firstInst = change;
-				firstDeleted = true;
-			}
-		}
-		return new Representative(firstInst.getAction(),
-				firstInst.getApplyTo());
-	}
-
-	private Frame findNamedClass(RDFResource resource) {
-		return resource;
-	}
-
 
 
 	/*
