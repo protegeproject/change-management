@@ -43,23 +43,22 @@ public class TimeIntervalCalculator {
         }
     }
 
+    /**
+     * Gets the time interval calculator for a changesKb.  
+     * 
+     * This routine is potentially very expensive.  The caller cannot be holding
+     * the changesKb lock.
+     * 
+     * @param changesKb
+     * @return
+     */
     public static TimeIntervalCalculator get(KnowledgeBase changesKb) {
         TimeIntervalCalculator t;
         synchronized (TimeIntervalCalculator.class) {
             t = instanceMap.get(changesKb);
-        }
-        if (t == null) {
-            t = new TimeIntervalCalculator(changesKb);
-            TimeIntervalCalculator existingCalculator;
-            synchronized (TimeIntervalCalculator.class) {
-                existingCalculator = instanceMap.get(changesKb);
-                if (existingCalculator == null) {
-                    instanceMap.put(changesKb, t);
-                }
-            }
-            if (existingCalculator != null) {
-                t.dispose();
-                t = existingCalculator;
+            if (t == null) {
+                t = new TimeIntervalCalculator(changesKb);
+                instanceMap.put(changesKb, t);
             }
         }
         return t;
