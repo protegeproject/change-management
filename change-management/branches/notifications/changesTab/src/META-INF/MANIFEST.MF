@@ -16,3 +16,5 @@ Tab-Widget: True
 Name: edu.stanford.smi.protegex.changes.stats.ChangeStatisticsTab.class
 Tab-Widget: True
 
+Name: edu.stanford.bmir.protegex.notification.NotificationProjectPlugin.class
+Project-Plugin: True
