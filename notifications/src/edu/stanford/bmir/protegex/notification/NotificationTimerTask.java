@@ -2,6 +2,7 @@ package edu.stanford.bmir.protegex.notification;
 
 import edu.stanford.bmir.protegex.chao.ChAOKbManager;
 import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
+import edu.stanford.bmir.protegex.notification.EmailUsersDelegate;
 import edu.stanford.bmir.protegex.notification.cache.AnnotationCache;
 import edu.stanford.bmir.protegex.notification.cache.WatchedEntitiesCache;
 import edu.stanford.smi.protege.model.KnowledgeBase;
@@ -102,7 +103,7 @@ public class NotificationTimerTask extends TimerTask {
 
                 final NotificationDelegate delegate = new PurgeCacheDelegate(
                         new UpdateProjectWithLastRuntimeDelegate(
-                                new NotifyUsersDelegate(
+                                new EmailUsersDelegate(
                                         new RemoveUnwantedChangesDelegate(
                                                 new GetOntologyChangesDelegate(
                                                         new GetCommentChangesDelegate(lastRunTime, now, annotationCache, watchedEntitiesCache, authorSlot), lastRunTime, now, watchedEntitiesCache))), now), now, annotationCache);

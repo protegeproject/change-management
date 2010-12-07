@@ -24,10 +24,10 @@ import java.util.logging.Logger;
  */
 public class GetOntologyChangesDelegate extends BranchWatchAwareDelegate {
     private static final Logger logger = Logger.getLogger(GetOntologyChangesDelegate.class.getName());
-    private NotificationDelegate delegate;
-    private Date fromDate;
-    private Date toDate;
-    private WatchedEntitiesCache watchedEntitiesCache;
+    private final NotificationDelegate delegate;
+    private final Date fromDate;
+    private final Date toDate;
+    private final WatchedEntitiesCache watchedEntitiesCache;
 
     public GetOntologyChangesDelegate(NotificationDelegate delegate, Date fromDate, Date toDate, WatchedEntitiesCache watchedEntitiesCache) {
         this.delegate = delegate;

@@ -27,7 +27,7 @@ public class NotificationProjectPlugin extends ProjectPluginAdapter {
         if (p.isMultiUserClient()) {
             return;
         }
-
+        if (!ChAOKbManager.isValidChAOKb(p.getKnowledgeBase())) {
         if (ApplicationProperties.getBooleanProperty(PropertyConstants.ENABLE_IMMEDIATE_NOTIFICATION, true)) {
             NotificationThreadManager.getNotificationSuspensionObserver(p).scheduleAtFixedRate(new NotificationTimerTask(p, NotificationInterval.IMMEDIATELY),
                     ApplicationProperties.getIntegerProperty(PropertyConstants.IMMEDIATE_NOTIFICATION_THREAD_STARTUP_DELAY_PROP, 180),     // delay
@@ -42,8 +42,7 @@ public class NotificationProjectPlugin extends ProjectPluginAdapter {
                 ApplicationProperties.getIntegerProperty(PropertyConstants.DAILY_NOTIFICATION_THREAD_STARTUP_DELAY_PROP, 1200),     // delay
                 NotificationInterval.DAILY.getIntervalInSeconds() //period
         );
-
-        if (ChAOKbManager.isValidChAOKb(p.getKnowledgeBase())) {
+        } else  {
             OntologyComponentFactory factory = new OntologyComponentFactory(p.getKnowledgeBase());
             WatchedEntitiesCache.initialize(p, factory);
             AnnotationCache.initialize(p);
