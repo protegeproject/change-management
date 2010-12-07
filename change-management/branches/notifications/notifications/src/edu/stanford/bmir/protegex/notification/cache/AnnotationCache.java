@@ -29,11 +29,11 @@ import java.util.Map;
 //project -> Project (ServerProject)
 //Instance -> Annotation
 public class AnnotationCache extends FrameAdapter {
-    private static Map<Project, AnnotationCache> caches = new HashMap<Project, AnnotationCache>();
+    private static final Map<Project, AnnotationCache> caches = new HashMap<Project, AnnotationCache>();
     private final Map<Instance, Date> annotationToDate = new HashMap<Instance, Date>();
     private final Map<Instance, Ontology_Component> annotationToRootNode = new HashMap<Instance, Ontology_Component>();
 
-    public AnnotationCache(final Project chaoProject) {
+    private AnnotationCache(final Project chaoProject) {
         final KnowledgeBase chaoKb = chaoProject.getKnowledgeBase();
         if (chaoKb != null) {
             final AnnotationFactory annotationFactory = new AnnotationFactory(chaoKb);
@@ -70,18 +70,18 @@ public class AnnotationCache extends FrameAdapter {
         return caches.get(project);
     }
 
-    public synchronized void removeAnnotation(final Instance inst) {
+    synchronized void removeAnnotation(final Instance inst) {
         annotationToDate.remove(inst);
         annotationToRootNode.remove(inst);
     }
 
-    public synchronized void removeAnnotations(final Collection<Instance> instances) {
+    synchronized void removeAnnotations(final Collection<Instance> instances) {
         for (Instance instance : instances) {
             removeAnnotation(instance);
         }
     }
 
-    public synchronized void addAnnotation(final Instance inst) {
+    synchronized void addAnnotation(final Instance inst) {
         annotationToDate.put(inst, new Date());
         Annotation annotation = new DefaultAnnotation(inst);
         final Collection<Ontology_Component> components = ServerChangesUtil.getAnnotatedOntologyComponents(annotation);

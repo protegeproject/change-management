@@ -19,7 +19,7 @@ public class NotificationThreadManager {
     private final Map<NotificationInterval, Boolean> hasRescheduledTaskPending = new HashMap<NotificationInterval, Boolean>();
     private final Project project;
     private static final Logger logger = Logger.getLogger(NotificationThreadManager.class.getName());
-    private static ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory(){
+    private static final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory(){
             public Thread newThread(Runnable r) {
                 final Thread thread = new Thread(r);
                 thread.setDaemon(true);

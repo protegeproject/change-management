@@ -51,6 +51,7 @@
             <pathelement location = "${owl.lib}"/>
             <pathelement location = "${rdf.lib}"/> 
             <pathelement location = "${lib}/icu4j.jar"/>
+            <pathelement location = "${lib}/mail.jar"/>
         </path>
         
     </target>
@@ -114,6 +115,7 @@
     
     <target name = "dist" depends = "jar">
         <copy file = "${lib}/icu4j.jar" todir="${plugin.dir}"/>
+        <copy file = "${lib}/mail.jar" todir="${plugin.dir}"/>
         <copy file = "plugin.properties" todir = "${plugin.dir}"/>
         <copy todir = "${plugin.dir}/projects">
             <fileset dir="projects"/>

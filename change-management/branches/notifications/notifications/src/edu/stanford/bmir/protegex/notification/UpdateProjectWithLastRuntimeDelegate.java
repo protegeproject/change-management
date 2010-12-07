@@ -13,8 +13,8 @@ import java.util.Set;
  * @author Jack Elliott <jacke@stanford.edu>
  */
 public class UpdateProjectWithLastRuntimeDelegate implements NotificationDelegate {
-    private NotificationDelegate delegate;
-    private Date now;
+    private final NotificationDelegate delegate;
+    private final Date now;
 
     public UpdateProjectWithLastRuntimeDelegate(NotificationDelegate delegate, Date now) {
         this.delegate = delegate;

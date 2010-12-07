@@ -23,14 +23,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Jack Elliott <jacke@stanford.edu>
  */
 public class WatchedEntitiesCache extends FrameAdapter  {
-    private static Map<Project, WatchedEntitiesCache> projectsToCaches= new HashMap<Project, WatchedEntitiesCache>();
-    private Map<User, Set<Ontology_Component>> usersToBranches = new HashMap<User, Set<Ontology_Component>>();
-    private Map<User, Set<Ontology_Component>> usersToEntities = new HashMap<User, Set<Ontology_Component>>();
-    private Map<Ontology_Component, Set<User>> branchesToUsers = new HashMap<Ontology_Component, Set<User>>();
-    private Map<Ontology_Component, Set<User>> entitiesToUsers = new HashMap<Ontology_Component, Set<User>>();
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final Map<Project, WatchedEntitiesCache> projectsToCaches= new HashMap<Project, WatchedEntitiesCache>();
+    private final Map<User, Set<Ontology_Component>> usersToBranches = new HashMap<User, Set<Ontology_Component>>();
+    private final Map<User, Set<Ontology_Component>> usersToEntities = new HashMap<User, Set<Ontology_Component>>();
+    private final Map<Ontology_Component, Set<User>> branchesToUsers = new HashMap<Ontology_Component, Set<User>>();
+    private final Map<Ontology_Component, Set<User>> entitiesToUsers = new HashMap<Ontology_Component, Set<User>>();
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    WatchedEntitiesCache(OntologyComponentFactory factory) {
+    private WatchedEntitiesCache(OntologyComponentFactory factory) {
 
         final Collection<User> allUserObjects = factory.getAllUserObjects();
         for (User user : allUserObjects) {
@@ -134,7 +134,7 @@ public class WatchedEntitiesCache extends FrameAdapter  {
         }
     }
 
-    public <M extends Map<K, Set<V>>, K, V> void addToMap(M map, K key, V value) {
+    private <M extends Map<K, Set<V>>, K, V> void addToMap(M map, K key, V value) {
         Set<V> set = map.get(key);
         if (set == null) {
             set = new HashSet<V>();
@@ -143,7 +143,7 @@ public class WatchedEntitiesCache extends FrameAdapter  {
         set.add(value);
     }
 
-    public <M extends Map<K, Set<V>>, K, V> boolean removeFromMap(M map, K key, V value) {
+    private <M extends Map<K, Set<V>>, K, V> boolean removeFromMap(M map, K key, V value) {
         Set<V> set = map.get(key);
         return set != null && set.remove(value);
     }

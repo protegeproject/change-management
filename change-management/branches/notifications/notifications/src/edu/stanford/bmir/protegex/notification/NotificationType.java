@@ -14,14 +14,4 @@ public enum NotificationType {
     public String getValue() {
         return value;
     }
-
-    public static NotificationType fromString(String str){
-        if (ONTOLOGY.getValue().equals(str)){
-            return ONTOLOGY;
-        }
-        if (COMMENT.getValue().equals(str)){
-            return COMMENT;
-        }
-        return null;
-    }
 }

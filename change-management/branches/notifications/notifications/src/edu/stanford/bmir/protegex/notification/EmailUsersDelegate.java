@@ -26,15 +26,15 @@ import java.util.logging.Logger;
 /**
  * @author Jack Elliott <jacke@stanford.edu>
  */
-public class NotifyUsersDelegate implements NotificationDelegate {
+public class EmailUsersDelegate implements NotificationDelegate {
 
-    private static final Logger logger = Logger.getLogger(NotifyUsersDelegate.class.getName());
+    private static final Logger logger = Logger.getLogger(EmailUsersDelegate.class.getName());
     private final MessageFormat ontologyChangeMessage = new MessageFormat("{1,date} {1,time}: {2} made the change: \n\t{0}\n");
     private final MessageFormat noteChangeMessage = new MessageFormat("{1,date} {1,time}: {2} added a new comment: \n\t{0}\n");
     private final MessageFormat linkMessage = new MessageFormat("\tDirect link: http://{0}?ontology={1}&tab={2}&id={3}\n\n");
-    private NotificationDelegate delegate;
+    private final NotificationDelegate delegate;
 
-    public NotifyUsersDelegate(NotificationDelegate delegate) {
+    public EmailUsersDelegate(NotificationDelegate delegate) {
         this.delegate = delegate;
     }
 
@@ -61,13 +61,13 @@ public class NotifyUsersDelegate implements NotificationDelegate {
             if (!changes.isEmpty()) {
                 final String userEmail = user.getEmail();
                 if (userEmail != null && !userEmail.trim().equals("")) {
-                    sendNotification(userEmail, sortedChanges);
+                    sendEmailNotification(userEmail, sortedChanges);
                 }
             }
         }
     }
 
-    private void sendNotification(final String userEmail, final Collection<ChangeData> changes) {
+    private void sendEmailNotification(final String userEmail, final Collection<ChangeData> changes) {
 
         StringBuffer stringBuffer = new StringBuffer();
         final String applicationName = ApplicationProperties.getString(PropertyConstants.APPLICATION_NAME_PROP, PropertyConstants.APPLICATION_NAME_DEFAULT);

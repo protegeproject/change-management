@@ -28,9 +28,8 @@ import java.util.logging.Logger;
  * @author Jack Elliott <jacke@stanford.edu>
  */
 public class GetCommentChangesDelegate extends BranchWatchAwareDelegate {
-    private static final Logger logger = Logger.getLogger(GetCommentChangesDelegate.class.getName());
-    private Date fromDate;
-    private Date toDate;
+    private final Date fromDate;
+    private final Date toDate;
     private final AnnotationCache annotationCache;
     private final WatchedEntitiesCache watchedEntitiesCache;
     private final Slot authorSlot;
