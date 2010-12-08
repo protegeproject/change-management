@@ -51,7 +51,7 @@ public class EmailUtil {
         });
 
         try {
-            Message msg = new MimeMessage(session);
+            MimeMessage msg = new MimeMessage(session);
             InternetAddress addressFrom = new InternetAddress(from);
             msg.setFrom(addressFrom);
 
@@ -61,7 +61,7 @@ public class EmailUtil {
             msg.setRecipients(Message.RecipientType.TO, addressTo);
 
             msg.setSubject(subject);
-            msg.setContent(message, "text/plain");
+            msg.setText(message, "UTF-8");
             Transport.send(msg);
         } catch (MessagingException e) {
             throw new RuntimeException("There was an error sending email to " + " " + recipient + ". Message: " + e.getMessage() , e);
