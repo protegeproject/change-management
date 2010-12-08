@@ -3,10 +3,14 @@ package edu.stanford.bmir.protegex.chao.util.interval;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import edu.stanford.bmir.protegex.chao.annotation.api.Annotation;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
@@ -21,12 +25,13 @@ import edu.stanford.smi.protegex.changes.ChangeProjectUtil;
 import edu.stanford.smi.protegex.server_changes.model.AbstractChangeListener;
 
 public class TimeIntervalCalculator {
-    private static Map<KnowledgeBase, TimeIntervalCalculator> instanceMap = new HashMap<KnowledgeBase, TimeIntervalCalculator>();
+    private static final ConcurrentMap<KnowledgeBase, Future<TimeIntervalCalculator>> instanceMap = new ConcurrentHashMap<KnowledgeBase, Future<TimeIntervalCalculator>>();
 
     private ProjectAdapter projectListener = new CleanupListener();
-    private AbstractChangeListener changeListener;
 
+    private AbstractChangeListener changeListener;
     private KnowledgeBase changesKb;
+
     private TreeMap<SimpleTime, Change> sortedChangesMap = new TreeMap<SimpleTime, Change>();
 
     private TimeIntervalCalculator(KnowledgeBase changesKb) {
@@ -52,16 +57,34 @@ public class TimeIntervalCalculator {
      * @param changesKb
      * @return
      */
-    public static TimeIntervalCalculator get(KnowledgeBase changesKb) {
-        TimeIntervalCalculator t;
-        synchronized (TimeIntervalCalculator.class) {
-            t = instanceMap.get(changesKb);
-            if (t == null) {
-                t = new TimeIntervalCalculator(changesKb);
-                instanceMap.put(changesKb, t);
+    public static TimeIntervalCalculator get(final KnowledgeBase changesKb) {
+        return get(changesKb, true);
+    }
+
+    private static TimeIntervalCalculator get(final KnowledgeBase changesKb, final boolean createTimeIntervalCalculatorIfNotAlreadyCalculated) {
+        Future<TimeIntervalCalculator> future = instanceMap.get(changesKb);
+        if (future == null) {
+            final Callable<TimeIntervalCalculator> callable = new Callable<TimeIntervalCalculator>() {
+                public TimeIntervalCalculator call() throws ExecutionException, InterruptedException {
+                    return new TimeIntervalCalculator(changesKb);
+                }
+            };
+            final FutureTask<TimeIntervalCalculator> futureTask = new FutureTask<TimeIntervalCalculator>(callable);
+            future = instanceMap.putIfAbsent(changesKb, futureTask);
+            if (future == null && createTimeIntervalCalculatorIfNotAlreadyCalculated) {
+                future = futureTask;
+                futureTask.run();
+            }
+            if (future == null && !createTimeIntervalCalculatorIfNotAlreadyCalculated){
+                return null;
             }
         }
-        return t;
+        try {
+            return future.get();
+        } catch (Exception e) {
+            instanceMap.remove(changesKb, future);
+            throw new RuntimeException(e);
+        }
     }
 
     public Collection<Change> getTopLevelChanges() {
@@ -102,10 +125,7 @@ public class TimeIntervalCalculator {
         public void projectClosed(ProjectEvent event) {
             Project changesProject = (Project) event.getSource();
             KnowledgeBase changesKb = changesProject.getKnowledgeBase();
-            TimeIntervalCalculator  t;
-            synchronized (TimeIntervalCalculator.class) {
-                t = instanceMap.get(changesKb);
-            }
+            TimeIntervalCalculator t = get(changesKb, false);
             if (t != null) {
                 t.dispose();
             }
