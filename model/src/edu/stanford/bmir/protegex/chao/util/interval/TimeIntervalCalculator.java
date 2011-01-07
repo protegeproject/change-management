@@ -21,6 +21,7 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.model.Slot;
 import edu.stanford.smi.protege.server.framestore.ServerFrameStore;
+import edu.stanford.smi.protege.util.Log;
 import edu.stanford.smi.protegex.changes.ChangeProjectUtil;
 import edu.stanford.smi.protegex.server_changes.model.AbstractChangeListener;
 
@@ -37,7 +38,12 @@ public class TimeIntervalCalculator {
     private TimeIntervalCalculator(KnowledgeBase changesKb) {
         this.changesKb = changesKb;
 
+        long t0= System.currentTimeMillis();
+        Log.getLogger().info("Started caching of top level changes at: " + new Date());
+
         sortedChangesMap = new GetTopLevelChangesTreeMapJob(changesKb).execute();
+
+        Log.getLogger().info("Finished caching top level changes in " + (System.currentTimeMillis() - t0)/1000 + " seconds.");
 
         changesKb.getProject().addProjectListener(projectListener);
 
