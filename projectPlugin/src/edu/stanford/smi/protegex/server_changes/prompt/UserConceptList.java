@@ -32,6 +32,7 @@ import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
+import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.ui.FrameRenderer;
 import edu.stanford.smi.protege.util.AbstractSelectableComponent;
 import edu.stanford.smi.protege.util.ComponentFactory;
@@ -44,6 +45,7 @@ import edu.stanford.smi.protege.util.ViewAction;
 import edu.stanford.smi.protegex.server_changes.ChangesProject;
 
 public class UserConceptList extends AbstractSelectableComponent implements Selectable {
+    private static final long serialVersionUID = 6011231863251153338L;
     private KnowledgeBase old_kb, new_kb;
     private JTable changesTable;
 
@@ -130,7 +132,7 @@ public class UserConceptList extends AbstractSelectableComponent implements Sele
 
 			private void view(Change change) {
 				if (change != null) {
-					ChangesProject.getChangesProj(new_kb).show(((AbstractWrappedInstance)change).getWrappedProtegeInstance());
+					getChangesProject().show(((AbstractWrappedInstance)change).getWrappedProtegeInstance());
 				}
 			}
 
@@ -153,6 +155,14 @@ public class UserConceptList extends AbstractSelectableComponent implements Sele
     public void setAuthorManagement(AuthorManagement authorManagement) {
         this.authorManagement = authorManagement;
     }
+    
+    protected Project getChangesProject() {
+        return ChangesProject.getChangesProj(new_kb);
+    }
+    
+    protected ChangeTabRenderer createChangeTabRenderer() {
+        return new ChangeTabRenderer(old_kb, new_kb);
+    }
 
 	private JComponent createConceptLists() {
 		JPanel result = new JPanel ();
@@ -170,7 +180,7 @@ public class UserConceptList extends AbstractSelectableComponent implements Sele
 			@Override
 			public void onView(Object o) {
 				Ontology_Component ontoComp = (Ontology_Component) o;
-				ChangesProject.getChangesProj(new_kb).show(((AbstractWrappedInstance)ontoComp).getWrappedProtegeInstance());
+				getChangesProject().show(((AbstractWrappedInstance)ontoComp).getWrappedProtegeInstance());
 			}
 		});
 
@@ -178,7 +188,7 @@ public class UserConceptList extends AbstractSelectableComponent implements Sele
 			@Override
 			public void onView(Object o) {
 				Ontology_Component ontoComp = (Ontology_Component) o;
-				ChangesProject.getChangesProj(new_kb).show(((AbstractWrappedInstance)ontoComp).getWrappedProtegeInstance());
+				getChangesProject().show(((AbstractWrappedInstance)ontoComp).getWrappedProtegeInstance());
 			}
 		});
 
@@ -202,7 +212,7 @@ public class UserConceptList extends AbstractSelectableComponent implements Sele
 	private SelectableList createConceptList (Collection concepts) {
 		SelectableList list = ComponentFactory.createSelectableList(null, false);
 
-		list.setCellRenderer(new ChangeTabRenderer(old_kb, new_kb));
+		list.setCellRenderer(createChangeTabRenderer());
 		((SimpleListModel)list.getModel()).setValues(concepts);
 
 		return list;

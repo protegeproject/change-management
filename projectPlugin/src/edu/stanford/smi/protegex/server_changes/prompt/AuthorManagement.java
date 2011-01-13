@@ -35,8 +35,6 @@ public class AuthorManagement {
 
     protected AuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
         this.kb = kb2;
-        evaluateConflicts();
-        setFilters(AuthorManagement.DEFAULT_FILTERS);
     }
 
     public static AuthorManagement getAuthorManagement(KnowledgeBase kb1, KnowledgeBase kb2) {
@@ -44,9 +42,16 @@ public class AuthorManagement {
     		return null;
     	}
 
-    	return new AuthorManagement(kb1, kb2);
+    	AuthorManagement management = new AuthorManagement(kb1, kb2);
+    	management.initialize();
+    	return management;
     }
-
+    
+    public void initialize() {
+        evaluateConflicts();
+        setFilters(AuthorManagement.DEFAULT_FILTERS);
+    }
+    
     public void reinitialize() {
         userConflictsMap.clear();
         conflictingFrameMap.clear();
@@ -56,12 +61,20 @@ public class AuthorManagement {
         active_users.clear();
         evaluateConflicts();
     }
+    
+    protected KnowledgeBase getChAOKb() {
+        return ChAOKbManager.getChAOKb(kb);
+    }
+    
+    protected boolean isOWL() {
+        return kb instanceof OWLModel;
+    }
 
     private void evaluateConflicts() {
 
         Map<Ontology_Component, Set<String>> whoChangedMeMap = new HashMap<Ontology_Component, Set<String>>();
 
-        for (Object o : ChangeProjectUtil.getSortedChanges(ChAOKbManager.getChAOKb(kb))) {
+        for (Object o : ChangeProjectUtil.getSortedChanges(getChAOKb())) {
             Change change = (Change) o;
             Ontology_Component frame = change.getApplyTo();
             Set<String> users = whoChangedMeMap.get(frame);
@@ -157,7 +170,7 @@ public class AuthorManagement {
     }
 
     public Set<String> getEditorsByFrameName(String name, boolean oldName) {
-    	KnowledgeBase changesKb = ChAOKbManager.getChAOKb(kb);
+    	KnowledgeBase changesKb = getChAOKb();
         Ontology_Component component = oldName ?
         		ChangeProjectUtil.getOntologyComponentByInitialName(changesKb, name) :
                 ChangeProjectUtil.getOntologyComponentByFinalName(changesKb, name);
@@ -210,7 +223,7 @@ public class AuthorManagement {
 
     public void setFilters(Set<ComponentFilter> filters) {
         this.filters = filters;
-        filter_anonymous_guys = kb instanceof OWLModel && !filters.contains(ComponentFilter.ANONYMOUS);
+        filter_anonymous_guys = isOWL() && !filters.contains(ComponentFilter.ANONYMOUS);
         nothing_to_filter = nothingToFilter();
     }
 
