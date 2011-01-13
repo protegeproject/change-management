@@ -70,6 +70,10 @@ public class DiffUserView extends JPanel {
 		getUserConceptList().setAuthorManagement(authorManagement);
 		initialize();
 	}
+	
+	protected void setIsOwl(boolean isOwl) {
+	    this.isOwl = isOwl;
+	}
 
 	protected UserConceptList getUserConceptList() {
 	    if (userConceptLists == null) {

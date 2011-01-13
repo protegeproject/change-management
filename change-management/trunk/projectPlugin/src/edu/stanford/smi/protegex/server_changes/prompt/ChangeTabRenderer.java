@@ -89,7 +89,7 @@ public class ChangeTabRenderer extends DefaultRenderer {
         super.load(value);
     }
 
-    private String calculateValueString(Ontology_Component ontoComp) {
+    protected String calculateValueString(Ontology_Component ontoComp) {
         String name = null;
         switch (ontoComp.getInternalStatus()) {
         case CHANGED:
