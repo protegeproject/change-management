@@ -26,7 +26,7 @@ import edu.stanford.smi.protegex.changes.ChangeProjectUtil;
 import edu.stanford.smi.protegex.server_changes.model.AbstractChangeListener;
 
 public class TimeIntervalCalculator {
-    private static final ConcurrentMap<KnowledgeBase, Future<TimeIntervalCalculator>> instanceMap = new ConcurrentHashMap<KnowledgeBase, Future<TimeIntervalCalculator>>();
+    private static final ConcurrentMap<KnowledgeBase, Future<TimeIntervalCalculator>> kb2TimeIntervalCalculatorMap = new ConcurrentHashMap<KnowledgeBase, Future<TimeIntervalCalculator>>();
 
     private ProjectAdapter projectListener = new CleanupListener();
 
@@ -68,7 +68,7 @@ public class TimeIntervalCalculator {
     }
 
     private static TimeIntervalCalculator get(final KnowledgeBase changesKb, final boolean createTimeIntervalCalculatorIfNotAlreadyCalculated) {
-        Future<TimeIntervalCalculator> future = instanceMap.get(changesKb);
+        Future<TimeIntervalCalculator> future = kb2TimeIntervalCalculatorMap.get(changesKb);
         if (future == null) {
             final Callable<TimeIntervalCalculator> callable = new Callable<TimeIntervalCalculator>() {
                 public TimeIntervalCalculator call() throws ExecutionException, InterruptedException {
@@ -76,7 +76,7 @@ public class TimeIntervalCalculator {
                 }
             };
             final FutureTask<TimeIntervalCalculator> futureTask = new FutureTask<TimeIntervalCalculator>(callable);
-            future = instanceMap.putIfAbsent(changesKb, futureTask);
+            future = kb2TimeIntervalCalculatorMap.putIfAbsent(changesKb, futureTask);
             if (future == null && createTimeIntervalCalculatorIfNotAlreadyCalculated) {
                 future = futureTask;
                 futureTask.run();
@@ -88,7 +88,7 @@ public class TimeIntervalCalculator {
         try {
             return future.get();
         } catch (Exception e) {
-            instanceMap.remove(changesKb, future);
+            kb2TimeIntervalCalculatorMap.remove(changesKb, future);
             throw new RuntimeException(e);
         }
     }
@@ -119,7 +119,7 @@ public class TimeIntervalCalculator {
 
     public void dispose() {
         synchronized (TimeIntervalCalculator.class) {
-            instanceMap.remove(changesKb);
+            kb2TimeIntervalCalculatorMap.remove(changesKb);
         }
         changesKb.getProject().removeProjectListener(projectListener);
         changesKb.removeFrameListener(changeListener);
