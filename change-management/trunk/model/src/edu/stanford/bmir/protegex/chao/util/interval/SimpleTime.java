@@ -28,6 +28,11 @@ public class SimpleTime implements Comparable<SimpleTime>, Serializable, Localiz
         counter = time.getSequence();
     }
 
+    public SimpleTime(Date date, int sequence) {
+        this.date = date;
+        this.counter = sequence;
+    }
+
     public Integer getCounter() {
         return counter;
     }
