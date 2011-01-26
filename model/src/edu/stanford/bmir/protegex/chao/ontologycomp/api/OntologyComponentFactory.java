@@ -14,6 +14,7 @@ import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultUser;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.code.generator.wrapping.OntologyJavaMappingUtil;
 import edu.stanford.smi.protege.model.Cls;
+import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.Instance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Slot;
@@ -474,5 +475,17 @@ public class OntologyComponentFactory {
             return ((AbstractWrappedInstance) ontoComp).getName();
         }
         return null;
+    }
+
+    public User getUserByName(String userName) {
+        Collection frames = kb.getFramesWithValue(getNameSlot(), null, false, userName);
+        if (frames == null || frames.isEmpty()) {
+            return null;
+        }
+        Frame frame = (Frame) frames.iterator().next();
+        if (!(frame instanceof Frame)) {
+            return null;
+        }
+        return new DefaultUser((Instance) frame);
     }
 }
