@@ -144,9 +144,7 @@ public class GetDirectDbTopLevelChanges {
             if (nfs instanceof AbstractDatabaseFrameDb) {
                 dbFrameStore = (AbstractDatabaseFrameDb) nfs;
             }
-
             nfs = nfs.getDelegate();
-
         }
         while (nfs != null);
         return dbFrameStore != null ? dbFrameStore.getCurrentConnection() : null;
