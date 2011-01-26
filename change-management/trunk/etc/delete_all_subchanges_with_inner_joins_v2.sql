@@ -1,4 +1,4 @@
-﻿DELIMITER $$
+DELIMITER $$
 
 #************** How to run it *******************
 # source ./delete_all_subchanges_with_inner_joins_v2.sql 
