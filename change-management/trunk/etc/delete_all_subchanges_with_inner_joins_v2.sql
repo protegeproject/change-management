@@ -1,8 +1,8 @@
 DELIMITER $$
 
 #************** How to run it *******************
-# source ./delete_all_subchanges_with_inner_joins_v2.sql 
-# call delete_subchanges('icd_ann'); - make sure you specify the right filename
+# source ./delete_all_subchanges_with_inner_joins_v2.sql	- make sure to specify the correct path
+# call delete_subchanges('icd_ann');	- make sure you specify the correct table name
 #************************************************
 
 DROP PROCEDURE IF EXISTS `protege`.`delete_subchanges` $$
