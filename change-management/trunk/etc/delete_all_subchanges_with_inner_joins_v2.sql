@@ -90,9 +90,9 @@ DEALLOCATE PREPARE stmt3;
 SET @v_command = CONCAT('ALTER TABLE `', @new_tablename, '` ',
   'DROP KEY `tcck_ann2_I2`, ',
   'DROP KEY `tcck_ann2_I3`, ',
-  'ADD KEY `', tablename, '_I1` (`frame`,`slot`,`facet`,`is_template`,`value_index`), ',
-  'ADD KEY `', tablename, '_I2` (`short_value`(255)), ',
-  'ADD KEY `', tablename, '_I4` (`slot`,`frame_type`)');
+  'ADD KEY `', @new_tablename, '_I1` (`frame`,`slot`,`facet`,`is_template`,`value_index`), ',
+  'ADD KEY `', @new_tablename, '_I2` (`short_value`(255)), ',
+  'ADD KEY `', @new_tablename, '_I4` (`slot`,`frame_type`)');
 PREPARE stmt3 FROM @v_command;
 EXECUTE stmt3;
 DEALLOCATE PREPARE stmt3;
