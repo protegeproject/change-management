@@ -9,6 +9,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+import edu.stanford.bmir.protegex.chao.ChAOKbManager;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.ui.ProjectManager;
 import edu.stanford.smi.protege.ui.ProjectView;
@@ -19,19 +20,21 @@ import edu.stanford.smi.protegex.changes.ChangeProjectUtil;
 import edu.stanford.smi.protegex.changes.ChangesTab;
 
 public class CleanUpChangesOntAction extends AbstractAction {
+    private static final long serialVersionUID = 5399527829679938005L;
 
-	private static final String EXTRACT_FROM_CHG_ONT = "Clean Up Changes Ontology ...";
+    private static final String EXTRACT_FROM_CHG_ONT = "Clean Up Changes Ontology ...";
 
-	private KnowledgeBase changesKb;
+	private KnowledgeBase kb;
 
-	public CleanUpChangesOntAction(KnowledgeBase changesKb) {
+	public CleanUpChangesOntAction(KnowledgeBase kb) {
 		super(EXTRACT_FROM_CHG_ONT);
-		this.changesKb = changesKb;
+		this.kb = kb;
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
 
 		CleanupPanel cleanupPanel = new CleanupPanel();
+		KnowledgeBase chaoKb = ChAOKbManager.getChAOKb(kb);
 
 		int result = ModalDialog.showDialog(ProjectManager.getProjectManager().getMainPanel(), cleanupPanel, EXTRACT_FROM_CHG_ONT, ModalDialog.MODE_OK_CANCEL);
 
@@ -39,7 +42,7 @@ public class CleanUpChangesOntAction extends AbstractAction {
 			if (cleanupPanel.isArchiveCurrentVersion()) {
 				ArchiveManager manager = ArchiveManager.getArchiveManager();
 				try {
-					manager.archive(changesKb.getProject(), new Date().toString() + ": Archiving changes ontology before clean-up");
+					manager.archive(chaoKb.getProject(), new Date().toString() + ": Archiving changes ontology before clean-up");
 				} catch (Exception e) {
 					Log.getLogger().log(Level.WARNING, "Archive of changes ontology failed. ", e);
 					ModalDialog.showMessageDialog(ProjectManager.getProjectManager().getMainPanel(),
@@ -48,21 +51,30 @@ public class CleanUpChangesOntAction extends AbstractAction {
 				}
 			}
 
-			/*
-			 * Disable events, so that the ChangesTab does not get updated
-			 * (this would slow things down)
-			 */
-
-			boolean eventsEnabled = changesKb.getGenerateEventsEnabled();
-			changesKb.setGenerateEventsEnabled(false);
-
 			boolean success = true;
+			boolean  continueCleanUp = true;
 
-			if (cleanupPanel.isExtractAnnotations()) {
-			    boolean generateEvents = changesKb.getGenerateEventsEnabled();
+			if (continueCleanUp && cleanupPanel.isWipeOut()) {
+			    int ret = ModalDialog.showMessageDialog(ProjectManager.getProjectManager().getCurrentProjectView(), "The entire Changes and Annotation Ontology will be wiped out.\n" +
+			    		"You will loose all the change tracking and notes. Are you sure you want to continue?",
+			            "Wipe out!", ModalDialog.MODE_OK_CANCEL);
+			    if (ret == ModalDialog.OPTION_OK) {
+			        try {
+			            ChAOKbManager.wipeOutChAO(kb);
+			            continueCleanUp = false;
+			        } catch (Exception e) {
+			            Log.getLogger().log(Level.WARNING, "Wipe out of ChAO failed.", e);
+			            ModalDialog.showMessageDialog(ProjectManager.getProjectManager().getCurrentProjectView(), "Wipe out of the Change and Annotation ontology failed.\n" +
+			            		"See console and logs for more details.");
+			        }
+			    }
+			}
+
+			if (continueCleanUp && cleanupPanel.isExtractAnnotations()) {
+			    boolean generateEvents = chaoKb.getGenerateEventsEnabled();
 				try {
-				    changesKb.setGenerateEventsEnabled(false);
-					ChangeProjectUtil.deleteAllAnnotations(changesKb);
+				    chaoKb.setGenerateEventsEnabled(false);
+					ChangeProjectUtil.deleteAllAnnotations(chaoKb);
 				} catch (Exception e) {
 					Log.getLogger().log(Level.WARNING, "Delete of annotation instances failed. ", e);
 					success = false;
@@ -70,15 +82,15 @@ public class CleanUpChangesOntAction extends AbstractAction {
 					ModalDialog.showMessageDialog(ProjectManager.getProjectManager().getMainPanel(),
 					"Delete of annotation instances failed.\nSee console and logs for more details.");
 				} finally {
-				    changesKb.setGenerateEventsEnabled(generateEvents);
+				    chaoKb.setGenerateEventsEnabled(generateEvents);
 				}
 			}
 
-			if (cleanupPanel.isExtractChanges()) {
-			    boolean generateEvents = changesKb.getGenerateEventsEnabled();
+			if (continueCleanUp && cleanupPanel.isExtractChanges()) {
+			    boolean generateEvents = chaoKb.getGenerateEventsEnabled();
 				try {
-				    changesKb.setGenerateEventsEnabled(false);
-					ChangeProjectUtil.deleteAllChanges(changesKb);
+				    chaoKb.setGenerateEventsEnabled(false);
+					ChangeProjectUtil.deleteAllChanges(chaoKb);
 				} catch (Exception e) {
 					Log.getLogger().log(Level.WARNING, "Delete of change instances failed. ", e);
 					success = false;
@@ -86,15 +98,15 @@ public class CleanUpChangesOntAction extends AbstractAction {
 					ModalDialog.showMessageDialog(ProjectManager.getProjectManager().getMainPanel(),
 					"Delete of change instances failed.\nSee console and logs for more details.");
 				} finally {
-                    changesKb.setGenerateEventsEnabled(generateEvents);
+                    chaoKb.setGenerateEventsEnabled(generateEvents);
                 }
 			}
 
-			if (cleanupPanel.isExtractSubChanges()) {
-			    boolean generateEvents = changesKb.getGenerateEventsEnabled();
+			if (continueCleanUp && cleanupPanel.isExtractSubChanges()) {
+			    boolean generateEvents = chaoKb.getGenerateEventsEnabled();
                 try {
-                    changesKb.setGenerateEventsEnabled(false);
-                    ChangeProjectUtil.deleteAllSubChanges(changesKb);
+                    chaoKb.setGenerateEventsEnabled(false);
+                    ChangeProjectUtil.deleteAllSubChanges(chaoKb);
                 } catch (Exception e) {
                     Log.getLogger().log(Level.WARNING, "Delete of change instances failed. ", e);
                     success = false;
@@ -102,7 +114,7 @@ public class CleanUpChangesOntAction extends AbstractAction {
                     ModalDialog.showMessageDialog(ProjectManager.getProjectManager().getMainPanel(),
                     "Delete of change instances failed.\nSee console and logs for more details.");
                 } finally {
-                    changesKb.setGenerateEventsEnabled(generateEvents);
+                    chaoKb.setGenerateEventsEnabled(generateEvents);
                 }
             }
 
@@ -115,15 +127,13 @@ public class CleanUpChangesOntAction extends AbstractAction {
 				ChangesTab changesTab = (ChangesTab) projectView.getTabByClassName(ChangesTab.class.getName());
 
 				if (changesTab != null) {
-					changesTab.refreshTables(null);
+					projectView.reload(changesTab);
 				}
 
 			} catch (Exception e) {
 				Log.getLogger().log(Level.WARNING, "Errors at reinitializing ChangesTab after ontology clean-up", e);
 			}
 
-			// re-enable events generation
-			changesKb.setGenerateEventsEnabled(eventsEnabled);
 
 			if (success == true) {
 				ModalDialog.showMessageDialog(ProjectManager.getProjectManager().getMainPanel(),
@@ -135,7 +145,7 @@ public class CleanUpChangesOntAction extends AbstractAction {
 
 	@Override
 	public boolean isEnabled() {
-		return !changesKb.getProject().isMultiUserClient();
+		return !kb.getProject().isMultiUserClient();
 	}
 
 
@@ -145,11 +155,13 @@ public class CleanUpChangesOntAction extends AbstractAction {
 		private static final String EXTRACT_CHANGES = "Delete changes";
 		private static final String EXTRACT_SUBCHANGES = "Delete sub-changes (keep only top-level changes)";
 		private static final String EXTRACT_ANNOTATIONS = "Delete annotations";
+		private static final String WIPE_OUT = "Wipe out changes and annotations (replace ChAO with an empty one)";
 		private static final String ARCHIVE = "Archive changes ontology before deleting";
 
 		private JCheckBox extractChangesCheckBox;
 		private JCheckBox extractSubChangesCheckBox;
 		private JCheckBox extractAnnotationsCheckBox;
+		private JCheckBox wipeOutCheckBox;
 		private JCheckBox archiveCheckBox;
 
 
@@ -158,17 +170,20 @@ public class CleanUpChangesOntAction extends AbstractAction {
 		}
 
 		public void buildGUI() {
-			extractChangesCheckBox = new JCheckBox(EXTRACT_CHANGES, true);
+			extractChangesCheckBox = new JCheckBox(EXTRACT_CHANGES, false);
 			extractSubChangesCheckBox = new JCheckBox(EXTRACT_SUBCHANGES, false);
 			extractAnnotationsCheckBox = new JCheckBox(EXTRACT_ANNOTATIONS, false);
+			extractAnnotationsCheckBox = new JCheckBox(EXTRACT_ANNOTATIONS, false);
+			wipeOutCheckBox = new JCheckBox(WIPE_OUT, false);
 			archiveCheckBox = new JCheckBox(ARCHIVE, true);
 
 
-			setLayout(new GridLayout(4,1));
+			setLayout(new GridLayout(5,1));
 
 			add(extractAnnotationsCheckBox);
 			add(extractChangesCheckBox);
 			add(extractSubChangesCheckBox);
+			add(wipeOutCheckBox);
 			add(archiveCheckBox);
 		}
 
@@ -186,6 +201,10 @@ public class CleanUpChangesOntAction extends AbstractAction {
 
 		public boolean isArchiveCurrentVersion(){
 			return archiveCheckBox.isSelected();
+		}
+
+		public boolean isWipeOut() {
+		    return wipeOutCheckBox.isSelected();
 		}
 
 	}
