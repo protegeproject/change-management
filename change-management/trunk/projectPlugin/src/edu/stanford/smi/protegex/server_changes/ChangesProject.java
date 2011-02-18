@@ -49,6 +49,13 @@ public class ChangesProject extends ProjectPluginAdapter {
 
     private static Map<KnowledgeBase, PostProcessorManager> postProcessorManagerMap = new HashMap<KnowledgeBase, PostProcessorManager>();
 
+    private static ChangesKBListener changesKbListener;
+    private static ChangesClsListener changesClsListener;
+    private static ChangesInstanceListener changesInstanceListener;
+    private static ChangesSlotListener changesSlotListener;
+    private static ChangesTransListener changesTransListener;
+    private static ChangesFrameListener changesFramesListener;
+
     /* ---------------------------- Project Plugin Interfaces ---------------------------- */
     @Override
     public void afterLoad(Project p) {
@@ -77,24 +84,29 @@ public class ChangesProject extends ProjectPluginAdapter {
 
     @Override
     public void beforeClose(Project p) {
-    	//very conservative
-    	OntologyComponentCache.clearCache();
+        dispose(p);
 
         if (!p.isMultiUserServer()) {
             removeChangeMenu();
             return;
         }
+    }
+
+    public static void dispose(Project p) {
+        OntologyComponentCache.clearCache();
+
         KnowledgeBase kb = p.getKnowledgeBase();
         PostProcessorManager postProcessorManager = getPostProcessorManager(kb);
         if (postProcessorManager != null) {
-            if (!p.isMultiUserServer()) {
-                //FIXME: don't dispose for now. The ChAOKBManager should handle this.
-                //changesDb.getChangesKb().dispose();
-            }
             postProcessorManagerMap.remove(kb);
         }
 
-        //TODO: who removes the KB listeners on the client?!
+        if ( Util.kbInOwl(p.getKnowledgeBase())) {
+            ChangesProjectOWL.deregisterOwlListeners(p.getKnowledgeBase());
+        } else {
+            deregisterKBListeners(p.getKnowledgeBase());
+        }
+
     }
 
     /* ---------------------------- End of Project Plugin Interfaces ---------------------------- */
@@ -248,7 +260,7 @@ public class ChangesProject extends ProjectPluginAdapter {
         KnowledgeBase changesKb = ChAOKbManager.getChAOKb(kb);
         if (changesKb == null) { return ; }
         try {
-            ChangeMenu changesMenu = new ChangeMenu(kb, changesKb);
+            ChangeMenu changesMenu = new ChangeMenu(kb);
             JMenuBar menuBar = ProjectManager.getProjectManager().getCurrentProjectMenuBar();
             menuBar.add(changesMenu);
         } catch (Exception e) {
@@ -272,12 +284,25 @@ public class ChangesProject extends ProjectPluginAdapter {
     /***************** Listeners *********************/
 
     private static void registerKBListeners(KnowledgeBase currentKB) {
-        currentKB.addKnowledgeBaseListener(new ChangesKBListener(currentKB));
-        currentKB.addClsListener(new ChangesClsListener(currentKB));
-        currentKB.addInstanceListener(new ChangesInstanceListener(currentKB));
-        currentKB.addSlotListener(new ChangesSlotListener(currentKB));
-        currentKB.addTransactionListener(new ChangesTransListener(currentKB));
-        currentKB.addFrameListener(new ChangesFrameListener(currentKB));
+        currentKB.addKnowledgeBaseListener(changesKbListener = new ChangesKBListener(currentKB));
+        currentKB.addClsListener(changesClsListener = new ChangesClsListener(currentKB));
+        currentKB.addInstanceListener(changesInstanceListener = new ChangesInstanceListener(currentKB));
+        currentKB.addSlotListener(changesSlotListener = new ChangesSlotListener(currentKB));
+        currentKB.addTransactionListener(changesTransListener = new ChangesTransListener(currentKB));
+        currentKB.addFrameListener(changesFramesListener = new ChangesFrameListener(currentKB));
+    }
+
+    private static void deregisterKBListeners(KnowledgeBase kb) {
+        try {
+           kb.removeKnowledgeBaseListener(changesKbListener) ;
+           kb.removeClsListener(changesClsListener);
+           kb.removeInstanceListener(changesInstanceListener);
+           kb.removeSlotListener(changesSlotListener);
+           kb.removeTransactionListener(changesTransListener);
+           kb.removeFrameListener(changesFramesListener);
+        } catch (Exception e) {
+            Log.getLogger().log(Level.WARNING, "Error at removing change listeners", e);
+        }
     }
 
     private static void installPostProcessors(KnowledgeBase currentKB) {
