@@ -17,6 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import edu.stanford.bmir.protegex.chao.ChAOKbManager;
 import edu.stanford.bmir.protegex.chao.annotation.api.Annotation;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
@@ -60,24 +61,20 @@ public class ChangeMenu extends JMenu {
 	protected Change lastInst;
 
     private KnowledgeBase kb;
-	private KnowledgeBase change_kb;
-	private Project change_project;
 
-	public ChangeMenu(KnowledgeBase kb, KnowledgeBase changeKb) {
+	public ChangeMenu(KnowledgeBase kb) {
 		super(MENU_TITLE);
 		setMnemonic(KeyEvent.VK_C);
 
         this.kb = kb;
-		this.change_kb = changeKb;
-		this.change_project = change_kb.getProject();
 
 		JMenuItem annotate = new JMenuItem(MENU_ITEM_ANNOTATE_LAST);
 		JMenuItem changeInfo = new JMenuItem(MENU_ITEM_CHANGE_INFO);
 		JMenuItem saveChangesPrj = new JMenuItem(MENU_ITEM_SAVE_CHANGE_PRJ);
 		JMenuItem statsPrj = new JMenuItem(MENU_ITEM_STATS_CONFL_PRJ);
 		JMenuItem browseChangesPrj = new JMenuItem(MENU_ITEM_BROWSE_CHANGE_PRJ);
-		JMenuItem extract = new JMenuItem(new CleanUpChangesOntAction(change_kb));
-		JMenuItem details = new JMenuItem(new ShowChAODetails(changeKb));
+		JMenuItem cleanup = new JMenuItem(new CleanUpChangesOntAction(kb));
+		JMenuItem details = new JMenuItem(new ShowChAODetails(kb));
 		JMenuItem change = new JMenuItem(new ChangeChAOAction(kb));
 		JMenuItem changeAnalysis = new JMenuItem(MENU_ITEM_CHANGE_ANALYSIS);
 
@@ -105,7 +102,7 @@ public class ChangeMenu extends JMenu {
 		add(browseChangesPrj);
 		addSeparator();
 		add(change);
-		add(extract);
+		add(cleanup);
 		add(saveChangesPrj);
 
 		if (PluginUtilities.forName(CHANGE_ANALYSIS_TAB_NAME, true) == null) {
@@ -224,9 +221,10 @@ public class ChangeMenu extends JMenu {
 
 			Collection changeInsts = new ArrayList();
 			changeInsts.add(lastInst);
-			final Annotation annotateInst = ChangeProjectUtil.createAnnotation(change_kb, "Comment", changeInsts);
+			KnowledgeBase chaoKb = ChAOKbManager.getChAOKb(kb);
+            final Annotation annotateInst = ChangeProjectUtil.createAnnotation(chaoKb, "Comment", changeInsts);
 
-			JFrame aEdit = change_project.show(((AbstractWrappedInstance)annotateInst).getWrappedProtegeInstance());
+			JFrame aEdit = chaoKb.getProject().show(((AbstractWrappedInstance)annotateInst).getWrappedProtegeInstance());
 			aEdit.addWindowListener(new WindowAdapter() {
 
 				@Override
@@ -265,7 +263,7 @@ public class ChangeMenu extends JMenu {
 			String className = null;
 			if (elem instanceof Frame) {
 				className = ((Frame)elem).getName();
-				ChangeAnnotateWindow cmWindow = new ChangeAnnotateWindow(change_kb, className, true);
+				ChangeAnnotateWindow cmWindow = new ChangeAnnotateWindow(ChAOKbManager.getChAOKb(kb), className, true);
 				cmWindow.show();
 			}
 		}
@@ -283,7 +281,7 @@ public class ChangeMenu extends JMenu {
 		return new AbstractAction(MENU_ITEM_SAVE_CHANGE_PRJ) {
 
 			public void actionPerformed(ActionEvent arg0) {
-				if (change_project == null) {
+				if (ChAOKbManager.getChAOKb(kb) == null) {
 					Log.getLogger().warning("Cannot save Changes project. Changes project is null.");
 					return;
 				}
