@@ -7,6 +7,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import edu.stanford.bmir.protegex.chao.ChAOKbManager;
 import edu.stanford.bmir.protegex.chao.annotation.api.AnnotationFactory;
 import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
 import edu.stanford.smi.protege.model.KnowledgeBase;
@@ -17,11 +18,11 @@ import edu.stanford.smi.protege.util.ModalDialog;
 public class ShowChAODetails extends AbstractAction {
 
 	private static final String EXTRACT_FROM_CHG_ONT = "Show Changes Ontology Details";
-	private KnowledgeBase changesKb;
+	private KnowledgeBase kb;
 
-	public ShowChAODetails(KnowledgeBase changesKb) {
+	public ShowChAODetails(KnowledgeBase kb) {
 		super(EXTRACT_FROM_CHG_ONT);
-		this.changesKb = changesKb;
+		this.kb = kb;
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
@@ -39,13 +40,14 @@ public class ShowChAODetails extends AbstractAction {
 		private void buildGUI() {
 			setLayout(new GridLayout(4, 1, 5, 5));
 
-			Project chaoPrj = changesKb.getProject();
+			KnowledgeBase chaoKb = ChAOKbManager.getChAOKb(kb);
+			Project chaoPrj = chaoKb.getProject();
 			String location = chaoPrj.getProjectURI() == null ? "(unknown)" : chaoPrj.getProjectURI().toString();
 
 			add(new JLabel("<html>Location: <b>" + location + "</b></html>"));
 			add(new JLabel("<html>Backend: <b>" + (chaoPrj.isMultiUserClient() ? " Remote project (stored on Protege server)" : chaoPrj.getKnowledgeBaseFactory().getDescription()) + "</html>"));
-			add(new JLabel("Number of annotations: " + new AnnotationFactory(changesKb).getAnnotationClass().getInstanceCount()));
-			add(new JLabel("Number of changes: " + new ChangeFactory(changesKb).getChangeClass().getInstanceCount()));
+			add(new JLabel("Number of annotations: " + new AnnotationFactory(chaoKb).getAnnotationClass().getInstanceCount()));
+			add(new JLabel("Number of changes: " + new ChangeFactory(chaoKb).getChangeClass().getInstanceCount()));
 		}
 
 	}
