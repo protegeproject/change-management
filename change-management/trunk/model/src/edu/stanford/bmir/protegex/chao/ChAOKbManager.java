@@ -40,9 +40,9 @@ import edu.stanford.smi.protegex.storage.rdf.RDFBackend;
  * bases attached to domain knowledge bases. Keeps a map between the domain kb
  * and its corresponding ChAO kb. All software should use this class to retrieve
  * the ChAO kb.
- * 
+ *
  * @author Tania Tudorache <tudorache@stanford.edu>
- * 
+ *
  */
 public class ChAOKbManager {
 
@@ -94,7 +94,7 @@ public class ChAOKbManager {
      * <li>A Protege multi-user server, in which case it will get the CHAO kb as
      * configured in the metaproject.</li>
      * </ol>
-     * 
+     *
      * @param kb
      *            - the domain kb
      * @return - the associated ChAO KB, if one exists, or null otherwise
@@ -315,7 +315,7 @@ public class ChAOKbManager {
      * unpredictable results is called in client-server mode. After calling this
      * method, make sure to call save on the domain project, otherwise this
      * change will not be persistent.
-     * 
+     *
      * @param kb
      *            - the domain kb
      * @param uri
@@ -421,6 +421,83 @@ public class ChAOKbManager {
     public static boolean isValidChAOKb(KnowledgeBase chaoKb) {
         return new AnnotationFactory(chaoKb).getAnnotatableThingClass() != null && new AnnotationFactory(chaoKb).getAnnotationClass() != null
                 && new ChangeFactory(chaoKb).getChangeClass() != null;
+    }
+
+    /**
+     * Replaces the current ChAO with an empty one.
+     * The entire content of ChAO will be lost.
+     *
+     * @param kb - the domain KB
+     */
+    public static void wipeOutChAO(KnowledgeBase kb) {
+        KnowledgeBase chaoKb = getChAOKb(kb);
+        if (chaoKb == null) {   return;   }
+        if (chaoKb.getKnowledgeBaseFactory() instanceof DatabaseKnowledgeBaseFactory) {
+            wipeOutChaoDB(kb);
+        } else {
+            wipeOutChaoFile(kb);
+        }
+
+        //clean up
+        Project project = kb.getProject();
+        ChangesProject.dispose(project);
+        kb2chaoKb.remove(kb);
+        project.removeProjectListener(domainKbListener);
+
+        getChAOKb(kb);
+        if (project.getChangeTrackingActive()) {
+            ChangesProject.initialize(project);
+        }
+    }
+
+
+    private static void wipeOutChaoDB(KnowledgeBase kb) {
+        Collection errors = new ArrayList();
+        Project templateChaoPrj = getChangesProject(errors);
+        if (templateChaoPrj == null) {
+            return;
+        }
+
+        KnowledgeBase chaoKb = getChAOKb(kb);
+        Project oldChaoPrj = chaoKb.getProject();
+        PropertyList oldSources = oldChaoPrj.getSources();
+
+        PropertyList sources = templateChaoPrj.getSources();
+        DatabaseKnowledgeBaseFactory.setSources(sources,
+                DatabaseKnowledgeBaseFactory.getDriver(oldSources),
+                DatabaseKnowledgeBaseFactory.getURL(oldSources),
+                DatabaseKnowledgeBaseFactory.getTableName(oldSources),
+                DatabaseKnowledgeBaseFactory.getUsername(oldSources),
+                DatabaseKnowledgeBaseFactory.getPassword(oldSources));
+        sources.setString(KnowledgeBaseFactory.FACTORY_CLASS_NAME, DatabaseKnowledgeBaseFactory.class.getName());
+
+        chaoKb.getKnowledgeBaseFactory().saveKnowledgeBase(templateChaoPrj.getKnowledgeBase(), sources, errors);
+
+        templateChaoPrj.dispose();
+
+        oldChaoPrj.dispose();
+
+    }
+
+    private static void wipeOutChaoFile(KnowledgeBase kb) {
+        Collection errors = new ArrayList();
+        Project newChaoPrj = getChangesProject(errors); //this is the empty (template chao)
+        if (newChaoPrj == null) {
+            return;
+        }
+
+        KnowledgeBase oldChaoKb = getChAOKb(kb);
+        URI chaoURI = oldChaoKb.getProject().getProjectURI();
+        newChaoPrj.setProjectURI(chaoURI);
+
+        String rdfsFile = RDFBackend.getClsesFileName(oldChaoKb.getProject().getSources());
+        String rdfFile = RDFBackend.getInstancesFileName(oldChaoKb.getProject().getSources());
+        String namespace = RDFBackend.getNamespace(oldChaoKb.getProject().getSources());
+
+        RDFBackend.setSourceFiles(newChaoPrj.getSources(), rdfsFile, rdfFile, namespace);
+        newChaoPrj.getKnowledgeBaseFactory().saveKnowledgeBase(newChaoPrj.getKnowledgeBase(), newChaoPrj.getSources(), errors);
+
+        oldChaoKb.getProject().dispose();
     }
 
     public void dispose() {
