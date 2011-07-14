@@ -21,6 +21,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultSimpleProposal extends DefaultProposal
          implements SimpleProposal {
 
+    private static final long serialVersionUID = -3532420415797401612L;
+
+
     public DefaultSimpleProposal(Instance instance) {
         super(instance);
     }

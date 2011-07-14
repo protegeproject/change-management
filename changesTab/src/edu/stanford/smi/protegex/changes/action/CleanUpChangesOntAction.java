@@ -152,7 +152,8 @@ public class CleanUpChangesOntAction extends AbstractAction {
 
 	protected class CleanupPanel extends JPanel {
 
-		private static final String EXTRACT_CHANGES = "Delete changes";
+		private static final long serialVersionUID = -4885321069512662284L;
+        private static final String EXTRACT_CHANGES = "Delete changes";
 		private static final String EXTRACT_SUBCHANGES = "Delete sub-changes (keep only top-level changes)";
 		private static final String EXTRACT_ANNOTATIONS = "Delete annotations";
 		private static final String WIPE_OUT = "Wipe out changes and annotations (replace ChAO with an empty one)";

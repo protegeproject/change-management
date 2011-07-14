@@ -32,7 +32,9 @@ import edu.stanford.smi.protegex.changes.ChangesTab;
 
 public class ChangeAnnotateWindow extends SelectableContainer {
 
-	public static final String CHANGE_ANNOTATE_TITLE = "Changes for: ";
+	private static final long serialVersionUID = 1809940176341942406L;
+
+    public static final String CHANGE_ANNOTATE_TITLE = "Changes for: ";
 
 	private ChangeTableModel cTableModel;
 	private AnnotationTableModel aTableModel;
@@ -105,7 +107,9 @@ public class ChangeAnnotateWindow extends SelectableContainer {
 		annotLC.setMaximumSize(new Dimension(1000,1000));
 
 		annotLC.addHeaderButton(new ViewAction("View Annotation", aTable) {
-			@Override
+			private static final long serialVersionUID = 4642614615510292030L;
+
+            @Override
 			public void onView() {
 				int[] selRows = aTable.getSelectedRows();
 				for (int selRow : selRows) {
@@ -116,7 +120,9 @@ public class ChangeAnnotateWindow extends SelectableContainer {
 		});
 
 		changeHistLC.addHeaderButton(new ViewAction("View Change", cTable) {
-			@Override
+			private static final long serialVersionUID = 8132917143216423740L;
+
+            @Override
 			public void onView() {
 				int[] selRows = cTable.getSelectedRows();
 				for (int selRow : selRows) {

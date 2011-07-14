@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultMinimum_Cardinality extends DefaultProperty_Change
          implements Minimum_Cardinality {
 
+    private static final long serialVersionUID = -7659105420210663734L;
+
+
     public DefaultMinimum_Cardinality(Instance instance) {
         super(instance);
     }

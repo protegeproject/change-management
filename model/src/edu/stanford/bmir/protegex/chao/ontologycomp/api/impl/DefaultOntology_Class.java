@@ -21,6 +21,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultOntology_Class extends DefaultOntology_Component
          implements Ontology_Class {
 
+    private static final long serialVersionUID = 5483786938052224075L;
+
+
     public DefaultOntology_Class(Instance instance) {
         super(instance);
     }

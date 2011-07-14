@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultCreated_Change extends DefaultChange
          implements Created_Change {
 
+    private static final long serialVersionUID = -4106478166869414002L;
+
+
     public DefaultCreated_Change(Instance instance) {
         super(instance);
     }

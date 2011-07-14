@@ -21,6 +21,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultComment extends DefaultAnnotation
          implements Comment {
 
+    private static final long serialVersionUID = 2875599043042327455L;
+
+
     public DefaultComment(Instance instance) {
         super(instance);
     }

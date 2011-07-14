@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultDocumentation_Removed extends DefaultClass_Change
          implements Documentation_Removed {
 
+    private static final long serialVersionUID = 9076149399989163829L;
+
+
     public DefaultDocumentation_Removed(Instance instance) {
         super(instance);
     }

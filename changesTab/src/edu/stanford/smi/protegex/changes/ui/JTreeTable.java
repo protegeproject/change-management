@@ -57,14 +57,18 @@ import edu.stanford.smi.protegex.changes.ChangeTreeTableNode;
  * @author Scott Violet
  */
 public class JTreeTable extends SelectableTable {
-	/** A subclass of JTree. */
+	private static final long serialVersionUID = 6357535101184538680L;
+
+    /** A subclass of JTree. */
 	protected TreeTableCellRenderer tree;
     
     private TreePath rootPath;
     
 	//Abhita: adding this because we want to change the icons of the nodes
 	TreeCellRenderer treeCellRenderer = new DefaultTreeCellRenderer() {
-		@Override
+		private static final long serialVersionUID = -4359894876221617458L;
+
+        @Override
 		public Component getTreeCellRendererComponent(
 			JTree tree,
 			Object value,
@@ -233,7 +237,9 @@ public class JTreeTable extends SelectableTable {
 	 */
 	public class TreeTableCellRenderer extends JTree implements
 			TableCellRenderer {
-		/** Last table/tree row asked to renderer. */
+		private static final long serialVersionUID = 84533948481872637L;
+
+        /** Last table/tree row asked to renderer. */
 		protected int visibleRow;
 
 		/**
@@ -406,7 +412,9 @@ public class JTreeTable extends SelectableTable {
 	 * JTreeTable, you will have to do something similiar.
 	 */
 	public class TreeTableCellEditor extends DefaultCellEditor {
-		public TreeTableCellEditor() {
+		private static final long serialVersionUID = -8196817251032413449L;
+
+        public TreeTableCellEditor() {
 			super(new TreeTableTextField());
 		}
 
@@ -501,7 +509,8 @@ public class JTreeTable extends SelectableTable {
 	 * location be <code>offset</code>.
 	 */
 	static class TreeTableTextField extends JTextField {
-		public int offset;
+		private static final long serialVersionUID = 5107152124230311209L;
+        public int offset;
 
 		@Override
 		public void reshape(int x, int y, int w, int h) {
@@ -517,7 +526,8 @@ public class JTreeTable extends SelectableTable {
 	 * DefaultTreeSelectionModel.
 	 */
 	class ListToTreeSelectionModelWrapper extends DefaultTreeSelectionModel {
-		/** Set to true when we are updating the ListSelectionModel. */
+		private static final long serialVersionUID = -12952814274913013L;
+        /** Set to true when we are updating the ListSelectionModel. */
 		protected boolean updatingListSelectionModel;
 
 		public ListToTreeSelectionModelWrapper() {

@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultDomainProperty_Removed extends DefaultClass_Change
          implements DomainProperty_Removed {
 
+    private static final long serialVersionUID = 8091132958422151934L;
+
+
     public DefaultDomainProperty_Removed(Instance instance) {
         super(instance);
     }

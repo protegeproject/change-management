@@ -17,7 +17,8 @@ import edu.stanford.smi.protege.util.ModalDialog;
 
 public class ShowChAODetails extends AbstractAction {
 
-	private static final String EXTRACT_FROM_CHG_ONT = "Show Changes Ontology Details";
+	private static final long serialVersionUID = -665490014819502949L;
+    private static final String EXTRACT_FROM_CHG_ONT = "Show Changes Ontology Details";
 	private KnowledgeBase kb;
 
 	public ShowChAODetails(KnowledgeBase kb) {
@@ -33,7 +34,9 @@ public class ShowChAODetails extends AbstractAction {
 
 	class ChAODetailsPanel extends JPanel {
 
-		public ChAODetailsPanel() {
+		private static final long serialVersionUID = 4413637178054085701L;
+
+        public ChAODetailsPanel() {
 			buildGUI();
 		}
 

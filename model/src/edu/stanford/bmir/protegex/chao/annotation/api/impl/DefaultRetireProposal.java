@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultRetireProposal extends DefaultProposal
          implements RetireProposal {
 
+    private static final long serialVersionUID = -5104674713137912769L;
+
+
     public DefaultRetireProposal(Instance instance) {
         super(instance);
     }

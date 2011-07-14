@@ -71,7 +71,8 @@ import edu.stanford.smi.protegex.server_changes.ChangesProject;
  *
  */
 public class ChangesTab extends AbstractTabWidget {
-	// Main UI tables
+	private static final long serialVersionUID = -889422137623478722L;
+    // Main UI tables
 	public static final String HEADERCOMP_NAME_CHANGE_VIEWER = "Change Viewer";
 	public static final String HEADERCOMP_NAME_ANNOTATE_VIEWER = "Annotation Viewer";
 	public static final String LABELCOMP_NAME_CHANGE_HIST = "Change History";
@@ -197,7 +198,9 @@ public class ChangesTab extends AbstractTabWidget {
 		changesLabledComponent.addHeaderButton(addAnnotationAction);
 
 		changesLabledComponent.addHeaderButton(new ViewAction("View change details", null) {
-			@Override
+			private static final long serialVersionUID = 288003809017610166L;
+
+            @Override
 			public void onView() {
 				TreePath[] selectedTreePaths = changesTreeTable.getTree().getSelectionPaths();
 
@@ -233,7 +236,9 @@ public class ChangesTab extends AbstractTabWidget {
 		assocLC.addHeaderSeparator();
 
 		assocLC.addHeaderButton(new ViewAction("View Change", annotationChangesTable) {
-			@Override
+			private static final long serialVersionUID = 5563199932885004454L;
+
+            @Override
 			public void onView() {
 				int[] selRows = annotationChangesTable.getSelectedRows();
 				for (int selRow : selRows) {
@@ -535,7 +540,8 @@ public class ChangesTab extends AbstractTabWidget {
 
 	public class AddInstanceAction extends AbstractAction {
 
-		Component myComp;
+		private static final long serialVersionUID = -7254487003708467283L;
+        Component myComp;
 
 		public AddInstanceAction(Component c, String prompt) {
 			super(prompt, Icons.getCreateClsNoteIcon());
@@ -604,7 +610,9 @@ public class ChangesTab extends AbstractTabWidget {
 
 	public class RemoveInstanceAction extends AbstractAction {
 
-		public RemoveInstanceAction(String prompt) {
+		private static final long serialVersionUID = -4757853031391692918L;
+
+        public RemoveInstanceAction(String prompt) {
 			super(prompt, Icons.getDeleteClsNoteIcon());
 		}
 
@@ -630,7 +638,9 @@ public class ChangesTab extends AbstractTabWidget {
 	}
 
 	public class EditInstanceAction extends AbstractAction {
-		public EditInstanceAction(String prompt) {
+		private static final long serialVersionUID = 8715397118173129783L;
+
+        public EditInstanceAction(String prompt) {
 			super(prompt, Icons.getClsNoteIcon());
 		}
 

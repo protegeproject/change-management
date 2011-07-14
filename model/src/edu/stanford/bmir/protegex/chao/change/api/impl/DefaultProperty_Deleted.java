@@ -27,6 +27,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultProperty_Deleted extends AbstractWrappedInstance
          implements Property_Deleted {
 
+    private static final long serialVersionUID = 2562477281218221589L;
+
+
     public DefaultProperty_Deleted(Instance instance) {
         super(instance);
     }

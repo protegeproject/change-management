@@ -26,6 +26,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultTemplateSlot_Removed extends DefaultClass_Change
          implements TemplateSlot_Removed {
 
+    private static final long serialVersionUID = -8127424255025807692L;
+
+
     public DefaultTemplateSlot_Removed(Instance instance) {
         super(instance);
     }

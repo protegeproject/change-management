@@ -34,7 +34,9 @@ import edu.stanford.smi.protege.util.Log;
 public class DefaultOntology_Component extends DefaultAnnotatableThing
 implements Ontology_Component {
 
-	public DefaultOntology_Component(Instance instance) {
+	private static final long serialVersionUID = 9145601503402547882L;
+
+    public DefaultOntology_Component(Instance instance) {
 		super(instance);
 	}
 

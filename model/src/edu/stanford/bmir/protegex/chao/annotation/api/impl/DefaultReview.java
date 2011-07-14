@@ -22,6 +22,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultReview extends DefaultAnnotation
          implements Review {
 
+    private static final long serialVersionUID = 765650071437046805L;
+
+
     public DefaultReview(Instance instance) {
         super(instance);
     }

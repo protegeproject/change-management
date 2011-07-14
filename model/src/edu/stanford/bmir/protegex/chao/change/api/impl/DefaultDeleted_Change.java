@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultDeleted_Change extends DefaultChange
          implements Deleted_Change {
 
+    private static final long serialVersionUID = -6373253752424103589L;
+
+
     public DefaultDeleted_Change(Instance instance) {
         super(instance);
     }

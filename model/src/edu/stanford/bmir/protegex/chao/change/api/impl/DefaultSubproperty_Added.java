@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultSubproperty_Added extends DefaultProperty_Change
          implements Subproperty_Added {
 
+    private static final long serialVersionUID = 5954640070869242343L;
+
+
     public DefaultSubproperty_Added(Instance instance) {
         super(instance);
     }

@@ -23,6 +23,8 @@ import edu.stanford.smi.protege.util.Log;
 public class DefaultTimestamp extends AbstractWrappedInstance
          implements Timestamp {
 
+    private static final long serialVersionUID = -8572237224418802008L;
+
     public DefaultTimestamp(Instance instance) {
         super(instance);
     }

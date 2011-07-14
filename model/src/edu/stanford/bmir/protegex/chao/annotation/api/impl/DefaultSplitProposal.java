@@ -23,6 +23,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultSplitProposal extends DefaultProposal
          implements SplitProposal {
 
+    private static final long serialVersionUID = -7279857704896211237L;
+
+
     public DefaultSplitProposal(Instance instance) {
         super(instance);
     }

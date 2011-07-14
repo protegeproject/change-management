@@ -21,6 +21,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultVotingProposal extends DefaultProposal
          implements VotingProposal {
 
+    private static final long serialVersionUID = -2848688881812574628L;
+
+
     public DefaultVotingProposal(Instance instance) {
         super(instance);
     }

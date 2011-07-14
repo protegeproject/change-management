@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultIndividual_Removed extends DefaultIndividual_Change
          implements Individual_Removed {
 
+    private static final long serialVersionUID = -3801633800313178176L;
+
+
     public DefaultIndividual_Removed(Instance instance) {
         super(instance);
     }

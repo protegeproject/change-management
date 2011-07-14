@@ -27,6 +27,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultProperty_Created extends AbstractWrappedInstance
          implements Property_Created {
 
+    private static final long serialVersionUID = 811422548969662899L;
+
+
     public DefaultProperty_Created(Instance instance) {
         super(instance);
     }

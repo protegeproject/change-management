@@ -21,7 +21,8 @@ import edu.stanford.smi.protegex.changes.ChangesTab;
 
 public class ChangeChAOAction extends AbstractAction {
 
-	private static final String CHANGE_CHG_ONT = "Change Associated Changes Ontology...";
+	private static final long serialVersionUID = -2672523601284229741L;
+    private static final String CHANGE_CHG_ONT = "Change Associated Changes Ontology...";
 	private KnowledgeBase kb;
 
 	public ChangeChAOAction(KnowledgeBase kb) {
@@ -75,7 +76,8 @@ public class ChangeChAOAction extends AbstractAction {
 
 
 	class ChangeChaoPanel extends JPanel {
-		FileField fileField;
+		private static final long serialVersionUID = -2689236306253317184L;
+        FileField fileField;
 
 		public ChangeChaoPanel() {
 			buildGUI();

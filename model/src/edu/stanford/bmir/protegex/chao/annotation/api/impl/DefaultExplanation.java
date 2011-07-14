@@ -21,6 +21,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultExplanation extends DefaultAnnotation
          implements Explanation {
 
+    private static final long serialVersionUID = -6793772468963554949L;
+
+
     public DefaultExplanation(Instance instance) {
         super(instance);
     }

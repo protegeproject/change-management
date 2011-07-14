@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultSuperclass_Added extends DefaultClass_Change
          implements Superclass_Added {
 
+    private static final long serialVersionUID = 5321117141943639625L;
+
+
     public DefaultSuperclass_Added(Instance instance) {
         super(instance);
     }

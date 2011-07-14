@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultComposite_Change extends DefaultChange
          implements Composite_Change {
 
+    private static final long serialVersionUID = 8615263344716261322L;
+
+
     public DefaultComposite_Change(Instance instance) {
         super(instance);
     }

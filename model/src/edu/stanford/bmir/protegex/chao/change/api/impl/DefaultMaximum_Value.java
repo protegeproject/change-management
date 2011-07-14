@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultMaximum_Value extends DefaultProperty_Change
          implements Maximum_Value {
 
+    private static final long serialVersionUID = -7434594521967767832L;
+
+
     public DefaultMaximum_Value(Instance instance) {
         super(instance);
     }

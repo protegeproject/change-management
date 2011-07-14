@@ -6,6 +6,7 @@ import edu.stanford.smi.protege.server.metaproject.ProjectInstance;
 import edu.stanford.smi.protege.util.ProtegeJob;
 
 public class GetAnnotationProjectName extends ProtegeJob {
+    private static final long serialVersionUID = 1408960132000428893L;
     public static final String METAPROJECT_ANNOTATION_PROJECT_SLOT="annotationProject";
    
     

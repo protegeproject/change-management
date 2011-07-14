@@ -122,7 +122,9 @@ public class UserConceptList extends AbstractSelectableComponent implements Sele
 		LabeledComponent labeledComponent = new LabeledComponent("Changes of selected ontology component", new JScrollPane(changesTable));
 
 		labeledComponent.addHeaderButton(new ViewAction("View change", (Selectable)changesTable) {
-			@Override
+			private static final long serialVersionUID = -7706642589778054036L;
+
+            @Override
 			public void onView() {
 				for (int i = 0; i < changesTable.getSelectedRows().length; i++) {
 					Change change = ((ChangesTableModel)changesTable.getModel()).getChange(changesTable.getSelectedRows()[i]);
@@ -177,7 +179,9 @@ public class UserConceptList extends AbstractSelectableComponent implements Sele
 		LabeledComponent labeledComponent2 = new LabeledComponent ("Ontology components changed by multiple users", ComponentFactory.createScrollPane (_conflictList));
 
 		labeledComponent1.addHeaderButton(new ViewAction("View changed ontology component", _noConflictList) {
-			@Override
+			private static final long serialVersionUID = 6167618367563238536L;
+
+            @Override
 			public void onView(Object o) {
 				Ontology_Component ontoComp = (Ontology_Component) o;
 				getChangesProject().show(((AbstractWrappedInstance)ontoComp).getWrappedProtegeInstance());
@@ -185,7 +189,9 @@ public class UserConceptList extends AbstractSelectableComponent implements Sele
 		});
 
 		labeledComponent2.addHeaderButton(new ViewAction("View changed ontology component", _conflictList) {
-			@Override
+			private static final long serialVersionUID = -8966510203658770324L;
+
+            @Override
 			public void onView(Object o) {
 				Ontology_Component ontoComp = (Ontology_Component) o;
 				getChangesProject().show(((AbstractWrappedInstance)ontoComp).getWrappedProtegeInstance());

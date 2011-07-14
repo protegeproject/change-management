@@ -25,6 +25,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultNewEntityProposal extends DefaultProposal
          implements NewEntityProposal {
 
+    private static final long serialVersionUID = 5752241660575800074L;
+
+
     public DefaultNewEntityProposal(Instance instance) {
         super(instance);
     }

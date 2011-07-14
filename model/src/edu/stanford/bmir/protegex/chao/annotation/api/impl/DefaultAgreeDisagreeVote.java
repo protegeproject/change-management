@@ -21,6 +21,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultAgreeDisagreeVote extends DefaultVote
          implements AgreeDisagreeVote {
 
+    private static final long serialVersionUID = -4095791629543600341L;
+
+
     public DefaultAgreeDisagreeVote(Instance instance) {
         super(instance);
     }

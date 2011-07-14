@@ -21,6 +21,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultAdvice extends DefaultAnnotation
          implements Advice {
 
+    private static final long serialVersionUID = -4910923846871725238L;
+
+
     public DefaultAdvice(Instance instance) {
         super(instance);
     }

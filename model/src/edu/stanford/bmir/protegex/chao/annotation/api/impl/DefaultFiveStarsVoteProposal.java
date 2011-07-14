@@ -21,6 +21,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultFiveStarsVoteProposal extends DefaultVotingProposal
          implements FiveStarsVoteProposal {
 
+    private static final long serialVersionUID = -5451034249223478239L;
+
+
     public DefaultFiveStarsVoteProposal(Instance instance) {
         super(instance);
     }

@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultName_Changed extends DefaultChange
          implements Name_Changed {
 
+    private static final long serialVersionUID = 1973715119176463344L;
+
+
     public DefaultName_Changed(Instance instance) {
         super(instance);
     }

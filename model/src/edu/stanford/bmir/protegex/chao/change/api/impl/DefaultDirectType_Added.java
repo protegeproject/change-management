@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultDirectType_Added extends DefaultIndividual_Change
          implements DirectType_Added {
 
+    private static final long serialVersionUID = 8991224534891410998L;
+
+
     public DefaultDirectType_Added(Instance instance) {
         super(instance);
     }

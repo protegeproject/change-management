@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultChangeHierarchyProposal extends DefaultProposal
          implements ChangeHierarchyProposal {
 
+    private static final long serialVersionUID = 8367759800764914891L;
+
+
     public DefaultChangeHierarchyProposal(Instance instance) {
         super(instance);
     }

@@ -26,6 +26,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultTemplateSlot_Added extends DefaultClass_Change
          implements TemplateSlot_Added {
 
+    private static final long serialVersionUID = 6696621800843335995L;
+
+
     public DefaultTemplateSlot_Added(Instance instance) {
         super(instance);
     }
