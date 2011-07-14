@@ -10,6 +10,8 @@ import edu.stanford.smi.protege.resource.Icons;
 
 public class ColoredTableCellRenderer extends DefaultTableCellRenderer {
 
+    private static final long serialVersionUID = -6864033774732865199L;
+
 	/*Color altColor = new Color(220, 220, 220, 100);
 	public Component getTableCellRendererComponent 
 		(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)  {

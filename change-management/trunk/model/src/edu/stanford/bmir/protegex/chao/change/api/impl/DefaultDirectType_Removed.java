@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultDirectType_Removed extends DefaultIndividual_Change
          implements DirectType_Removed {
 
+    private static final long serialVersionUID = -6439827032624951324L;
+
+
     public DefaultDirectType_Removed(Instance instance) {
         super(instance);
     }

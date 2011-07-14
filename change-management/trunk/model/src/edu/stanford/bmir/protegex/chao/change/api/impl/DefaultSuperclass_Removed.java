@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultSuperclass_Removed extends DefaultClass_Change
          implements Superclass_Removed {
 
+    private static final long serialVersionUID = 1058457586790395921L;
+
+
     public DefaultSuperclass_Removed(Instance instance) {
         super(instance);
     }

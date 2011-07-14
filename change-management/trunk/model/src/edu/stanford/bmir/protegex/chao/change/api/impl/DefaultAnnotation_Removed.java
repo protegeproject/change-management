@@ -26,6 +26,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultAnnotation_Removed extends DefaultAnnotation_Change
          implements Annotation_Removed {
 
+    private static final long serialVersionUID = -3577968176744079797L;
+
+
     public DefaultAnnotation_Removed(Instance instance) {
         super(instance);
     }

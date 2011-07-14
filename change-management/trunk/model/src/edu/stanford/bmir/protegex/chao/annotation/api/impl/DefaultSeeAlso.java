@@ -21,6 +21,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultSeeAlso extends DefaultAnnotation
          implements SeeAlso {
 
+    private static final long serialVersionUID = 3065546065150989282L;
+
+
     public DefaultSeeAlso(Instance instance) {
         super(instance);
     }

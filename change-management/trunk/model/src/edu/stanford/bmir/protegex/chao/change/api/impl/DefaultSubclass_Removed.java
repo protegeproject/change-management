@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultSubclass_Removed extends DefaultClass_Change
          implements Subclass_Removed {
 
+    private static final long serialVersionUID = -3045256790628016720L;
+
+
     public DefaultSubclass_Removed(Instance instance) {
         super(instance);
     }

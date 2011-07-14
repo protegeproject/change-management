@@ -14,6 +14,8 @@ import edu.stanford.smi.protege.model.Slot;
 
 
 public class ChangeTableModel extends AbstractTableModel {
+    private static final long serialVersionUID = -5982707274885744570L;
+
     public enum FilterMethod {
         FILTER_TRANS, FILTER_TRANS_INFO, SHOW_ALL
     }

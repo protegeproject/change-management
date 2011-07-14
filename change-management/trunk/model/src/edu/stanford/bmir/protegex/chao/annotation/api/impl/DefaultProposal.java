@@ -22,6 +22,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultProposal extends DefaultAnnotation
          implements Proposal {
 
+    private static final long serialVersionUID = 6761607145009415347L;
+
+
     public DefaultProposal(Instance instance) {
         super(instance);
     }

@@ -21,7 +21,8 @@ import edu.stanford.smi.protegex.server_changes.ChangesProject;
 public class ChangesKBViewTab extends AbstractTabWidget {
 	//TODO: Clean up this class
 
-	ClsesAndInstancesTab ciTab;
+	private static final long serialVersionUID = 8675401825976680549L;
+    ClsesAndInstancesTab ciTab;
 	Project changesProject;
 
 	public void initialize() {
@@ -94,7 +95,9 @@ public class ChangesKBViewTab extends AbstractTabWidget {
 	}
 
 	private final class FrameIDRenderer extends FrameRenderer {
-		@Override
+		private static final long serialVersionUID = -7127917979533440099L;
+
+        @Override
 		public void load(Object value) {
 			super.load(value);
 		}

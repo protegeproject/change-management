@@ -21,6 +21,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultQuestion extends DefaultAnnotation
          implements Question {
 
+    private static final long serialVersionUID = -2357711935880339702L;
+
+
     public DefaultQuestion(Instance instance) {
         super(instance);
     }

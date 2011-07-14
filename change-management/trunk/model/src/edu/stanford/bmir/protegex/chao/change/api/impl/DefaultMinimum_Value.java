@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultMinimum_Value extends DefaultProperty_Change
          implements Minimum_Value {
 
+    private static final long serialVersionUID = -940077702528453181L;
+
+
     public DefaultMinimum_Value(Instance instance) {
         super(instance);
     }

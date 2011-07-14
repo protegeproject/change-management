@@ -19,7 +19,8 @@ import edu.stanford.smi.protege.util.Log;
  *
  */
 public class StatsTableModel extends AbstractTableModel {
-	private final static String COL_USER = "User";
+	private static final long serialVersionUID = 4050566986764133763L;
+    private final static String COL_USER = "User";
 	private final static String COL_CHANGES = "Changes";
 	private final static String COL_ANNOTATIONS = "Annotations";
 	private final static String COL_TOTAL = "Total";

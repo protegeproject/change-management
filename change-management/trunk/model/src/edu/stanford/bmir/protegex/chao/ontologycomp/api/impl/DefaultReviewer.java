@@ -16,6 +16,8 @@ import edu.stanford.smi.protege.model.Slot;
  */
 public class DefaultReviewer extends DefaultUser implements Reviewer {
 
+    private static final long serialVersionUID = -3787816725965759316L;
+
     public DefaultReviewer(Instance instance) {
         super(instance);
     }

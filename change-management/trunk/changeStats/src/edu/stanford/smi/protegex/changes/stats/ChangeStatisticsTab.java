@@ -25,7 +25,8 @@ import edu.stanford.smi.protegex.server_changes.ChangesProject;
 
 public class ChangeStatisticsTab extends AbstractTabWidget {
 
-	private KnowledgeBase changesKb;
+	private static final long serialVersionUID = 876741310546805905L;
+    private KnowledgeBase changesKb;
 	private StatsTableModel statsTableModel;
 	private SelectableTable statsTable;
 
@@ -72,7 +73,9 @@ public class ChangeStatisticsTab extends AbstractTabWidget {
 
 	private AllowableAction getGenerateStatsButton() {
 		return new AllowableAction(new ResourceKey("Generate change statistics")) {
-			public void actionPerformed(ActionEvent arg0) {
+			private static final long serialVersionUID = -7200917439332916810L;
+
+            public void actionPerformed(ActionEvent arg0) {
 				statsTableModel.generateStatsTable();
 			}
 		};

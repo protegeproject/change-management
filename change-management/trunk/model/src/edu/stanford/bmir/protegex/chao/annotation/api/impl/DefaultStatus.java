@@ -14,6 +14,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultStatus extends AbstractWrappedInstance
          implements Status {
 
+    private static final long serialVersionUID = -4318167339218449163L;
+
+
     public DefaultStatus(Instance instance) {
         super(instance);
     }

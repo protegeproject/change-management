@@ -16,6 +16,7 @@ import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Property;
 import edu.stanford.smi.protege.code.generator.wrapping.OntologyJavaMappingUtil;
 
 public class FilterPanel extends JPanel {
+    private static final long serialVersionUID = -643928429779037562L;
     private Map<ComponentFilter, JCheckBox> buttons = new EnumMap<ComponentFilter, JCheckBox>(ComponentFilter.class);
 
     public FilterPanel(boolean isOwl, Set<ComponentFilter> existing_filters) {

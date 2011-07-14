@@ -12,6 +12,8 @@ import edu.stanford.smi.protege.util.ProtegeJob;
 
 public class GetSortedChangesJob extends ProtegeJob {
 
+    private static final long serialVersionUID = -3879453212234214773L;
+
     public GetSortedChangesJob(KnowledgeBase changes_kb) {
         super(changes_kb);
     }

@@ -25,6 +25,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultChange extends DefaultAnnotatableThing
          implements Change {
 
+    private static final long serialVersionUID = 7871589012225355753L;
+
+
     public DefaultChange(Instance instance) {
         super(instance);
     }

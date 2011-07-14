@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultMaximum_Cardinality extends DefaultProperty_Change
          implements Maximum_Cardinality {
 
+    private static final long serialVersionUID = -3224839299632190010L;
+
+
     public DefaultMaximum_Cardinality(Instance instance) {
         super(instance);
     }

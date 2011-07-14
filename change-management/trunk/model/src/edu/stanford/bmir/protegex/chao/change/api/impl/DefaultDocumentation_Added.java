@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultDocumentation_Added extends DefaultClass_Change
          implements Documentation_Added {
 
+    private static final long serialVersionUID = -2377147886592239556L;
+
+
     public DefaultDocumentation_Added(Instance instance) {
         super(instance);
     }

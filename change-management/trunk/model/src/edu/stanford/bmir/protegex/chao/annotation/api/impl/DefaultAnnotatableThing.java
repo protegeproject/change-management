@@ -20,6 +20,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultAnnotatableThing extends AbstractWrappedInstance
          implements AnnotatableThing {
 
+    private static final long serialVersionUID = -8995669538829342493L;
+
+
     public DefaultAnnotatableThing(Instance instance) {
         super(instance);
     }

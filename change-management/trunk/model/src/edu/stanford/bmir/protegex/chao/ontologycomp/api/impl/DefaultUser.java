@@ -19,6 +19,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultUser extends AbstractWrappedInstance
          implements User {
 
+    private static final long serialVersionUID = 7934719239904622587L;
+
+
     public DefaultUser(Instance instance) {
         super(instance);
     }

@@ -27,6 +27,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultClass_Created extends AbstractWrappedInstance
          implements Class_Created {
 
+    private static final long serialVersionUID = 4953299867287742060L;
+
+
     public DefaultClass_Created(Instance instance) {
         super(instance);
     }

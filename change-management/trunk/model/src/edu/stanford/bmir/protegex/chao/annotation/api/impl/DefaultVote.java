@@ -21,6 +21,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultVote extends DefaultAnnotation
          implements Vote {
 
+    private static final long serialVersionUID = -3487892674610926674L;
+
+
     public DefaultVote(Instance instance) {
         super(instance);
     }

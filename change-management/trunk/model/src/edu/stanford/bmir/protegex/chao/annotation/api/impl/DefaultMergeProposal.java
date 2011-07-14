@@ -24,6 +24,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultMergeProposal extends DefaultProposal
          implements MergeProposal {
 
+    private static final long serialVersionUID = 7097078362353855879L;
+
+
     public DefaultMergeProposal(Instance instance) {
         super(instance);
     }

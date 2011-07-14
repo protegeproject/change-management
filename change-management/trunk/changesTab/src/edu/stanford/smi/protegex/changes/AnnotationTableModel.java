@@ -17,6 +17,8 @@ import edu.stanford.smi.protege.model.KnowledgeBase;
  */
 public class AnnotationTableModel extends AbstractTableModel{
 
+    private static final long serialVersionUID = 5744895933863486914L;
+
     public enum Column {
         ANNOTATE_COLNAME_TYPE("Type"),
         ANNOTATE_COLNAME_COMMENTS("Description"),

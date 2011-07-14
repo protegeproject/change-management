@@ -45,7 +45,9 @@ import edu.stanford.smi.protegex.server_changes.prompt.UsersTab;
 
 public class ChangeMenu extends JMenu {
 
-	private static final String CHANGE_ANALYSIS_TAB_NAME = "edu.stanford.smi.protegex.changeanalysis.ChangeAnalysisTab";
+	private static final long serialVersionUID = 6331307666741687976L;
+
+    private static final String CHANGE_ANALYSIS_TAB_NAME = "edu.stanford.smi.protegex.changeanalysis.ChangeAnalysisTab";
 
     public static final String MENU_TITLE = "Change";
 	public static final String MENU_ITEM_ANNOTATE_LAST = "Annotate Last Change";
@@ -116,7 +118,9 @@ public class ChangeMenu extends JMenu {
 
 	protected Action getViewStatsAndConflictsPrjAction() {
 		return new AbstractAction(MENU_ITEM_STATS_CONFL_PRJ) {
-			public void actionPerformed(ActionEvent arg0) {
+			private static final long serialVersionUID = -7060649649247351074L;
+
+            public void actionPerformed(ActionEvent arg0) {
 				try {
 					String changesKbViewTabClassName = UsersTab.class.getName();
 
@@ -148,7 +152,9 @@ public class ChangeMenu extends JMenu {
 
 	   protected Action getViewChangeAnalysisPrjAction() {
 	        return new AbstractAction(MENU_ITEM_CHANGE_ANALYSIS) {
-	            public void actionPerformed(ActionEvent arg0) {
+	            private static final long serialVersionUID = 4386154113362944216L;
+
+                public void actionPerformed(ActionEvent arg0) {
 	                try {
 	                    String changeAnalysisTabName = CHANGE_ANALYSIS_TAB_NAME;
 
@@ -181,7 +187,9 @@ public class ChangeMenu extends JMenu {
 
 	protected Action getBrowseChangePrjAction() {
 		return new AbstractAction(MENU_ITEM_BROWSE_CHANGE_PRJ) {
-			public void actionPerformed(ActionEvent arg0) {
+			private static final long serialVersionUID = 3305372581044826189L;
+
+            public void actionPerformed(ActionEvent arg0) {
 				try {
 					String changesKbViewTabClassName = ChangesKBViewTab.class.getName();
 
@@ -211,7 +219,8 @@ public class ChangeMenu extends JMenu {
 
 	public class AnnotateLastChange extends AbstractAction {
 
-		public AnnotateLastChange() {
+		private static final long serialVersionUID = 8287671712439741974L;
+        public AnnotateLastChange() {
 			super(MENU_ITEM_ANNOTATE_LAST);
 		}
 		/* (non-Javadoc)
@@ -245,7 +254,9 @@ public class ChangeMenu extends JMenu {
 
 	public class SelectedChangeInfo extends AbstractAction {
 
-		public SelectedChangeInfo() {
+		private static final long serialVersionUID = 4857818314035334259L;
+
+        public SelectedChangeInfo() {
 			super(MENU_ITEM_CHANGE_INFO);
 		}
 
@@ -280,7 +291,9 @@ public class ChangeMenu extends JMenu {
 	public Action getSaveChangesPrjAction() {
 		return new AbstractAction(MENU_ITEM_SAVE_CHANGE_PRJ) {
 
-			public void actionPerformed(ActionEvent arg0) {
+			private static final long serialVersionUID = 1349707086514243515L;
+
+            public void actionPerformed(ActionEvent arg0) {
 				if (ChAOKbManager.getChAOKb(kb) == null) {
 					Log.getLogger().warning("Cannot save Changes project. Changes project is null.");
 					return;
@@ -315,6 +328,8 @@ public class ChangeMenu extends JMenu {
 	}
 
     public static class SaveChangeProjectJob extends ProtegeJob {
+        private static final long serialVersionUID = 8966542452398798372L;
+
         public SaveChangeProjectJob(KnowledgeBase kb) {
             super(kb);
         }

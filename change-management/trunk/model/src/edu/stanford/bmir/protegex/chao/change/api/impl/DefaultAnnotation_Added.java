@@ -26,6 +26,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultAnnotation_Added extends DefaultAnnotation_Change
          implements Annotation_Added {
 
+    private static final long serialVersionUID = -245424208642570910L;
+
+
     public DefaultAnnotation_Added(Instance instance) {
         super(instance);
     }

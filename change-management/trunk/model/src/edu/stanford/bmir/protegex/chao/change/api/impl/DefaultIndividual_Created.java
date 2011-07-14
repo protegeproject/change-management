@@ -27,6 +27,9 @@ import edu.stanford.smi.protege.model.Slot;
 public class DefaultIndividual_Created extends AbstractWrappedInstance
          implements Individual_Created {
 
+    private static final long serialVersionUID = -8912860188170480127L;
+
+
     public DefaultIndividual_Created(Instance instance) {
         super(instance);
     }

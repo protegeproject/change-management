@@ -14,6 +14,9 @@ import edu.stanford.bmir.protegex.chao.annotation.api.*;
 public class DefaultLinguisticEntity extends AbstractWrappedInstance
          implements LinguisticEntity {
 
+    private static final long serialVersionUID = 6652537396320770012L;
+
+
     public DefaultLinguisticEntity(Instance instance) {
         super(instance);
     }
