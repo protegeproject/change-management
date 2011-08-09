@@ -37,10 +37,21 @@ SELECT count(*) FROM icd_ann
     WHERE slot = "author" AND short_value="WHO";
 
     
-/* convert query 3. to an update statement, such as:
-UPDATE icd_ann SET short_value="WHO"
-	WHERE ....
+/* convert query 3. to an update statement, such as:        	
+CREATE TABLE tmp AS
+    SELECT frame FROM icd_ann 
+        	WHERE slot = "context" AND short_value LIKE "Automatic import of the isGrouping%";
 
+ALTER TABLE `tmp`
+  ADD INDEX `tmp_I1` (`frame`);
+  
+  
+UPDATE icd_ann SET short_value="WHO"
+    WHERE slot = "author" AND
+        frame in (SELECT frame FROM tmp);
+        
+DROP TABLE tmp;
+        
    After running the update script rerunning query 5. should return the SUM OF THE PREVIOUS RESULTS of query 4 and query 5.
  */
 	
