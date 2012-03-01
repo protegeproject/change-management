@@ -1,4 +1,0 @@
-alter table icd_ann add KEY `icd_ann_I1` (`frame`,`slot`,`facet`,`is_template`,`value_index`),add KEY `icd_ann_I2` (`short_value`(255)),add  KEY `icd_ann_I4` (`slot`,`frame_type`), drop key `new_icd_ann_I1`, drop key `new_icd_ann_I2`, drop key `new_icd_ann_I4`;
-
-alter table icd_ann engine=innodb;
-
