@@ -12,7 +12,7 @@ BEGIN
 #create copy of table to work on
 DROP TABLE IF EXISTS tcck_ann2;
 
-SET @v_command = CONCAT('CREATE TABLE tcck_ann2 AS SELECT * FROM ', tablename, ' ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;');
+SET @v_command = CONCAT('CREATE TABLE tcck_ann2  ENGINE = InnoDB, DEFAULT CHARACTER SET = utf8 AS SELECT * FROM ', tablename, ';');
 PREPARE stmt3 FROM @v_command;
 EXECUTE stmt3;
 DEALLOCATE PREPARE stmt3;
