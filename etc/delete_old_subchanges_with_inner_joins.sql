@@ -54,7 +54,8 @@ DROP TABLE IF EXISTS timestamps_of_old_subchanges;
 CREATE TABLE timestamps_of_old_subchanges AS
   SELECT frame AS id FROM tcck_ann2 AS o
     INNER JOIN timestamps_of_all_subchanges i ON i.id = o.frame
-    WHERE o.slot = "date" AND o.short_value < '12/06/2011 02:00:39 PST';
+    WHERE o.slot = "date" 
+  	  AND TIMESTAMPDIFF(SECOND, STR_TO_DATE(SUBSTRING(o.short_value, 1, 19), '%m/%d/%Y %H:%i:%s'), '2011-06-15 00:00:00') > 0;
     
 ALTER TABLE `timestamps_of_old_subchanges`
   ADD INDEX `timestamps_of_old_subchanges_I1` (`id`);
