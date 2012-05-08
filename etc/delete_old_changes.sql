@@ -30,8 +30,8 @@ DROP TABLE IF EXISTS old_changes;
 
 CREATE TABLE old_changes AS
   SELECT frame AS id FROM tcck_ann2 
-  where slot = 'date' 
-  	and TIMESTAMPDIFF(SECOND, STR_TO_DATE(SUBSTRING(short_value, 1, 19), '%m/%d/%Y %H:%i:%s'), '2011-06-01 00:00:00') > 0;
+  WHERE slot = 'date' 
+    AND TIMESTAMPDIFF(SECOND, STR_TO_DATE(SUBSTRING(short_value, 1, 19), '%m/%d/%Y %H:%i:%s'), '2011-06-01 00:00:00') > 0;
 
 ALTER TABLE `old_changes`
   ADD INDEX `old_changes_I1` (`id`);
