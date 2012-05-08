@@ -1,7 +1,7 @@
 DELIMITER $$
 
 #************** How to run it *******************
-# source ./delete_all_subchanges_with_inner_joins_v2.sql	- make sure to specify the correct path
+# source ./delete_old_subchanges_with_inner_joins.sql	- make sure to specify the correct path
 # call delete_subchanges('icd_ann');	- make sure you specify the correct table name
 #************************************************
 
