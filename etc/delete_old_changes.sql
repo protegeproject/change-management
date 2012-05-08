@@ -2,11 +2,11 @@ DELIMITER $$
 
 #************** How to run it *******************
 # source ./delete_old_changes.sql	- make sure to specify the correct path
-# call delete_subchanges('icd_ann');	- make sure you specify the correct table name
+# call delete_old_changes('icd_ann', '2010-06-01 00:00:00');	- make sure you specify the correct table name
 #************************************************
 
-DROP PROCEDURE IF EXISTS `protege`.`delete_subchanges` $$
-CREATE DEFINER=`protege`@`%` PROCEDURE `delete_subchanges`(IN tablename CHAR(50))
+DROP PROCEDURE IF EXISTS `protege`.`delete_old_changes` $$
+CREATE DEFINER=`protege`@`%` PROCEDURE `delete_old_changes`(IN tablename CHAR(50), IN start_date CHAR(19))
 BEGIN
 
 #create copy of table to work on
@@ -28,10 +28,15 @@ ALTER TABLE `tcck_ann2`
 #that need to be deleted from the ontology
 DROP TABLE IF EXISTS old_changes;
 
-CREATE TABLE old_changes AS
-  SELECT frame AS id FROM tcck_ann2 
-  WHERE slot = 'date' 
-    AND TIMESTAMPDIFF(SECOND, STR_TO_DATE(SUBSTRING(short_value, 1, 19), '%m/%d/%Y %H:%i:%s'), '2011-06-01 00:00:00') > 0;
+#CREATE TABLE old_changes AS
+#  SELECT frame AS id FROM tcck_ann2 
+#  WHERE slot = 'date' 
+#    AND TIMESTAMPDIFF(SECOND, STR_TO_DATE(SUBSTRING(short_value, 1, 19), '%m/%d/%Y %H:%i:%s'), '2010-06-01 00:00:00') > 0;
+
+SET @v_command = CONCAT('CREATE TABLE old_changes AS SELECT frame AS id FROM tcck_ann2 WHERE slot = "date" AND TIMESTAMPDIFF(SECOND, STR_TO_DATE(SUBSTRING(short_value, 1, 19), "%m/%d/%Y %H:%i:%s"), ' + start_date + ') > 0;');
+PREPARE stmt3 FROM @v_command;
+EXECUTE stmt3;
+DEALLOCATE PREPARE stmt3;
 
 ALTER TABLE `old_changes`
   ADD INDEX `old_changes_I1` (`id`);
