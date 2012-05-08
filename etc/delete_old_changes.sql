@@ -33,7 +33,7 @@ DROP TABLE IF EXISTS old_changes;
 #  WHERE slot = 'date' 
 #    AND TIMESTAMPDIFF(SECOND, STR_TO_DATE(SUBSTRING(short_value, 1, 19), '%m/%d/%Y %H:%i:%s'), '2010-06-01 00:00:00') > 0;
 
-SET @v_command = CONCAT('CREATE TABLE old_changes AS SELECT frame AS id FROM tcck_ann2 WHERE slot = "date" AND TIMESTAMPDIFF(SECOND, STR_TO_DATE(SUBSTRING(short_value, 1, 19), "%m/%d/%Y %H:%i:%s"), ' + start_date + ') > 0;');
+SET @v_command = CONCAT('CREATE TABLE old_changes AS SELECT frame AS id FROM tcck_ann2 WHERE slot = "date" AND TIMESTAMPDIFF(SECOND, STR_TO_DATE(SUBSTRING(short_value, 1, 19), "%m/%d/%Y %H:%i:%s"), "' + start_date + '") > 0;');
 PREPARE stmt3 FROM @v_command;
 EXECUTE stmt3;
 DEALLOCATE PREPARE stmt3;
