@@ -167,6 +167,9 @@ public class NotesExport {
     private String getNoteDirectAnnotatesId(Annotation note) {
         Collection<AnnotatableThing> anns = note.getAnnotates();
         AnnotatableThing ann = CollectionUtilities.getFirstItem(anns);
+        if (ann == null) {
+            return "";
+        }
        return ((AbstractWrappedInstance)ann).getName();
     }
 
