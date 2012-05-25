@@ -73,7 +73,7 @@ public class ChAO2CSVExport {
         } else if (filter.equalsIgnoreCase("NCI") ) {
             return new DefaultChangesFilter(); //FIXME
         } else if (filter.equalsIgnoreCase("ICD") ) {
-            return new DefaultChangesFilter(); //FIXME
+            return new ICDChangesFilter();
         } else {
             return new DefaultChangesFilter();
         }
@@ -249,16 +249,7 @@ public class ChAO2CSVExport {
 
         @Override
         public EntityOperationType getEntityAndOperationType(Change change) {
-            EntityOperationType entityOp = new EntityOperationType("","");
-
             String desc = change.getContext();
-            if (desc.contains("Create")) {
-                entityOp.setOperationType(OP_TYPE_ADD);
-                if (desc.contains("class")) {
-                    entityOp.setEntityType(ENTITY_CLS);
-                }
-                return entityOp;
-            }
 
             if (desc.contains("Replace") || desc.contains("Set") || desc.contains("Add") || desc.contains("Delete") ||
                     desc.contains("Remove") || desc.contains("Made")) {
@@ -271,6 +262,19 @@ public class ChAO2CSVExport {
 
             if (desc.contains("Imported") || desc.contains("reference")) {
                 return new EntityOperationType(OP_TYPE_REF, ENTITY_IND);
+            }
+
+            if (desc.contains("Subclass Added")) {
+                return new EntityOperationType(OP_TYPE_ADD, ENTITY_CLS);
+            }
+
+            EntityOperationType entityOp = new EntityOperationType("","");
+            if (desc.contains("Create")) {
+                entityOp.setOperationType(OP_TYPE_ADD);
+                if (desc.contains("class")) {
+                    entityOp.setEntityType(ENTITY_CLS);
+                }
+                return entityOp;
             }
 
             return new EntityOperationType("", "");
