@@ -74,7 +74,7 @@ public class ChAO2CSVExport {
         if (filter == null) {
             return new DefaultChangesFilter();
         } else if (filter.equalsIgnoreCase("NCI") ) {
-            return new DefaultChangesFilter(); //FIXME
+            return new NCIChangesFilter();
         } else if (filter.equalsIgnoreCase("ICD") ) {
             return new ICDChangesFilter();
         } else {
@@ -243,7 +243,8 @@ public class ChAO2CSVExport {
             String author = change.getAuthor();
             String desc = change.getContext();
 
-            if ((author != null && author.equalsIgnoreCase("WHO")) || desc.contains("Automatic") || desc.contains("Exported")) {
+            if ((author != null && author.equalsIgnoreCase("WHO")) || desc.contains("Automatic") || desc.contains("Exported") ||
+                    desc.contains("owl:equivalentClass") ) {
                 return true;
             }
 
@@ -254,12 +255,24 @@ public class ChAO2CSVExport {
         public EntityOperationType getEntityAndOperationType(Change change) {
             String desc = change.getContext();
 
-            if (desc.contains("Subclass Added")) {
+            if (desc.contains("Subclass Added") ) {
                 return new EntityOperationType(OP_TYPE_ADD, ENTITY_CLS);
+            }
+
+            if (desc.contains("Superclass Added") || desc.contains("Superclass Removed")) {
+                return new EntityOperationType(OP_TYPE_MOVE, ENTITY_CLS);
             }
 
             if (desc.contains("Annotation")) {
                 return new EntityOperationType(OP_TYPE_PROP_CHANGE, getOntologyComponentType(change.getApplyTo()));
+            }
+
+            if (desc.contains("Retire")) {
+                return new EntityOperationType(OP_TYPE_DELETE, ENTITY_CLS);
+            }
+
+            if (desc.contains("Property: rdfs:subClassOf")) {
+                return new EntityOperationType(OP_TYPE_MOVE, ENTITY_CLS);
             }
 
             if (desc.contains("hierarchy") || desc.contains("Move")) {
@@ -279,17 +292,21 @@ public class ChAO2CSVExport {
                 return entityOp;
             }
 
-            if (desc.contains("Retire")) {
-                return new EntityOperationType(OP_TYPE_DELETE, ENTITY_CLS);
+            if (desc.contains("Property:")) {
+                return new EntityOperationType(OP_TYPE_PROP_CHANGE, getOntologyComponentType(change.getApplyTo()));
             }
 
             if (desc.contains("Replace") || desc.contains("Set") || desc.contains("Add") || desc.contains("Delete") ||
                     desc.contains("Remove") || desc.contains("Made")) {
-                return new EntityOperationType(OP_TYPE_PROP_CHANGE, ENTITY_IND);
+                return new EntityOperationType(OP_TYPE_PROP_CHANGE, ENTITY_CLS);
             }
 
             return new EntityOperationType("", "");
         }
+
+    }
+
+    class NCIChangesFilter extends DefaultChangesFilter {
 
     }
 
@@ -330,4 +347,5 @@ public class ChAO2CSVExport {
             this.entityType = entityType;
         }
     }
+
 }
