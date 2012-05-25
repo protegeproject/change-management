@@ -13,10 +13,7 @@ import java.util.logging.Logger;
 
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
-import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Class;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
-import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Individual;
-import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Property;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Timestamp;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
@@ -41,6 +38,22 @@ public class ChangesExport {
 
     private static final String SEPARATOR = "\t";
     private static final String QUOTE_CHAR = "\"";
+
+    //create a new class, property, restriction
+    static String OP_TYPE_ADD="ADD";
+    //delete or retire a class, property, restriction
+    static String OP_TYPE_DELETE="DEL";
+    //change of a property value
+    static String OP_TYPE_PROP_CHANGE="EDIT";
+    //change in class hierarchy
+    static String OP_TYPE_MOVE="MOVE";
+    //create reference
+    static String OP_TYPE_REF="REF";
+
+    static String ENTITY_CLS="CLS";
+    static String ENTITY_PROP="PROP";
+    static String ENTITY_RESTR="RESTR";
+    static String ENTITY_IND="IND";
 
     private KnowledgeBase chAOKb;
     private ProjectChangeFilter changeFilter;
@@ -190,162 +203,6 @@ public class ChangesExport {
 
     private String quote(String s) {
         return QUOTE_CHAR + s.replaceAll("\\" + QUOTE_CHAR, QUOTE_CHAR + QUOTE_CHAR) + QUOTE_CHAR;
-    }
-
-    /*
-     * Filters
-     */
-
-    //create a new class, property, restriction
-    private static String OP_TYPE_ADD="ADD";
-
-    //delete or retire a class, property, restriction
-    private static String OP_TYPE_DELETE="DEL";
-
-    //change of a property value
-    private static String OP_TYPE_PROP_CHANGE="EDIT";
-
-    //change in class hierarchy
-    private static String OP_TYPE_MOVE="MOVE";
-
-    //create reference
-    private static String OP_TYPE_REF="REF";
-
-    private static String ENTITY_CLS="CLS";
-    private static String ENTITY_PROP="PROP";
-    private static String ENTITY_RESTR="RESTR";
-    private static String ENTITY_IND="IND";
-
-    interface ProjectChangeFilter {
-        boolean isFilteredOut(Change change);
-        EntityOperationType getEntityAndOperationType(Change change);
-    }
-
-    class DefaultChangesFilter implements ProjectChangeFilter {
-
-        public boolean isFilteredOut(Change change) {
-            return change.getPartOfCompositeChange() != null;
-        }
-
-        public EntityOperationType getEntityAndOperationType(Change change) {
-            return new EntityOperationType("", "");
-        }
-
-    }
-
-    class ICDChangesFilter extends DefaultChangesFilter {
-        @Override
-        public boolean isFilteredOut(Change change) {
-            if (super.isFilteredOut(change)) {
-                return true;
-            }
-
-            String author = change.getAuthor();
-            String desc = change.getContext();
-
-            if ((author != null && author.equalsIgnoreCase("WHO")) || desc.contains("Automatic") || desc.contains("Exported") ||
-                    desc.contains("owl:equivalentClass") ) {
-                return true;
-            }
-
-            return false;
-        }
-
-        @Override
-        public EntityOperationType getEntityAndOperationType(Change change) {
-            String desc = change.getContext();
-
-            if (desc.contains("Subclass Added") ) {
-                return new EntityOperationType(OP_TYPE_ADD, ENTITY_CLS);
-            }
-
-            if (desc.contains("Superclass Added") || desc.contains("Superclass Removed")) {
-                return new EntityOperationType(OP_TYPE_MOVE, ENTITY_CLS);
-            }
-
-            if (desc.contains("Annotation")) {
-                return new EntityOperationType(OP_TYPE_PROP_CHANGE, getOntologyComponentType(change.getApplyTo()));
-            }
-
-            if (desc.contains("Retire")) {
-                return new EntityOperationType(OP_TYPE_DELETE, ENTITY_CLS);
-            }
-
-            if (desc.contains("Property: rdfs:subClassOf")) {
-                return new EntityOperationType(OP_TYPE_MOVE, ENTITY_CLS);
-            }
-
-            if (desc.contains("hierarchy") || desc.contains("Move")) {
-                return new EntityOperationType(OP_TYPE_MOVE, ENTITY_CLS);
-            }
-
-            if (desc.contains("Imported") || desc.contains("reference")) {
-                return new EntityOperationType(OP_TYPE_REF, ENTITY_CLS);
-            }
-
-            EntityOperationType entityOp = new EntityOperationType("","");
-            if (desc.contains("Create")) {
-                entityOp.setOperationType(OP_TYPE_ADD);
-                if (desc.contains("class")) {
-                    entityOp.setEntityType(ENTITY_CLS);
-                }
-                return entityOp;
-            }
-
-            if (desc.contains("Property:")) {
-                return new EntityOperationType(OP_TYPE_PROP_CHANGE, getOntologyComponentType(change.getApplyTo()));
-            }
-
-            if (desc.contains("Replace") || desc.contains("Set") || desc.contains("Add") || desc.contains("Delete") ||
-                    desc.contains("Remove") || desc.contains("Made")) {
-                return new EntityOperationType(OP_TYPE_PROP_CHANGE, ENTITY_CLS);
-            }
-
-            return new EntityOperationType("", getOntologyComponentType(change.getApplyTo()));
-        }
-
-    }
-
-    class NCIChangesFilter extends DefaultChangesFilter {
-
-    }
-
-    private String getOntologyComponentType(Ontology_Component oc) {
-        if (oc == null) {
-            return "";
-        } else if (oc instanceof Ontology_Class) {
-            return ENTITY_CLS;
-        } else if (oc instanceof Ontology_Property) {
-            return ENTITY_PROP;
-        } else if (oc instanceof Ontology_Individual) {
-            return ENTITY_IND;
-        }
-        return "";
-    }
-
-    class EntityOperationType {
-        String operationType;
-        String entityType;
-
-        public EntityOperationType(String opType, String entityType) {
-            this.operationType = opType;
-            this.entityType = entityType;
-        }
-
-        public String getOperationType() {
-            return operationType;
-        }
-
-        public String getEntityType() {
-            return entityType;
-        }
-        public void setOperationType(String opType) {
-            this.operationType = opType;
-        }
-
-        public void setEntityType(String entityType) {
-            this.entityType = entityType;
-        }
     }
 
 }
