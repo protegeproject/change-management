@@ -46,14 +46,14 @@ public class ClassTreeExport {
     private KnowledgeBase getKb(String uri) {
 
         if (uri.endsWith("pprj")) { //load pprj
-            ArrayList errors = new ArrayList();
+            ArrayList<?> errors = new ArrayList<Object>();
 
             Project prj = Project.loadProjectFromURI(URIUtilities.createURI(uri), errors);
             owlModel = (OWLModel) prj.getKnowledgeBase();
 
             if (errors.size() > 0) {
                 log.warning("There were errors at loading project " + uri);
-                for (Iterator iterator = errors.iterator(); iterator.hasNext();) {
+                for (Iterator<?> iterator = errors.iterator(); iterator.hasNext();) {
                     Object object = iterator.next();
                     log.warning(object.toString());
                 }
@@ -101,6 +101,11 @@ public class ClassTreeExport {
                 return treeNode.getName();
             }
 
+            @Override
+            public String getTreeNodeDisplayText(RDFSClass treeNode) {
+            	return treeNode.getBrowserText();
+            }
+            
             @SuppressWarnings("unchecked")
             @Override
             public List<RDFSClass> getTreeNodeChildren(RDFSClass treeNode) {
