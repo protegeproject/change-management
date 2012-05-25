@@ -301,7 +301,7 @@ public class ChAO2CSVExport {
                 return new EntityOperationType(OP_TYPE_PROP_CHANGE, ENTITY_CLS);
             }
 
-            return new EntityOperationType("", "");
+            return new EntityOperationType("", getOntologyComponentType(change.getApplyTo()));
         }
 
     }
