@@ -73,11 +73,17 @@ public class ClassTreeExport {
 
 
     public void exportClassTree(KnowledgeBase kb, String exportFilePath, String topClassName) throws IOException {
+        RDFSClass topClass = getTopClass(topClassName);
+        if (topClass == null) {
+            log.warning("Could not find top class: " + topClassName);
+            return;
+        }
+
         Writer w = new FileWriter(new File(exportFilePath));
         TreeExport<RDFSClass> exporter = getTreeExporter();
 
         log.info("Starting class tree export on " + new Date());
-        exporter.printTree(getTopClass(topClassName), w);
+        exporter.printTree(topClass, w);
         log.info("Ended class tree export on " + new Date());
     }
 
