@@ -108,11 +108,19 @@ public class ChAO2CSVExport {
     public void exportToCSV(KnowledgeBase kb, Writer w) throws IOException {
         printHeader(w);
 
+        log.info("Started getting all changes on " + new Date());
         Collection<Change> changes = new ChangeFactory(chAOKb).getAllChangeObjects(true);
+        log.info("Ended getting " + changes.size() +" (total) changes on " + new Date());
+
+        int i = 0;
         for (Change change : changes) {
             try {
                 if (isIncluded(change)) {
                     printChange(change, w);
+                }
+                i++;
+                if (i % 1000 == 0) {
+                    log.info("Processed " + i + " changes on " + new Date());
                 }
             } catch (Exception e) {
                 log.log(Level.WARNING, "Error at exporting change " + change, e);
@@ -150,10 +158,12 @@ public class ChAO2CSVExport {
         text.append(quote(change.getContext()));
         text.append(SEPARATOR);
 
-        text.append(changeFilter.getChangeOperationType(change));
+        EntityOperationType entityOpType = changeFilter.getEntityAndOperationType(change);
+
+        text.append(entityOpType.getOperationType());
         text.append(SEPARATOR);
 
-        text.append(changeFilter.getChangedEntityType(change));
+        text.append(entityOpType.getEntityType());
         text.append(SEPARATOR);
 
         text.append(change.getApplyTo().getCurrentName());
@@ -183,26 +193,114 @@ public class ChAO2CSVExport {
      * Filters
      */
 
+    //create a new class, property, restriction
+    private static String OP_TYPE_ADD="ADD";
+
+    //delete or retire a class, property, restriction
+    private static String OP_TYPE_DELETE="DEL";
+
+    //change of a property value
+    private static String OP_TYPE_PROP_CHANGE="EDIT";
+
+    //change in class hierarchy
+    private static String OP_TYPE_MOVE="MOVE";
+
+    //create reference
+    private static String OP_TYPE_REF="REF";
+
+    private static String ENTITY_CLS="CLS";
+    private static String ENTITY_PROP="PROP";
+    private static String ENTITY_RESTR="RESTR";
+    private static String ENTITY_IND="IND";
+
     interface ProjectChangeFilter {
         boolean isFilteredOut(Change change);
-        String getChangeOperationType(Change change);
-        String getChangedEntityType(Change change);
+        EntityOperationType getEntityAndOperationType(Change change);
     }
 
     class DefaultChangesFilter implements ProjectChangeFilter {
 
         public boolean isFilteredOut(Change change) {
-            return false;
+            return change.getPartOfCompositeChange() != null;
         }
 
-        public String getChangeOperationType(Change change) {
-            return "";
-        }
-
-        public String getChangedEntityType(Change change) {
-            return "";
+        public EntityOperationType getEntityAndOperationType(Change change) {
+            return new EntityOperationType("", "");
         }
 
     }
 
+    class ICDChangesFilter extends DefaultChangesFilter {
+        @Override
+        public boolean isFilteredOut(Change change) {
+            if (super.isFilteredOut(change)) {
+                return true;
+            }
+
+            String author = change.getAuthor();
+            String desc = change.getContext();
+
+            if (author.equalsIgnoreCase("WHO") || desc.contains("Automatic") || desc.contains("Exported")) {
+                return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        public EntityOperationType getEntityAndOperationType(Change change) {
+            EntityOperationType entityOp = new EntityOperationType("","");
+
+            String desc = change.getContext();
+            if (desc.contains("Create")) {
+                entityOp.setOperationType(OP_TYPE_ADD);
+                if (desc.contains("class")) {
+                    entityOp.setEntityType(ENTITY_CLS);
+                }
+                return entityOp;
+            }
+
+            if (desc.contains("Replace") || desc.contains("Set") || desc.contains("Add") || desc.contains("Delete") ||
+                    desc.contains("Remove") || desc.contains("Made")) {
+                return new EntityOperationType(OP_TYPE_PROP_CHANGE, ENTITY_IND);
+            }
+
+            if (desc.contains("hierarchy") || desc.contains("Move")) {
+                return new EntityOperationType(OP_TYPE_MOVE, ENTITY_CLS);
+            }
+
+            if (desc.contains("Imported") || desc.contains("reference")) {
+                return new EntityOperationType(OP_TYPE_REF, ENTITY_IND);
+            }
+
+            return new EntityOperationType("", "");
+        }
+
+    }
+
+
+    class EntityOperationType {
+        String operationType;
+        String entityType;
+
+        public EntityOperationType(String opType, String entityType) {
+            this.operationType = opType;
+            this.entityType = entityType;
+        }
+
+        public String getOperationType() {
+            return operationType;
+        }
+
+        public String getEntityType() {
+            return entityType;
+        }
+        public void setOperationType(String opType) {
+            this.operationType = opType;
+        }
+
+        public void setEntityType(String entityType) {
+            this.entityType = entityType;
+        }
+    }
 }
