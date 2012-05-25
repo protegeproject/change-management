@@ -1,5 +1,5 @@
 <?xml version = "1.0" encoding = "utf-8"?>
-<project name = "Export the class tree to a CSV" default = "run">    
+<project name = "Export the class tree to a CSV">    
    <property file="export.properties"/>  
    <property name = "owl.path"         value = "edu.stanford.smi.protegex.owl"/>   
    <property name = "owl.plugin.path"  value = "${protege.home}/plugins/${owl.path}"/>
@@ -49,7 +49,7 @@
       <fail message = "missing protege libraries"/>
     </target>
    	
-	 <target name="run" depends="checkProtegeLibsAndReport">
+	 <target name="exportChanges" depends="checkProtegeLibsAndReport">
 	        <java 
 			fork="true" 
 	        	dir="." 
@@ -57,9 +57,22 @@
                         maxmemory="${heap.size.max}">
 		      	<classpath refid = "project.classpath"/>	        	
 	 		<arg value="${pprj.file}"/>
-			<arg value="${export.csv.path}"/>
+			<arg value="${export.changes.csv.path}"/>
 			<arg value="${export.filter}"/>
 	        </java>
 	 </target>
+
+	 <target name="exportNotes" depends="checkProtegeLibsAndReport">
+	        <java 
+			fork="true" 
+	        	dir="." 
+	            	classname="edu.stanford.bmir.protegex.changes.export.NotesExport"
+                       maxmemory="${heap.size.max}">
+		      	<classpath refid = "project.classpath"/>	        	
+	 		<arg value="${pprj.file}"/>
+			<arg value="${export.notes.csv.path}"/>
+	        </java>
+	 </target>
+
 	
 </project>
