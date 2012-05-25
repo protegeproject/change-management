@@ -251,9 +251,8 @@ public class ChAO2CSVExport {
         public EntityOperationType getEntityAndOperationType(Change change) {
             String desc = change.getContext();
 
-            if (desc.contains("Replace") || desc.contains("Set") || desc.contains("Add") || desc.contains("Delete") ||
-                    desc.contains("Remove") || desc.contains("Made")) {
-                return new EntityOperationType(OP_TYPE_PROP_CHANGE, ENTITY_IND);
+            if (desc.contains("Subclass Added")) {
+                return new EntityOperationType(OP_TYPE_ADD, ENTITY_CLS);
             }
 
             if (desc.contains("hierarchy") || desc.contains("Move")) {
@@ -264,10 +263,6 @@ public class ChAO2CSVExport {
                 return new EntityOperationType(OP_TYPE_REF, ENTITY_IND);
             }
 
-            if (desc.contains("Subclass Added")) {
-                return new EntityOperationType(OP_TYPE_ADD, ENTITY_CLS);
-            }
-
             EntityOperationType entityOp = new EntityOperationType("","");
             if (desc.contains("Create")) {
                 entityOp.setOperationType(OP_TYPE_ADD);
@@ -275,6 +270,11 @@ public class ChAO2CSVExport {
                     entityOp.setEntityType(ENTITY_CLS);
                 }
                 return entityOp;
+            }
+
+            if (desc.contains("Replace") || desc.contains("Set") || desc.contains("Add") || desc.contains("Delete") ||
+                    desc.contains("Remove") || desc.contains("Made")) {
+                return new EntityOperationType(OP_TYPE_PROP_CHANGE, ENTITY_IND);
             }
 
             return new EntityOperationType("", "");
