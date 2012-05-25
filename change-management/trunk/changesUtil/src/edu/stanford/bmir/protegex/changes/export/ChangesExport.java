@@ -35,9 +35,9 @@ import edu.stanford.smi.protege.storage.database.DatabaseKnowledgeBaseFactory;
  * @author ttania
  *
  */
-public class ChAO2CSVExport {
+public class ChangesExport {
 
-    private static Logger log = Logger.getLogger(ChAO2CSVExport.class.getName());
+    private static Logger log = Logger.getLogger(ChangesExport.class.getName());
 
     private static final String SEPARATOR = "\t";
     private static final String QUOTE_CHAR = "\"";
@@ -58,13 +58,13 @@ public class ChAO2CSVExport {
         String chaoPrjPath = args[0];
         String exportFilePath = args[1];
 
-        ChAO2CSVExport exporter = new ChAO2CSVExport();
+        ChangesExport exporter = new ChangesExport();
         exporter.setChangeFilter(exporter.getChangeFilterFromArg(args[2]));
 
         log.info("Started ChAO to CSV export on " + new Date());
 
         Writer w = new FileWriter(new File(exportFilePath));
-        exporter.exportToCSV(exporter.getKb(chaoPrjPath), w);
+        exporter.exportChanges(exporter.getKb(chaoPrjPath), w);
         w.close();
 
         log.info("Ended ChAO to CSV export on " + new Date());
@@ -108,7 +108,7 @@ public class ChAO2CSVExport {
         this.changeFilter = changeFilter;
     }
 
-    public void exportToCSV(KnowledgeBase kb, Writer w) throws IOException {
+    public void exportChanges(KnowledgeBase kb, Writer w) throws IOException {
         printHeader(w);
 
         log.info("Started getting all changes on " + new Date());
