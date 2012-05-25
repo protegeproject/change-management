@@ -53,7 +53,7 @@
 	        <java 
 			fork="true" 
 	        	dir="." 
-	            	classname="edu.stanford.bmir.protegex.changes.export.ChAO2CSVExport"
+	            	classname="edu.stanford.bmir.protegex.changes.export.ChangesExport"
                         maxmemory="${heap.size.max}">
 		      	<classpath refid = "project.classpath"/>	        	
 	 		<arg value="${pprj.file}"/>
