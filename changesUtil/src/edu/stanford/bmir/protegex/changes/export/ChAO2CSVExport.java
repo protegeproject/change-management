@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,6 +55,9 @@ public class ChAO2CSVExport {
             "third argument can be the project change filter (NCI | ICD | something else)");
             System.exit(1);
         }
+
+        FileHandler fileHandler = new FileHandler("exportChAO.log", true);
+        log.addHandler(fileHandler);
 
         String chaoPrjPath = args[0];
         String exportFilePath = args[1];
