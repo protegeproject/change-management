@@ -123,7 +123,7 @@ public abstract class TreeExport<N> {
     }
 
     private void printHeader(Writer w) throws IOException {
-        w.write("name" + separator + "level" + separator + "display_text" + separator +
+        w.write("name" + separator + "display_text" + separator + "level" + separator + 
                 "top_parent" + separator + "child_count" + separator + "is_duplicate" + "\n");
     }
 
@@ -133,7 +133,7 @@ public abstract class TreeExport<N> {
     	String nodeDisplayText = (node == null ? null : getTreeNodeDisplayText(node));
     	String topParentName = (node == null ? null : getTreeNodeName(topParent));
     	
-        w.write(formatTreeNodeInfo(nodeName) + separator + level + separator + formatTreeNodeInfo(nodeDisplayText) + separator + 
+        w.write(formatTreeNodeInfo(nodeName) + separator + formatTreeNodeInfo(nodeDisplayText) + separator + level + separator +  
                 formatTreeNodeInfo(topParentName) + separator + childCount + separator + isDuplicate + "\n");
     }
 
