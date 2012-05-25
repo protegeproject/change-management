@@ -16,21 +16,15 @@ class DefaultChangesFilter implements ProjectChangeFilter {
         return new EntityOperationType("", "");
     }
 
-    /*
-     * Filters
-     */
-
-
-
     String getOntologyComponentType(Ontology_Component oc) {
         if (oc == null) {
             return "";
         } else if (oc instanceof Ontology_Class) {
-            return ENTITY_CLS;
+            return ChangesExport.ENTITY_CLS;
         } else if (oc instanceof Ontology_Property) {
-            return ENTITY_PROP;
+            return ChangesExport.ENTITY_PROP;
         } else if (oc instanceof Ontology_Individual) {
-            return ENTITY_IND;
+            return ChangesExport.ENTITY_IND;
         }
         return "";
     }
