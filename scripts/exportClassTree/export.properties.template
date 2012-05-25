@@ -1,0 +1,12 @@
+<!-- protege.home = the Protege 3.x installation directory, e.g., /home/user/Protege_3.4  -->
+protege.home=/usr/local/protege
+
+<!-- The fully specified URI of the pprj or .owl, .rdf or .rdfs file, e.g., file:/home/ttania/projects/icd_umbrella.pprj -->
+pprj.file=file:/usr/local/icat-files/projects/icd/icd_umbrella.pprj
+
+<!-- The path of the exported CSV file -->
+export.csv.path=export.csv
+
+<!-- The top level class for the export, e.g., owl:Thing-->
+top.class=owl:Thing
+
