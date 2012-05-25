@@ -31,6 +31,7 @@
       </condition>
       <path id = "project.classpath">    
         <pathelement location = "${protege.lib}"/>
+        <pathelement location = "${protege.home}/driver.jar"/>
         <fileset dir="${owl.plugin.path}"/>
       	<fileset dir="${chao.path}"/>
       </path>
