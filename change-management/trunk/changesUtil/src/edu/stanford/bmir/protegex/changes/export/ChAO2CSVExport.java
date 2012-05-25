@@ -240,7 +240,7 @@ public class ChAO2CSVExport {
             String author = change.getAuthor();
             String desc = change.getContext();
 
-            if (author.equalsIgnoreCase("WHO") || desc.contains("Automatic") || desc.contains("Exported")) {
+            if ((author != null && author.equalsIgnoreCase("WHO")) || desc.contains("Automatic") || desc.contains("Exported")) {
                 return true;
             }
 
