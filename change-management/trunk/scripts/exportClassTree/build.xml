@@ -31,11 +31,8 @@
       </condition>
       <path id = "project.classpath">    
         <pathelement location = "${protege.lib}"/>
-        <pathelement location = "${protege.home}/driver.jar"/>
-        <pathelement location = "../lib/jxl.jar"/>
         <fileset dir="${owl.plugin.path}"/>
       	<fileset dir="${chao.path}"/>
-      	<pathelement location = "excel_import_hist_linearizations.jar"/>
       </path>
 
     </target>
