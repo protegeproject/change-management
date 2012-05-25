@@ -13,7 +13,10 @@ import java.util.logging.Logger;
 
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Class;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Individual;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Property;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Timestamp;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
@@ -255,6 +258,10 @@ public class ChAO2CSVExport {
                 return new EntityOperationType(OP_TYPE_ADD, ENTITY_CLS);
             }
 
+            if (desc.contains("Annotation")) {
+                return new EntityOperationType(OP_TYPE_PROP_CHANGE, getOntologyComponentType(change.getApplyTo()));
+            }
+
             if (desc.contains("hierarchy") || desc.contains("Move")) {
                 return new EntityOperationType(OP_TYPE_MOVE, ENTITY_CLS);
             }
@@ -272,6 +279,10 @@ public class ChAO2CSVExport {
                 return entityOp;
             }
 
+            if (desc.contains("Retire")) {
+                return new EntityOperationType(OP_TYPE_DELETE, ENTITY_CLS);
+            }
+
             if (desc.contains("Replace") || desc.contains("Set") || desc.contains("Add") || desc.contains("Delete") ||
                     desc.contains("Remove") || desc.contains("Made")) {
                 return new EntityOperationType(OP_TYPE_PROP_CHANGE, ENTITY_IND);
@@ -282,6 +293,18 @@ public class ChAO2CSVExport {
 
     }
 
+    private String getOntologyComponentType(Ontology_Component oc) {
+        if (oc == null) {
+            return "";
+        } else if (oc instanceof Ontology_Class) {
+            return ENTITY_CLS;
+        } else if (oc instanceof Ontology_Property) {
+            return ENTITY_PROP;
+        } else if (oc instanceof Ontology_Individual) {
+            return ENTITY_IND;
+        }
+        return "";
+    }
 
     class EntityOperationType {
         String operationType;
