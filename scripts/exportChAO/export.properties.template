@@ -1,0 +1,14 @@
+<!-- protege.home = the Protege 3.x installation directory, e.g., /home/user/Protege_3.4  -->
+protege.home=/usr/local/protege
+
+<!-- The path of the ChAO pprj -->
+pprj.file=file:/usr/local/icat-files/projects/icd/icd_umbrella.pprj
+
+<!-- The path of the exported CSV file -->
+export.csv.path=export_icd_chao.csv
+
+<!-- Export filter type (e.g., NCI, ICD, other) -->
+export.filter=ICD
+
+heap.size.max=4000M
+
