@@ -85,6 +85,8 @@ public class ClassTreeExport {
         log.info("Starting class tree export on " + new Date());
         exporter.printTree(topClass, w);
         log.info("Ended class tree export on " + new Date());
+
+        w.close();
     }
 
     private RDFSClass getTopClass(String topClassName) {
