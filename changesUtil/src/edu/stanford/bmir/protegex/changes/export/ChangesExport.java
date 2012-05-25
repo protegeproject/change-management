@@ -280,7 +280,7 @@ public class ChangesExport {
             }
 
             if (desc.contains("Imported") || desc.contains("reference")) {
-                return new EntityOperationType(OP_TYPE_REF, ENTITY_IND);
+                return new EntityOperationType(OP_TYPE_REF, ENTITY_CLS);
             }
 
             EntityOperationType entityOp = new EntityOperationType("","");
