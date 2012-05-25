@@ -87,6 +87,7 @@
             <src path = "changesTab/src"/>
             <src path = "changeStats/src"/>
             <src path = "projectPlugin/src"/>
+        	<src path = "changesUtil/src"/>
             <classpath refid = "project.classpath"/>
         </javac>
         
