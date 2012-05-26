@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import edu.stanford.bmir.protegex.chao.annotation.api.OntologyJavaMapping;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
@@ -55,7 +56,6 @@ public class ChangesExport {
     static String ENTITY_RESTR="RESTR";
     static String ENTITY_IND="IND";
 
-    private KnowledgeBase chAOKb;
     private ProjectChangeFilter changeFilter;
 
     private String dbTable = null;
@@ -71,12 +71,17 @@ public class ChangesExport {
         String chaoPrjPath = args[0];
         String exportFilePath = args[1];
 
+        OntologyJavaMapping.initMap();
+        edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyJavaMapping.initMap();
+        edu.stanford.bmir.protegex.chao.change.api.OntologyJavaMapping.initMap();
+
         ChangesExport exporter = new ChangesExport();
         exporter.setChangeFilter(exporter.getChangeFilterFromArg(args[2]));
 
         log.info("Started ChAO to CSV export on " + new Date());
 
-        Writer w = new FileWriter(new File(exportFilePath));
+        Writer w = new FileWriter(new File(exportFilePath), false); //second arg: append or not
+        exporter.printHeader(w);
         exporter.exportChanges(exporter.getKb(chaoPrjPath), w);
         w.close();
 
@@ -100,7 +105,7 @@ public class ChangesExport {
         ArrayList errors = new ArrayList();
 
         Project prj = Project.loadProjectFromFile(pprjPath, errors);
-        chAOKb =  prj.getKnowledgeBase();
+        KnowledgeBase kb =  prj.getKnowledgeBase();
 
         if (errors.size() > 0) {
             log.warning("There were errors at loading project " + pprjPath);
@@ -110,20 +115,23 @@ public class ChangesExport {
             }
         }
 
-        if (chAOKb.getKnowledgeBaseFactory() instanceof DatabaseKnowledgeBaseFactory) {
-            dbTable = DatabaseKnowledgeBaseFactory.getTableName(chAOKb.getProject().getSources());
+        if (kb.getKnowledgeBaseFactory() instanceof DatabaseKnowledgeBaseFactory) {
+            dbTable = DatabaseKnowledgeBaseFactory.getTableName(kb.getProject().getSources());
         }
 
-        return chAOKb;
+        return kb;
+    }
+
+
+    public void setDbTable(String dbTable) {
+        this.dbTable = dbTable;
     }
 
     public void setChangeFilter(ProjectChangeFilter changeFilter) {
         this.changeFilter = changeFilter;
     }
 
-    public void exportChanges(KnowledgeBase kb, Writer w) throws IOException {
-        printHeader(w);
-
+    public void exportChanges(KnowledgeBase chAOKb, Writer w) throws IOException {
         log.info("Started getting all changes on " + new Date());
         Collection<Change> changes = new ChangeFactory(chAOKb).getAllChangeObjects(true);
         log.info("Ended getting " + changes.size() +" (total) changes on " + new Date());
@@ -158,7 +166,7 @@ public class ChangesExport {
     }
 
 
-    private void printHeader(Writer w) throws IOException {
+    public void printHeader(Writer w) throws IOException {
         w.write("change_desc" + SEPARATOR + "change_type" + SEPARATOR +
                 "entity_type" + SEPARATOR + "entity" + SEPARATOR + "author" + SEPARATOR + "timestamp" +
                 SEPARATOR + "change_id" + SEPARATOR + "db_table" + "\n");
