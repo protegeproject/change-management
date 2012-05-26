@@ -54,7 +54,7 @@ class ICDChangesFilter extends DefaultChangesFilter {
             }
 
             EntityOperationType entityOp = new EntityOperationType("","");
-            if (desc.contains("Create")) {
+            if (desc.contains("Create") || desc.contains("create")) {
                 entityOp.setOperationType(ChangesExport.OP_TYPE_ADD);
                 if (desc.contains("class")) {
                     entityOp.setEntityType(ChangesExport.ENTITY_CLS);
