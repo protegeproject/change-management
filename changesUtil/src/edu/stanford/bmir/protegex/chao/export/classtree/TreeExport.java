@@ -21,6 +21,7 @@ public abstract class TreeExport<N> {
 
     public static final String SEPARATOR = "\t";
     public static final String QUOTE_CHAR = "\"";
+	public static final CharSequence NEW_LINE = "\n";
 
     private static Logger log = Logger.getLogger(TreeExport.class.getName());
     
@@ -124,7 +125,7 @@ public abstract class TreeExport<N> {
 
     private void printHeader(Writer w) throws IOException {
         w.write("name" + separator + "display_text" + separator + "level" + separator + 
-                "top_parent" + separator + "child_count" + separator + "is_duplicate" + "\n");
+                "top_parent" + separator + "child_count" + separator + "is_duplicate" + NEW_LINE);
     }
 
     private void printTreeNode(N node, int level, N topParent,
@@ -134,7 +135,7 @@ public abstract class TreeExport<N> {
     	String topParentName = (node == null ? null : getTreeNodeName(topParent));
     	
         w.write(formatTreeNodeInfo(nodeName) + separator + formatTreeNodeInfo(nodeDisplayText) + separator + level + separator +  
-                formatTreeNodeInfo(topParentName) + separator + childCount + separator + isDuplicate + "\n");
+                formatTreeNodeInfo(topParentName) + separator + childCount + separator + isDuplicate + NEW_LINE);
     }
 
     private String formatTreeNodeInfo(String s){
@@ -142,7 +143,7 @@ public abstract class TreeExport<N> {
             return "";
         }
         else {
-            if (s.contains(separator)) {
+            if (s.contains(separator) || s.contains(NEW_LINE)) {
                 return quote(s);
             }
             else {
