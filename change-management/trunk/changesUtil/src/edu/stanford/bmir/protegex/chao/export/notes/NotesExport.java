@@ -32,6 +32,8 @@ public class NotesExport {
     private static final String SEPARATOR = "\t";
     private static final String QUOTE_CHAR = "\"";
 
+    private String quote = QUOTE_CHAR;
+
     private KnowledgeBase chAOKb;
 
     private String dbTable = null;
@@ -150,9 +152,10 @@ public class NotesExport {
         return name.replace("Default", "");
     }
 
+
     private String quote(String s) {
-        if (s == null) { return ""; }
-        return QUOTE_CHAR + s.replaceAll("\\" + QUOTE_CHAR, QUOTE_CHAR + QUOTE_CHAR) + QUOTE_CHAR;
+        String str = (s == null)  ?  "" : s.replaceAll("\\" + quote, quote + quote);
+        return quote + str + quote;
     }
 
     private String getNoteAttachedToOC(Annotation note) {
