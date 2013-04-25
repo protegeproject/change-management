@@ -1,0 +1,75 @@
+; Wed Aug 26 10:25:29 PDT 2009
+; 
+;+ (version "3.4.2")
+;+ (build "Build 541")
+
+([metaproject_Class0] of  User
+
+	(name "Csongor Nyulas")
+	(password "csongor"))
+
+([metaproject_Class1] of  User
+
+	(name "Samson Tu")
+	(password "samson"))
+
+([metaproject_Class10000] of  Project
+
+	(annotationProject [metaproject_Class20001])
+	(description "A project  for some changes junits.")
+	(location "build/projects/scratch.pprj")
+	(name "Scratch")
+	(owner [metaproject_Instance_10007]))
+
+([metaproject_Class10001] of  User
+
+	(name "Dilvan Moreira")
+	(password "dilvan"))
+
+([metaproject_Class20001] of  Project
+
+	(description "A changes project  for some changes junits.")
+	(location "build/projects/annotation_scratch.pprj")
+	(name "Scratch Changes Project")
+	(owner [metaproject_Instance_10007]))
+
+([metaproject_Class20008] of  User
+
+	(description "A admin user that can perform adminisitrative operations on the Protege server.")
+	(name "Admin")
+	(password "admin"))
+
+([metaproject_Class20009] of  Server
+
+	(description "The server on which the policies apply.\nCurrent implementaion does not take into account the hostname, so all the policies (allowed group operations) are applied to this one instance.")
+	(name "MyServer"))
+
+([metaproject_Instance_10002] of  User
+
+	(name "Guest")
+	(password "guest"))
+
+([metaproject_Instance_10003] of  User
+
+	(name "Jennifer Vendetti")
+	(password "jenny"))
+
+([metaproject_Instance_10004] of  User
+
+	(name "Natasha Noy")
+	(password "natalia"))
+
+([metaproject_Instance_10005] of  User
+
+	(name "Ray Fergerson")
+	(password "claudia"))
+
+([metaproject_Instance_10006] of  User
+
+	(name "Tania Tudorache")
+	(password "tania"))
+
+([metaproject_Instance_10007] of  User
+
+	(name "Timothy Redmond")
+	(password "troglodyte"))

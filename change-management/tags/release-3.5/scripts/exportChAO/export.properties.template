@@ -1,0 +1,17 @@
+<!-- protege.home = the Protege 3.x installation directory, e.g., /home/user/Protege_3.4  -->
+protege.home=/usr/local/protege
+
+<!-- The path of the ChAO pprj -->
+pprj.file=/usr/local/icat-files/projects/icd/annotation_ICD.pprj
+
+<!-- The path of the exported changes CSV file -->
+export.changes.csv.path=export_icd_changes.csv
+
+<!-- The path of the exported notes CSV file -->
+export.notes.csv.path=export_icd_notes.csv
+
+<!-- Export filter type (e.g., NCI, ICD, other) -->
+export.filter=ICD
+
+heap.size.max=4000M
+
