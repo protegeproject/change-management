@@ -91,32 +91,32 @@ public abstract class TreeExport<N> {
             int childCount = (children == null ? 0 :children.size());
 
             Set<N> visited = new HashSet<N>();
-            printTreeNode(root, 0, root, childCount, false, w);
+            printTreeNode(root, 0, root, root, childCount, false, w);
             visited.add(root);
 
             if (childCount > 0) {
                 for (N childNode : children) {
-                    recursivePrintTree(childNode, 1, childNode, visited, w);
+                    recursivePrintTree(childNode, 1, childNode, root, visited, w);
                 }
             }
         }
     }
 
-    private void recursivePrintTree(N node, int level, N topParent, Set<N> visited, Writer w) throws IOException {
+    private void recursivePrintTree(N node, int level, N topParent, N parent, Set<N> visited, Writer w) throws IOException {
         if (node != null ) {
             List<N> children = getTreeNodeChildren(node);
             int childCount = (children == null ? 0 :children.size());
 
             if (visited.contains(node)) {
-                printTreeNode(node, level, topParent, childCount, true, w);
+                printTreeNode(node, level, topParent, parent, childCount, true, w);
             }
             else {
-                printTreeNode(node, level, topParent, childCount, false, w);
+                printTreeNode(node, level, topParent, parent, childCount, false, w);
                 visited.add(node);
 
                 if (childCount > 0) {
                     for (N childNode : children) {
-                        recursivePrintTree(childNode, level + 1, topParent, visited, w);
+                        recursivePrintTree(childNode, level + 1, topParent, node, visited, w);
                     }
                 }
             }
@@ -125,17 +125,21 @@ public abstract class TreeExport<N> {
 
     private void printHeader(Writer w) throws IOException {
         w.write("name" + separator + "display_text" + separator + "level" + separator + 
-                "top_parent" + separator + "child_count" + separator + "is_duplicate" + NEW_LINE);
+        		"parent" + separator + "top_parent" + separator + "child_count" + separator + 
+        		"is_duplicate" + NEW_LINE);
     }
 
-    private void printTreeNode(N node, int level, N topParent,
+    private void printTreeNode(N node, int level, N topParent, N parent,
             int childCount, boolean isDuplicate, Writer w) throws IOException {
     	String nodeName = (node == null ? null : getTreeNodeName(node));
     	String nodeDisplayText = (node == null ? null : getTreeNodeDisplayText(node));
+    	String parentName = (node == null ? null : getTreeNodeName(parent));
     	String topParentName = (node == null ? null : getTreeNodeName(topParent));
     	
-        w.write(formatTreeNodeInfo(nodeName) + separator + formatTreeNodeInfo(nodeDisplayText) + separator + level + separator +  
-                formatTreeNodeInfo(topParentName) + separator + childCount + separator + isDuplicate + NEW_LINE);
+        w.write(formatTreeNodeInfo(nodeName) + separator + formatTreeNodeInfo(nodeDisplayText) + separator + 
+        		level + separator + formatTreeNodeInfo(parentName) + separator + 
+                formatTreeNodeInfo(topParentName) + separator + childCount + separator + 
+                isDuplicate + NEW_LINE);
     }
 
     private String formatTreeNodeInfo(String s){
