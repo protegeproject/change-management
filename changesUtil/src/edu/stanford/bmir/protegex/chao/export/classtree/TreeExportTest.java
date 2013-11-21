@@ -36,13 +36,21 @@ public class TreeExportTest {
     }
 
     
-    public static String outputFile = System.getenv("TEMP") + File.separator + "test_print_tree.txt";
+    public static String tempDir = (System.getenv("TEMP") != null ? System.getenv("TEMP") :
+		((System.getenv("TMP") != null ? System.getenv("TMP") : System.getenv("TMPDIR"))));
+    public static String outputFile = tempDir + File.separator + "test_print_tree.txt";
     public static TestTreeNode sampleTree =
             new TestTreeNode("root", Arrays.asList( new TestTreeNode[] {
                     new TestTreeNode("Level1_ch1", Arrays.asList( new TestTreeNode[] {
                             new TestTreeNode("Level2_'ch1,1'"),
-                            new TestTreeNode("\tLevel2_\"ch1,2\"")})),
-                    new TestTreeNode("Level1_ch2")}));
+                            new TestTreeNode("\tLevel2_\"ch1,2\"", Arrays.asList( new TestTreeNode[] {
+                                    new TestTreeNode("Level3_ch1,2,1"),
+                                    new TestTreeNode("Level2_ch1,2,2")}))})),
+                    new TestTreeNode("Level1_ch2 (aka A2)", Arrays.asList( new TestTreeNode[] {
+                            new TestTreeNode("B2.1"),
+                            new TestTreeNode("B2.2", Arrays.asList( new TestTreeNode[] {
+                                    new TestTreeNode("C2.2.1"),
+                                    new TestTreeNode("C2.2.2")}))}))}));
 
     
     public static Logger log = Logger.getLogger(TreeExportTest.class.getName());
