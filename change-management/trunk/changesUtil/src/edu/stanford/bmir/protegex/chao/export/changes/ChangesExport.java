@@ -14,8 +14,10 @@ import java.util.logging.Logger;
 import edu.stanford.bmir.protegex.chao.annotation.api.OntologyJavaMapping;
 import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.change.api.ChangeFactory;
+import edu.stanford.bmir.protegex.chao.change.api.Composite_Change;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Timestamp;
+import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultTimestamp;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
@@ -57,14 +59,17 @@ public class ChangesExport {
     static String ENTITY_IND="IND";
 
     private ProjectChangeFilter changeFilter;
-
+    private Date maxDate;
+    
     private String dbTable = null;
 
     public static void main(String[] args) throws IOException {
-        if (args.length < 3) {
-            log.severe("First argument should be the file or project URI, " +
-                    "second argument should be the path to the exported file," +
-            "third argument can be the project change filter (NCI | ICD | something else)");
+        if (args.length < 4) {
+            log.severe("(1) ChAO file or project URI, " +
+                    "(2) Path to the exported file, " +
+                    "(3) The project change filter (NCI | ICD | something else), "
+                  + "(4) Date up to which to export changes, date format: MM/dd/yyyy HH:mm:ss zzz "
+                  + "(5) Append to existing CSV file [true|false] ");
             System.exit(1);
         }
 
@@ -76,19 +81,26 @@ public class ChangesExport {
         edu.stanford.bmir.protegex.chao.change.api.OntologyJavaMapping.initMap();
 
         ChangesExport exporter = new ChangesExport();
+        
         exporter.setChangeFilter(exporter.getChangeFilterFromArg(args[2]));
 
         log.info("Started ChAO to CSV export on " + new Date());
 
-        Writer w = new FileWriter(new File(exportFilePath), false); //second arg: append or not
+        Writer w = new FileWriter(new File(exportFilePath), Boolean.parseBoolean(args[3])); //second arg: append or not
+        
+        exporter.setMaxDate(DefaultTimestamp.getDateParsed(args[3]));
         exporter.printHeader(w);
         exporter.exportChanges(exporter.getKb(chaoPrjPath), w);
+        
         w.close();
+        
+        exporter.exportMetadata(args[1], Boolean.parseBoolean(args[3]));
 
         log.info("Ended ChAO to CSV export on " + new Date());
     }
 
-    private ProjectChangeFilter getChangeFilterFromArg(String filter) {
+
+	private ProjectChangeFilter getChangeFilterFromArg(String filter) {
         if (filter == null) {
             return new DefaultChangesFilter();
         } else if (filter.equalsIgnoreCase("NCI") ) {
@@ -130,10 +142,16 @@ public class ChangesExport {
     public void setChangeFilter(ProjectChangeFilter changeFilter) {
         this.changeFilter = changeFilter;
     }
-
+    
+	public void setMaxDate(Date maxDate) {
+		this.maxDate = maxDate;
+	}
+    
     public void exportChanges(KnowledgeBase chAOKb, Writer w) throws IOException {
         log.info("Started getting all changes on " + new Date());
-        Collection<Change> changes = new ChangeFactory(chAOKb).getAllChangeObjects(true);
+        //Collection<Change> changes = new ChangeFactory(chAOKb).getAllChangeObjects(true);
+        Collection<Composite_Change> changes = new ChangeFactory(chAOKb).getAllComposite_ChangeObjects();
+        
         log.info("Ended getting " + changes.size() +" (total) changes on " + new Date());
 
         int i = 0;
@@ -162,7 +180,16 @@ public class ChangesExport {
             return false;
         }
 
-        return !changeFilter.isFilteredOut(change);
+        if (changeFilter.isFilteredOut(change) == true) {
+			return false;
+		}
+		
+		Date changeDate = change.getTimestamp().getDateParsed();
+		if (changeDate == null) {
+			return true;
+		}
+		
+		return changeDate.before(maxDate);
     }
 
 
@@ -172,7 +199,8 @@ public class ChangesExport {
                 SEPARATOR + "change_id" + SEPARATOR + "db_table" + "\n");
     }
 
-    private void printChange(Change change, Writer w) throws IOException {
+
+	private void printChange(Change change, Writer w) throws IOException {
         w.write(getChangeRow(change));
     }
 
@@ -209,6 +237,16 @@ public class ChangesExport {
         return text.toString();
     }
 
+    
+    private void exportMetadata(String exportFileName, boolean append) throws IOException {
+		File metadataFile = new File(exportFileName + ".metadata");
+		FileWriter w = new FileWriter(metadataFile, append);
+		w.write("exported-on:" + DefaultTimestamp.DATE_FORMAT.format(new Date()) + "\n");
+		w.write("max-date:" + DefaultTimestamp.DATE_FORMAT.format(maxDate) + "\n");
+		w.close();
+	}
+    
+    
     private String quote(String s) {
         return QUOTE_CHAR + s.replaceAll("\\" + QUOTE_CHAR, QUOTE_CHAR + QUOTE_CHAR) + QUOTE_CHAR;
     }
