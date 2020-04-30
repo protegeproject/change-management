@@ -1,8 +1,18 @@
+h1 {
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;	
+  font-size: 16px;
+  color: #084a6e;
+}
+
+p {
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;	
+  font-size: 14px;
+  color: #084a6e;
+}
+
 table {
   font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
   border: 1px solid #FFFFFF;
- 
-  
   text-align: left;
   border-collapse: collapse;
 }
