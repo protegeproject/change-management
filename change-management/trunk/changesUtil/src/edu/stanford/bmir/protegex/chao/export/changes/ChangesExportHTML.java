@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,17 +27,28 @@ import edu.stanford.bmir.protegex.chao.ontologycomp.api.Timestamp;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultTimestamp;
 import edu.stanford.bmir.protegex.chao.util.ChangeDateComparator;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
+import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 
 /**
- * Exports the changes from the Changes and Annotation ontology (ChAO) to a HTML
- * file. It will also export an "export.metadata" file with the export date and max date for 
- * the export. And will also export a "entitiesToDelete.csv" that contains
- * the change objects and the timestamp objects that should be deleted from ChAO
- * (maybe with a SQL script to be faster).
+ * Exports the changes from the Changes and Annotation ontology (ChAO) to HTML and CSV
+ * file. 
+ * The script will generate in the output folder:
+ * - (1) The HTML files containing the changes after the max date (one HTML file per ontology entity)
+ * - (2) A file "exportedChanges.csv" that contains a tabular format of all the exported changes (change desc, author, timestamp, change inst name)
+ * - (3) A file "entitiesToDelete" prefixed with "yyyy-MM-dd.HHmmss" that contains a list of entity ids (changes and timestamps) that should be 
+ *       deleted from ChAO. They include changes and their timestamps that have been included in this export, but also changes and their
+ *       timestamps that are before the max date (E.g. subchanges, or invalid changes that are not part of the HTML and CSV export)
+ * - (4) An "export.metadata" file that contains the max date and the time of the export.
  * 
- *
+ * Notes: 
+ * This script is supposed to be run on the same folder at different dates (e.g., once yearly). The script assumes
+ * that the changes that have been exported, have also been deleted from ChAO. Even if not, a future run of the script will not include
+ * again in the HTML a change instance that already exists in the file. The CSV file will not make this distinction and may 
+ * include duplicates. If exported changes are deleted after each run of the script, as intended, this situation will not
+ * occur.
+ * 
  * @author ttania
  *
  */
@@ -59,6 +71,7 @@ public class ChangesExportHTML {
 
 	private ProjectChangeFilter changeFilter = new DefaultChangesFilter();
 
+	private KnowledgeBase kb;
 	private KnowledgeBase chaoKb;
 
 	private File exportHMTLDir;
@@ -70,17 +83,30 @@ public class ChangesExportHTML {
 
 	public static void main(String[] args) throws IOException {
 		if (args.length < 4) {
-		   	 log.severe("(1) ChAO file or project URI, " + 
+		   	 log.severe("(1) Path to ChAO file or project URI, " + 
 						"(2) Path to export HTML folder, "
 					  + "(3) Append to existing HTML files [true|false],"
-					  + "(4) Date up to which to export changes, date format: MM/dd/yyyy HH:mm:ss zzz");
+					  + "(4) Date up to which to export changes, date format: MM/dd/yyyy HH:mm:ss zzz"
+					  + "(5) Optional: Path to main pprj file to export entity browser text.");
 
 			System.exit(1);
 		}
 
 		initJavaMappings();
 
-		ChangesExportHTML exporter = new ChangesExportHTML(loadChaoKB(args[0]));
+		KnowledgeBase chaoKB = loadKB(args[0]);
+		
+		if (chaoKB == null) {
+			log.severe("Could not load project from: " + args[0]);
+			System.exit(1);
+		}
+		
+		KnowledgeBase kb = null;
+		if (args.length == 5) {
+			kb = loadKB(args[4]);
+		}
+		
+		ChangesExportHTML exporter = new ChangesExportHTML(chaoKB, kb);
 		exporter.setExportHMTLDir(new File(args[1]));
 		exporter.setAppend(Boolean.parseBoolean(args[2]));
 		exporter.setMaxDate(DefaultTimestamp.getDateParsed(args[3]));
@@ -100,7 +126,7 @@ public class ChangesExportHTML {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static KnowledgeBase loadChaoKB(String pprjPath) {
+	private static KnowledgeBase loadKB(String pprjPath) {
 		ArrayList errors = new ArrayList();
 
 		Project prj = Project.loadProjectFromFile(pprjPath, errors);
@@ -114,16 +140,12 @@ public class ChangesExportHTML {
 			}
 		}
 
-		if (kb == null) {
-			log.severe("Could not load ChAO KB from: " + pprjPath);
-			System.exit(1);
-		}
-
 		return kb;
 	}
 
-	public ChangesExportHTML(KnowledgeBase chaoKb) {
+	public ChangesExportHTML(KnowledgeBase chaoKb, KnowledgeBase kb) {
 		this.chaoKb = chaoKb;
+		this.kb = kb;
 	}
 
 	public void setExportHMTLDir(File exportHMTLDir) throws IOException {
@@ -182,6 +204,10 @@ public class ChangesExportHTML {
 	}
 
 
+	/**
+	 * @param oc
+	 * @throws IOException
+	 */
 	private void exportChanges(Ontology_Component oc) throws IOException {
 		
 		Collection<Change> changes = oc.getChanges();
@@ -196,30 +222,62 @@ public class ChangesExportHTML {
 			return;
 		}
 		
-		File file = getFile(oc.getCurrentName());
-		boolean shouldExportHeader = shouldExportHeader(file);
-				
-		FileWriter ocFileWriter = new FileWriter(file, append);
+		File ocFile = getFile(oc.getCurrentName());
+		boolean readExistingOCFile = append && ocFile.exists();
+		String existingOCFileContent = readExistingOCFile ? readExistingFile(ocFile) : "";
 		
-		if (shouldExportHeader == true) {
-			exportHeader(ocFileWriter);
-		}
+		//write to tmp file, so that we can insert the new changes at the beginning
+		//of the old file, and rename the file later.
 		
-		printExportDate(ocFileWriter);
+		File tmpFile = new File(exportHMTLDir, "tmp");
+		FileWriter tmpWriter = new FileWriter(tmpFile);
+		
+		exportHeader(tmpWriter, oc);
+		printExportDate(tmpWriter);
 		
 		for (Change change : filteredChanges) {
-			ocFileWriter.write("<tr> " + "<!-- " + ((AbstractWrappedInstance)change).getName() + " -->\n");
-			ocFileWriter.write(getChangeRow(change));
-			ocFileWriter.write("</tr>\n");
+			String changeInstName = ((AbstractWrappedInstance)change).getName();
+			
+			if (existingOCFileContent.contains(changeInstName)) {
+				log.warning(ocFile + " already contains change: " + changeInstName );
+			} else {
+				tmpWriter.write("<tr> " + "<!-- " + changeInstName + " -->\n");
+				tmpWriter.write(getChangeRow(change));
+				tmpWriter.write("</tr>\n");
+			}
 			
 			exportCSVRow(change);
 		}
 		
-		exportFooter(ocFileWriter);
+		if (readExistingOCFile == true) {
+			tmpWriter.write(existingOCFileContent);
+		}
 		
-		ocFileWriter.close();
+		exportFooter(tmpWriter);
+		
+		tmpWriter.close();
+		
+		renameTmpToOCFile(tmpFile,ocFile);
 	}
 
+
+	private void renameTmpToOCFile(File tmpFile, File ocFile) {
+		Path ocPath = new File(ocFile.getAbsolutePath()).toPath();
+		
+		if (ocFile.exists() == true) {
+			try {
+				Files.delete(ocFile.toPath());
+			} catch (IOException e) {
+				log.log(Level.SEVERE, "Could not delete file: " + ocFile, e);
+			}
+		}
+		
+		try {
+			Files.copy(tmpFile.toPath(), ocPath);
+		} catch (IOException e) {
+			log.log(Level.SEVERE, "Could not copy file: " + tmpFile + " to " + ocPath, e);
+		}
+	}
 
 	private void printExportDate(FileWriter w) throws IOException {
 		w.write("\n<!-- *************** Changes up to date: " + DefaultTimestamp.DATE_FORMAT.format(maxDate) +
@@ -237,9 +295,6 @@ public class ChangesExportHTML {
 		return filteredChanges;
 	}
 
-	private boolean shouldExportHeader(File exportFile) {
-		return exportFile.exists() == false || append == false;
-	}
 
 	private String getChangeRow(Change change) {
 		StringBuffer text = new StringBuffer();
@@ -255,23 +310,21 @@ public class ChangesExportHTML {
 		text.append("<td>");
 		Timestamp timestamp = change.getTimestamp();
 		text.append(timestamp == null ? "(no info)" : timestamp.getDate());
-		text.append("</td>\n");
+		text.append("</td>");
 
 		return text.toString();
 	}
 
 	private File getFile(String ocName) throws IOException {
 		ocName = ocName.replaceAll(FILE_NAME_REPLACE_REGEX, FILE_NAME_REPLACE_WITH);
-		File file = new File(exportHMTLDir, ocName + ".html");
-		
-		if (file.exists() == true && append == true) {
-			truncateFile(file);
-		}
-		
-		return file;
+		return new File(exportHMTLDir, ocName + ".html");
 	}
 
-	private void truncateFile(File file) throws IOException {
+	private String readExistingFile(File file) throws IOException {
+		if (file.exists() == false) {
+			return "";
+		}
+		
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 
 		StringBuffer output = new StringBuffer();
@@ -279,17 +332,18 @@ public class ChangesExportHTML {
 
 		while ((row = reader.readLine()) != null) {
 			row = row.trim();
-			if (row.contains("</html>") == false && row.contains("</body>") == false
-					&& row.contains("</table>") == false) {
+			//keep only empty rows, rows with comments, and rows with <tr> or <td>, but not <thead>
+			if     ( //row.length() == 0 || 
+					row.contains("<!--") ||
+					row.contains("td>") ||
+					(row.contains("tr>") && row.contains("thead>") == false) ) {
 				output.append(row);
 				output.append("\n");
 			}
 		}
 		reader.close();
 		
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		writer.write(output.toString());
-		writer.close();
+		return output.toString();
 	}
 	
 	
@@ -314,18 +368,31 @@ public class ChangesExportHTML {
 		return changeDate.before(maxDate);
 	}
 
-	private void exportHeader(Writer w) throws IOException {
+	private void exportHeader(Writer w, Ontology_Component oc) throws IOException {
 		w.write("<html>\n");
 		w.write("<head>\n" + 
 				"    <link href=\"style.css\" rel=\"stylesheet\" type=\"text/css\">\n" + 
 				"</head>\n\n");
 		w.write("<body>\n");
+		w.write("<p>\n");
+		w.write("<h1>Changes for <i>" + getOCDisplayName(oc) + "</i></h1>");
+		w.write("<p>that occured before " + DefaultTimestamp.DATE_FORMAT.format(maxDate) + "</p>\n\n");
 		w.write("<table>\n");
 		w.write("<thead> <tr> <th>Description</th> <th>Author</th> <th>Timestamp</th> </tr></thead>\n");
 	}
 
+	private String getOCDisplayName(Ontology_Component oc) {
+		String currentName = oc.getCurrentName();
+		if (kb == null) {
+			return currentName;
+		}
+		
+		Frame inst = kb.getFrame(currentName);
+		return inst == null ? currentName : inst.getBrowserText();
+	}
+
 	private void exportFooter(Writer w) throws IOException {
-		w.write("\n</table>\n\n");
+		w.write("</table>\n\n");
 		w.write("</body>\n</html>\n");
 	}
 
@@ -393,7 +460,7 @@ public class ChangesExportHTML {
         text.append(CSV_SEPARATOR);
 
         Timestamp timestamp = change.getTimestamp();
-        text.append(timestamp == null ? "(no timestamp)" : timestamp.getDate());
+        text.append(timestamp == null ? "(no_timestamp)" : timestamp.getDate());
         text.append(CSV_SEPARATOR);
         text.append(change.getApplyTo().getCurrentName());
         text.append(CSV_SEPARATOR);
