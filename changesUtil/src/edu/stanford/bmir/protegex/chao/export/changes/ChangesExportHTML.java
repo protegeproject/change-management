@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -65,7 +66,7 @@ public class ChangesExportHTML {
 	public static final String ENTITIES_TO_DELETE_FILE = "entitiesToDelete.csv";
 	public static final String EXPORTED_CHANGES_CSV_FILE = "exportedChanges.csv";
 	
-	public static final String STYLES_CSS = "etc/style.css";
+	public static final String STYLE_CSS = "style.css";
 
 	private static Logger log = Logger.getLogger(ChangesExportHTML.class.getName());
 
@@ -161,7 +162,9 @@ public class ChangesExportHTML {
 		
 		//copy the styles.css file
 		try {
-			Files.copy(new File(STYLES_CSS).toPath(), styleFile.toPath());
+			URI sourceURL = ChangesExportHTML.class.getClassLoader().
+				getResource("edu/stanford/bmir/protegex/chao/export/changes/style.css").toURI();
+			Files.copy(new File(sourceURL).toPath(), styleFile.toPath());
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Could not copy styles.css file.", e);
 		}
@@ -201,7 +204,10 @@ public class ChangesExportHTML {
 		}
 		
 		closeWriters();
+		deleteTmpFile();
 	}
+
+
 
 
 	/**
@@ -400,6 +406,15 @@ public class ChangesExportHTML {
     	toDeleteWriter.close();
     	csvWriter.close();
     }
+    
+	private void deleteTmpFile() {
+		File tmpFile = new File(exportHMTLDir, "tmp");
+		try {
+			Files.delete(tmpFile.toPath());
+		} catch (IOException e) {
+			//do nothing
+		}
+	}
 	
     
     // ************** Write metadata file **************
