@@ -95,6 +95,7 @@ public class ChangesExportHTML {
 
 		initJavaMappings();
 
+		log.info("Loading ChAO from: " + args[0]);
 		KnowledgeBase chaoKB = loadKB(args[0]);
 		
 		if (chaoKB == null) {
