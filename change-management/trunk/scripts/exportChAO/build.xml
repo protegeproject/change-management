@@ -55,6 +55,7 @@
 	        	dir="." 
 	            	classname="edu.stanford.bmir.protegex.chao.export.changes.ChangesExportHTML"
                         maxmemory="${heap.size.max}">
+	        	<jvmarg value="-agentlib:jdwp=transport=dt_socket,address=8100,server=y,suspend=n" />
 		      	<classpath refid = "project.classpath"/>	        	
 	 			<arg value="${chao.pprj.file}"/>
 				<arg value="${export.folder}"/>
