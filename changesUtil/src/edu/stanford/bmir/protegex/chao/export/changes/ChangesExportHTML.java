@@ -31,7 +31,6 @@ import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
-import edu.stanford.smi.protege.storage.database.DatabaseKnowledgeBaseFactory;
 
 /**
  * Exports the changes from the Changes and Annotation ontology (ChAO) to HTML and CSV
@@ -97,9 +96,7 @@ public class ChangesExportHTML {
 		initJavaMappings();
 
 		log.info("Loading ChAO from: " + args[0]);
-		//workaround for pprj loading bug! Params are hard coded
-		//KnowledgeBase chaoKB = loadKB(args[0]);
-		KnowledgeBase chaoKB = loadChAOKb("icd_ann");
+		KnowledgeBase chaoKB = loadKB(args[0]);
 		
 		if (chaoKB == null) {
 			log.severe("Could not load project from: " + args[0]);
@@ -148,16 +145,6 @@ public class ChangesExportHTML {
 		return kb;
 	}
 
-    private static KnowledgeBase loadChAOKb(String tableName) {
-        DatabaseKnowledgeBaseFactory factory = new DatabaseKnowledgeBaseFactory();
-        ArrayList errors = new ArrayList();
-        Project prj = Project.createNewProject(factory, errors);
-        DatabaseKnowledgeBaseFactory.setSources(prj.getSources(), "com.mysql.jdbc.Driver",
-        		"jdbc:mysql://localhost:3306/protege", tableName, "protege", "protege");
-        prj.createDomainKnowledgeBase(factory, errors, true);
-        return prj.getKnowledgeBase();
-    }
-	
 	public ChangesExportHTML(KnowledgeBase chaoKb, KnowledgeBase kb) {
 		this.chaoKb = chaoKb;
 		this.kb = kb;
