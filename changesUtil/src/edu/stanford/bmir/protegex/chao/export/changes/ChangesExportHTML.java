@@ -108,10 +108,13 @@ public class ChangesExportHTML {
 			kb = loadKB(args[4]);
 		}
 		
+		Date maxDate = DefaultTimestamp.getDateParsed(args[3]);
+		log.info("Exporting changes after: " + maxDate);
+		
 		ChangesExportHTML exporter = new ChangesExportHTML(chaoKB, kb);
 		exporter.setExportHMTLDir(new File(args[1]));
 		exporter.setAppend(Boolean.parseBoolean(args[2]));
-		exporter.setMaxDate(DefaultTimestamp.getDateParsed(args[3]));
+		exporter.setMaxDate(maxDate);
 
 		log.info("Started ChAO to HTML export on " + new Date());
 
