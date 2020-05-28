@@ -31,6 +31,7 @@ import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
+import edu.stanford.smi.protege.model.Transaction;
 
 /**
  * Exports the changes from the Changes and Annotation ontology (ChAO) to HTML and CSV
@@ -310,7 +311,7 @@ public class ChangesExportHTML {
 		StringBuffer text = new StringBuffer();
 
 		text.append("<td>");
-		text.append(change.getContext());
+		text.append(getChangeDescription(change.getContext()));
 		text.append("</td> ");
 
 		text.append("<td>");
@@ -472,7 +473,7 @@ public class ChangesExportHTML {
     private String getCSVChangeRow(Change change) {
         StringBuffer text = new StringBuffer();
 
-        text.append(quote(change.getContext()));
+        text.append(quote(getChangeDescription(change.getContext())));
         text.append(CSV_SEPARATOR);
 
         text.append(change.getAuthor());
@@ -497,5 +498,16 @@ public class ChangesExportHTML {
     
     private String quote(String s) {
         return CSV_QUOTE_CHAR + s.replaceAll("\\" + CSV_QUOTE_CHAR, CSV_QUOTE_CHAR + CSV_QUOTE_CHAR) + CSV_QUOTE_CHAR;
+    }
+    
+    private String getChangeDescription(String text) {
+        if (text == null) {
+            return "No details";
+        }
+        int index = text.indexOf(Transaction.APPLY_TO_TRAILER_STRING);
+        if (index > 0) {
+            return text.substring(0, index);
+        }
+        return text;
     }
 }
