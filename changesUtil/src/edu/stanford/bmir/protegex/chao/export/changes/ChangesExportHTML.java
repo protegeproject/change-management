@@ -424,7 +424,7 @@ public class ChangesExportHTML {
     // ************** Write metadata file **************
     
     private void exportMetadata(String exportFolder) throws IOException {
-		File metadataFile = new File(exportFolder + METADATA_FILE);
+		File metadataFile = new File(exportFolder, METADATA_FILE);
 		FileWriter w = new FileWriter(metadataFile, append);
 		w.write("\n");
 		w.write("exported-on:" + DefaultTimestamp.DATE_FORMAT.format(new Date()) + "\n");
