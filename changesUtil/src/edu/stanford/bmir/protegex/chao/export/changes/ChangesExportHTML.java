@@ -194,10 +194,12 @@ public class ChangesExportHTML {
 		
 		Collection<Ontology_Component> ocs = new OntologyComponentFactory(chaoKb).getAllOntology_ComponentObjects(true);
 
+		List<Change> changesToDelete = new ArrayList<Change>();
+		
 		int i = 0;
 		for (Ontology_Component oc : ocs) {
 			try {
-				exportChanges(oc);
+				 changesToDelete.addAll(exportChanges(oc));
 				i++;
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Exceptions at export" , e);
@@ -210,6 +212,9 @@ public class ChangesExportHTML {
 		
 		closeWriters();
 		deleteTmpFile();
+		
+		//do the actual delete
+		deleteChanges(changesToDelete);
 	}
 
 
@@ -219,7 +224,7 @@ public class ChangesExportHTML {
 	 * @param oc
 	 * @throws IOException
 	 */
-	private void exportChanges(Ontology_Component oc) throws IOException {
+	private List<Change> exportChanges(Ontology_Component oc) throws IOException {
 		
 		Collection<Change> changes = oc.getChanges();
 		List<Change> filteredChanges = filterChanges(changes);
@@ -230,7 +235,7 @@ public class ChangesExportHTML {
 		printToDeleteEntities(changes);
 		
 		if (filteredChanges.size() == 0) { //don't export entities with no changes
-			return;
+			return filteredChanges;
 		}
 		
 		File ocFile = getFile(oc.getCurrentName());
@@ -270,8 +275,7 @@ public class ChangesExportHTML {
 		
 		renameTmpToOCFile(tmpFile,ocFile);
 		
-		//do the actual delete
-		deleteChanges(filteredChanges);
+		return filteredChanges;
 	}
 
 	private void deleteChanges(List<Change> changesToDel) {
