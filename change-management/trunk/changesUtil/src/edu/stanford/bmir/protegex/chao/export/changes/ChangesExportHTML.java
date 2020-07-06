@@ -269,8 +269,29 @@ public class ChangesExportHTML {
 		tmpWriter.close();
 		
 		renameTmpToOCFile(tmpFile,ocFile);
+		
+		//do the actual delete
+		deleteChanges(filteredChanges);
 	}
 
+	private void deleteChanges(List<Change> changesToDel) {
+		log.info("Starting deleting changes ..");
+		int count = 0;
+		for (Change change : changesToDel) {
+			if (shouldDeleteChange(change) == true) {
+				((AbstractWrappedInstance)change.getTimestamp()).delete();
+				((AbstractWrappedInstance)change).delete();
+				
+				count ++;
+				
+				if (count % 1000 == 0) {
+					log.info("Deleted " + count + " changes.");
+				}
+			}
+		}
+		
+		log.info("Finished deleting changes .. ");
+	}
 
 	private void renameTmpToOCFile(File tmpFile, File ocFile) {
 		Path ocPath = new File(ocFile.getAbsolutePath()).toPath();
