@@ -250,4 +250,24 @@ public class ServerChangesUtil {
         }
         return annotatedOcs;
     }
+    
+    
+    public static Collection<Annotation> getAnnotatations(Ontology_Component oc) {
+    	return getAnnotations(oc, new HashSet<AnnotatableThing>());
+    }
+    
+    private static Collection<Annotation> getAnnotations(AnnotatableThing annThing, Set<AnnotatableThing> visited) {
+    	Collection<Annotation> annotations = annThing.getAssociatedAnnotations();
+        Set<Annotation> retAnnotations = new HashSet<Annotation>();
+        retAnnotations.addAll(annotations);
+        if (!visited.contains(annThing)) {
+            visited.add(annThing);
+            for (AnnotatableThing annotatableThing : annotations) {
+               if (annotatableThing.canAs(AnnotatableThing.class)) {
+                    retAnnotations.addAll(getAnnotations(annotatableThing.as(AnnotatableThing.class), visited));
+                }
+            }
+        }
+        return retAnnotations;
+    }
  }
