@@ -517,6 +517,9 @@ public class NotesExportHTML {
     }
     
     private String quote(String s) {
+    	if (s == null) {
+    		return "";
+    	}
         return CSV_QUOTE_CHAR + s.replaceAll("\\" + CSV_QUOTE_CHAR, CSV_QUOTE_CHAR + CSV_QUOTE_CHAR) + CSV_QUOTE_CHAR;
     }
     
