@@ -1,4 +1,4 @@
-package edu.stanford.bmir.protegex.chao.export.changes;
+package edu.stanford.bmir.protegex.chao.export.notes;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,41 +20,44 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import edu.stanford.bmir.protegex.chao.annotation.api.AnnotatableThing;
+import edu.stanford.bmir.protegex.chao.annotation.api.Annotation;
 import edu.stanford.bmir.protegex.chao.annotation.api.OntologyJavaMapping;
-import edu.stanford.bmir.protegex.chao.change.api.Change;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyComponentFactory;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Ontology_Component;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.Timestamp;
 import edu.stanford.bmir.protegex.chao.ontologycomp.api.impl.DefaultTimestamp;
-import edu.stanford.bmir.protegex.chao.util.ChangeDateComparator;
+import edu.stanford.bmir.protegex.chao.util.NoteDateComparator;
 import edu.stanford.smi.protege.code.generator.wrapping.AbstractWrappedInstance;
 import edu.stanford.smi.protege.model.Frame;
 import edu.stanford.smi.protege.model.KnowledgeBase;
 import edu.stanford.smi.protege.model.Project;
 import edu.stanford.smi.protege.model.Transaction;
+import edu.stanford.smi.protege.util.CollectionUtilities;
+import edu.stanford.smi.protegex.server_changes.ServerChangesUtil;
 
 /**
- * Exports the changes from the Changes and Annotation ontology (ChAO) to HTML and CSV
+ * Exports the notes from the Changes and Annotation ontology (ChAO) to HTML and CSV
  * file. 
  * The script will generate in the output folder:
- * - (1) The HTML files containing the changes after the max date (one HTML file per ontology entity)
- * - (2) A file "exportedChanges.csv" that contains a tabular format of all the exported changes (change desc, author, timestamp, change inst name)
- * - (3) A file "entitiesToDelete" prefixed with "yyyy-MM-dd.HHmmss" that contains a list of entity ids (changes and timestamps) that should be 
- *       deleted from ChAO. They include changes and their timestamps that have been included in this export, but also changes and their
- *       timestamps that are before the max date (E.g. subchanges, or invalid changes that are not part of the HTML and CSV export)
+ * - (1) The HTML files containing the notes after the max date (one HTML file per ontology entity)
+ * - (2) A file "exportedNotes.csv" that contains a tabular format of all the exported notes
+ * - (3) A file "entitiesToDelete" prefixed with "yyyy-MM-dd.HHmmss" that contains a list of entity ids (notes and timestamps) that should be 
+ *       deleted from ChAO. They include notes and their timestamps that have been included in this export, but also notes and their
+ *       timestamps that are before the max date 
  * - (4) An "export.metadata" file that contains the max date and the time of the export.
  * 
  * Notes: 
  * This script is supposed to be run on the same folder at different dates (e.g., once yearly). The script assumes
- * that the changes that have been exported, have also been deleted from ChAO. Even if not, a future run of the script will not include
- * again in the HTML a change instance that already exists in the file. The CSV file will not make this distinction and may 
- * include duplicates. If exported changes are deleted after each run of the script, as intended, this situation will not
+ * that the notes that have been exported, have also been deleted from ChAO. Even if not, a future run of the script will not include
+ * again in the HTML a note instance that already exists in the file. The CSV file will not make this distinction and may 
+ * include duplicates. If exported notes are deleted after each run of the script, as intended, this situation will not
  * occur.
  * 
  * @author ttania
  *
  */
-public class ChangesExportHTML {
+public class NotesExportHTML {
 
 	public static final String FILE_NAME_REPLACE_REGEX = "[\\/:\"*?<>|#]+";
 	public static final String FILE_NAME_REPLACE_WITH = "_";
@@ -65,13 +68,11 @@ public class ChangesExportHTML {
 	
 	public static final String METADATA_FILE = "export.metadata";
 	public static final String ENTITIES_TO_DELETE_FILE = "entitiesToDelete.csv";
-	public static final String EXPORTED_CHANGES_CSV_FILE = "exportedChanges.csv";
+	public static final String EXPORTED_NOTES_CSV_FILE = "exportedNotes.csv";
 	
 	public static final String STYLE_CSS = "style.css";
 
-	private static Logger log = Logger.getLogger(ChangesExportHTML.class.getName());
-
-	private ProjectChangeFilter changeFilter = new DefaultChangesFilter();
+	private static Logger log = Logger.getLogger(NotesExportHTML.class.getName());
 
 	private KnowledgeBase kb;
 	private KnowledgeBase chaoKb;
@@ -88,7 +89,7 @@ public class ChangesExportHTML {
 		   	 log.severe("(1) Path to ChAO file or project URI, " + 
 						"(2) Path to export HTML folder, "
 					  + "(3) Append to existing HTML files [true|false],"
-					  + "(4) Date up to which to export changes, date format: MM/dd/yyyy HH:mm:ss zzz"
+					  + "(4) Date up to which to export notes, date format: MM/dd/yyyy HH:mm:ss zzz"
 					  + "(5) Optional: Path to main pprj file to export entity browser text.");
 
 			System.exit(1);
@@ -112,14 +113,14 @@ public class ChangesExportHTML {
 		Date maxDate = DefaultTimestamp.getDateParsed(args[3]);
 		log.info("Exporting changes before date: " + maxDate);
 		
-		ChangesExportHTML exporter = new ChangesExportHTML(chaoKB, kb);
+		NotesExportHTML exporter = new NotesExportHTML(chaoKB, kb);
 		exporter.setExportHMTLDir(new File(args[1]));
 		exporter.setAppend(Boolean.parseBoolean(args[2]));
 		exporter.setMaxDate(maxDate);
 
 		log.info("Started ChAO to HTML export on " + new Date());
 
-		exporter.exportChanges();
+		exporter.exportNotes();
 		exporter.exportMetadata(args[1]);
 
 		log.info("Ended ChAO to HTML export on " + new Date());
@@ -128,7 +129,8 @@ public class ChangesExportHTML {
 	private static void initJavaMappings() {
 		OntologyJavaMapping.initMap();
 		edu.stanford.bmir.protegex.chao.ontologycomp.api.OntologyJavaMapping.initMap();
-		edu.stanford.bmir.protegex.chao.change.api.OntologyJavaMapping.initMap();
+		//edu.stanford.bmir.protegex.chao.change.api.OntologyJavaMapping.initMap();
+		edu.stanford.bmir.protegex.chao.annotation.api.OntologyJavaMapping.initMap();
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -149,7 +151,7 @@ public class ChangesExportHTML {
 		return kb;
 	}
 
-	public ChangesExportHTML(KnowledgeBase chaoKb, KnowledgeBase kb) {
+	public NotesExportHTML(KnowledgeBase chaoKb, KnowledgeBase kb) {
 		this.chaoKb = chaoKb;
 		this.kb = kb;
 	}
@@ -167,7 +169,7 @@ public class ChangesExportHTML {
 		
 		//copy the styles.css file
 		try {
-			URI sourceURL = ChangesExportHTML.class.getClassLoader().
+			URI sourceURL = NotesExportHTML.class.getClassLoader().
 				getResource("edu/stanford/bmir/protegex/chao/export/changes/style.css").toURI();
 			Files.copy(new File(sourceURL).toPath(), styleFile.toPath());
 		} catch (Exception e) {
@@ -189,7 +191,7 @@ public class ChangesExportHTML {
 		this.maxDate = maxDate;
 	}
 
-	public void exportChanges() throws IOException {
+	public void exportNotes() throws IOException {
 		initWriters();
 		
 		Collection<Ontology_Component> ocs = new OntologyComponentFactory(chaoKb).getAllOntology_ComponentObjects(true);
@@ -197,7 +199,7 @@ public class ChangesExportHTML {
 		int i = 0;
 		for (Ontology_Component oc : ocs) {
 			try {
-				exportChanges(oc);
+				exportNotes(oc);
 				i++;
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Exceptions at export" , e);
@@ -213,23 +215,22 @@ public class ChangesExportHTML {
 	}
 
 
-
-
 	/**
 	 * @param oc
 	 * @throws IOException
 	 */
-	private void exportChanges(Ontology_Component oc) throws IOException {
+	private void exportNotes(Ontology_Component oc) throws IOException {
 		
-		Collection<Change> changes = oc.getChanges();
-		List<Change> filteredChanges = filterChanges(changes);
+		//Collection<Annotation> notes = oc.getAssociatedAnnotations();
+		Collection<Annotation> notes = ServerChangesUtil.getAnnotatations(oc);
+		List<Annotation> filteredNotes = filterNotes(notes);
 		
-		Collections.sort(filteredChanges, new ChangeDateComparator(chaoKb));
-		Collections.reverse(filteredChanges);
+		Collections.sort(filteredNotes, new NoteDateComparator(chaoKb));
+		Collections.reverse(filteredNotes);
 		
-		printToDeleteEntities(changes);
+		printToDeleteEntities(notes);
 		
-		if (filteredChanges.size() == 0) { //don't export entities with no changes
+		if (filteredNotes.size() == 0) { //don't export entities with no changes
 			return;
 		}
 		
@@ -246,18 +247,18 @@ public class ChangesExportHTML {
 		exportHeader(tmpWriter, oc);
 		printExportDate(tmpWriter);
 		
-		for (Change change : filteredChanges) {
-			String changeInstName = ((AbstractWrappedInstance)change).getName();
+		for (Annotation note : filteredNotes) {
+			String changeInstName = ((AbstractWrappedInstance)note).getName();
 			
 			if (existingOCFileContent.contains(changeInstName)) {
 				log.warning(ocFile + " already contains change: " + changeInstName );
 			} else {
 				tmpWriter.write("<tr> " + "<!-- " + changeInstName + " -->\n");
-				tmpWriter.write(getChangeRow(change));
+				tmpWriter.write(getNoteHtmlRow(note));
 				tmpWriter.write("</tr>\n");
 			}
 			
-			exportCSVRow(change);
+			exportCSVRow(note);
 		}
 		
 		if (readExistingOCFile == true) {
@@ -295,35 +296,43 @@ public class ChangesExportHTML {
 				" *************** -->\n\n");
 	}
 
-	private List<Change> filterChanges(Collection<Change> changes) {
-		List<Change> filteredChanges = new ArrayList<>();
-		for (Change change : changes) {
-			if (shouldExportChange(change) == true) {
-				filteredChanges.add(change);
+	private List<Annotation> filterNotes(Collection<Annotation> notes) {
+		List<Annotation> filteredNotes = new ArrayList<>();
+		for (Annotation note : notes) {
+			if (shouldExportNote(note) == true) {
+				filteredNotes.add(note);
 			}
 		}
-		return filteredChanges;
+		return filteredNotes;
 	}
 
-
-	private String getChangeRow(Change change) {
+	private String getNoteHtmlRow(Annotation note) {
 		StringBuffer text = new StringBuffer();
 
 		text.append("<td>");
-		text.append(getChangeDescription(change.getContext()));
+		text.append(note.getSubject());
+		text.append("</td> ");
+		
+		text.append("<td>");
+		text.append(note.getBody());
 		text.append("</td> ");
 
 		text.append("<td>");
-		text.append(change.getAuthor());
+		text.append(note.getAuthor());
 		text.append("</td> ");
-
+		
 		text.append("<td>");
-		Timestamp timestamp = change.getTimestamp();
+		Timestamp timestamp = note.getCreated();
 		text.append(timestamp == null ? "(no info)" : timestamp.getDate());
 		text.append("</td>");
+		
+		text.append("<td>");
+		text.append(getNoteType(note));
+		text.append("</td> ");
 
 		return text.toString();
 	}
+
 
 	private File getFile(String ocName) throws IOException {
 		ocName = ocName.replaceAll(FILE_NAME_REPLACE_REGEX, FILE_NAME_REPLACE_WITH);
@@ -357,29 +366,18 @@ public class ChangesExportHTML {
 	}
 	
 	
-	private boolean shouldExportChange(Change change) {
-		Ontology_Component applyTo = change.getApplyTo();
-		if (applyTo == null) {
-			return false;
+	private boolean shouldExportNote(Annotation note) {
+		Timestamp timestamp = note.getCreated();
+		if (timestamp == null) {
+			return true;
 		}
-		if (applyTo.getCurrentName() == null) {
-			return false;
-		}
-
-		/*if (changeFilter.isFilteredOut(change) == true) {
-			return false;
-		}*/
-		
-		if (change.getPartOfCompositeChange() != null) {
-			return false;
-		}
-		
-		Date changeDate = change.getTimestamp().getDateParsed();
-		if (changeDate == null) {
+		Date date = timestamp.getDateParsed();
+			
+		if (date == null) {
 			return true;
 		}
 		
-		return changeDate.before(maxDate);
+		return date.before(maxDate);
 	}
 
 	private void exportHeader(Writer w, Ontology_Component oc) throws IOException {
@@ -389,10 +387,10 @@ public class ChangesExportHTML {
 				"</head>\n\n");
 		w.write("<body>\n");
 		w.write("<p>\n");
-		w.write("<h1>Changes for <i>" + getOCDisplayName(oc) + "</i></h1>");
+		w.write("<h1>Notes for <i>" + getOCDisplayName(oc) + "</i></h1>");
 		w.write("<p>that occured before " + DefaultTimestamp.DATE_FORMAT.format(maxDate) + "</p>\n\n");
 		w.write("<table>\n");
-		w.write("<thead> <tr> <th>Description</th> <th>Author</th> <th>Timestamp</th> </tr></thead>\n");
+		w.write("<thead> <tr> <th>Subject</th> <th>Body</th> <th>Author</th> <th>Timestamp</th> <th>Type</th> </tr></thead>\n");
 	}
 
 	private String getOCDisplayName(Ontology_Component oc) {
@@ -443,60 +441,79 @@ public class ChangesExportHTML {
 		toDeleteWriter = new BufferedWriter(new FileWriter(new File(exportHMTLDir, prefix + "." + ENTITIES_TO_DELETE_FILE)));
 	}
 	
-	/**
-	 * This method will print also changes that might not be included in the
-	 * HTML export, e.g., subchanges, or invalid changes 
-	 * that have a prior date to max date
-	 * @param changes
-	 * @throws IOException 
-	 */
-	private void printToDeleteEntities(Collection<Change> changes) throws IOException {
-		for (Change change : changes) {
-			if (shouldDeleteChange(change) == true) {
-				toDeleteWriter.write(((AbstractWrappedInstance)change).getName() + "\n");
-				toDeleteWriter.write(((AbstractWrappedInstance)change.getTimestamp()).getName() + "\n");
-				
-				//for testing purposes
-				//toDeleteWriter.write(((AbstractWrappedInstance)change).getName() + CSV_SEPARATOR + change.getTimestamp().getDate() + "\n");
-				//toDeleteWriter.write(((AbstractWrappedInstance)change.getTimestamp()).getName() + CSV_SEPARATOR + change.getTimestamp().getDate() + "\n");
+
+	private void printToDeleteEntities(Collection<Annotation> notes) throws IOException {
+		for (Annotation note : notes) {
+			if (shouldExportNote(note) == true) {
+				toDeleteWriter.write(((AbstractWrappedInstance)note).getName() + "\n");
+				toDeleteWriter.write(((AbstractWrappedInstance)note.getCreated()).getName() + "\n");
 			}
 		}
 	}
 	
-	private boolean shouldDeleteChange(Change change) {
-		return change.getTimestamp().getDateParsed().before(maxDate);
-	}
-    
     // ************** CSV export ****************
 	
 	private void initCSVWriter() throws IOException {
-		csvWriter = new BufferedWriter(new FileWriter(new File(exportHMTLDir, EXPORTED_CHANGES_CSV_FILE), append));
+		csvWriter = new BufferedWriter(new FileWriter(new File(exportHMTLDir, EXPORTED_NOTES_CSV_FILE), append));
 	}
     
-    private String getCSVChangeRow(Change change) {
+    private String getNoteCSVRow(Annotation note) {
         StringBuffer text = new StringBuffer();
 
-        text.append(quote(getChangeDescription(change.getContext())));
+        text.append(quote(note.getSubject()));
+        text.append(CSV_SEPARATOR);
+        
+        text.append(quote(note.getBody()));
         text.append(CSV_SEPARATOR);
 
-        text.append(change.getAuthor());
+        text.append(getNoteType(note));
         text.append(CSV_SEPARATOR);
 
-        Timestamp timestamp = change.getTimestamp();
-        text.append(timestamp == null ? "(no_timestamp)" : timestamp.getDate());
-        text.append(CSV_SEPARATOR);
-        text.append(change.getApplyTo().getCurrentName());
+        text.append(getNoteAttachedToOC(note));
         text.append(CSV_SEPARATOR);
 
-        text.append(((AbstractWrappedInstance)change).getName());
+        text.append(getNoteDirectAnnotatesId(note));
         text.append(CSV_SEPARATOR);
 
-        text.append("\n");
+        text.append(note.getAuthor());
+        text.append(CSV_SEPARATOR);
+
+        Timestamp timestamp = note.getCreated();
+        text.append(timestamp == null ? "" : timestamp.getDate());
+        text.append(CSV_SEPARATOR);
+
+        text.append(((AbstractWrappedInstance)note).getName());
+        text.append(CSV_SEPARATOR);
+        
         return text.toString();
     }
     
-    private void exportCSVRow(Change change) throws IOException {
-    	csvWriter.write(getCSVChangeRow(change));
+    
+    private String getNoteType(Annotation note) {
+        String name = note.getClass().getSimpleName();
+        return name.replace("Default", "");
+    } 
+    
+    private String getNoteAttachedToOC(Annotation note) {
+        Collection<Ontology_Component> ocs = ServerChangesUtil.getAnnotatedOntologyComponents(note);
+        if (ocs.size() > 0) {
+            Ontology_Component oc = CollectionUtilities.getFirstItem(ocs);
+            return oc == null ? "" : oc.getCurrentName();
+        }
+        return "";
+    }
+
+    private String getNoteDirectAnnotatesId(Annotation note) {
+        Collection<AnnotatableThing> anns = note.getAnnotates();
+        AnnotatableThing ann = CollectionUtilities.getFirstItem(anns);
+        if (ann == null) {
+            return "";
+        }
+       return ((AbstractWrappedInstance)ann).getName();
+    }
+    
+    private void exportCSVRow(Annotation note) throws IOException {
+    	csvWriter.write(getNoteCSVRow(note));
     }
     
     private String quote(String s) {

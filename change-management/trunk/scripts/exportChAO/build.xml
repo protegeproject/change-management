@@ -65,6 +65,22 @@
 	       		<arg value="${main.pprj.file}"/>
 	        </java>
 	 </target>
+	
+	 <target name="notes" depends="checkProtegeLibsAndReport">
+		        <java 
+				fork="true" 
+		        	dir="." 
+		            	classname="edu.stanford.bmir.protegex.chao.export.notes.NotesExportHTML"
+	                        maxmemory="${heap.size.max}">
+		        	<jvmarg value="-agentlib:jdwp=transport=dt_socket,address=8100,server=y,suspend=n" />
+			      	<classpath refid = "project.classpath"/>	        	
+		 			<arg value="${chao.pprj.file}"/>
+					<arg value="${export.folder}"/>
+					<arg value="${append.to.existing.files}"/>
+		       		<arg value="${max.date}"/>
+		       		<arg value="${main.pprj.file}"/>
+		        </java>
+		 </target>
 
 	
 </project>
