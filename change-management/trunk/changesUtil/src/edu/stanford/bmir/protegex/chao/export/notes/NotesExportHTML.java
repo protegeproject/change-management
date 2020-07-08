@@ -446,7 +446,11 @@ public class NotesExportHTML {
 		for (Annotation note : notes) {
 			if (shouldExportNote(note) == true) {
 				toDeleteWriter.write(((AbstractWrappedInstance)note).getName() + "\n");
-				toDeleteWriter.write(((AbstractWrappedInstance)note.getCreated()).getName() + "\n");
+				Timestamp ts = note.getCreated();
+				
+				if (ts != null) {
+					toDeleteWriter.write(((AbstractWrappedInstance)ts).getName() + "\n");
+				} 
 			}
 		}
 	}
