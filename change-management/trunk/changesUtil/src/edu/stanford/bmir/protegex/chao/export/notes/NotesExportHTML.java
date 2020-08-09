@@ -464,7 +464,7 @@ public class NotesExportHTML {
     private String getNoteCSVRow(Annotation note) {
         StringBuffer text = new StringBuffer();
 
-        text.append(quote(note.getSubject()));
+        text.append(quote(getSubjectText(note.getSubject())));
         text.append(CSV_SEPARATOR);
         
         text.append(quote(note.getBody()));
@@ -527,7 +527,7 @@ public class NotesExportHTML {
         return CSV_QUOTE_CHAR + s.replaceAll("\\" + CSV_QUOTE_CHAR, CSV_QUOTE_CHAR + CSV_QUOTE_CHAR) + CSV_QUOTE_CHAR;
     }
     
-    private String getChangeDescription(String text) {
+    private String getSubjectText(String text) {
         if (text == null) {
             return "No details";
         }
