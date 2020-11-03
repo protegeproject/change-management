@@ -60,6 +60,7 @@ public class ChangesExport {
 
     private ProjectChangeFilter changeFilter;
     private Date maxDate;
+    private Date minDate;
     
     private String dbTable = null;
 
@@ -68,8 +69,9 @@ public class ChangesExport {
             log.severe("(1) ChAO file or project URI, " +
                     "(2) Path to the exported file, " +
                     "(3) The project change filter (NCI | ICD | something else), "
-                  + "(4) Date up to which to export changes, date format: MM/dd/yyyy HH:mm:ss zzz "
-                  + "(5) Append to existing CSV file [true|false] ");
+                  + "(4) Max date: Date up to which to export changes, date format: MM/dd/yyyy HH:mm:ss zzz. If null, don't use max threshold. "
+                  + "(5) Min date: Date up from which to export changes, date format: MM/dd/yyyy HH:mm:ss zzz. If null, don't use min threshold. "
+                  + "(6) Append to existing CSV file [true|false] ");
             System.exit(1);
         }
 
@@ -89,12 +91,14 @@ public class ChangesExport {
         Writer w = new FileWriter(new File(exportFilePath), Boolean.parseBoolean(args[3])); //second arg: append or not
         
         exporter.setMaxDate(DefaultTimestamp.getDateParsed(args[3]));
+        exporter.setMaxDate(DefaultTimestamp.getDateParsed(args[4]));
+        
         exporter.printHeader(w);
         exporter.exportChanges(exporter.getKb(chaoPrjPath), w);
         
         w.close();
         
-        exporter.exportMetadata(args[1], Boolean.parseBoolean(args[3]));
+        exporter.exportMetadata(args[1], Boolean.parseBoolean(args[6]));
 
         log.info("Ended ChAO to CSV export on " + new Date());
     }
@@ -146,6 +150,10 @@ public class ChangesExport {
 	public void setMaxDate(Date maxDate) {
 		this.maxDate = maxDate;
 	}
+	
+	public void setMinDate(Date minDate) {
+		this.minDate = minDate;
+	}
     
     public void exportChanges(KnowledgeBase chAOKb, Writer w) throws IOException {
         log.info("Started getting all changes on " + new Date());
@@ -189,14 +197,21 @@ public class ChangesExport {
 			return true;
 		}
 		
-		return changeDate.before(maxDate);
+		if (minDate != null && changeDate.before(minDate)) {
+			return false;
+		}
+		
+		return maxDate == null || changeDate.before(maxDate);
     }
 
 
     public void printHeader(Writer w) throws IOException {
-        w.write("change_desc" + SEPARATOR + "change_type" + SEPARATOR +
+        /*w.write("change_desc" + SEPARATOR + "change_type" + SEPARATOR +
                 "entity_type" + SEPARATOR + "entity" + SEPARATOR + "author" + SEPARATOR + "timestamp" +
                 SEPARATOR + "change_id" + SEPARATOR + "db_table" + "\n");
+                */
+    	w.write("entity" + SEPARATOR + "timestamp" + SEPARATOR + "change_desc" + 
+                		   SEPARATOR + "author" + SEPARATOR + "change_id" + "\n");
     }
 
 
@@ -207,31 +222,21 @@ public class ChangesExport {
     private String getChangeRow(Change change) {
         StringBuffer text = new StringBuffer();
 
-        text.append(quote(change.getContext()));
-        text.append(SEPARATOR);
-
-        EntityOperationType entityOpType = changeFilter.getEntityAndOperationType(change);
-
-        text.append(entityOpType.getOperationType());
-        text.append(SEPARATOR);
-
-        text.append(entityOpType.getEntityType());
-        text.append(SEPARATOR);
-
         text.append(change.getApplyTo().getCurrentName());
+        text.append(SEPARATOR);
+        
+        Timestamp timestamp = change.getTimestamp();
+        text.append(timestamp == null ? "(not_set)" : timestamp.getDate());
+        text.append(SEPARATOR);
+        
+        text.append(quote(change.getContext()));
         text.append(SEPARATOR);
 
         text.append(change.getAuthor());
         text.append(SEPARATOR);
 
-        Timestamp timestamp = change.getTimestamp();
-        text.append(timestamp == null ? "null" : timestamp.getDate());
-        text.append(SEPARATOR);
-
         text.append(((AbstractWrappedInstance)change).getName());
         text.append(SEPARATOR);
-
-        text.append(dbTable);
 
         text.append("\n");
         return text.toString();
@@ -242,6 +247,7 @@ public class ChangesExport {
 		File metadataFile = new File(exportFileName + ".metadata");
 		FileWriter w = new FileWriter(metadataFile, append);
 		w.write("exported-on:" + DefaultTimestamp.DATE_FORMAT.format(new Date()) + "\n");
+		w.write("min-date:" + DefaultTimestamp.DATE_FORMAT.format(minDate) + "\n");
 		w.write("max-date:" + DefaultTimestamp.DATE_FORMAT.format(maxDate) + "\n");
 		w.close();
 	}
