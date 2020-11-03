@@ -88,7 +88,7 @@ public class ChangesExport {
 
         log.info("Started ChAO to CSV export on " + new Date());
 
-        Writer w = new FileWriter(new File(exportFilePath), Boolean.parseBoolean(args[3])); //second arg: append or not
+        Writer w = new FileWriter(new File(exportFilePath), Boolean.parseBoolean(args[5])); //second arg: append or not
         
         exporter.setMaxDate(DefaultTimestamp.getDateParsed(args[3]));
         exporter.setMaxDate(DefaultTimestamp.getDateParsed(args[4]));
@@ -98,7 +98,7 @@ public class ChangesExport {
         
         w.close();
         
-        exporter.exportMetadata(args[1], Boolean.parseBoolean(args[6]));
+        exporter.exportMetadata(args[1], Boolean.parseBoolean(args[5]));
 
         log.info("Ended ChAO to CSV export on " + new Date());
     }
