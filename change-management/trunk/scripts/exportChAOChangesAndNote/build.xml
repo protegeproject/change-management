@@ -59,8 +59,8 @@
 	 		<arg value="${pprj.file}"/>
 			<arg value="${export.changes.csv.path}"/>
 			<arg value="${export.filter}"/>
-	        <arg value="${max.date}"/>
 	        <arg value="${min.date}"/>
+	        <arg value="${max.date}"/>
 	        <arg value="${append}"/>
 	        </java>
 	 </target>

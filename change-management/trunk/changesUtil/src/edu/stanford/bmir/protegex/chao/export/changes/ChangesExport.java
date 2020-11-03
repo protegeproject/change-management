@@ -66,11 +66,12 @@ public class ChangesExport {
 
     public static void main(String[] args) throws IOException {
         if (args.length < 4) {
-            log.severe("(1) ChAO file or project URI, " +
+            log.severe(
+            		"(1) ChAO file or project URI, " +
                     "(2) Path to the exported file, " +
                     "(3) The project change filter (NCI | ICD | something else), "
-                  + "(4) Max date: Date up to which to export changes, date format: MM/dd/yyyy HH:mm:ss zzz. If null, don't use max threshold. "
-                  + "(5) Min date: Date up from which to export changes, date format: MM/dd/yyyy HH:mm:ss zzz. If null, don't use min threshold. "
+                  + "(4) Min date: Date up from which to export changes, date format: MM/dd/yyyy HH:mm:ss zzz. If null, don't use min threshold. "
+                  + "(5) Max date: Date up to which to export changes, date format: MM/dd/yyyy HH:mm:ss zzz. If null, don't use max threshold. "
                   + "(6) Append to existing CSV file [true|false] ");
             System.exit(1);
         }
@@ -90,7 +91,7 @@ public class ChangesExport {
 
         Writer w = new FileWriter(new File(exportFilePath), Boolean.parseBoolean(args[5])); //second arg: append or not
         
-        exporter.setMaxDate(DefaultTimestamp.getDateParsed(args[3]));
+        exporter.setMinDate(DefaultTimestamp.getDateParsed(args[3]));
         exporter.setMaxDate(DefaultTimestamp.getDateParsed(args[4]));
         
         exporter.printHeader(w);
