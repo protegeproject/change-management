@@ -248,8 +248,8 @@ public class ChangesExport {
 		File metadataFile = new File(exportFileName + ".metadata");
 		FileWriter w = new FileWriter(metadataFile, append);
 		w.write("exported-on:" + DefaultTimestamp.DATE_FORMAT.format(new Date()) + "\n");
-		w.write("min-date:" + DefaultTimestamp.DATE_FORMAT.format(minDate) + "\n");
-		w.write("max-date:" + DefaultTimestamp.DATE_FORMAT.format(maxDate) + "\n");
+		w.write("min-date:" + minDate + "\n");
+		w.write("max-date:" + maxDate + "\n");
 		w.close();
 	}
     
